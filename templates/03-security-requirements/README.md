@@ -2,7 +2,7 @@
 
 ## Aperçu
 
-Ce répertoire contient des modèles pour le **Principe Constitutionnel III : Sécurité dès la Conception** - l'intégration de contrôles de sécurité dans l'architecture et la conception du système avant le début de l'implémentation.
+Ce répertoire contient des modèles pour le **Principe constitutionnel III : sécurité dès la conception** - l'intégration de contrôles de sécurité dans l'architecture et la conception du système avant le début de l'implémentation.
 
 ## Pourquoi des exigences de sécurité ?
 
@@ -33,36 +33,36 @@ Les exigences de sécurité vous aident à :
 ### Workflow recommandé
 
 ```
-1. Compléter la Modélisation des Menaces (Principe I)
+1. Compléter la modélisation des menaces (Principe I)
    ↓
-2. Noter les Risques (Principe II)
+2. Noter les risques (Principe II)
    ↓
-3. Identifier les Contrôles Requis (Checklist OWASP ASVS)
+3. Identifier les contrôles requis (Checklist OWASP ASVS)
    ↓
-4. Concevoir le Système d'Authentification
+4. Concevoir le système d'authentification
    ↓
-5. Concevoir le Système d'Autorisation
+5. Concevoir le système d'autorisation
    ↓
-6. Concevoir la Stratégie de Chiffrement
+6. Concevoir la stratégie de chiffrement
    ↓
 7. Documenter les exigences de sécurité
    ↓
-8. Créer les Cas de Tests (Principe IV)
+8. Créer les cas de tests (Principe IV)
 ```
 
 ## Démarrage rapide
 
-### Première Définition d'exigences de sécurité ?
+### Première définition d'exigences de sécurité ?
 
 **Commencez ici** : [checklist-owasp-asvs-conception.md](owasp-asvs-checklist-design.md)
 
-1. **Déterminer le Niveau ASVS** : Niveau 1 (basique), Niveau 2 (standard), ou Niveau 3 (haute sécurité)
-2. **Réviser la Checklist ASVS** : Parcourir chaque catégorie d'exigences
+1. **Déterminer le niveau ASVS** : Niveau 1 (basique), Niveau 2 (standard), ou Niveau 3 (haute sécurité)
+2. **Réviser la checklist ASVS** : Parcourir chaque catégorie d'exigences
 3. **Marquer les exigences applicables** : Cocher celles qui s'appliquent à votre application
 4. **Approfondir** : Utiliser les modèles spécialisés (auth, authz, chiffrement) pour les détails
 5. **Documenter les décisions** : Capturer la justification pour chaque exigence
 
-### Besoin d'Exigences Spécifiques ?
+### Besoin d'exigences spécifiques ?
 
 **Authentification** : [modele-exigences-authentification-conception.md](authentication-requirements-template-design.md)
 - Politiques de mots de passe, force, stockage (bcrypt)
@@ -95,7 +95,7 @@ Les exigences de sécurité font le lien entre conception et implémentation :
 - **Phase d'implémentation** : Les exigences guident l'implémentation par les développeurs
 - **Revue de Code** : Vérifier que les exigences sont correctement implémentées
 
-## Conformité Constitutionnelle
+## Conformité constitutionnelle
 
 D'après la constitution SSDLC, le Principe III exige :
 
@@ -103,9 +103,9 @@ D'après la constitution SSDLC, le Principe III exige :
 - ✅ **Contrôles adressant les menaces identifiées** (lien avec le modèle de menaces)
 - ✅ **Défense en profondeur** (multiples couches de sécurité)
 - ✅ **Principe du moindre privilège** (accès minimal requis)
-- ✅ **sécurité par défaut** (refus par défaut, échec sécurisé)
+- ✅ **Sécurité par défaut** (refus par défaut, échec sécurisé)
 
-## Modèles Courants d'exigences de sécurité
+## Modèles courants d'exigences de sécurité
 
 ### Authentification
 - Mot de passe : 12+ caractères, hachage bcrypt, détection de violations
@@ -125,10 +125,10 @@ D'après la constitution SSDLC, le Principe III exige :
 - Clés : Vault/KMS, chiffrement d'enveloppe, rotation (90 jours)
 - Algorithmes : Approuvés NIST uniquement (pas de crypto personnalisé)
 
-### Validation des Entrées
-- Stratégie : Liste blanche (validation positive)
-- Sanitisation : Encodage de sortie contextuel
-- Prévention d'Injection : Requêtes paramétrées, pas d'eval()
+### Validation des entrées
+- Stratégie : liste blanche (validation positive)
+- Sanitisation : encodage de sortie contextuel
+- Prévention d'injection : requêtes paramétrées, pas d'eval()
 
 ### Journalisation
 - Événements : Authentification, autorisation, accès données, actions admin
@@ -174,6 +174,6 @@ Contributions précieuses :
 
 ---
 
-**Besoin d'Aide ?** Ouvrir une [Discussion GitHub](https://github.com/YourOrg/OpenSecKit/discussions) avec le tag `03-security-requirements`.
+**Besoin d'aide ?** Ouvrir une [Discussion GitHub](https://github.com/YourOrg/OpenSecKit/discussions) avec le tag `03-security-requirements`.
 
 **Prochaines étapes** : Après avoir défini les exigences de sécurité, procéder aux [tests de sécurité](../04-security-testing/) pour créer des cas de tests vérifiant l'implémentation.
