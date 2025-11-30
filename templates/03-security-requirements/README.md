@@ -1,0 +1,179 @@
+# Modèles d'exigences de sécurité
+
+## Aperçu
+
+Ce répertoire contient des modèles pour le **Principe Constitutionnel III : Sécurité dès la Conception** - l'intégration de contrôles de sécurité dans l'architecture et la conception du système avant le début de l'implémentation.
+
+## Pourquoi des exigences de sécurité ?
+
+Les exigences de sécurité vous aident à :
+- **Concevoir la sécurité** dès le départ (pas l'ajouter après coup)
+- **Traduire les menaces en contrôles** (modèle de menaces → exigences)
+- **Communiquer les besoins de sécurité** aux développeurs et architectes
+- **Vérifier l'implémentation de la sécurité** (exigences → cas de tests)
+- **Démontrer la conformité** avec les cadres de sécurité
+
+## Modèles disponibles
+
+| Modèle | Phase | Difficulté | Temps | Description |
+|--------|-------|------------|-------|-------------|
+| [checklist-owasp-asvs-conception.md](owasp-asvs-checklist-design.md) | Conception | Intermédiaire | 2-3 heures | Checklist OWASP ASVS complète pour identifier les contrôles de sécurité requis |
+| [modele-exigences-authentification-conception.md](authentication-requirements-template-design.md) | Conception | Intermédiaire | 1-2 heures | Politiques de mots de passe, MFA, gestion de sessions, exigences SSO |
+| [modele-exigences-autorisation-conception.md](authorization-requirements-template-design.md) | Conception | Intermédiaire | 1-2 heures | RBAC, permissions, contrôle d'accès, prévention IDOR |
+| [modele-exigences-chiffrement-conception.md](encryption-requirements-template-design.md) | Conception | Avancé | 1-2 heures | Données au repos, en transit, gestion des clés, algorithmes cryptographiques |
+
+## Quand utiliser ces modèles
+
+### Phase de conception
+- ✅ Utiliser la **Checklist OWASP ASVS** pour identifier tous les contrôles de sécurité requis
+- ✅ Utiliser les **Exigences d'Authentification** pour concevoir la connexion, MFA, gestion de sessions
+- ✅ Utiliser les **Exigences d'Autorisation** pour concevoir les rôles, permissions, contrôle d'accès
+- ✅ Utiliser les **Exigences de Chiffrement** pour concevoir la protection des données et gestion des clés
+
+### Workflow recommandé
+
+```
+1. Compléter la Modélisation des Menaces (Principe I)
+   ↓
+2. Noter les Risques (Principe II)
+   ↓
+3. Identifier les Contrôles Requis (Checklist OWASP ASVS)
+   ↓
+4. Concevoir le Système d'Authentification
+   ↓
+5. Concevoir le Système d'Autorisation
+   ↓
+6. Concevoir la Stratégie de Chiffrement
+   ↓
+7. Documenter les exigences de sécurité
+   ↓
+8. Créer les Cas de Tests (Principe IV)
+```
+
+## Démarrage rapide
+
+### Première Définition d'exigences de sécurité ?
+
+**Commencez ici** : [checklist-owasp-asvs-conception.md](owasp-asvs-checklist-design.md)
+
+1. **Déterminer le Niveau ASVS** : Niveau 1 (basique), Niveau 2 (standard), ou Niveau 3 (haute sécurité)
+2. **Réviser la Checklist ASVS** : Parcourir chaque catégorie d'exigences
+3. **Marquer les exigences applicables** : Cocher celles qui s'appliquent à votre application
+4. **Approfondir** : Utiliser les modèles spécialisés (auth, authz, chiffrement) pour les détails
+5. **Documenter les décisions** : Capturer la justification pour chaque exigence
+
+### Besoin d'Exigences Spécifiques ?
+
+**Authentification** : [modele-exigences-authentification-conception.md](authentication-requirements-template-design.md)
+- Politiques de mots de passe, force, stockage (bcrypt)
+- Authentification multi-facteurs (TOTP, SMS)
+- Gestion de sessions (timeouts, cookies)
+- Intégration SSO (OAuth, SAML)
+
+**Autorisation** : [modele-exigences-autorisation-conception.md](authorization-requirements-template-design.md)
+- Définitions de rôles (admin, utilisateur, invité)
+- Matrice de permissions (qui peut faire quoi)
+- RBAC vs ABAC
+- Prévention IDOR
+
+**Chiffrement** : [modele-exigences-chiffrement-conception.md](encryption-requirements-template-design.md)
+- Configuration TLS (TLS 1.3, suites de chiffrement)
+- Chiffrement de base de données (au repos)
+- Gestion des clés (rotation, stockage)
+- Algorithmes approuvés (AES-256, RSA-4096)
+
+## Intégration avec les autres principes
+
+Les exigences de sécurité font le lien entre conception et implémentation :
+
+**Entrées** :
+- **Principe I (modélisation des menaces)** : Les menaces déterminent quels contrôles sont nécessaires
+- **Principe II (analyse de risques)** : Les risques prioritaires exigent des contrôles plus forts
+
+**Sorties** :
+- **Principe IV (tests de sécurité)** : Les exigences deviennent des cas de tests
+- **Phase d'implémentation** : Les exigences guident l'implémentation par les développeurs
+- **Revue de Code** : Vérifier que les exigences sont correctement implémentées
+
+## Conformité Constitutionnelle
+
+D'après la constitution SSDLC, le Principe III exige :
+
+- ✅ **Contrôles de sécurité documentés** en phase de conception (cette checklist)
+- ✅ **Contrôles adressant les menaces identifiées** (lien avec le modèle de menaces)
+- ✅ **Défense en profondeur** (multiples couches de sécurité)
+- ✅ **Principe du moindre privilège** (accès minimal requis)
+- ✅ **sécurité par défaut** (refus par défaut, échec sécurisé)
+
+## Modèles Courants d'exigences de sécurité
+
+### Authentification
+- Mot de passe : 12+ caractères, hachage bcrypt, détection de violations
+- MFA : Obligatoire pour admins, optionnel pour utilisateurs
+- Session : Cookies HttpOnly, timeout inactif 30min, timeout absolu
+- SSO : OAuth 2.0 + OIDC
+
+### Autorisation
+- Modèle : RBAC (contrôle d'accès basé sur les rôles)
+- Par défaut : Refus par défaut (autorisation explicite requise)
+- Application : Côté serveur, couche service
+- Prévention : Vérifications IDOR, validation de propriété
+
+### Chiffrement
+- En Transit : TLS 1.3, chiffrements forts uniquement, HSTS
+- Au Repos : AES-256-GCM, TDE base de données, S3 SSE-KMS
+- Clés : Vault/KMS, chiffrement d'enveloppe, rotation (90 jours)
+- Algorithmes : Approuvés NIST uniquement (pas de crypto personnalisé)
+
+### Validation des Entrées
+- Stratégie : Liste blanche (validation positive)
+- Sanitisation : Encodage de sortie contextuel
+- Prévention d'Injection : Requêtes paramétrées, pas d'eval()
+
+### Journalisation
+- Événements : Authentification, autorisation, accès données, actions admin
+- Pas de PII : Nettoyer les données sensibles des journaux
+- Intégrité : Stockage de journaux immuable (SIEM)
+- Rétention : 90 jours minimum
+
+## Exemples
+
+Voir l'exemple concret :
+- [_example-ecommerce-requirements.md](_example-ecommerce-requirements.md) - Exigences de sécurité complètes pour une application e-commerce
+
+## Mapping de conformité
+
+Ces modèles aident à satisfaire :
+
+- **OWASP ASVS 4.0** : Application Security Verification Standard
+- **NIST SP 800-53** : Contrôles de sécurité et Confidentialité
+- **PCI-DSS** : Exigences 6, 8 (Développement Sécurisé, Authentification)
+- **HIPAA** : § 164.308(a)(4) Contrôles d'Accès, § 164.312 Garanties Techniques
+- **ISO 27001** : Annexe A.9 Contrôle d'Accès, A.10 Cryptographie
+
+## Outils et ressources
+
+### Outils d'exigences de sécurité
+- **OWASP ASVS** : https://owasp.org/www-project-application-security-verification-standard/
+- **NIST SP 800-53** : https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final
+- **BSIMM** : https://www.bsimm.com/
+
+### Ressources externes
+- [OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/)
+- [NIST Cybersecurity Framework](https://www.nist.gov/cyberframework)
+- [CWE Top 25](https://cwe.mitre.org/top25/)
+
+## Contribuer
+
+Vous avez des améliorations pour les modèles d'exigences de sécurité ? Voir les [directives de contribution](../../.github/CONTRIBUTING.md).
+
+Contributions précieuses :
+- Modèles d'exigences spécifiques aux secteurs (santé, finance)
+- Intégration avec les outils de tests de sécurité
+- Exemples d'exigences pour technologies émergentes (IA/ML, blockchain)
+
+---
+
+**Besoin d'Aide ?** Ouvrir une [Discussion GitHub](https://github.com/YourOrg/OpenSecKit/discussions) avec le tag `03-security-requirements`.
+
+**Prochaines étapes** : Après avoir défini les exigences de sécurité, procéder aux [tests de sécurité](../04-security-testing/) pour créer des cas de tests vérifiant l'implémentation.
