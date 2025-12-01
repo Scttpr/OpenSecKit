@@ -90,7 +90,7 @@ cp stride-threat-model-template-planning.md ~/mon-projet/docs/threat-model.md
 | [constitution.md](constitution.md) | Les 7 principes constitutionnels expliqués |
 | [FAQ.md](FAQ.md) | Questions fréquentes (démarrage, templates, validation, outils) |
 | [CHANGELOG.md](CHANGELOG.md) | Historique des modifications |
-| [.github/CONTRIBUTING.md](.github/CONTRIBUTING.md) | Comment contribuer au projet |
+| [.github/CONTRIBUTING.md](/CONTRIBUTING.md) | Comment contribuer au projet |
 | [.github/SECURITY.md](.github/SECURITY.md) | Politique de signalement des vulnérabilités |
 
 ---
@@ -104,7 +104,7 @@ Vous avez créé un template utile ? Partagez-le !
 3. Ajoutez un exemple `_example-*.md`
 4. Soumettez une Pull Request
 
-👉 **[.github/CONTRIBUTING.md](.github/CONTRIBUTING.md)** pour les détails
+👉 **[CONTRIBUTING.md](/CONTRIBUTING.md)** pour les détails
 
 ---
 
@@ -116,6 +116,6 @@ Vous avez créé un template utile ? Partagez-le !
 
 ## 📞 Support
 
-- **Discussions** : [GitHub Discussions](https://github.com/YourOrg/OpenSecKit/discussions)
-- **Bugs** : [GitHub Issues](https://github.com/YourOrg/OpenSecKit/issues)
+- **Discussions** : [GitHub Discussions](https://github.com/Scttpr/OpenSecKit/discussions)
+- **Bugs** : [GitHub Issues](https://github.com/Scttpr/OpenSecKit/issues)
 - **Sécurité** : [.github/SECURITY.md](.github/SECURITY.md)
