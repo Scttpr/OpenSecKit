@@ -8,9 +8,11 @@ Ce répertoire contient des modèles pour le **Principe Constitutionnel VI : Jou
 
 | Modèle | Description |
 |--------|-------------|
-| [modele-exigences-journalisation-conception.md](logging-requirements-template-design.md) | Quoi journaliser, rétention, protection |
-| [siem-integration-guide.md](siem-integration-guide.md) | Intégration SIEM (Splunk, ELK) |
+| [logging-requirements-template-design.md](logging-requirements-template-design.md) | Quoi journaliser, rétention, protection |
+| [log-centralization-requirements.md](log-centralization-requirements.md) | Exigences pour centraliser les logs |
+| [siem-selection-guide.md](siem-selection-guide.md) | Guide de sélection d'un SIEM |
 | [security-alert-rules-template.md](security-alert-rules-template.md) | Règles de surveillance et alertes |
+| [_example-ecommerce-logging.md](_example-ecommerce-logging.md) | Exemple e-commerce |
 
 ## Principes Clés
 
