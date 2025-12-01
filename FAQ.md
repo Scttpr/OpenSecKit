@@ -24,7 +24,7 @@ Réponses aux questions les plus fréquentes sur OpenSecKit.
 
 **Non.** Adaptez à votre contexte :
 
-**Minimum vital** (obligatoire) :
+**Minimum vital** :
 - ✅ Modélisation des menaces (template STRIDE)
 - ✅ Analyse de risques (scoring)
 - ✅ Détection de secrets (gitleaks)
@@ -244,7 +244,7 @@ npm audit --audit-level=high || exit 1
 
 - **Pre-merge** : Hook gitleaks bloque les secrets
 - **Pull request** : Template inclut "Security checklist"
-- **Avant release** : Validation constitutionnelle obligatoire
+- **Avant release** : Validation constitutionnelle
 
 **CI/CD** :
 

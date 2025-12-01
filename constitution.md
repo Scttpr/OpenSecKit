@@ -14,7 +14,7 @@ Cette constitution définit les principes non négociables pour le développemen
 
 ## Les sept principes fondamentaux
 
-### I. Modélisation des menaces obligatoire
+### I. Modélisation des menaces 
 
 **Principe** : Toute nouvelle fonctionnalité doit faire l'objet d'une modélisation des menaces **avant** le début du développement.
 
@@ -51,8 +51,8 @@ Cette constitution définit les principes non négociables pour le développemen
 1. **Scorer chaque risque** : Criticité × Probabilité × Exposition (échelle 1-5, score max 25)
 2. **Maintenir un registre des risques** : document vivant recensant tous les risques identifiés
 3. **Définir des seuils de validation** :
-   - Risques critiques (score > 15/25) → validation Direction obligatoire
-   - Risques élevés (score 10-15/25) → validation équipe sécurité obligatoire
+   - Risques critiques (score > 15/25) → validation Direction
+   - Risques élevés (score 10-15/25) → validation équipe sécurité
    - Risques moyens/faibles → documentation et suivi
 4. **Réévaluer périodiquement** : le paysage de menaces évolue, les risques aussi
 
@@ -110,7 +110,7 @@ Exposition (surface d'attaque) :
 
 ---
 
-### IV. Tests de sécurité obligatoires
+### IV. Tests de sécurité
 
 **Principe** : Les tests de sécurité sont non négociables et bloquants pour le déploiement.
 
@@ -118,7 +118,7 @@ Exposition (surface d'attaque) :
 
 **Comment l'appliquer :**
 
-**Types de tests obligatoires :**
+**Types de tests :**
 
 1. **SAST (Static Application Security Testing)** :
    - Analyse du code source avant chaque merge
@@ -248,7 +248,7 @@ Exposition (surface d'attaque) :
 **Processus :**
 1. **Scan quotidien** : automatique des dépendances (npm audit, pip-audit, Dependabot)
 2. **Priorisation** : selon CVSS et exploitabilité dans le contexte
-3. **Test** : non-régression obligatoire avant déploiement du patch
+3. **Test** : non-régression avant déploiement du patch
 4. **Déploiement** : selon SLA et procédure d'urgence si nécessaire
 5. **Communication** : transparente aux parties prenantes
 
@@ -322,7 +322,7 @@ Exposition (surface d'attaque) :
 - Revue de design avec security champion
 
 **4. Implémentation**
-- Code review obligatoire avec checklist OWASP
+- Code review avec checklist OWASP
 - SAST intégré en CI/CD (build bloqué si vulnérabilité critique)
 - Pre-commit hooks (détection secrets + linting sécurité)
 
@@ -382,7 +382,7 @@ Avant chaque mise en production, vérifier que :
 - **Fréquence** : audit trimestriel
 - **Périmètre** : échantillon représentatif (minimum 20% du code produit)
 - **Métriques** : taux de conformité aux 7 principes + KPI sécurité
-- **Non-conformités** : escalade direction + plan de remédiation obligatoire
+- **Non-conformités** : escalade direction + plan de remédiation
 - **Amélioration continue** : résultats partagés en rétrospective + roadmap
 
 ---
@@ -432,7 +432,7 @@ Avant chaque mise en production, vérifier que :
 
 ### Formation recommandée
 
-Formation annuelle obligatoire pour tous les développeurs :
+Formation annuelle pour tous les développeurs :
 - OWASP Top 10 (8h)
 - Atelier pratique de modélisation des menaces (4h)
 - Certification security champion (recommandée)
