@@ -87,24 +87,34 @@ Les DFD sont essentiels pour la modélisation des menaces, spécialement l'analy
 
 ### Diagramme
 
-```
-                       Frontière de confiance : Internet ↔ DMZ
-                       - - - - - - - - - - - - - - - -
-                              |
-┌──────────┐            ┌─────────┐            ║ Base de  ║
-│Utilisateur│───Login───>│   App   │<──Query───>║ Données  ║
-│(Navigateur)│<──Response─│   Web   │            ║Utilisateur║
-└──────────┘            │  (1.0)  │            ║   (D1)   ║
-                        └─────────┘
-                              │
-                      Authenticate
-                              │
-                              v
-                        ┌──────────┐
-                        │ Service  │
-                        │   Auth   │
-                        │  (2.0)   │
-                        └──────────┘
+```mermaid
+graph TD
+    %% Définition des Entités Externes (Carrés)
+    User["Utilisateur<br>(Navigateur)"]
+
+    %% Définition de la Zone de Confiance (DMZ)
+    subgraph "Frontière de confiance : Internet ↔ DMZ"
+        direction TB
+        WebApp("App Web<br>(1.0)")
+        Auth("Service Auth<br>(2.0)")
+        DB[("Base de Données<br>Utilisateur<br>(D1)")]
+    end
+
+    %% Définition des Flux
+    User -- "1. Login" --> WebApp
+    WebApp -- "2. Response" --> User
+    
+    WebApp -- "3. Query" <--> DB
+    WebApp -- "4. Authenticate" --> Auth
+
+    %% Styles pour respecter la convention DFD (Optionnel mais recommandé)
+    classDef entity fill:#e1f5fe,stroke:#01579b,stroke-width:2px;
+    classDef process fill:#fff9c4,stroke:#fbc02d,stroke-width:2px,rx:10,ry:10;
+    classDef store fill:#e0e0e0,stroke:#616161,stroke-width:2px;
+
+    class User entity;
+    class WebApp,Auth process;
+    class DB store;
 ```
 
 **Description** : Vue de haut niveau montrant le système principal et les entités externes.
@@ -115,41 +125,64 @@ Les DFD sont essentiels pour la modélisation des menaces, spécialement l'analy
 
 ### Diagramme
 
-```
-Frontière de confiance : Internet ↔ DMZ
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                |
-                                |
-┌──────────┐              ┌──────────┐              ║ Magasin  ║
-│Utilisateur│─1.Login────> │   API    │<─2.Validate─>║ Session  ║
-│(Navigateur)│              │ Gateway  │              ║   (D1)   ║
-│          │<─9.Response──│  (1.0)   │              ║          ║
-└──────────┘              └──────────┘
-                                │
-                                │ 3.AuthRequest
-                                v
-                          ┌──────────┐              ║Base de   ║
-                          │ Service  │<─4.GetUser──>║Données   ║
-                          │   Auth   │              ║Utilisateur║
-                          │  (2.0)   │              ║  (D2)    ║
-                          └──────────┘
-                                │
-                            5.Token
-                                │
-Frontière de confiance : DMZ ↔ Réseau interne
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                                │
-                                v
-                          ┌──────────┐              ║Base de   ║
-                          │ Logique  │<─6.GetData──>║Données   ║
-                          │ Métier   │              ║ Métier   ║
-                          │  (3.0)   │<─7.Log───────>║  (D3)    ║
-                          └──────────┘              ║   Log    ║
-                                │                   ║  (D4)    ║
-                            8.Result
-                                │
-                                v
-                         [Retour vers Gateway]
+```mermaid
+graph TD
+    %% Entité Externe
+    User["Utilisateur<br>(Navigateur)"]
+
+    %% Zone DMZ (Frontière 1)
+    subgraph "Frontière : DMZ (Semi-fiable)"
+        direction TB
+        Gateway("Passerelle API<br>(1.0)")
+        SessionStore[("Magasin Session<br>(D1)")]
+        AuthService("Service Auth<br>(2.0)")
+        UserDB[("BD Utilisateur<br>(D2)")]
+    end
+
+    %% Zone Réseau Interne (Frontière 2)
+    subgraph "Frontière : Réseau Interne (Fiable)"
+        direction TB
+        BusinessLogic("Logique Métier<br>(3.0)")
+        BusinessDB[("BD Métier<br>(D3)")]
+        LogStore[("Magasin Log<br>(D4)")]
+    end
+
+    %% --- Flux de Données (basés sur le tableau de la section 3) ---
+
+    %% 1. Login & 9. Response
+    User -- "1. Login" --> Gateway
+    Gateway -- "9. Response" --> User
+
+    %% 2. Validate
+    Gateway <-- "2. Validate" --> SessionStore
+
+    %% 3. AuthRequest & 5. Token
+    Gateway -- "3. AuthRequest" --> AuthService
+    AuthService -- "5. Token (JWT)" --> Gateway
+
+    %% 4. GetUser (Interrogation BD Auth)
+    AuthService <-- "4. GetUser" --> UserDB
+
+    %% Lien implicite (Gateway orchestre vers Logique Métier)
+    Gateway -- "Requête avec Token" --> BusinessLogic
+
+    %% 6. GetData (Interrogation BD Métier)
+    BusinessLogic <-- "6. GetData" --> BusinessDB
+
+    %% 7. Log (Ecriture logs)
+    BusinessLogic -- "7. Log" --> LogStore
+
+    %% 8. Result
+    BusinessLogic -- "8. Result" --> Gateway
+
+    %% --- Styles DFD ---
+    classDef entity fill:#e1f5fe,stroke:#01579b,stroke-width:2px;
+    classDef process fill:#fff9c4,stroke:#fbc02d,stroke-width:2px,rx:10,ry:10;
+    classDef store fill:#e0e0e0,stroke:#616161,stroke-width:2px;
+
+    class User entity;
+    class Gateway,AuthService,BusinessLogic process;
+    class SessionStore,UserDB,BusinessDB,LogStore store;
 ```
 
 **Descriptions des flux de données** :

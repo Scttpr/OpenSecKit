@@ -86,34 +86,78 @@ Nœuds OR : N'importe quel enfant peut réussir (représentés avec |)
 
 ### Diagramme de l'arbre d'attaque
 
-```
-[OBJECTIF RACINE : Accès non autorisé à la base de données clients]
-    |
-    ├── OR : Accès physique au centre de données
-    │   ├── AND : Contourner la sécurité physique
-    │   │   ├── Ingénierie sociale (se faire passer pour technicien)
-    │   │   └── Vaincre les contrôles d'accès (tailgating, badge volé)
-    │   └── Menace interne (employé malveillant)
-    │
-    ├── OR : Attaque réseau
-    │   ├── AND : Injection SQL
-    │   │   ├── Trouver endpoint vulnérable
-    │   │   └── Créer payload d'exploitation
-    │   ├── AND : Credential stuffing
-    │   │   ├── Obtenir liste d'identifiants divulgués
-    │   │   ├── Tentatives de connexion automatisées
-    │   │   └── Contourner rate limiting
-    │   └── AND : Exploitation de vulnérabilité API
-    │       ├── Découvrir endpoint API non authentifié
-    │       └── Exfiltrer données via API
-    │
-    └── OR : Attaque supply chain
-        ├── AND : Compromettre bibliothèque tierce
-        │   ├── Injecter code malveillant dans dépendance
-        │   └── Attendre le déploiement
-        └── AND : Compromettre compte fournisseur cloud
-            ├── Phishing des identifiants admin cloud
-            └── Accéder base de données via console cloud
+```mermaid
+graph TD
+    %% --- Objectif Racine ---
+    Root("🔴 OBJECTIF :<br>Accès non autorisé<br>BDD Clients")
+
+    %% --- Niveau 1 : Vecteurs principaux (OR implicite) ---
+    Physical("🏢 OR : Accès physique<br>Centre de données")
+    Network("🌐 OR : Attaque réseau")
+    Supply("📦 OR : Attaque<br>Supply Chain")
+
+    Root --> Physical
+    Root --> Network
+    Root --> Supply
+
+    %% --- Branche Physique ---
+    BypassSec("🔒 AND : Contourner<br>sécurité physique")
+    Insider("👤 Menace interne<br>(Employé malveillant)")
+
+    Physical --> BypassSec
+    Physical --> Insider
+
+    %% Feuilles Physique
+    SocialEng["Ingénierie sociale<br>(Faux technicien)"]
+    BreakAccess["Vaincre contrôles d'accès<br>(Badge volé)"]
+    
+    BypassSec --> SocialEng
+    BypassSec --> BreakAccess
+
+    %% --- Branche Réseau ---
+    SQLi("💉 AND : Injection SQL")
+    CredStuff("🔑 AND : Credential<br>Stuffing")
+    ApiVuln("🔌 AND : Vulnérabilité<br>API")
+
+    Network --> SQLi
+    Network --> CredStuff
+    Network --> ApiVuln
+
+    %% Feuilles Réseau
+    SQLi --> FindEnd["Trouver endpoint<br>vulnérable"]
+    SQLi --> Payload["Créer payload<br>d'exploitation"]
+
+    CredStuff --> GetList["Obtenir liste<br>identifiants"]
+    CredStuff --> AutoTry["Tentatives<br>automatisées"]
+    CredStuff --> BypassRate["Contourner<br>Rate Limiting"]
+
+    ApiVuln --> FindApi["Découvrir endpoint<br>non authentifié"]
+    ApiVuln --> Exfil["Exfiltrer données"]
+
+    %% --- Branche Supply Chain ---
+    LibComp("📚 AND : Compromettre<br>librairie tierce")
+    CloudComp("☁️ AND : Compromettre<br>compte Cloud")
+
+    Supply --> LibComp
+    Supply --> CloudComp
+
+    %% Feuilles Supply Chain
+    LibComp --> Inject["Injecter code<br>malveillant"]
+    LibComp --> Wait["Attendre le<br>déploiement"]
+
+    CloudComp --> Phishing["Phishing Admin<br>Cloud"]
+    CloudComp --> Console["Accès BDD via<br>Console"]
+
+    %% --- Styles ---
+    classDef root fill:#ffcdd2,stroke:#c62828,stroke-width:2px,color:black;
+    classDef vector fill:#e1f5fe,stroke:#0277bd,stroke-width:2px,color:black;
+    classDef logic fill:#fff9c4,stroke:#fbc02d,stroke-width:2px,color:black;
+    classDef action fill:#f5f5f5,stroke:#616161,stroke-width:1px,color:black;
+
+    class Root root;
+    class Physical,Network,Supply vector;
+    class BypassSec,SQLi,CredStuff,ApiVuln,LibComp,CloudComp logic;
+    class Insider,SocialEng,BreakAccess,FindEnd,Payload,GetList,AutoTry,BypassRate,FindApi,Exfil,Inject,Wait,Phishing,Console action;
 ```
 
 ---
