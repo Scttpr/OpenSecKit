@@ -259,6 +259,38 @@ vault write -f auth/approle/role/mon-app/secret-id
 
 **Intégration** : Utiliser `role_id` et `secret_id` pour s'authentifier via l'API Vault.
 
+**Visualisation du flux AppRole**
+
+Ce diagramme montre comment une application s'authentifie et récupère des identifiants de base de données dynamiques (qui changent tout le temps).
+
+```mermaid
+sequenceDiagram
+    participant App as Application (Client)
+    participant Vault as HashiCorp Vault
+    participant DB as Base de Données (PostgreSQL)
+
+    Note over App,Vault: 1. Authentification (Login)
+    App->>Vault: POST /auth/approle/login<br/>{role_id, secret_id}
+    Vault-->>App: Retourne Client Token (temporaire)
+
+    Note over App,DB: 2. Récupération du Secret
+    App->>Vault: GET /database/creds/readonly<br/>(Header: X-Vault-Token)
+    
+    rect rgb(240, 248, 255)
+        Note right of Vault: Génération Dynamique
+        Vault->>DB: CREATE USER 'v-token-h7g...' ...;
+        DB-->>Vault: Succès
+    end
+
+    Vault-->>App: Retourne {username, password, lease_id}
+
+    Note over App,DB: 3. Connexion
+    App->>DB: Connect(username, password)
+    
+    Note over Vault,DB: 4. Expiration (TTL)
+    Vault->>DB: DROP USER 'v-token-h7g...';
+```
+
 ### Azure : Managed Identity (recommandé)
 
 ```bash

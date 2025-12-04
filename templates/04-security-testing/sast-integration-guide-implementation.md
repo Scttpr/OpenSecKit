@@ -55,20 +55,29 @@ compliance_frameworks:
 
 ## 2. Architecture d'intégration
 
-```
-Commit développeur → GitHub/GitLab
-        ↓
-    Pipeline CI/CD (GitHub Actions / GitLab CI)
-        ↓
-    Scan SAST (Semgrep)
-        ↓
-    Analyse des résultats
-        ↓
-    ├── Critique/Élevé → Bloquer PR, notifier l'équipe
-    ├── Moyen → Avertir, autoriser PR avec approbation
-    └── Faible/Info → Journaliser uniquement
-        ↓
-    Tableau de bord sécurité (optionnel : DefectDojo, onglet Security)
+```mermaid
+graph TD
+    Dev[Développeur] -->|Commit & Push| Repo[GitHub/GitLab]
+    Repo -->|Trigger| CI[Pipeline CI/CD]
+    CI -->|Exécution| Scanner[Scan SAST Semgrep]
+    
+    Scanner -->|Résultats| Analysis{Analyse Sévérité}
+
+    Analysis -->|Critique/Élevé| Block[❌ Bloquer PR<br>Notifier l'équipe]
+    Analysis -->|Moyen| Warn[⚠️ Avertir<br>Approbation requise]
+    Analysis -->|Faible/Info| Log[ℹ️ Journaliser<br>Pas d'action]
+
+    Block --> Dashboard[Tableau de bord sécurité<br>DefectDojo / GitHub Security]
+    Warn --> Dashboard
+    Log --> Dashboard
+
+    %% Styles pour la lisibilité
+    classDef critical fill:#ffcdd2,stroke:#b71c1c,stroke-width:2px;
+    classDef warning fill:#fff9c4,stroke:#fbc02d,stroke-width:2px;
+    classDef info fill:#e1f5fe,stroke:#01579b,stroke-width:2px;
+    
+    class Block critical;
+    class Warn warning;
 ```
 
 ---
