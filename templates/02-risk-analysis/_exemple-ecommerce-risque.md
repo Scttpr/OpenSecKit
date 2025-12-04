@@ -514,26 +514,24 @@ Score de risque = Criticité × Probabilité × Exposition
 
 ### 5.1 Carte de chaleur des risques résiduels
 
-```
-                    EXPOSITION
-                1   2   3   4   5
-              ┌───┬───┬───┬───┬───┐
-          5   │   │   │   │I01│   │  CRITICITÉ
-          4   │   │   │   │   │   │
-          3   │   │   │   │   │   │
-          2   │   │   │   │   │   │
-          1   │I03│E03│S01│D01│   │
-P         0   │   │E01│I02│R01│   │
-R             │   │S02│D02│   │   │
-O             │   │T01│   │   │   │
-B             │   │T02│   │   │   │
-A             │   │T03│   │   │   │
-B             │   │E02│   │   │   │
-I             └───┴───┴───┴───┴───┘
-L
-I
-T
-É
+```mermaid
+quadrantChart
+    title Matrice des Risques Résiduels
+    x-axis Probabilité Faible --> Probabilité Élevée
+    y-axis Impact Faible --> Impact Critique
+    quadrant-1 "P1 - ÉLEVÉ (Atténuer avant Prod)"
+    quadrant-2 "P0 - CRITIQUE (Bloquant)"
+    quadrant-3 "P4 - FAIBLE (Surveiller)"
+    quadrant-4 "P2 - MOYEN (Backlog)"
+    
+    %% Positionnement des risques (0.0 à 1.0)
+    %% Format: [Probabilité, Impact]
+    "I01: Carte Paiement (Mitigé)": [0.1, 0.95]
+    "T02: SQL Injection (Mitigé)": [0.15, 0.90]
+    "D01: DDoS (Partiel)": [0.55, 0.70]
+    "R01: Répudiation (Partiel)": [0.45, 0.60]
+    "I02: IDOR (Mitigé)": [0.15, 0.75]
+    "E01: JWT Role (Mitigé)": [0.1, 0.92]
 ```
 
 **Interprétation** :
