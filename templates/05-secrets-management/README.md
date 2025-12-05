@@ -203,6 +203,6 @@ Contributions courantes :
 
 ---
 
-**Besoin d'aide ?** Ouvrir une [Discussion GitHub](https://github.com/YourOrg/OpenSecKit/discussions) avec le tag `secrets-management`.
+**Besoin d'aide ?** Ouvrir une [Discussion GitHub](https://github.com/Scttpr/OpenSecKit/discussions) avec le tag `secrets-management`.
 
 **Prochaines étapes** : Après la gestion des secrets, passer à la [journalisation d'audit](../06-audit-logging/) pour tracer les accès.

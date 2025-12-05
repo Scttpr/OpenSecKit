@@ -202,6 +202,6 @@ Contributions précieuses :
 
 ---
 
-**Besoin d'Aide ?** Ouvrir une [Discussion GitHub](https://github.com/YourOrg/OpenSecKit/discussions) avec le tag `02-risk-analysis`.
+**Besoin d'Aide ?** Ouvrir une [Discussion GitHub](https://github.com/Scttpr/OpenSecKit/discussions) avec le tag `02-risk-analysis`.
 
 **Prochaines étapes** : Après l'analyse de risques, procéder aux [exigences de sécurité](../03-security-requirements/) pour concevoir des contrôles pour les risques prioritaires.

@@ -174,6 +174,6 @@ Contributions précieuses :
 
 ---
 
-**Besoin d'aide ?** Ouvrir une [Discussion GitHub](https://github.com/YourOrg/OpenSecKit/discussions) avec le tag `03-security-requirements`.
+**Besoin d'aide ?** Ouvrir une [Discussion GitHub](https://github.com/Scttpr/OpenSecKit/discussions) avec le tag `03-security-requirements`.
 
 **Prochaines étapes** : Après avoir défini les exigences de sécurité, procéder aux [tests de sécurité](../04-security-testing/) pour créer des cas de tests vérifiant l'implémentation.
