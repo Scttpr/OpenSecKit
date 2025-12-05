@@ -1,0 +1,105 @@
+name: Build and release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+env:
+  CARGO_TERM_COLOR: always
+  BIN_NAME: osk
+
+jobs:
+  build:
+    name: Build - ${{ matrix.platform.release_for }}
+    strategy:
+      matrix:
+        platform:
+          - release_for: Linux-x86_64
+            os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            bin: osk
+            name: osk-linux-amd64
+
+          - release_for: Windows-x86_64
+            os: windows-latest
+            target: x86_64-pc-windows-msvc
+            bin: osk.exe
+            name: osk-windows-amd64.exe
+
+          - release_for: macOS-x86_64
+            os: macos-latest
+            target: x86_64-apple-darwin
+            bin: osk
+            name: osk-darwin-amd64
+
+          - release_for: macOS-AppleSilicon
+            os: macos-latest
+            target: aarch64-apple-darwin
+            bin: osk
+            name: osk-darwin-arm64
+
+    runs-on: ${{ matrix.platform.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache Cargo registry
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform.target }}
+
+      - name: Build binary
+        run: cargo build --release --target ${{ matrix.platform.target }}
+
+      - name: Rename binary (prepare for release)
+        shell: bash
+        run: |
+          cp target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }} ${{ matrix.platform.name }}
+
+      - name: Generate SHA256 checksum
+        shell: bash
+        run: |
+          if [[ "${{ runner.os }}" == "Windows" ]]; then
+            certutil -hashfile ${{ matrix.platform.name }} SHA256 > ${{ matrix.platform.name }}.sha256
+          else
+            shasum -a 256 ${{ matrix.platform.name }} > ${{ matrix.platform.name }}.sha256
+          fi
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.platform.name }}
+          path: |
+            ${{ matrix.platform.name }}
+            ${{ matrix.platform.name }}.sha256
+          retention-days: 1
+
+  create-release:
+    needs: [build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            **/osk-*
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
