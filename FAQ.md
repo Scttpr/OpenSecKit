@@ -372,7 +372,7 @@ security:
 
 ### Où poser des questions non couvertes par la FAQ ?
 
-**GitHub Discussions** : [https://github.com/YourOrg/OpenSecKit/discussions](https://github.com/YourOrg/OpenSecKit/discussions)
+**GitHub Discussions** : [https://github.com/Scttpr/OpenSecKit/discussions](https://github.com/Scttpr/OpenSecKit/discussions)
 
 **Channels** :
 - `#general` : Questions générales
@@ -403,6 +403,6 @@ security:
 
 **Cette FAQ ne répond pas à votre question ?**
 
-👉 [Ouvrir une Discussion GitHub](https://github.com/YourOrg/OpenSecKit/discussions/new?category=q-a)
+👉 [Ouvrir une Discussion GitHub](https://github.com/Scttpr/OpenSecKit/discussions/new?category=q-a)
 
 *FAQ mise à jour le 2025-11-29*

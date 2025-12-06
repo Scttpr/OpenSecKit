@@ -164,7 +164,7 @@ Une extension de domaine est manquante ? Consultez les [Directives de contributi
 
 **Besoin d'aide pour sélectionner les domaines ?**
 
-Ouvrez une [GitHub Discussion](https://github.com/YourOrg/OpenSecKit/discussions) avec :
+Ouvrez une [GitHub Discussion](https://github.com/Scttpr/OpenSecKit/discussions) avec :
 - Votre secteur/industrie ;
 - Votre localisation géographique ;
 - Les types de données traitées ;
