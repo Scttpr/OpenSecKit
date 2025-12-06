@@ -1,12 +1,23 @@
 [package]
 name = "osk"
-version = "0.1.0"
-edition = "2025"
+version = "0.2.0"
+edition = "2021"
 
 [dependencies]
 clap = { version = "4.5", features = ["derive"] }
 reqwest = { version = "0.12", features = ["blocking", "json", "rustls-tls"] }
 serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
 anyhow = "1.0"
 walkdir = "2.4"
 ignore = "0.4"
+dialoguer = "0.11"
+toml = "0.8"
+dotenv = "0.15"
+
+[dev-dependencies]
+tempfile = "3"       # Pour créer des dossiers de test isolés
+serde_json = "1.0"   # Pour valider les JSON générés
+assert_fs = "1.0"    # Utile pour les assertions de fichiers (optionnel, mais tempfile suffit souvent)
+predicates = "3.0"   # Pour des assertions fluides
+mockito = "1.2"      # (Optionnel) Si vous voulez mocker le serveur HTTP complet

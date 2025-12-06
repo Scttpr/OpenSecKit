@@ -1,0 +1,42 @@
+# registry.toml
+# Ce fichier mappe les commandes CLI vers les prompts bruts du dépôt.
+
+[commands]
+
+# --- COMMANDE SPEC (Analyse 360° d'une User Story) ---
+# Utilise votre prompt "osk-secure-feature.md" qui couvre déjà les 7 principes
+spec = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-secure-feature.md"
+
+# --- COMMANDE AUDIT (Audit global) ---
+audit = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-audit-all.md"
+
+# --- SOUS-COMMANDES AUDIT (Les 7 Principes) ---
+
+# Principe I : Modélisation des menaces
+"audit.1" = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-threat-model.md"
+"audit.menaces" = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-threat-model.md"
+"audit.threats" = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-threat-model.md"
+
+# Principe II : Analyse de risques
+"audit.2" = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-risk-analyze.md"
+"audit.risques" = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-risk-analyze.md"
+
+# Principe III : Sécurité dès la conception (Design)
+"audit.3" = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-design-requirements.md"
+"audit.design" = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-design-requirements.md"
+
+# Principe IV : Tests de sécurité
+"audit.4" = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-gen-tests.md"
+"audit.tests" = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-gen-tests.md"
+
+# Principe V : Gestion des secrets
+"audit.5" = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-secrets-policy.md"
+"audit.secrets" = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-secrets-policy.md"
+
+# Principe VI : Journalisation (Logs)
+"audit.6" = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-logging-specs.md"
+"audit.logs" = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-logging-specs.md"
+
+# Principe VII : Patch Management
+"audit.7" = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-patch-policy.md"
+"audit.patch" = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-patch-policy.md"

@@ -1,0 +1,14 @@
+{
+  "options": [
+    {
+      "name": "Claude 3.5 Sonnet (Recommandé)",
+      "provider_id": "claude",
+      "model_id": "claude-3-5-sonnet-latest"
+    },
+    {
+      "name": "Gemini 3 Pro",
+      "provider_id": "gemini",
+      "model_id": "gemini-3-pro"
+    }
+  ]
+}
