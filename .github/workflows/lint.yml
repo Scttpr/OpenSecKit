@@ -1,0 +1,49 @@
+name: 🎨 Linting
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+
+jobs:
+    lint-rust:
+        name: Lint Rust (Clippy & Fmt)
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Install Rust
+              uses: dtolnay/rust-toolchain@stable
+              with:
+                  components: clippy, rustfmt
+
+            - name: Cache Cargo dependencies
+              uses: actions/cache@v3
+              with:
+                  path: |
+                      ~/.cargo/bin/
+                      ~/.cargo/registry/index/
+                      ~/.cargo/registry/cache/
+                      ~/.cargo/git/db/
+                      cli/target/
+                  key: ${{ runner.os }}-cargo-lint-${{ hashFiles('cli/Cargo.lock') }}
+
+            - name: Check Formatting
+              working-directory: ./cli
+              run: cargo fmt -- --check
+
+            - name: Run Clippy
+              working-directory: ./cli
+              run: cargo clippy -- -D warnings
+
+    # lint-markdown:
+    #     name: Lint Markdown
+    #     runs-on: ubuntu-latest
+    #     steps:
+    #         - uses: actions/checkout@v4
+
+    #         - name: Run markdownlint
+    #           uses: DavidAnson/markdownlint-cli2-action@v16
+    #           with:
+    #               config: .markdownlint.json
+    #               globs: "**/*.md"
