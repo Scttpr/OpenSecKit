@@ -1,0 +1,65 @@
+name: 📚 Doc Quality Gate
+
+on:
+    pull_request:
+        paths: ["**.md"]
+
+jobs:
+    validate-docs:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with: { node-version: "20" }
+
+            - name: Install Link Checker
+              run: npm install -g markdown-link-check
+
+            - name: 🔗 Check Dead Links
+              run: |
+                  find . -name "*.md" \
+                  | xargs -n1 markdown-link-check --config .github/link-check-config.json
+
+            - name: Setup Python
+              uses: actions/setup-python@v5
+              with: { python-version: "3.x" }
+
+            - name: Install PyYAML
+              run: pip install python-frontmatter
+
+            - name: 📝 Validate Frontmatter Structure
+              shell: python
+              run: |
+                  import frontmatter
+                  import glob
+                  import sys
+
+                  required_keys = ['title', 'constitutional_principle', 'ssdlc_phase']
+                  failed = False
+
+                  files = glob.glob('templates/**/*.md', recursive=True) + glob.glob('domaines/**/*.md', recursive=True)
+
+                  print(f"🔍 Audit {len(files)} templates...")
+
+                  for file in files:
+                      if "_example-" in file or "README.md" in file: 
+                          continue
+                      
+                      try:
+                          with open(file, 'r', encoding='utf-8') as f:
+                              post = frontmatter.load(f)
+                          
+                          missing = [key for key in required_keys if key not in post.metadata]
+                          
+                          if missing:
+                              print(f"❌ {file}: Missing keys {missing}")
+                              failed = True
+                      except Exception as e:
+                          print(f"❌ {file}: Parsing error - {e}")
+                          failed = True
+
+                  if failed:
+                      sys.exit(1)
+                  print("✅ Validation OK.")

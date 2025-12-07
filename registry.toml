@@ -1,0 +1,5 @@
+[commands]
+audit = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-audit.md"
+spec = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-specify.md"
+domain = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-domain.md"
+context = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-context.md"

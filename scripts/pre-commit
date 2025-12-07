@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# OpenSecKit pre-commit hook
+# Runs all validation checks before allowing commit
+
+echo "🔍 Running pre-commit checks..."
+
+# Run all tests
+npm test
+
+if [ $? -ne 0 ]; then
+    echo ""
+    echo "❌ Pre-commit checks failed!"
+    echo "   Fix errors before committing or use 'git commit --no-verify' to skip."
+    exit 1
+fi
+
+echo "✅ All pre-commit checks passed!"
+exit 0
