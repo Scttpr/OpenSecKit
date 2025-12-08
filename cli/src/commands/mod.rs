@@ -22,5 +22,12 @@ pub fn handle(command: Commands, client: &Client) -> Result<()> {
         }
 
         Commands::Context { provider } => run::exec_specific(client, "context", None, provider),
+        Commands::Assess { subject, provider } => {
+            run::exec_specific(client, "assess", Some(subject), provider)
+        }
+        Commands::Incident {
+            description,
+            provider,
+        } => run::exec_specific(client, "incident", Some(description), provider),
     }
 }

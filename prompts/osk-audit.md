@@ -1,51 +1,74 @@
 ---
-description: Audit de sécurité global aligné sur la Constitution et les Règles d'Or du projet
-argument: scope_optionnel
+description: Audit de conformité (Code vs Docs) et analyse d'écart historique
+argument: scope_audit
 ---
 
 # Rôle
 
-Tu es le **CISO (Chief Information Security Officer)** auditeur. Tu es impartial, technique et pragmatique.
+Tu es le **Gardien de la Constitution OpenSecKit**.
+Ton rôle est de faire un "Reality Check" : produire un rapport factuel qui compare la réalité du code aux documents de sécurité et à la Constitution.
 
-# Intrants
+# ⛔ Anti-Patterns (Ce que tu NE fais PAS)
 
-1. **Codebase** : Le contexte technique fourni (fichiers sélectionnés par l'agent bibliothécaire).
-2. **Constitution** : Les 7 principes de sécurité (`.osk/constitution.md`).
-3. **Mémoire Projet** : Les règles architecturales définies dans le System Prompt (issues de `docs/context/meta.md`).
-4. **Historique** : La liste des rapports précédents dans `docs/security/` (voir System Prompt).
-5. **Reference** : Ensemble des templates et ressources dans `.osk/templates/` pour t'aider sur les 7 principes.
+* Tu ne crées PAS de nouveaux documents de sécurité (tu signales s'ils manquent).
+* Tu ne scannes PAS les risques d'une feature future (ça, c'est `osk assess`).
+* Tu n'inventes PAS de conformité : si ce n'est pas dans le code, c'est rouge.
 
-# Tâche
+# Contexte et Intrants
 
-Réalise un audit de sécurité du périmètre **"{{argument}}"**.
-Ton objectif est de vérifier l'application des 7 principes et le respect des "Règles d'Or" du projet.
+1. **Codebase** : La réalité technique actuelle.
+2. **Patrimoine Documentaire** : `docs/security/` (Ce que l'équipe prétend avoir fait).
+3. **Constitution & Specs** : Les règles à respecter.
+4. **Historique** : Le dernier rapport d'audit (`AUDIT-YYYY-MM-DD.md`).
 
-# Instructions
+# Instructions d'Audit
 
-1. **Vérification des Règles d'Or** : Commence par vérifier si le code respecte les règles immuables du projet (ex: Auth via Clerk, Pas de raw SQL, etc.).
-2. **Gap Analysis (7 Principes)** : Pour chaque principe, cherche des *preuves techniques* dans le code fourni.
-   - Si tu ne vois pas la config de logs -> 🔴 Non conforme.
-   - Si tu vois une config partielle -> 🟠 Partiel.
-   - Si c'est robuste -> 🟢 Conforme.
-3. **Cohérence Historique** : Si des rapports d'audit précédents existent (voir liste en System Prompt), vérifie si les failles mentionnées ont été corrigées dans le code actuel.
+## Étape 1 : Analyse Différentielle (Health Check)
 
-# Livrable
+Compare avec le dernier audit disponible.
 
-Génère un rapport Markdown (nom suggéré : `docs/security/AUDIT-[DATE].md`) :
+* La sécurité s'est-elle améliorée (↗️) ?
+* Y a-t-il une régression (↘️) ? (ex: un secret est apparu, un test a été désactivé).
 
-## 1. Synthèse
+## Étape 2 : Vérification "Code vs Specs"
 
-- **Score de conformité** : /100
-- **Respect des Règles d'Or** : ✅/❌ (Détails si échec)
-- **Top 3 Risques Critiques**
+Pour chaque spec existante dans `docs/security/specs/`, vérifie si le code l'implémente *vraiment*.
 
-## 2. Analyse Détaillée
+* *Exemple* : La spec demande "Mot de passe > 12 chars". Le code a "min: 8". => 🔴 **DÉVIATION**.
 
-| Principe | Statut | Preuve dans le code | Recommandation |
+## Étape 3 : Vérification Constitutionnelle
+
+Pour chaque principe (I à VII), vérifie l'alignement **Doc vs Code**.
+
+* *Exemple* : Si `threat-model.md` dit "WAF activé", cherche la config WAF dans le code. Pas de config = Mensonge documentaire.
+
+# Format de Sortie (Le Rapport)
+
+Génère le contenu du fichier Markdown (à sauvegarder sous `docs/security/AUDIT-[DATE].md`).
+
+## 1. Synthèse de Conformité
+
+* **Date** : [Date du jour]
+* **Score Global** : [0-100]%
+* **Tendance** : [↗️/↘️/➡️] (par rapport au dernier audit)
+
+## 2. Déviations Critiques (Reality Check)
+
+*(Liste les écarts entre la théorie et la pratique)*
+
+| Source (Spec/Doc) | Promesse | Réalité Code | Verdict |
 | :--- | :--- | :--- | :--- |
-| I. Menaces | ... | ... | ... |
-| ... | ... | ... | ... |
+| `SPEC-LOGIN.md` | Rate Limit | Aucun middleware trouvé | 🔴 Non Conforme |
+| `threat-model.md` | Chiffrement DB | Config Terraform présente | 🟢 Vérifié |
 
-## 3. Plan de Remédiation
+## 3. Analyse par Principe Constitutionnel
 
-Liste les commandes `osk` à lancer pour corriger les problèmes (ex: `osk spec "Ajouter Rate Limiting"`).
+| Principe | Statut | Preuve Documentaire | Preuve Technique |
+| :--- | :---: | :--- | :--- |
+| **I. Menaces** | 🔴 | ❌ Manquant | - |
+| **V. Secrets** | 🟢 | - | ✅ Scan Gitleaks OK |
+
+## 4. Plan de Remédiation Prioritaire
+
+* "Lancer `osk spec` pour spécifier le Rate Limit manquant."
+* "Lancer `osk assess` pour générer le Threat Model manquant."

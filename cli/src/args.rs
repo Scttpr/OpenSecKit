@@ -43,4 +43,16 @@ pub enum Commands {
         #[arg(long)]
         provider: Option<String>,
     },
+
+    Assess {
+        subject: String,
+        #[arg(long)]
+        provider: Option<String>,
+    },
+
+    Incident {
+        description: String,
+        #[arg(long)]
+        provider: Option<String>,
+    },
 }

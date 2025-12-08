@@ -1,0 +1,83 @@
+# ==============================================================================
+# SQUELETTE DE CONTEXTE RGPD (Source de Vérité)
+# Ce fichier est utilisé par l'agent IA pour mapper le code aux exigences RGPD.
+# ==============================================================================
+
+# --- 1. IDENTITÉ & GOUVERNANCE (Pour Privacy Notice & RoPA) ---
+organization:
+  # Chercher dans LICENSE, package.json (author), ou footer du README
+  legal_name: "<EXTRACT: Nom légal de l'entité>"
+  # Chercher dans SECURITY.md, CONTRIBUTING.md ou pages de contact
+  address: "<EXTRACT: Adresse postale du siège>"
+  contact_email: "<EXTRACT: Email de contact générique (ex: contact@, privacy@)>"
+  # Déduire le pays depuis l'adresse
+  country: "<INFER: Code pays ISO (ex: FR, DE)>"
+
+governance:
+  # Souvent absent du code -> Placeholder pour l'humain
+  dpo:
+    name: "<HUMAN_INPUT: Nom du DPO>"
+    email: "<HUMAN_INPUT: Email du DPO>"
+  # Déduire l'autorité selon le pays (ex: FR -> CNIL)
+  supervisory_authority: "<INFER: Nom de l'autorité de contrôle>"
+
+# --- 2. MESURES DE SÉCURITÉ (TOMs - Art. 32) (Pour DPA & RoPA) ---
+security_measures:
+  encryption_at_rest:
+    # Chercher 'sse_algorithm' (Terraform), 'encrypted: true' (ORM), ou bibliothèques crypto
+    enabled: "<BOOLEAN>"
+    standard: "<EXTRACT: Algorithme détecté (ex: AES-256)>"
+    scope: "<LIST: BDD, Backups, Logs>"
+
+  encryption_in_transit:
+    # Chercher configs Nginx, Ingress, 'tls', 'ssl'
+    enabled: "<BOOLEAN>"
+    standard: "<EXTRACT: Version TLS (ex: TLS 1.2+)>"
+
+  access_control:
+    # Chercher 'mfa', 'otp', 'auth0', 'clerk', politiques IAM
+    mfa_required: "<BOOLEAN: Est-ce que le MFA semble forcé pour les admins ?>"
+    sso_enabled: "<BOOLEAN: Présence de SAML/OIDC>"
+
+  backups:
+    # Chercher scripts de backup, cron jobs, retention policies AWS
+    frequency: "<EXTRACT: Fréquence détectée (ex: Daily)>"
+    retention_days: "<EXTRACT: Durée de rétention (ex: 30)>"
+
+# --- 3. SOUS-TRAITANTS (PROCESSORS) (Pour RoPA & Privacy Notice) ---
+# Analyse des dépendances (package.json, Cargo.toml, requirements.txt)
+# et des appels API externes.
+processors:
+  # Exemple de structure attendue pour chaque tiers détecté
+  - name: "<DETECTED: ex: Stripe>"
+    service_type: "<INFER: ex: Paiement>"
+    # Déduire la localisation du siège du fournisseur (Base de connaissance IA)
+    location: "<KNOWLEDGE: ex: USA>"
+    # Si hors UE, suggérer le mécanisme (DPF, CCT)
+    transfer_mechanism: "<SUGGEST: ex: Data Privacy Framework>"
+    # Quelles données sont envoyées ? (ex: email, credit_card)
+    data_shared:
+      - "<INFER: Catégories de données>"
+
+# --- 4. ACTIVITÉS DE TRAITEMENT (Pour RoPA) ---
+# Analyse des modèles de données (Schema Prisma, Mongoose, SQL)
+processing_activities:
+  - id: "CORE-APP"
+    name: "Fourniture du service principal"
+    # Lister les champs PII trouvés dans le code (email, phone, birthdate...)
+    data_categories:
+      - "<LIST: Champs sensibles détectés dans les modèles>"
+    # Déduire les personnes concernées (User, Admin, Employee)
+    data_subjects:
+      - "<INFER: Acteurs identifiés dans le code>"
+    # Base légale probable (souvent Contrat pour le service principal)
+    legal_basis: "Contrat (Art. 6.1.b)"
+    # Durée de conservation (Chercher 'TTL', 'expireAfter', 'cleanup' jobs)
+    retention_period: "<EXTRACT_OR_DEFAULT: ex: 'Durée du compte'>"
+
+# --- 5. ALERTES DE CONFORMITÉ ---
+# L'IA ajoutera ici les violations flagrantes détectées
+alerts:
+  - "<CHECK: Mots de passe en clair ?>"
+  - "<CHECK: Logs contenant des PII ?>"
+  - "<CHECK: Google Fonts chargé depuis les serveurs US ?>"

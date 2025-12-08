@@ -1,54 +1,59 @@
 ---
-description: Analyse le code pour générer le fichier de mémoire docs/context/meta.md
+description: Analyse le code pour générer ou mettre à jour la mémoire du projet (docs/context/meta.md)
 argument: (aucun)
 ---
 
 # Rôle
 
-Tu es un **Lead Architecte** et **Expert Technique**.
-Ta mission est d'analyser le code existant pour en extraire l'ADN technique et les règles implicites.
+Tu es le **Lead Architecte** et le gardien de la connaissance du projet.
+Ta mission est d'extraire l'ADN technique, métier, sécuritaire et **réglementaire** du code.
+
+# Objectif
+
+Générer le contenu du fichier `docs/context/meta.md`. Ce fichier servira de source de vérité unique.
 
 # Intrants
 
-1. **Codebase** : L'arborescence et le contenu des fichiers de configuration (package.json, Cargo.toml, Dockerfile, etc.) et des fichiers sources principaux.
+1. **Codebase** : Fichiers de configuration et code source représentatif.
 
-# Tâche
+# Instructions d'Analyse
 
-Génère le contenu du fichier `docs/context/meta.md`. Ce fichier servira de "Mémoire" pour les futurs agents IA.
+Extrais les informations suivantes :
 
-# Instructions d'Extraction
+1. **Stack Technique** : Langages, Frameworks, Base de données, Infra.
+2. **Domaine Métier** : Entités principales (ex: Patient, Client) et vocabulaire.
 
-Analyse le code pour déterminer :
+3. **Profilage Réglementaire (Nouveau)** :
+    * Analyse les dépendances et le code pour déduire les contraintes légales.
+    * **RGPD** : Y a-t-il des données personnelles (User, Email) ?
+    * **PCI-DSS** : Y a-t-il des paiements (Stripe, Paypal) ?
+    * **Santé (HDS/HIPAA)** : Y a-t-il des données médicales (FHIR, Patient) ?
+    * **Secteur Public (RGS)** : Indices dans le README ou LICENSE ?
 
-1. **Stack Technique** : Langages, Frameworks, Base de données, ORM, Outils de Build.
-2. **Architecture** : Monolith/Microservices ? API REST/GraphQL ? MVC/Clean Arch ?
-3. **Principes de Sécurité (Détectés)** :
-   - Quelle lib d'auth est utilisée ? (ex: NextAuth, Clerk, JWT maison)
-   - Comment sont gérés les inputs ? (ex: Zod, Joi, Validator)
-   - Comment sont gérés les logs ?
-4. **Conventions de Code (Détectées)** :
-   - Gestion des erreurs (Try/Catch, Result types ?)
-   - Style (Classes, Fonctionnel ?)
+4. **Patterns de Sécurité** : Auth, Validation, Logs, Secrets.
+5. **Conventions** : Architecture, Gestion d'erreurs.
 
 # Format de Sortie (Strict Markdown)
 
-Ne mets pas de texte avant ou après. Uniquement le contenu du fichier.
-
 ```markdown
-# Règles d'Or & Architecture
+# Mémoire du Projet & Règles d'Or
+
+> **Note aux Agents IA :** Ce document est votre source de vérité.
 
 ## 🛠 Stack Technique
-* **Langage** : [Détecté]
-* **Framework** : [Détecté]
-* **Data** : [Détecté]
-* **Infra** : [Détecté]
+* **Langage** : ...
+* **Framework** : ...
 
-## 🔒 Principes de Sécurité (Actuels)
-* **Auth** : [Détecté]
-* **Validation** : [Détecté]
-* **Secrets** : [Détecté]
+## ⚖️ Contexte Réglementaire (Détecté)
+* **[Nom Référentiel]** : [Statut: ✅/⚠️/❌] (Preuve : [Indice technique trouvé])
+* *Exemple :* **RGPD** : ✅ Actif (Preuve : Table `Users` avec emails)
+
+## 💼 Domaine Métier
+* ...
+
+## 🔒 Patterns de Sécurité
+* ...
 
 ## 📏 Conventions de Code
-* [Règle 1 détectée]
-* [Règle 2 détectée]
+* ...
 ```
