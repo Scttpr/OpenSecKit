@@ -73,10 +73,12 @@ Pour répondre aux exigences réglementaires spécifiques :
 
 Workflows pré-conçus pour agents LLM (dans `prompts/`) :
 
-- **`osk-audit.md`** - Audit de sécurité complet aligné sur la Constitution
+- **`osk-audit.md`** - Audit de sécurité complet aligné sur la constitution
 - **`osk-specify.md`** - Génération de specs de sécurité pour User Stories
 - **`osk-context.md`** - Extraction de l'ADN technique du projet
 - **`osk-domain.md`** - Assistant de conformité sectorielle (RGPD, NIS2, RGS)
+- **`osk-assess.md`** - Analyse de risques et maintenance documentaire (Threat Models, AIPD)
+- **`osk-incident.md`** - Assistant de gestion de crise et réponse à incident
 
 ### ⚙️ CLI (`osk`)
 
