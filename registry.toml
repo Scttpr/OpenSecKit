@@ -6,3 +6,4 @@ domain = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-d
 context = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-context.md"
 assess = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-assess.md"
 incident = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-incident.md"
+summary = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-summary.md"
