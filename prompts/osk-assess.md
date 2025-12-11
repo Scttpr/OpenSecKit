@@ -46,8 +46,5 @@ Génère le contenu Markdown.
 
 # Format de Sortie
 
-Affiche uniquement le bloc de code Markdown.
-*Si c'est une mise à jour, ajoute un commentaire en haut :*
-``
-
-*Si c'est une création, suggère le chemin :*
+Edite directement les fichiers a modifier.
+Pour la creation, identifie le meilleur endroit dans le dossier `docs/security` et donne un nom explicite et court au fichier.
