@@ -1,130 +1,111 @@
- ██████╗ ██╗   ██╗██╗ ██████╗██╗  ██╗    ███████╗████████╗ █████╗ ██████╗ ████████╗
-██╔═══██╗██║   ██║██║██╔════╝██║ ██╔╝    ██╔════╝╚══██╔══╝██╔══██╗██╔══██╗╚══██╔══╝
-██║   ██║██║   ██║██║██║     █████╔╝     ███████╗   ██║   ███████║██████╔╝   ██║
-██║▄▄ ██║██║   ██║██║██║     ██╔═██╗     ╚════██║   ██║   ██╔══██║██╔══██╗   ██║
-╚██████╔╝╚██████╔╝██║╚██████╗██║  ██╗    ███████║   ██║   ██║  ██║██║  ██║   ██║
- ╚══▀▀═╝  ╚═════╝ ╚═╝ ╚═════╝╚═╝  ╚═╝    ╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝
+OpenSecKit - Quick Start                                     Version 2.0.0
 
-╔═══════════════════════════════════════════════════════════════════════════╗
-║                                                                           ║
-║  QUICK START - Sécurisez votre projet en 10 minutes                      ║
-║                                                                           ║
-╚═══════════════════════════════════════════════════════════════════════════╝
 
-  OBJECTIF : Audit de sécurité et corrections de vulnérabilités.
+NAME
+    Quick Start - Sécurisez votre projet en 10 minutes
 
-═══════════════════════════════════════════════════════════════════════════════
+OBJECTIF
+    Audit de sécurité et corrections de vulnérabilités
 
-[APPROCHE 1] AVEC CLAUDE CODE (5 MINUTES) - RECOMMANDÉ
 
-  [ÉTAPE 1] Installer
+1. APPROCHE 1 : AVEC CLAUDE CODE (5 MINUTES) - RECOMMANDÉ
 
-    $ git clone https://github.com/Scttpr/OpenSecKit
-    $ cd OpenSecKit/cli
-    $ cargo install --path .
+   1.1. Installer
 
-  [ÉTAPE 2] Initialiser
+      $ git clone https://github.com/Scttpr/OpenSecKit
+      $ cd OpenSecKit/cli
+      $ cargo install --path .
 
-    $ cd mon-projet/
-    $ osk init
+   1.2. Initialiser
 
-  [ÉTAPE 3] Auditer
+      $ cd mon-projet/
+      $ osk init
 
-    $ claude
-    >>> /audit
+   1.3. Auditer
 
-  [ÉTAPE 4] Corriger
+      $ claude
+      >>> /audit
 
-  Claude Code affiche les vulnérabilités. Demandez-lui de les corriger :
+   1.4. Corriger
 
-    >>> Corrige l'injection SQL dans src/api/users.js:42
+      Claude Code affiche les vulnérabilités. Demandez-lui de les corriger :
 
-  [ÉTAPE 5] Vérifier
+      >>> Corrige l'injection SQL dans src/api/users.js:42
 
-    >>> /audit
+   1.5. Vérifier
 
-  RÉSULTAT : Audit complet + corrections automatiques en 5 minutes.
+      >>> /audit
 
-═══════════════════════════════════════════════════════════════════════════════
+   Résultat : Audit complet + corrections automatiques en 5 minutes.
 
-[APPROCHE 2] MANUELLE (15 MINUTES)
 
-  [1] Modélisation menaces (5 min)
+2. APPROCHE 2 : MANUELLE (15 MINUTES)
 
-    $ cp templates/01-threat-modeling/stride-threat-model-template-planning.md \
-         docs/security/threat-model.md
+   2.1. Modélisation menaces (5 min)
 
-  Identifiez :
+      $ cp templates/01-threat-modeling/stride-threat-model-template-planning.md \
+           docs/security/threat-model.md
 
-    - Actifs critiques (DB, secrets, sessions)
-    - Top 3 menaces STRIDE
-    - Contre-mesures
+      Identifiez :
+         - Actifs critiques (DB, secrets, sessions)
+         - Top 3 menaces STRIDE
+         - Contre-mesures
 
-  [2] Analyse risques (3 min)
+   2.2. Analyse risques (3 min)
 
-    $ cp templates/02-risk-analysis/risk-scoring-template-planning.md \
-         docs/security/risk-analysis.md
+      $ cp templates/02-risk-analysis/risk-scoring-template-planning.md \
+           docs/security/risk-analysis.md
 
-  Scorez chaque risque : Criticité × Probabilité × Exposition
+      Scorez chaque risque : Criticité × Probabilité × Exposition
 
-  [3] Actions immédiates (7 min)
+   2.3. Actions immédiates (7 min)
 
-  SÉCURISER LA DB : Requêtes préparées
+      Sécuriser la DB : Requêtes préparées
 
-  INSTALLER DÉTECTION SECRETS :
+      Installer détection secrets :
 
-    $ brew install gitleaks
-    $ gitleaks detect --source . --verbose
+         $ brew install gitleaks
+         $ gitleaks detect --source . --verbose
 
-  HOOK PRE-COMMIT :
+      Hook pre-commit :
 
-    $ cat > .git/hooks/pre-commit << 'EOF'
-    #!/bin/sh
-    gitleaks protect --staged --verbose
-    EOF
-    $ chmod +x .git/hooks/pre-commit
+         $ cat > .git/hooks/pre-commit << 'EOF'
+         #!/bin/sh
+         gitleaks protect --staged --verbose
+         EOF
+         $ chmod +x .git/hooks/pre-commit
 
-  PLANIFIER MFA : Ajouter dans le backlog
+      Planifier MFA : Ajouter dans le backlog
 
-═══════════════════════════════════════════════════════════════════════════════
 
-[PROCHAINES ÉTAPES]
+3. PROCHAINES ÉTAPES
 
-  Cette semaine :
-    [1] Configurer SAST (Semgrep/SonarQube)
-    [2] Ajouter logging sécurisé
-    [3] Configurer Dependabot
+   Cette semaine :
+      [1] Configurer SAST (Semgrep/SonarQube)
+      [2] Ajouter logging sécurisé
+      [3] Configurer Dependabot
 
-  Ce mois :
-    [4] Implémenter MFA
-    [5] Gestionnaire de secrets (Vault)
-    [6] Audit complet
+   Ce mois :
+      [4] Implémenter MFA
+      [5] Gestionnaire de secrets (Vault)
+      [6] Audit complet
 
-  Voir templates/ pour détails.
+   Voir templates/ pour détails.
 
-═══════════════════════════════════════════════════════════════════════════════
 
-[AIDE]
+4. AIDE
 
-    [*] constitution.md     Les 7 principes
-    [*] FAQ.md              Questions fréquentes
-    [*] cli/README.md       Toutes les commandes
+   constitution.md     Les 7 principes
+   FAQ.md              Questions fréquentes
+   cli/README.md       Toutes les commandes
 
-═══════════════════════════════════════════════════════════════════════════════
 
-╔═══════════════════════════════════════════════════════════════════════════╗
-║                                                                           ║
-║  Prochaines étapes :                                                      ║
-║  - Avec Claude Code : /spec "description" pour vos features              ║
-║  - Manuel : Configurer SAST (templates/04-security-testing/)             ║
-║                                                                           ║
-╚═══════════════════════════════════════════════════════════════════════════╝
+5. PROCHAINES ÉTAPES
 
-╔═══════════════════════════════════════════════════════════════════════════╗
-║                                                                           ║
-║  OpenSecKit Quick Start v2.0.0                                            ║
-║  https://github.com/Scttpr/OpenSecKit                                    ║
-║                                                                           ║
-║  "Security as Code, AI-Ready"                                            ║
-║                                                                           ║
-╚═══════════════════════════════════════════════════════════════════════════╝
+   Avec Claude Code : /spec "description" pour vos features
+   Manuel : Configurer SAST (templates/04-security-testing/)
+
+
+---
+OpenSecKit Quick Start v2.0.0
+https://github.com/Scttpr/OpenSecKit
