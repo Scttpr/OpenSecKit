@@ -1,40 +1,32 @@
- ██████╗ ███████╗██╗   ██╗     ██████╗ ██╗   ██╗██╗██████╗ ███████╗
- ██╔══██╗██╔════╝██║   ██║    ██╔════╝ ██║   ██║██║██╔══██╗██╔════╝
- ██║  ██║█████╗  ██║   ██║    ██║  ███╗██║   ██║██║██║  ██║█████╗
- ██║  ██║██╔══╝  ╚██╗ ██╔╝    ██║   ██║██║   ██║██║██║  ██║██╔══╝
- ██████╔╝███████╗ ╚████╔╝     ╚██████╔╝╚██████╔╝██║██████╔╝███████╗
- ╚═════╝ ╚══════╝  ╚═══╝       ╚═════╝  ╚═════╝ ╚═╝╚═════╝ ╚══════╝
+OpenSecKit - Dev Guide                                        Version 2.0.0
 
-╔═══════════════════════════════════════════════════════════════════════════╗
-║                                                                           ║
-║  GUIDE DEV                                                                ║
-║                                                                           ║
-╚═══════════════════════════════════════════════════════════════════════════╝
 
-═══════════════════════════════════════════════════════════════════════════════
+NAME
+    Dev Guide - Guide développeur
 
-[SECTION 1] INSTALLATION
 
-    $ ./scripts/setup-dev.sh
+1. INSTALLATION
 
-  Installe :
-    - Node.js (local)
-    - Python virtualenv (local)
-    - Hook pre-commit
+   $ ./scripts/setup-dev.sh
 
-═══════════════════════════════════════════════════════════════════════════════
+   Installe :
+      - Node.js (local)
+      - Python virtualenv (local)
+      - Hook pre-commit
 
-[SECTION 2] COMMANDES
 
-    $ npm test                           # Tout tester
-    $ npm run check:links:all            # Liens morts
-    $ npm run check:frontmatter          # Frontmatter YAML
-    $ npm run check:rust                 # Rust linting
+2. COMMANDES
 
-═══════════════════════════════════════════════════════════════════════════════
+   $ npm test                           # Tout tester
+   $ npm run check:links:all            # Liens morts
+   $ npm run check:frontmatter          # Frontmatter YAML
+   $ npm run check:rust                 # Rust linting
 
-╔═══════════════════════════════════════════════════════════════════════════╗
-║                                                                           ║
-║  Tout est installé localement. Rien de global.                           ║
-║                                                                           ║
-╚═══════════════════════════════════════════════════════════════════════════╝
+
+NOTE
+   Tout est installé localement. Rien de global.
+
+
+---
+OpenSecKit Dev Guide v2.0.0
+https://github.com/Scttpr/OpenSecKit

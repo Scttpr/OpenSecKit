@@ -1,241 +1,192 @@
- ██████╗ ███████╗██╗  ██╗     ██████╗██╗     ██╗
-██╔═══██╗██╔════╝██║ ██╔╝    ██╔════╝██║     ██║
-██║   ██║███████╗█████╔╝     ██║     ██║     ██║
-██║   ██║╚════██║██╔═██╗     ██║     ██║     ██║
-╚██████╔╝███████║██║  ██╗    ╚██████╗███████╗██║
- ╚═════╝ ╚══════╝╚═╝  ╚═╝     ╚═════╝╚══════╝╚═╝
+OpenSecKit CLI                                                Version 2.0.0
 
-╔═══════════════════════════════════════════════════════════════════════════╗
-║                                                                           ║
-║  CLI pour générer des slash commands Claude Code                         ║
-║  Sécurisez votre code automatiquement                                    ║
-║                                                                           ║
-╚═══════════════════════════════════════════════════════════════════════════╝
 
-═══════════════════════════════════════════════════════════════════════════════
+NAME
+    osk - CLI pour générer des slash commands Claude Code
 
-[SECTION 1] INSTALLATION
+SYNOPSIS
+    osk init [--force]
+    osk ingest [-p PATH] [-o OUTPUT]
 
-    $ git clone https://github.com/Scttpr/OpenSecKit
-    $ cd OpenSecKit/cli
-    $ cargo install --path .
 
-  Vérification :
+1. INSTALLATION
 
-    $ osk --version
+   $ git clone https://github.com/Scttpr/OpenSecKit
+   $ cd OpenSecKit/cli
+   $ cargo install --path .
 
+   Vérification :
+      $ osk --version
 
-═══════════════════════════════════════════════════════════════════════════════
 
-[SECTION 2] COMMANDES
+2. COMMANDES
 
-┌─────────────┬──────────────────────────────────────────────────────────┐
-│ Commande    │ Description                                              │
-├─────────────┼──────────────────────────────────────────────────────────┤
-│ init        │ Initialiser + installer slash commands Claude Code      │
-│ ingest      │ Export contexte pour CI/CD ou copier-coller              │
-└─────────────┴──────────────────────────────────────────────────────────┘
+   init      Initialiser + installer slash commands Claude Code
+   ingest    Export contexte pour CI/CD ou copier-coller
 
 
-═══════════════════════════════════════════════════════════════════════════════
+3. WORKFLOW TYPIQUE
 
-[SECTION 3] WORKFLOW TYPIQUE
+   [1] osk init              Initialise + installe slash commands
+   [2] claude                Lancer Claude Code
+   [3] /audit                Exécuter l'audit de sécurité
+   [4] /spec "..."           Analyser une user story
+   [5] /assess "..."         Évaluer conformité
+   [6] /domain rgpd          Vérifier conformité RGPD
 
-    [1] osk init              Initialise + installe slash commands
-    [2] claude                Lancer Claude Code
-    [3] /audit                Exécuter l'audit de sécurité
-    [4] /spec "..."           Analyser une user story
-    [5] /assess "..."         Évaluer conformité
-    [6] /domain rgpd          Vérifier conformité RGPD
+   Slash commands disponibles :
+      /audit /spec /assess /domain /context /incident
 
-  Slash commands disponibles : /audit /spec /assess /domain /context /incident
 
+4. USAGE DÉTAILLÉ
 
-═══════════════════════════════════════════════════════════════════════════════
+   4.1. init
 
-[SECTION 4] USAGE DÉTAILLÉ
+      $ osk init              # Installation initiale
+      $ osk init --force      # Mise à jour forcée
 
-  ┌─────────────────────────────────────────────────────────────────────────┐
-  │ COMMANDE : init                                                         │
-  └─────────────────────────────────────────────────────────────────────────┘
+      Initialise le projet :
+         - Crée la structure .osk/ et .claude/commands/
+         - Télécharge templates, prompts et domaines
+         - Installe les slash commands pour Claude Code
+         - Détecte automatiquement la stack technique
 
-    $ osk init              # Installation initiale
-    $ osk init --force      # Mise à jour forcée
+      Options :
+         --force / -f : Force la mise à jour des ressources
 
-  Initialise le projet :
+      Slash commands disponibles après init :
+         /audit    - Audit de sécurité complet
+         /spec     - Analyse specs pour user story
+         /assess   - Évaluation conformité 7 principes
+         /domain   - Conformité sectorielle (RGPD, NIS2, RGS)
+         /context  - Extraction ADN technique
+         /incident - Gestion de crise
 
-    - Crée la structure .osk/ et .claude/commands/
-    - Télécharge templates, prompts et domaines
-    - Installe les slash commands pour Claude Code
-    - Détecte automatiquement la stack technique
+      Mise à jour des slash commands :
+         $ osk init --force
 
-  OPTIONS :
+      Impact de --force :
 
-    --force / -f : Force la mise à jour des ressources et slash commands
+      Écrasé (mis à jour) :
+         .osk/prompts/           Prompts sources
+         .osk/templates/         Templates
+         .osk/domaines/          Domaines sectoriels
+         .claude/commands/       Slash commands
+         .osk/config.toml        Configuration (re-demandée)
 
-  APRÈS INIT, LES SLASH COMMANDS SUIVANTS SONT DISPONIBLES :
+      Préservé (jamais touché) :
+         docs/security/          Vos documents de sécurité
+         Code source du projet
+         Historique git
+         .osk/memory/            Mémoire conversations
 
-    /audit    - Audit de sécurité complet
-    /spec     - Analyse specs pour user story
-    /assess   - Évaluation conformité 7 principes
-    /domain   - Conformité sectorielle (RGPD, NIS2, RGS)
-    /context  - Extraction ADN technique
-    /incident - Gestion de crise
+      Attention : Si vous avez modifié manuellement les slash commands dans
+      .claude/commands/, ces modifications seront perdues. Versionnez-les
+      dans git si nécessaire.
 
-  POUR METTRE À JOUR LES SLASH COMMANDS :
+   4.2. ingest
 
-    $ osk init --force      # Met à jour depuis le repo OpenSecKit
+      $ osk ingest [options]
 
-  ⚠️  IMPACT DE --force
+      Export du contexte pour CI/CD ou copier-coller.
 
-  Écrasé (mis à jour) :
+      Options :
+         -p, --path <chemin>     Chemin spécifique à ingérer
+         -o, --output <fichier>  Fichier de sortie (défaut: stdout)
 
-    ✓ .osk/prompts/           Prompts sources
-    ✓ .osk/templates/         Templates
-    ✓ .osk/domaines/          Domaines sectoriels
-    ✓ .claude/commands/       Slash commands
-    ✓ .osk/config.toml        Configuration (re-demandée)
+      Exemples :
+         $ osk ingest > context.txt
+         $ osk ingest -p src/ > context-src.txt
 
-  Préservé (jamais touché) :
 
-    ✓ docs/security/          Vos documents de sécurité
-    ✓ Code source du projet
-    ✓ Historique git
-    ✓ .osk/memory/            Mémoire conversations
+5. INTÉGRATION CI/CD
 
-  ⚠️  ATTENTION : Si vous avez modifié manuellement les slash commands dans
-      .claude/commands/, ces modifications seront perdues. Versionnez-les dans
-      git si nécessaire.
+   Génération automatique du contexte dans votre pipeline.
 
-  ┌─────────────────────────────────────────────────────────────────────────┐
-  │ COMMANDE : ingest                                                       │
-  └─────────────────────────────────────────────────────────────────────────┘
+   5.1. GitHub Actions
 
-    $ osk ingest [options]
+      Fichier : .github/workflows/security-context.yml
 
-  Export du contexte pour CI/CD ou copier-coller.
+      name: Security Context
+      on: [push, pull_request]
 
-  OPTIONS :
+      jobs:
+        generate:
+          runs-on: ubuntu-latest
+          steps:
+            - uses: actions/checkout@v3
+            - uses: actions-rs/toolchain@v1
+            - run: cargo install --git https://github.com/Scttpr/OpenSecKit --path cli
+            - run: osk ingest > security-context.txt
+            - uses: actions/upload-artifact@v3
+              with:
+                name: security-context
+                path: security-context.txt
 
-    -p, --path <chemin>     Chemin spécifique à ingérer
-    -o, --output <fichier>  Fichier de sortie (défaut: stdout)
+   5.2. GitLab CI
 
-  EXEMPLES :
+      Fichier : .gitlab-ci.yml
 
-    $ osk ingest > context.txt
-    $ osk ingest -p src/ > context-src.txt
+      security-context:
+        stage: security
+        image: rust:latest
+        script:
+          - cargo install --git https://github.com/Scttpr/OpenSecKit --path cli
+          - osk ingest > security-context.txt
+        artifacts:
+          paths: [security-context.txt]
+          expire_in: 30 days
 
+   Cas d'usage :
+      - Traçabilité : un contexte par commit
+      - Audit externe sans accès au code
+      - Revue de sécurité continue
 
-═══════════════════════════════════════════════════════════════════════════════
 
-[SECTION 5] INTÉGRATION CI/CD
+6. CONFIGURATION
 
-  Génération automatique du contexte dans votre pipeline.
+   Fichier .osk/config.toml généré par osk init.
 
-  ┌─────────────────────────────────────────────────────────────────────────┐
-  │ GitHub Actions                                                          │
-  └─────────────────────────────────────────────────────────────────────────┘
+   Structure :
 
-    Fichier : .github/workflows/security-context.yml
+      [project]
+      name = "mon-projet"
+      stack = ["rust", "node"]
 
-    name: Security Context
-    on: [push, pull_request]
+      [memory]
+      max_tokens = 100000
 
-    jobs:
-      generate:
-        runs-on: ubuntu-latest
-        steps:
-          - uses: actions/checkout@v3
-          - uses: actions-rs/toolchain@v1
-          - run: cargo install --git https://github.com/Scttpr/OpenSecKit --path cli
-          - run: osk ingest > security-context.txt
-          - uses: actions/upload-artifact@v3
-            with:
-              name: security-context
-              path: security-context.txt
 
-  ┌─────────────────────────────────────────────────────────────────────────┐
-  │ GitLab CI                                                               │
-  └─────────────────────────────────────────────────────────────────────────┘
+7. FICHIERS GÉNÉRÉS
 
-    Fichier : .gitlab-ci.yml
+   .osk/
+   ├── config.toml              Configuration
+   ├── templates/               Templates téléchargés
+   └── prompts/                 Prompts sources
 
-    security-context:
-      stage: security
-      image: rust:latest
-      script:
-        - cargo install --git https://github.com/Scttpr/OpenSecKit --path cli
-        - osk ingest > security-context.txt
-      artifacts:
-        paths: [security-context.txt]
-        expire_in: 30 days
+   .claude/
+   └── commands/                Slash commands installés par init
+       ├── osk-audit.md         → /audit
+       ├── osk-spec.md          → /spec
+       ├── osk-assess.md        → /assess
+       ├── osk-domain.md        → /domain
+       ├── osk-context.md       → /context
+       └── osk-incident.md      → /incident
 
-  CAS D'USAGE :
 
-    [*] Traçabilité : un contexte par commit
-    [*] Audit externe sans accès au code
-    [*] Revue de sécurité continue
+8. DÉPANNAGE
 
+   Erreur : Config introuvable
+      $ osk init
 
-═══════════════════════════════════════════════════════════════════════════════
+   Templates obsolètes
+      $ osk init --force
 
-[SECTION 6] CONFIGURATION
+   Plus d'aide
+      $ osk --help
+      $ osk <commande> --help
 
-  Fichier .osk/config.toml généré par osk init.
 
-  STRUCTURE :
-
-    [project]
-    name = "mon-projet"
-    stack = ["rust", "node"]
-
-    [memory]
-    max_tokens = 100000
-
-
-═══════════════════════════════════════════════════════════════════════════════
-
-[SECTION 7] FICHIERS GÉNÉRÉS
-
-    .osk/
-    ├── config.toml              Configuration
-    ├── templates/               Templates téléchargés
-    └── prompts/                 Prompts sources
-
-    .claude/
-    └── commands/                Slash commands installés par init
-        ├── osk-audit.md         → /audit
-        ├── osk-spec.md          → /spec
-        ├── osk-assess.md        → /assess
-        ├── osk-domain.md        → /domain
-        ├── osk-context.md       → /context
-        └── osk-incident.md      → /incident
-
-
-═══════════════════════════════════════════════════════════════════════════════
-
-[SECTION 8] DÉPANNAGE
-
-  ERREUR : Config introuvable
-
-    $ osk init
-
-  TEMPLATES OBSOLÈTES
-
-    $ osk init --force
-
-  PLUS D'AIDE
-
-    $ osk --help
-    $ osk <commande> --help
-
-═══════════════════════════════════════════════════════════════════════════════
-
-╔═══════════════════════════════════════════════════════════════════════════╗
-║                                                                           ║
-║  CLI OpenSecKit v2.0.0                                                    ║
-║  https://github.com/Scttpr/OpenSecKit                                    ║
-║                                                                           ║
-║  "Security as Code, AI-Ready"                                            ║
-║                                                                           ║
-╚═══════════════════════════════════════════════════════════════════════════╝
+---
+OpenSecKit CLI v2.0.0
+https://github.com/Scttpr/OpenSecKit
