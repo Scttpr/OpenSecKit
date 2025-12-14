@@ -1,4 +1,4 @@
-use crate::config::{self, ModelManifest};
+use crate::config;
 use anyhow::{bail, Context, Result};
 use reqwest::blocking::Client;
 use reqwest::StatusCode;
@@ -24,26 +24,6 @@ pub struct GitTreeItem {
 }
 
 const GITHUB_API_URL: &str = "https://api.github.com";
-
-pub fn fetch_model_manifest(client: &Client) -> ModelManifest {
-    let url = format!(
-        "https://raw.githubusercontent.com/{}/{}/main/models.json",
-        config::REPO_OWNER,
-        config::REPO_NAME
-    );
-
-    if let Ok(resp) = client.get(&url).send() {
-        if resp.status().is_success() {
-            match resp.json::<ModelManifest>() {
-                Ok(manifest) => return manifest,
-                Err(e) => eprintln!("   ⚠️  Erreur parsing models.json : {e}"),
-            }
-        }
-    }
-
-    println!("   ⚠️  Impossible de récupérer la liste à jour. Utilisation des modèles intégrés.");
-    ModelManifest::fallback()
-}
 
 pub fn fetch_latest_tag(client: &Client) -> Result<String> {
     let url = format!(
