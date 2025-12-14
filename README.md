@@ -1,70 +1,53 @@
-```
  ██████╗ ██████╗ ███████╗███╗   ██╗███████╗███████╗ ██████╗██╗  ██╗██╗████████╗
 ██╔═══██╗██╔══██╗██╔════╝████╗  ██║██╔════╝██╔════╝██╔════╝██║ ██╔╝██║╚══██╔══╝
 ██║   ██║██████╔╝█████╗  ██╔██╗ ██║███████╗█████╗  ██║     █████╔╝ ██║   ██║
 ██║   ██║██╔═══╝ ██╔══╝  ██║╚██╗██║╚════██║██╔══╝  ██║     ██╔═██╗ ██║   ██║
 ╚██████╔╝██║     ███████╗██║ ╚████║███████║███████╗╚██████╗██║  ██╗██║   ██║
  ╚═════╝ ╚═╝     ╚══════╝╚═╝  ╚═══╝╚══════╝╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝   ╚═╝
-```
 
-```
 ╔═══════════════════════════════════════════════════════════════════════════╗
 ║                                                                           ║
 ║  Framework de sécurité applicative                                       ║
 ║  Templates + CLI + Intégration Claude Code                               ║
 ║                                                                           ║
 ╚═══════════════════════════════════════════════════════════════════════════╝
-```
 
-**Security as Code, AI-Ready**
+                          Security as Code, AI-Ready
 
----
+═══════════════════════════════════════════════════════════════════════════════
 
-## ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂
-
-## C'EST QUOI ?
+[SECTION 1] C'EST QUOI ?
 
 Framework complet pour intégrer la sécurité dans vos projets.
 
-```
-[*] 40 templates markdown organisés selon 7 principes
-[*] CLI Rust pour automatiser la génération de contexte
-[*] Intégration Claude Code via slash commands
-[*] Agnostique du langage
-```
+    [*] 40 templates markdown organisés selon 7 principes
+    [*] CLI Rust pour automatiser la génération de contexte
+    [*] Intégration Claude Code via slash commands
+    [*] Agnostique du langage
 
----
+═══════════════════════════════════════════════════════════════════════════════
 
-## ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂
+[SECTION 2] DÉMARRAGE RAPIDE
 
-## DÉMARRAGE RAPIDE
+  Installation :
 
-**Installation** :
+    $ git clone https://github.com/Scttpr/OpenSecKit
+    $ cd OpenSecKit/cli
+    $ cargo install --path .
 
-```bash
-git clone https://github.com/Scttpr/OpenSecKit
-cd OpenSecKit/cli
-cargo install --path .
-```
+  Utilisation :
 
-**Utilisation** :
+    $ cd /mon-projet
+    $ osk init      # Installe automatiquement les slash commands
+    $ claude
+    >>> /audit
 
-```bash
-cd /mon-projet
-osk init      # Installe automatiquement les slash commands
-claude
->>> /audit
-```
+  Voir QUICK-START.md pour le guide complet.
 
-**Voir QUICK-START.md pour le guide complet.**
+═══════════════════════════════════════════════════════════════════════════════
 
----
+[SECTION 3] LES 7 PRINCIPES
 
-## ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂
-
-## LES 7 PRINCIPES
-
-```
 ┌────┬────────────────────────────────────────────────────────────────┐
 │ I  │ Modélisation des menaces                                       │
 │ II │ Analyse de risques                                             │
@@ -74,105 +57,82 @@ claude
 │ VI │ Journalisation d'audit                                         │
 │ VII│ Patch management                                               │
 └────┴────────────────────────────────────────────────────────────────┘
-```
 
-**Voir constitution.md pour les détails.**
+  Voir constitution.md pour les détails.
 
----
+═══════════════════════════════════════════════════════════════════════════════
 
-## ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂
+[SECTION 4] COMMANDES CLI
 
-## COMMANDES CLI
+    osk init          Initialiser + installer slash commands Claude Code
+    osk ingest        Export contexte (CI/CD)
 
-```
-osk init          Initialiser + installer slash commands Claude Code
-osk ingest        Export contexte (CI/CD)
-```
+  Slash commands disponibles après init :
+    /audit /spec /assess /domain /context /incident
 
-**Slash commands disponibles après init** : `/audit`, `/spec`, `/assess`, `/domain`, `/context`, `/incident`
+  Voir cli/README.md pour détails.
 
-**Voir cli/README.md pour détails.**
+═══════════════════════════════════════════════════════════════════════════════
 
----
+[SECTION 5] STRUCTURE
 
-## ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂
+    OpenSecKit/
+    ├── cli/                   CLI Rust
+    ├── templates/             Templates par principe (40 templates)
+    │   ├── 01-threat-modeling/
+    │   ├── 02-risk-analysis/
+    │   ├── 03-security-requirements/
+    │   ├── 04-security-testing/
+    │   ├── 05-secrets-management/
+    │   ├── 06-audit-logging/
+    │   └── 07-patch-management/
+    ├── domaines/              RGPD, NIS2, RGS (13 templates)
+    ├── prompts/               Prompts pour Claude Code
+    └── docs/                  Documentation
 
-## STRUCTURE
+═══════════════════════════════════════════════════════════════════════════════
 
-```
-OpenSecKit/
-├── cli/                   CLI Rust
-├── templates/             Templates par principe (40 templates)
-│   ├── 01-threat-modeling/
-│   ├── 02-risk-analysis/
-│   ├── 03-security-requirements/
-│   ├── 04-security-testing/
-│   ├── 05-secrets-management/
-│   ├── 06-audit-logging/
-│   └── 07-patch-management/
-├── domaines/              RGPD, NIS2, RGS (13 templates)
-├── prompts/               Prompts pour Claude Code
-└── docs/                  Documentation
-```
+[SECTION 6] MODES D'UTILISATION
 
----
+  [1] Avec Claude Code (recommandé)
 
-## ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂
+        osk init → claude → /audit
 
-## MODES D'UTILISATION
+      AVANTAGES : Modifications automatiques, pas de clés API
 
-### [1] Avec Claude Code (recommandé)
+  [2] Export contexte
 
-```
-osk init → claude → /audit
-```
+        osk ingest -p . -o context.txt
 
-**Avantages** : Modifications automatiques, pas de clés API
+      USAGE : Copier-coller dans n'importe quel LLM
 
-### [2] Export contexte
+  [3] CI/CD
 
-```
-osk ingest -p . -o context.txt
-```
+      Intégration GitHub Actions / GitLab CI pour génération automatique.
 
-**Usage** : Copier-coller dans n'importe quel LLM
+      Voir cli/README.md section CI/CD pour exemples complets.
 
-### [3] CI/CD
+  [4] Templates manuels
 
-Intégration GitHub Actions / GitLab CI pour génération automatique.
+      Utiliser directement les templates markdown sans CLI.
 
-**Voir cli/README.md section CI/CD pour exemples complets.**
+═══════════════════════════════════════════════════════════════════════════════
 
-### [4] Templates manuels
+[SECTION 7] DOMAINES SECTORIELS
 
-Utiliser directement les templates markdown sans CLI.
+    domaines/rgpd/              Conformité RGPD (UE)
+    domaines/nis2/              Directive NIS2
+    domaines/gouvernement-rgs/  RGS (secteur public français)
 
----
+  Utilisation :
 
-## ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂
+    $ claude
+    >>> /domain rgpd
 
-## DOMAINES SECTORIELS
+═══════════════════════════════════════════════════════════════════════════════
 
-```
-domaines/rgpd/              Conformité RGPD (UE)
-domaines/nis2/              Directive NIS2
-domaines/gouvernement-rgs/  RGS (secteur public français)
-```
+[SECTION 8] DOCUMENTATION
 
-**Utilisation** :
-
-```bash
-claude
->>> /domain rgpd
-```
-
----
-
-## ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂
-
-## DOCUMENTATION
-
-```
 ┌──────────────────────┬────────────────────────────────────────────────┐
 │ Fichier              │ Contenu                                        │
 ├──────────────────────┼────────────────────────────────────────────────┤
@@ -182,30 +142,22 @@ claude
 │ cli/README.md        │ Documentation CLI                             │
 │ CONTRIBUTING.md      │ Guide contribution                            │
 └──────────────────────┴────────────────────────────────────────────────┘
-```
 
----
+═══════════════════════════════════════════════════════════════════════════════
 
-## ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂
+[SECTION 9] SUPPORT
 
-## SUPPORT
+    [*] Issues      : https://github.com/Scttpr/OpenSecKit/issues
+    [*] Discussions : https://github.com/Scttpr/OpenSecKit/discussions
 
-```
-[*] Issues      : https://github.com/Scttpr/OpenSecKit/issues
-[*] Discussions : https://github.com/Scttpr/OpenSecKit/discussions
-```
+═══════════════════════════════════════════════════════════════════════════════
 
----
-
-## ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂
-
-## LICENCE
+[SECTION 10] LICENCE
 
 MIT License
 
----
+═══════════════════════════════════════════════════════════════════════════════
 
-```
 ╔═══════════════════════════════════════════════════════════════════════════╗
 ║                                                                           ║
 ║  OpenSecKit v2.0.0                                                        ║
@@ -214,4 +166,3 @@ MIT License
 ║  "Security as Code, AI-Ready"                                            ║
 ║                                                                           ║
 ╚═══════════════════════════════════════════════════════════════════════════╝
-```

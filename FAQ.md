@@ -1,182 +1,137 @@
-```
  ███████╗ █████╗  ██████╗
  ██╔════╝██╔══██╗██╔═══██╗
  █████╗  ███████║██║   ██║
  ██╔══╝  ██╔══██║██║▄▄ ██║
  ██║     ██║  ██║╚██████╔╝
  ╚═╝     ╚═╝  ╚═╝ ╚══▀▀═╝
-```
 
-```
 ╔═══════════════════════════════════════════════════════════════════════════╗
 ║                                                                           ║
 ║  FAQ - Questions fréquentes                                               ║
 ║                                                                           ║
 ╚═══════════════════════════════════════════════════════════════════════════╝
-```
 
----
+═══════════════════════════════════════════════════════════════════════════════
 
-## ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂
+[SECTION 1] DÉMARRAGE
 
-## DÉMARRAGE
+  Q: Par où commencer ?
+  R: Suivez QUICK-START.md (10 minutes).
 
-**Par où commencer ?**
+  Q: Dois-je remplir TOUS les templates ?
+  R: Non. Minimum vital :
+     - Modélisation menaces
+     - Analyse risques
+     - Détection secrets
 
-Suivez QUICK-START.md (10 minutes).
+  Q: Combien de temps ?
+  R: Version rapide : 10-15 min
+     Version complète : 1-2 jours
 
-**Dois-je remplir TOUS les templates ?**
+  Q: Quel langage ?
+  R: Tous. OpenSecKit est agnostique du langage.
 
-Non. Minimum vital : Modélisation menaces + Analyse risques + Détection secrets.
+═══════════════════════════════════════════════════════════════════════════════
 
-**Combien de temps ?**
+[SECTION 2] CLAUDE CODE
 
-Version rapide : 10-15 min. Version complète : 1-2 jours.
+  Q: Quels agents IA supportés ?
+  R: Claude Code uniquement pour l'exécution automatisée.
+     Autres LLMs via copier-coller manuel.
 
-**Quel langage ?**
+  Q: Comment ça marche ?
+  R: osk init → Installe slash commands dans .claude/commands/
+              → /audit dans Claude Code
 
-Tous. OpenSecKit est agnostique du langage.
+  Q: Mon code est envoyé où ?
+  R: Nulle part. Tout reste local. Claude Code utilise votre session.
 
----
+  Q: Comment mettre à jour les slash commands ?
+  R: $ osk init --force
 
-## ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂
+     Cela télécharge et installe les dernières versions des prompts
+     depuis le repo OpenSecKit.
 
-## CLAUDE CODE
+═══════════════════════════════════════════════════════════════════════════════
 
-**Quels agents IA supportés ?**
+[SECTION 3] CONFORMITÉ
 
-Claude Code uniquement pour l'exécution automatisée. Autres LLMs via copier-coller manuel.
+  Q: Comment utiliser les templates RGPD/NIS2/RGS ?
+  R: $ osk init              # Installe les slash commands
+     $ claude
+     >>> /domain rgpd
+     >>> /domain nis2
+     >>> /domain rgs
 
-**Comment ça marche ?**
+     Puis suivez les templates dans domaines/{secteur}/
 
-```
-osk init → Installe slash commands dans .claude/commands/ → /audit dans Claude Code
-```
+  Q: Puis-je combiner plusieurs domaines ?
+  R: Oui. Les templates sont compatibles entre eux.
 
-**Mon code est envoyé où ?**
+═══════════════════════════════════════════════════════════════════════════════
 
-Nulle part. Tout reste local. Claude Code utilise votre session.
+[SECTION 4] OUTILS
 
-**Comment mettre à jour les slash commands ?**
+  Q: Quels outils recommandés ?
+  R:
+     Détection secrets    gitleaks, truffleHog
+     SAST                 Semgrep, SonarQube
+     DAST                 OWASP ZAP, Burp Suite
+     SCA                  Dependabot, Snyk
 
-```bash
-osk init --force
-```
+  Q: Intégration CI/CD ?
+  R: Oui, via osk ingest. Voir cli/README.md section CI/CD.
 
-Cela télécharge et installe les dernières versions des prompts depuis le repo OpenSecKit.
+═══════════════════════════════════════════════════════════════════════════════
 
----
+[SECTION 5] DÉPANNAGE
 
-## ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂
+  PROBLÈME : 'osk' n'est pas reconnu
+  SOLUTION :
+    $ cd OpenSecKit/cli
+    $ cargo install --path .
+    $ osk --version
 
-## CONFORMITÉ
+  PROBLÈME : Config introuvable
+  SOLUTION :
+    $ osk init
 
-**Comment utiliser les templates RGPD/NIS2/RGS ?**
+  PROBLÈME : Templates obsolètes
+  SOLUTION :
+    $ osk init --force
 
-```bash
-osk init              # Installe les slash commands
-claude
->>> /domain rgpd
->>> /domain nis2
->>> /domain rgs
-```
+  PROBLÈME : Secret trouvé dans l'historique git
+  SOLUTION :
+    [1] Révoquer le secret immédiatement
+    [2] Nettoyer l'historique (git-filter-repo, BFG)
+    [3] Force push (coordonner avec l'équipe)
+    [4] Installer gitleaks pre-commit hook
 
-Puis suivez les templates dans `domaines/{secteur}/`.
+═══════════════════════════════════════════════════════════════════════════════
 
-**Puis-je combiner plusieurs domaines ?**
+[SECTION 6] CONTRIBUTION
 
-Oui. Les templates sont compatibles entre eux.
+  Q: Puis-je contribuer ?
+  R: Oui. Nouveaux templates, exemples, traductions, corrections.
+     Voir CONTRIBUTING.md.
 
----
+  Q: Comment proposer un template ?
+  R:
+    [1] Fork le repo
+    [2] Créer template dans templates/{principe}/
+    [3] Ajouter exemple _example-*.md
+    [4] Tester avec projet réel
+    [5] Pull request
 
-## ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂
+═══════════════════════════════════════════════════════════════════════════════
 
-## OUTILS
+[SECTION 7] SUPPORT
 
-**Quels outils recommandés ?**
+    [*] Issues      : https://github.com/Scttpr/OpenSecKit/issues
+    [*] Discussions : https://github.com/Scttpr/OpenSecKit/discussions
 
-```
-Détection secrets    gitleaks, truffleHog
-SAST                 Semgrep, SonarQube
-DAST                 OWASP ZAP, Burp Suite
-SCA                  Dependabot, Snyk
-```
+═══════════════════════════════════════════════════════════════════════════════
 
-**Intégration CI/CD ?**
-
-Oui, via `osk ingest`. Voir cli/README.md section CI/CD.
-
----
-
-## ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂
-
-## DÉPANNAGE
-
-**'osk' n'est pas reconnu**
-
-```bash
-cd OpenSecKit/cli
-cargo install --path .
-osk --version
-```
-
-**Config introuvable**
-
-```bash
-osk init
-```
-
-**Templates obsolètes**
-
-```bash
-osk init --force
-```
-
-**Secret trouvé dans l'historique git**
-
-```
-[1] Révoquer le secret immédiatement
-[2] Nettoyer l'historique (git-filter-repo, BFG)
-[3] Force push (coordonner avec l'équipe)
-[4] Installer gitleaks pre-commit hook
-```
-
----
-
-## ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂
-
-## CONTRIBUTION
-
-**Puis-je contribuer ?**
-
-Oui. Nouveaux templates, exemples, traductions, corrections.
-
-Voir CONTRIBUTING.md.
-
-**Comment proposer un template ?**
-
-```
-[1] Fork le repo
-[2] Créer template dans templates/{principe}/
-[3] Ajouter exemple _example-*.md
-[4] Tester avec projet réel
-[5] Pull request
-```
-
----
-
-## ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂
-
-## SUPPORT
-
-```
-[*] Issues      : https://github.com/Scttpr/OpenSecKit/issues
-[*] Discussions : https://github.com/Scttpr/OpenSecKit/discussions
-```
-
----
-
-```
 ╔═══════════════════════════════════════════════════════════════════════════╗
 ║                                                                           ║
 ║  OpenSecKit FAQ v2.0.0                                                    ║
@@ -185,4 +140,3 @@ Voir CONTRIBUTING.md.
 ║  "Security as Code, AI-Ready"                                            ║
 ║                                                                           ║
 ╚═══════════════════════════════════════════════════════════════════════════╝
-```
