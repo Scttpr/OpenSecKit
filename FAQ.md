@@ -18,6 +18,7 @@
 ---
 
 ## ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂
+
 ## DÉMARRAGE
 
 **Par où commencer ?**
@@ -39,6 +40,7 @@ Tous. OpenSecKit est agnostique du langage.
 ---
 
 ## ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂
+
 ## CLAUDE CODE
 
 **Quels agents IA supportés ?**
@@ -55,9 +57,18 @@ osk init → Installe slash commands dans .claude/commands/ → /audit dans Clau
 
 Nulle part. Tout reste local. Claude Code utilise votre session.
 
+**Comment mettre à jour les slash commands ?**
+
+```bash
+osk init --force
+```
+
+Cela télécharge et installe les dernières versions des prompts depuis le repo OpenSecKit.
+
 ---
 
 ## ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂
+
 ## CONFORMITÉ
 
 **Comment utiliser les templates RGPD/NIS2/RGS ?**
@@ -79,6 +90,7 @@ Oui. Les templates sont compatibles entre eux.
 ---
 
 ## ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂
+
 ## OUTILS
 
 **Quels outils recommandés ?**
@@ -97,6 +109,7 @@ Oui, via `osk ingest`. Voir cli/README.md section CI/CD.
 ---
 
 ## ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂
+
 ## DÉPANNAGE
 
 **'osk' n'est pas reconnu**
@@ -131,6 +144,7 @@ osk init --force
 ---
 
 ## ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂
+
 ## CONTRIBUTION
 
 **Puis-je contribuer ?**
@@ -152,6 +166,7 @@ Voir CONTRIBUTING.md.
 ---
 
 ## ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂
+
 ## SUPPORT
 
 ```

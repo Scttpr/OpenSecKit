@@ -9,11 +9,27 @@ use std::path::{Path, PathBuf};
 pub fn run(client: &Client, force: bool) -> Result<()> {
     println!("🚀 Initialisation de OpenSecKit...");
 
-    let config = prompt_configuration()?;
-    scaffold_project(&config)?;
+    let config_exists = Path::new(".osk/config.toml").exists();
+
+    let config = if config_exists && !force {
+        println!("   ℹ️  Configuration existante détectée.");
+        fs::read_to_string(".osk/config.toml")
+            .and_then(|s| {
+                toml::from_str(&s)
+                    .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))
+            })
+            .unwrap_or_else(|_| {
+                println!("   ⚠️  Config corrompue, création d'une nouvelle...");
+                prompt_configuration().unwrap()
+            })
+    } else {
+        prompt_configuration()?
+    };
+
+    scaffold_project(&config, force)?;
 
     install_resources(client, force)?;
-    install_slash_commands()?;
+    install_slash_commands(force)?;
 
     println!("\n✅ OpenSecKit initialisé !");
     println!("\n📂 Slash commands générés dans .claude/commands/");
@@ -61,14 +77,20 @@ fn prompt_configuration() -> Result<OskConfig> {
     Ok(config)
 }
 
-fn scaffold_project(config: &OskConfig) -> Result<()> {
+fn scaffold_project(config: &OskConfig, force: bool) -> Result<()> {
     fs::create_dir_all(".osk/prompts")?;
     fs::create_dir_all(".osk/templates")?;
     fs::create_dir_all(".osk/memory")?;
     fs::create_dir_all(".claude/commands")?;
 
-    let toml_string = toml::to_string_pretty(config)?;
-    fs::write(".osk/config.toml", toml_string)?;
+    let config_path = Path::new(".osk/config.toml");
+    if !config_path.exists() || force {
+        let toml_string = toml::to_string_pretty(config)?;
+        fs::write(config_path, toml_string)?;
+        if force && config_path.exists() {
+            println!("   ✅ Configuration mise à jour");
+        }
+    }
 
     if Path::new(".gitignore").exists() {
         println!("   ℹ️  Pensez à ajouter .osk/memory/ et .osk/config.toml à votre .gitignore");
@@ -130,7 +152,7 @@ fn install_resources(client: &Client, force: bool) -> Result<()> {
     Ok(())
 }
 
-fn install_slash_commands() -> Result<()> {
+fn install_slash_commands(force: bool) -> Result<()> {
     println!("   📝 Installation des slash commands...");
 
     let prompts_dir = PathBuf::from(".osk/prompts");
@@ -143,7 +165,10 @@ fn install_slash_commands() -> Result<()> {
 
     fs::create_dir_all(&commands_dir)?;
 
-    let mut count = 0;
+    let mut count_installed = 0;
+    let mut count_updated = 0;
+    let mut count_skipped = 0;
+
     for entry in fs::read_dir(prompts_dir)? {
         let entry = entry?;
         let path = entry.path();
@@ -151,12 +176,33 @@ fn install_slash_commands() -> Result<()> {
         if path.extension().and_then(|s| s.to_str()) == Some("md") {
             if let Some(filename) = path.file_name() {
                 let dest = commands_dir.join(filename);
-                fs::copy(&path, &dest)?;
-                count += 1;
+
+                if dest.exists() && !force {
+                    count_skipped += 1;
+                } else {
+                    fs::copy(&path, &dest)?;
+                    if dest.metadata().is_ok() && !force {
+                        count_updated += 1;
+                    } else {
+                        count_installed += 1;
+                    }
+                }
             }
         }
     }
 
-    println!("   ✅ {} slash commands installés", count);
+    if force && count_updated > 0 {
+        println!("   ✅ {} slash commands mis à jour", count_installed);
+    } else if count_installed > 0 {
+        println!("   ✅ {} slash commands installés", count_installed);
+    }
+
+    if count_skipped > 0 && !force {
+        println!(
+            "   ℹ️  {} slash commands déjà présents (utilisez --force pour mettre à jour)",
+            count_skipped
+        );
+    }
+
     Ok(())
 }
