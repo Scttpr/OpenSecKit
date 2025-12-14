@@ -1,0 +1,50 @@
+name: OpenSecKit Ingest
+
+on:
+    push:
+        branches:
+            - main
+    workflow_dispatch:
+
+jobs:
+    ingest-codebase:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Download Latest OpenSecKit
+              run: |
+                  DOWNLOAD_URL=$(curl -s https://api.github.com/repos/Scttpr/OpenSecKit/releases/latest \
+                    | jq -r '.assets[] | select(.name == "osk-linux-amd64") | .browser_download_url')
+
+                  wget -O osk "$DOWNLOAD_URL"
+                  chmod +x osk
+
+            - name: Generate Output Filename
+              run: |
+                  REPO_NAME="${GITHUB_REPOSITORY#*/}"
+                  CURRENT_DATE=$(date +'%Y-%m-%d')
+
+                  if git describe --tags --exact-match >/dev/null 2>&1; then
+                    VERSION=$(git describe --tags --exact-match)
+                    FINAL_NAME="context-${REPO_NAME}-${VERSION}-${CURRENT_DATE}.txt"
+                  else
+                    SHORT_SHA=$(git rev-parse --short HEAD)
+                    FINAL_NAME="context-${REPO_NAME}-${SHORT_SHA}-${CURRENT_DATE}.txt"
+                  fi
+
+                  echo "CTX_FILENAME=$FINAL_NAME" >> $GITHUB_ENV
+            - name: Run Ingest
+              run: |
+                  ./osk ingest -p . -o ${{ env.CTX_FILENAME }}
+
+            - name: Upload Ingest Artifact
+              uses: actions/upload-artifact@v4
+              with:
+                  name: ${{ env.CTX_FILENAME }}
+                  path: ${{ env.CTX_FILENAME }}
+                  retention-days: 5
