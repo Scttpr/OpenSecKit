@@ -14,7 +14,10 @@ pub fn run(client: &Client, force: bool) -> Result<()> {
     let config = if config_exists && !force {
         println!("   ℹ️  Configuration existante détectée.");
         fs::read_to_string(".osk/config.toml")
-            .and_then(|s| toml::from_str(&s).map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e)))
+            .and_then(|s| {
+                toml::from_str(&s)
+                    .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))
+            })
             .unwrap_or_else(|_| {
                 println!("   ⚠️  Config corrompue, création d'une nouvelle...");
                 prompt_configuration().unwrap()
@@ -195,7 +198,10 @@ fn install_slash_commands(force: bool) -> Result<()> {
     }
 
     if count_skipped > 0 && !force {
-        println!("   ℹ️  {} slash commands déjà présents (utilisez --force pour mettre à jour)", count_skipped);
+        println!(
+            "   ℹ️  {} slash commands déjà présents (utilisez --force pour mettre à jour)",
+            count_skipped
+        );
     }
 
     Ok(())

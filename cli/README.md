@@ -80,15 +80,18 @@ osk init --force      # Mise à jour forcée
 ```
 
 Initialise le projet :
+
 - Crée la structure `.osk/` et `.claude/commands/`
 - Télécharge templates, prompts et domaines
 - Installe les slash commands pour Claude Code
 - Détecte automatiquement la stack technique
 
 **Options** :
+
 - `--force` / `-f` : Force la mise à jour des ressources et slash commands existants
 
 **Après init, les slash commands suivants sont disponibles** :
+
 - `/audit` - Audit de sécurité complet
 - `/spec` - Analyse specs pour user story
 - `/assess` - Évaluation conformité 7 principes
@@ -97,6 +100,7 @@ Initialise le projet :
 - `/incident` - Gestion de crise
 
 **Pour mettre à jour les slash commands** :
+
 ```bash
 osk init --force      # Met à jour depuis le repo OpenSecKit
 ```
@@ -104,6 +108,7 @@ osk init --force      # Met à jour depuis le repo OpenSecKit
 **⚠️ Impact de `--force`** :
 
 Écrasé (mis à jour) :
+
 - ✅ `.osk/prompts/` - Prompts sources
 - ✅ `.osk/templates/` - Templates
 - ✅ `.osk/domaines/` - Domaines sectoriels
@@ -111,6 +116,7 @@ osk init --force      # Met à jour depuis le repo OpenSecKit
 - ✅ `.osk/config.toml` - Configuration (re-demandée)
 
 **Préservé (jamais touché)** :
+
 - ✅ `docs/security/` - Vos documents de sécurité
 - ✅ Code source du projet
 - ✅ Historique git

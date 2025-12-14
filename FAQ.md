@@ -18,6 +18,7 @@
 ---
 
 ## ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂
+
 ## DÉMARRAGE
 
 **Par où commencer ?**
@@ -39,6 +40,7 @@ Tous. OpenSecKit est agnostique du langage.
 ---
 
 ## ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂
+
 ## CLAUDE CODE
 
 **Quels agents IA supportés ?**
@@ -66,6 +68,7 @@ Cela télécharge et installe les dernières versions des prompts depuis le repo
 ---
 
 ## ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂
+
 ## CONFORMITÉ
 
 **Comment utiliser les templates RGPD/NIS2/RGS ?**
@@ -87,6 +90,7 @@ Oui. Les templates sont compatibles entre eux.
 ---
 
 ## ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂
+
 ## OUTILS
 
 **Quels outils recommandés ?**
@@ -105,6 +109,7 @@ Oui, via `osk ingest`. Voir cli/README.md section CI/CD.
 ---
 
 ## ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂
+
 ## DÉPANNAGE
 
 **'osk' n'est pas reconnu**
@@ -139,6 +144,7 @@ osk init --force
 ---
 
 ## ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂
+
 ## CONTRIBUTION
 
 **Puis-je contribuer ?**
@@ -160,6 +166,7 @@ Voir CONTRIBUTING.md.
 ---
 
 ## ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂
+
 ## SUPPORT
 
 ```
