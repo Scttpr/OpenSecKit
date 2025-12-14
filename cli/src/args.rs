@@ -21,38 +21,4 @@ pub enum Commands {
         #[arg(short, long, default_value = ".")]
         path: String,
     },
-
-    Audit {
-        #[arg(long)]
-        provider: Option<String>,
-    },
-
-    Spec {
-        user_story: String,
-        #[arg(long)]
-        provider: Option<String>,
-    },
-
-    Domaine {
-        nom: String,
-        #[arg(long)]
-        provider: Option<String>,
-    },
-
-    Context {
-        #[arg(long)]
-        provider: Option<String>,
-    },
-
-    Assess {
-        subject: String,
-        #[arg(long)]
-        provider: Option<String>,
-    },
-
-    Incident {
-        description: String,
-        #[arg(long)]
-        provider: Option<String>,
-    },
 }

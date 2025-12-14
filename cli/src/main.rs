@@ -4,9 +4,6 @@ mod args;
 mod commands;
 mod config;
 mod github;
-mod memory;
-mod prompts;
-mod providers;
 mod stack;
 
 use anyhow::Result;
