@@ -55,6 +55,14 @@ osk init → Installe slash commands dans .claude/commands/ → /audit dans Clau
 
 Nulle part. Tout reste local. Claude Code utilise votre session.
 
+**Comment mettre à jour les slash commands ?**
+
+```bash
+osk init --force
+```
+
+Cela télécharge et installe les dernières versions des prompts depuis le repo OpenSecKit.
+
 ---
 
 ## ▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂

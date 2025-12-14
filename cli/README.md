@@ -75,16 +75,18 @@ osk --version
 ### init
 
 ```bash
-osk init
+osk init              # Installation initiale
+osk init --force      # Mise à jour forcée
 ```
-
-Initialise le projet avec détection automatique de la stack.
 
 Initialise le projet :
 - Crée la structure `.osk/` et `.claude/commands/`
 - Télécharge templates, prompts et domaines
 - Installe les slash commands pour Claude Code
 - Détecte automatiquement la stack technique
+
+**Options** :
+- `--force` / `-f` : Force la mise à jour des ressources et slash commands existants
 
 **Après init, les slash commands suivants sont disponibles** :
 - `/audit` - Audit de sécurité complet
@@ -93,6 +95,28 @@ Initialise le projet :
 - `/domain` - Conformité sectorielle (RGPD, NIS2, RGS)
 - `/context` - Extraction ADN technique
 - `/incident` - Gestion de crise
+
+**Pour mettre à jour les slash commands** :
+```bash
+osk init --force      # Met à jour depuis le repo OpenSecKit
+```
+
+**⚠️ Impact de `--force`** :
+
+Écrasé (mis à jour) :
+- ✅ `.osk/prompts/` - Prompts sources
+- ✅ `.osk/templates/` - Templates
+- ✅ `.osk/domaines/` - Domaines sectoriels
+- ✅ `.claude/commands/` - Slash commands
+- ✅ `.osk/config.toml` - Configuration (re-demandée)
+
+**Préservé (jamais touché)** :
+- ✅ `docs/security/` - Vos documents de sécurité
+- ✅ Code source du projet
+- ✅ Historique git
+- ✅ `.osk/memory/` - Mémoire conversations
+
+**⚠️ Attention** : Si vous avez modifié manuellement les slash commands dans `.claude/commands/`, ces modifications seront perdues. Versionnez-les dans git si nécessaire.
 
 ---
 
