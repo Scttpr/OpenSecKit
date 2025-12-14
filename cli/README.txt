@@ -1,13 +1,19 @@
-OpenSecKit CLI                                                Version 2.0.0
+╔══════════════════════════════════════════════════════════════════════════╗
+║                         OPENSECKIT - CLI                                 ║
+║              CLI pour générer des slash commands                         ║
+║                          Version 2.0.0                                   ║
+╚══════════════════════════════════════════════════════════════════════════╝
 
 
 NAME
-    osk - CLI pour générer des slash commands Claude Code
+    osk - OpenSecKit Command Line Interface
 
 SYNOPSIS
     osk init [--force]
     osk ingest [-p PATH] [-o OUTPUT]
 
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 1. INSTALLATION
 
@@ -19,11 +25,15 @@ SYNOPSIS
       $ osk --version
 
 
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 2. COMMANDES
 
    init      Initialiser + installer slash commands Claude Code
    ingest    Export contexte pour CI/CD ou copier-coller
 
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 3. WORKFLOW TYPIQUE
 
@@ -37,6 +47,8 @@ SYNOPSIS
    Slash commands disponibles :
       /audit /spec /assess /domain /context /incident
 
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 4. USAGE DÉTAILLÉ
 
@@ -99,6 +111,8 @@ SYNOPSIS
          $ osk ingest -p src/ > context-src.txt
 
 
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 5. INTÉGRATION CI/CD
 
    Génération automatique du contexte dans votre pipeline.
@@ -143,6 +157,8 @@ SYNOPSIS
       - Revue de sécurité continue
 
 
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 6. CONFIGURATION
 
    Fichier .osk/config.toml généré par osk init.
@@ -156,6 +172,8 @@ SYNOPSIS
       [memory]
       max_tokens = 100000
 
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 7. FICHIERS GÉNÉRÉS
 
@@ -174,6 +192,8 @@ SYNOPSIS
        └── osk-incident.md      → /incident
 
 
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 8. DÉPANNAGE
 
    Erreur : Config introuvable
@@ -187,6 +207,8 @@ SYNOPSIS
       $ osk <commande> --help
 
 
----
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 OpenSecKit CLI v2.0.0
 https://github.com/Scttpr/OpenSecKit
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
