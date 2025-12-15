@@ -39,13 +39,16 @@ SYNOPSIS
 
    [1] osk init              Initialise + installe slash commands
    [2] claude                Lancer Claude Code
-   [3] /audit                Exécuter l'audit de sécurité
-   [4] /spec "..."           Analyser une user story
-   [5] /assess "..."         Évaluer conformité
-   [6] /domain rgpd          Vérifier conformité RGPD
+   [3] /security "login"     Analyser sécurité d'une fonctionnalité
+   [4] /audit                Vérifier conformité aux 7 principes
+   [5] /dashboard            Vue consolidée des métriques
+   [6] /incident "..."       Gérer un incident de sécurité
 
    Slash commands disponibles :
-      /audit /spec /assess /domain /context /incident
+      /security <feature>  - Analyse constitutionnelle complète
+      /audit               - Vérification conformité et risk register
+      /dashboard           - Tableau de bord et métriques clés
+      /incident <desc>     - Gestion de crise et plan d'action
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -67,12 +70,10 @@ SYNOPSIS
          --force / -f : Force la mise à jour des ressources
 
       Slash commands disponibles après init :
-         /audit    - Audit de sécurité complet
-         /spec     - Analyse specs pour user story
-         /assess   - Évaluation conformité 7 principes
-         /domain   - Conformité sectorielle (RGPD, NIS2, RGS)
-         /context  - Extraction ADN technique
-         /incident - Gestion de crise
+         /security  - Analyse constitutionnelle de sécurité
+         /audit     - Vérification conformité aux 7 principes
+         /dashboard - Tableau de bord et métriques clés
+         /incident  - Gestion de crise et plan d'action
 
       Mise à jour des slash commands :
          $ osk init --force
@@ -184,11 +185,9 @@ SYNOPSIS
 
    .claude/
    └── commands/                Slash commands installés par init
+       ├── osk-security.md      → /security
        ├── osk-audit.md         → /audit
-       ├── osk-spec.md          → /spec
-       ├── osk-assess.md        → /assess
-       ├── osk-domain.md        → /domain
-       ├── osk-context.md       → /context
+       ├── osk-dashboard.md     → /dashboard
        └── osk-incident.md      → /incident
 
 

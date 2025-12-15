@@ -50,7 +50,7 @@ DESCRIPTION
       $ cd /mon-projet
       $ osk init
       $ claude
-      >>> /audit
+      >>> /security "système de login"
 
    Voir QUICK-START.txt pour le guide complet.
 
@@ -78,7 +78,10 @@ DESCRIPTION
    osk ingest        Export contexte (CI/CD)
 
    Slash commands disponibles après init :
-      /audit /spec /assess /domain /context /incident
+      /security <feature>    Analyse constitutionnelle de sécurité
+      /audit                 Vérification conformité aux 7 principes
+      /dashboard             Vue consolidée des métriques
+      /incident <desc>       Gestion de crise et plan d'action
 
    Voir cli/README.txt pour détails.
 
@@ -140,8 +143,10 @@ DESCRIPTION
 
    Utilisation :
 
-      $ claude
-      >>> /domain rgpd
+      Détection automatique dans /security si données personnelles,
+      paiements, ou santé détectés.
+
+      Templates manuels disponibles dans domaines/{secteur}/
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

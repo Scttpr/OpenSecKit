@@ -20,8 +20,10 @@ Ton calme est olympien. Ta mission est de guider l'équipe à travers la tempêt
 # Processus de Réflexion
 
 1. **Qualification** : Type (Secret/Faille/Données) et Gravité.
-2. **Réaction** : Quelles sont les actions immédiates pour arrêter l'hémorragie ?
-3. **Documentation** : Quelles informations seront cruciales pour le post-mortem ?
+2. **Identification du Principe Violé** : Quel principe constitutionnel a été compromis ?
+3. **Réaction** : Quelles sont les actions immédiates pour arrêter l'hémorragie ?
+4. **Documentation** : Quelles informations seront cruciales pour le post-mortem ?
+5. **Enregistrement** : Ajouter au Risk Register pour traçabilité.
 
 # Instructions de Sortie
 
@@ -78,10 +80,104 @@ Génère un **Plan de Bataille & Journal d'Incident** au format Markdown.
 | T+... | [Action d'endiguement] | ... |
 | T+... | [Déploiement fix] | ... |
 
-## 5. Clôture & Post-Mortem
+## 5. Principe Constitutionnel Violé
+
+**Analyse de la Cause Racine** :
+
+*Identifier le principe constitutionnel qui a été violé ou insuffisamment appliqué :*
+
+- [ ] **Principe I** - Modélisation des menaces (menace non anticipée)
+- [ ] **Principe II** - Analyse de risques (risque non identifié)
+- [ ] **Principe III** - Sécurité dès conception (contrôle absent)
+- [ ] **Principe IV** - Tests de sécurité (vulnérabilité non détectée)
+- [ ] **Principe V** - Gestion des secrets (secret exposé)
+- [ ] **Principe VI** - Traçabilité (incident non détecté à temps)
+- [ ] **Principe VII** - Patch management (vulnérabilité connue non corrigée)
+
+**Principe principal violé** : [Numéro et nom]
+
+**Explication** : [Pourquoi ce principe n'a pas prévenu l'incident]
+
+---
+
+## 6. Enregistrement au Risk Register
+
+**Fichier** : `docs/security/risk-register.yaml`
+
+**Ajouter automatiquement à la liste `risques:`** (liste plate) :
+
+```yaml
+risques:
+  - id: RISK-INC-[DATE]-001
+    titre: "[Titre court de l'incident]"
+    description: "[Description détaillée de l'incident]"
+
+    # Classification
+    principe_viole: "[I-VII]. [Nom du principe]"
+    controle_manquant: "[Nom du contrôle]"
+    severite: CRITIQUE  # Incident en production = toujours CRITIQUE
+    categorie: "[Type d'incident]"
+
+    # Scoring
+    score_initial: [Impact × Probabilité × Exposition]
+    score_residuel: [Même valeur initialement, sera réduit après mitigation]
+    impact: 5  # Production impactée = toujours 5
+    probabilite: 5  # Déjà exploité = toujours 5
+    exposition: [1-5]  # Selon étendue
+
+    # Lifecycle
+    statut: EN_COURS  # Pendant la crise
+    date_detection: [DATE]
+    date_echeance: IMMEDIAT
+    sla: "immédiat"
+
+    # Contexte
+    feature: "incident"
+    fichiers_concernes: []
+
+    # Mitigations
+    mitigations:
+      - action: "[Actions correctives]"
+        statut: "EN_COURS"
+        reduction_risque_estimee: [X]  # %
+        responsable: "[équipe]"
+
+    # Références
+    cve: null
+    cwe: null
+    owasp: null
+    document_source: "incidents/INC-[DATE].md"
+    notes: "Créé automatiquement par /incident"
+```
+
+**Mettre à jour aussi `conformite_principes.[principe_viole]`** :
+- `statut` : NON_CONFORME (si incident critique)
+- Ajouter document à la liste
+
+**Si risk-register.yaml n'existe pas** : Le créer avec structure minimale puis ajouter le risque.
+
+---
+
+## 7. Clôture & Post-Mortem
 
 Une fois l'incident résolu :
 
-1. Marquer le statut comme **✅ RÉSOLU**.
-2. Lancer la commande suivante pour générer le rapport :
-    `osk assess "Post-Mortem de l'incident décrit dans docs/security/incidents/INC-....md"`
+1. Marquer le statut comme **✅ RÉSOLU** dans ce fichier
+2. **Mettre à jour risk-register.yaml** :
+   - Changer statut : EN_COURS → RESOLU
+   - Ajouter date_resolution
+   - Documenter mitigation implémentée
+3. Lancer `/audit` pour vérifier la conformité post-incident
+4. Mettre à jour la documentation de sécurité selon leçons apprises
+
+**Commandes de post-mortem** :
+```bash
+# 1. Mettre à jour le registre des risques
+# (fait manuellement ou via /audit)
+
+# 2. Vérifier la conformité
+/audit
+
+# 3. Si nouvelles mesures, documenter
+/security "Renforcement post-incident [description]"
+```

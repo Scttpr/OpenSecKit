@@ -1,0 +1,251 @@
+╔══════════════════════════════════════════════════════════════════════════╗
+║                         OPENSECKIT - CHANGELOG                           ║
+║                        Historique des versions                           ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+VERSION 2.0.0 - 2025-01-15
+
+REFONTE MAJEURE - Architecture Constitutionnelle
+
+Cette version simplifie radicalement l'architecture en centrant tout
+autour des 7 principes constitutionnels.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+BREAKING CHANGES
+
+   🔴 Slash Commands : 6 → 4 commandes
+
+   SUPPRIMÉES :
+      ❌ /spec      → Fusionnée dans /security
+      ❌ /assess    → Fusionnée dans /audit
+      ❌ /context   → Fusionnée dans /security
+      ❌ /domain    → Fusionnée dans /security (détection auto)
+
+   NOUVELLES :
+      ✅ /security <feature>  - Analyse constitutionnelle complète
+      ✅ /audit               - Vérification conformité 7 principes
+      ✅ /dashboard           - Vue consolidée et métriques
+      ✅ /incident <desc>     - Gestion de crise (mis à jour)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+NOUVELLES FONCTIONNALITÉS
+
+   ✨ /security - Analyse Constitutionnelle Complète
+
+      • Fusionne /context + /spec + /domain en une seule commande
+      • Détection automatique du contexte projet (première utilisation)
+      • Génère meta.md avec profilage réglementaire auto (RGPD/PCI-DSS/HDS)
+      • Génère SEC-FEATURE.md structuré selon les 7 principes
+      • Met à jour automatiquement risk-register.yaml
+      • Un seul ton : technique mais accessible
+
+   ✨ Risk Register Centralisé
+
+      • Nouveau fichier docs/security/risk-register.yaml
+      • Structure PLATE (liste de risques, pas de regroupement par principe)
+      • Chaque risque mentionne le principe violé comme attribut
+      • Score INITIAL et RÉSIDUEL (après mitigations)
+      • Cycle de vie complet : OUVERT → EN_COURS → RESOLU → ACCEPTE
+      • Métriques : score résiduel total, réduction globale, MTTR
+      • Vue de synthèse par principe (conformite_principes)
+      • Vue auto-générée : RISK-REGISTER.md avec tri par score résiduel
+
+   ✨ /audit - Vérification Conformité Étendue
+
+      • Fusionne /audit + /assess
+      • Vérifie les 7 principes dans code ET documentation
+      • Met à jour automatiquement statuts risques (OUVERT → RESOLU)
+      • Dashboard de conformité dans le terminal
+      • Génère AUDIT-[DATE].md avec évolution temporelle
+      • Bloque production si principes critiques non respectés
+
+   ✨ /dashboard - Vue Consolidée et Métriques
+
+      • NOUVELLE commande pour pilotage visuel
+      • Dashboard terminal avec graphiques ASCII
+      • Métriques clés :
+        - Conformité globale aux 7 principes
+        - Security Debt Score
+        - MTTR (Mean Time To Resolve)
+        - Taux de résolution
+        - Couverture fonctionnalités
+      • Évolution temporelle avec graphiques
+      • Répartition des risques par principe
+      • Recommandations prioritaires (URGENT/IMPORTANT/AMÉLIORATION)
+      • Génère DASHBOARD.md persistant
+
+   ✨ /incident - Gestion de Crise Améliorée
+
+      • Identifie le principe constitutionnel violé
+      • Ajoute automatiquement au risk-register.yaml
+      • Lien vers post-mortem via /audit
+      • Plan de bataille structuré
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+AMÉLIORATIONS
+
+   📄 Documentation Unifiée
+
+      • Tous les documents générés suivent la même structure
+      • Résumé Exécutif en PREMIER (avant détails techniques)
+      • Ton uniforme : technique mais accessible
+      • Référence systématique aux 7 principes
+      • Exemples de code (vulnérable vs sécurisé)
+      • Scoring rigoureux : Impact × Probabilité × Exposition
+
+   🎯 Alignement Objectifs
+
+      Architecture alignée sur 3 objectifs principaux :
+      1. Générer documentation via 7 principes ✅
+      2. Accompagner PM/Dev/Designers ✅
+      3. Renforcer codebase ✅
+
+   📊 Métriques et KPIs
+
+      • Security Debt Score (points de dette)
+      • Couverture fonctionnalités (% features analysées)
+      • MTTR par sévérité (temps moyen résolution)
+      • Taux de résolution global
+      • Conformité par principe
+
+   🔄 Cycle de Vie Complet
+
+      Workflow : /security → /dashboard → corriger → /audit
+      Boucle fermée : /audit met à jour automatiquement risk-register
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+EXEMPLES
+
+   📁 Nouveaux Exemples
+
+      • examples/docs/security/SEC-LOGIN.md
+        Exemple complet (14KB) d'analyse constitutionnelle
+        Montre les 7 principes appliqués au login
+
+      • examples/docs/security/risk-register.yaml
+        Template initial du registre des risques
+
+      Structure des fichiers générés documentée avec exemples réels
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+DOCUMENTATION
+
+   📚 Mise à Jour Complète
+
+      • README.txt : 4 commandes, workflow simplifié
+      • QUICK-START.txt : Nouveau workflow en 6 étapes
+      • FAQ.txt : Détection automatique réglementaire
+      • cli/README.txt : Liste des 4 commandes
+      • index.html : Page web GitHub Pages mise à jour
+      • Tous les fichiers cohérents entre eux
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+FICHIERS MODIFIÉS
+
+   Prompts (Slash Commands) :
+      • prompts/osk-security.md      (NOUVEAU - 15KB)
+      • prompts/osk-audit.md         (REFAIT - 18KB)
+      • prompts/osk-dashboard.md     (NOUVEAU - 17KB)
+      • prompts/osk-incident.md      (MIS À JOUR)
+
+   Supprimés :
+      • prompts/osk-spec.md          (fusionné dans security)
+      • prompts/osk-assess.md        (fusionné dans audit)
+      • prompts/osk-context.md       (fusionné dans security)
+      • prompts/osk-domain.md        (fusionné dans security)
+
+   CLI :
+      • cli/src/commands/init.rs     (affichage 4 commandes)
+
+   Documentation :
+      • README.txt
+      • QUICK-START.txt
+      • FAQ.txt
+      • cli/README.txt
+      • website/index.html
+      • CHANGELOG.txt                (NOUVEAU)
+
+   Exemples :
+      • examples/docs/security/SEC-LOGIN.md
+      • examples/docs/security/risk-register.yaml
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+MIGRATION v1 → v2
+
+   Pour les projets existants utilisant v1 :
+
+   1. Mettre à jour le CLI :
+      $ cd OpenSecKit/cli
+      $ git pull
+      $ cargo install --path .
+
+   2. Réinstaller les slash commands :
+      $ cd votre-projet/
+      $ osk init --force
+
+   3. Migrer la documentation :
+
+      Ancien → Nouveau :
+      • docs/security/specs/         → Renommer en SEC-*.md
+      • Créer risk-register.yaml     → Lancer /security puis /audit
+      • threat-model.md              → Conservé tel quel
+
+   4. Nouveau workflow :
+      $ claude
+      >>> /security "votre feature"    # au lieu de /spec
+      >>> /dashboard                   # nouveau
+      >>> /audit                       # comme avant mais amélioré
+
+   Note : Les templates (templates/) et domaines (domaines/) restent
+   compatibles et inchangés.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CORRECTIONS
+
+   • Suppression des "modes" PM/Dev dans les prompts (ton uniforme)
+   • Cohérence absolue entre tous les documents de documentation
+   • Frontmatter YAML validé pour tous les prompts
+   • CLI compile sans warnings
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+NOTES TECHNIQUES
+
+   • CLI : Rust 1.70+
+   • Taille totale prompts : ~65KB (vs ~35KB en v1)
+   • Nouveaux prompts plus détaillés et guidés
+   • Format YAML pour risk-register (machine-readable)
+   • Graphiques ASCII pour dashboard terminal
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CONTRIBUTEURS
+
+   Merci à tous les contributeurs de cette version majeure !
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+OpenSecKit Changelog v2.0.0
+https://github.com/Scttpr/OpenSecKit
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

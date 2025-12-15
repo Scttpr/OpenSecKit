@@ -56,13 +56,16 @@ NAME
 3. CONFORMITÉ
 
    Q: Comment utiliser les templates RGPD/NIS2/RGS ?
-   A: $ osk init
-      $ claude
-      >>> /domain rgpd
-      >>> /domain nis2
-      >>> /domain rgs
+   A: Le contexte réglementaire est détecté automatiquement par /security.
 
-      Puis suivez les templates dans domaines/{secteur}/
+      $ osk init
+      $ claude
+      >>> /security "traitement données utilisateurs"
+
+      Si données personnelles détectées → Analyse RGPD incluse
+      Si paiements détectés → Analyse PCI-DSS incluse
+
+      Templates manuels disponibles dans domaines/{secteur}/
 
    Q: Puis-je combiner plusieurs domaines ?
    A: Oui. Les templates sont compatibles entre eux.

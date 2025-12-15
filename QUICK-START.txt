@@ -27,22 +27,26 @@ OBJECTIF
       $ cd mon-projet/
       $ osk init
 
-   1.3. Auditer
+   1.3. Analyser une fonctionnalité
 
       $ claude
-      >>> /audit
+      >>> /security "système de login"
 
-   1.4. Corriger
+   1.4. Voir l'état global
+
+      >>> /dashboard
+
+   1.5. Corriger les risques critiques
 
       Claude Code affiche les vulnérabilités. Demandez-lui de les corriger :
 
-      >>> Corrige l'injection SQL dans src/api/users.js:42
+      >>> Corrige RISK-LOGIN-001 (injection SQL dans src/auth/login.js:42)
 
-   1.5. Vérifier
+   1.6. Vérifier la conformité
 
       >>> /audit
 
-   Résultat : Audit complet + corrections automatiques en 5 minutes.
+   Résultat : Analyse constitutionnelle + conformité aux 7 principes en 5 minutes.
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -116,7 +120,7 @@ OBJECTIF
 
 5. PROCHAINES ÉTAPES
 
-   Avec Claude Code : /spec "description" pour vos features
+   Avec Claude Code : /security "description" pour analyser chaque feature
    Manuel : Configurer SAST (templates/04-security-testing/)
 
 
