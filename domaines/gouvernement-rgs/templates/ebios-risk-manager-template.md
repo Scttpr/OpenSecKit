@@ -488,9 +488,8 @@ Tous les risques résiduels sont **≤ Moyen** après traitement.
 
 ### Annexe B : Références
 
-- **ANSSI - Guide EBIOS RM** : https://www.ssi.gouv.fr/guide/la-methode-ebios-risk-manager/
-- **RGS v2.0** : https://www.ssi.gouv.fr/rgs/
-- **Base de connaissances EBIOS RM** : https://github.com/anssi-fr/EBIOS-RM
+- **ANSSI - Guide EBIOS RM** : https://cyber.gouv.fr/la-methode-ebios-risk-manager
+- **RGS v2.0** : https://cyber.gouv.fr/le-referentiel-general-de-securite-rgs
 
 ---
 

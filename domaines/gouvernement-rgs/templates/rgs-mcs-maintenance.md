@@ -283,7 +283,7 @@ derogation:
 |--------|------|-----------|-----|
 | **CERT-FR** | Alertes gouvernementales | Temps réel | https://www.cert.ssi.gouv.fr/ |
 | **NVD (NIST)** | Base CVE | Temps réel | https://nvd.nist.gov/ |
-| **ANSSI Alertes** | Alertes critiques | Temps réel | https://www.ssi.gouv.fr/actualite/ |
+| **ANSSI Alertes** | Alertes critiques | Temps réel | https://cyber.gouv.fr/actualites |
 | **GitHub Advisory** | Dépendances | Temps réel | https://github.com/advisories |
 | **Vendor Security** | Éditeurs | Variable | [URLs éditeurs] |
 
@@ -316,7 +316,7 @@ derogation:
 | **Synacktiv** | Pentest offensif, R&D | synacktiv.com |
 | **Intrinsec** | Pentest, CERT | intrinsec.com |
 
-**Liste officielle** : https://www.ssi.gouv.fr/entreprise/qualifications/prestataires-de-services-de-confiance-qualifies/
+**Liste officielle** : https://www.lsti-certification.fr/
 
 ### 4.3 Template de Suivi des Tests
 
@@ -750,9 +750,9 @@ changement_majeur:
 
 ### Documentation ANSSI
 
-- **Guide MCS** : https://www.ssi.gouv.fr/guide/
+- **Guides et publications** : https://cyber.gouv.fr/publications
 - **CERT-FR** : https://www.cert.ssi.gouv.fr/
-- **Prestataires qualifiés** : https://www.ssi.gouv.fr/entreprise/qualifications/
+- **Prestataires qualifiés** : https://www.lsti-certification.fr/
 
 ### Standards
 

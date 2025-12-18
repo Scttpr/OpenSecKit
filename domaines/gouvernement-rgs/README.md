@@ -241,10 +241,9 @@ window.location.href = `${franceConnectUrl}?${params}`;
 
 ### documentation ANSSI
 
-- **Guide RGS v2.0**: https://www.ssi.gouv.fr/entreprise/reglementation/confiance-numerique/le-referentiel-general-de-securite-rgs/
-- **EBIOS Risk Manager**: https://www.ssi.gouv.fr/entreprise/management-du-risque/la-methode-ebios-risk-manager/
-- **Guides de bonnes pratiques**: https://www.ssi.gouv.fr/entreprise/guide/
-- **Produits de sécurité certifiés**: https://www.ssi.gouv.fr/entreprise/produits-certifies/
+- **Guide RGS v2.0**: https://cyber.gouv.fr/le-referentiel-general-de-securite-rgs
+- **EBIOS Risk Manager**: https://cyber.gouv.fr/la-methode-ebios-risk-manager
+- **Guides de bonnes pratiques**: https://cyber.gouv.fr/publications
 
 ### FranceConnect
 

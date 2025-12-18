@@ -200,7 +200,7 @@ Ces modèles aident à satisfaire :
 
 ## Contribuer
 
-Vous avez des améliorations pour les modèles d'analyse de risques ? Voir les [directives de contribution](../../CONTRIBUTING.md).
+Vous avez des améliorations pour les modèles d'analyse de risques ? Voir les [directives de contribution](../../CONTRIBUTING.txt).
 
 Contributions précieuses :
 

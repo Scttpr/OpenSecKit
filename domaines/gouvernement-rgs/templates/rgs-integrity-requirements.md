@@ -960,9 +960,8 @@ spec:
 
 ### Documentation ANSSI
 
-- **RGS v2.0 Annexe B3** : https://www.ssi.gouv.fr/rgs/
-- **Prestataires qualifiés** : https://www.ssi.gouv.fr/entreprise/qualifications/
-- **Guide signature électronique** : https://www.ssi.gouv.fr/guide/
+- **RGS v2.0 Annexe B3** : https://cyber.gouv.fr/le-referentiel-general-de-securite-rgs
+- **Guides et publications** : https://cyber.gouv.fr/publications
 
 ### Standards ETSI
 

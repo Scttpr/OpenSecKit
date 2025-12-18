@@ -902,8 +902,8 @@ def calculer_score_rgs(resultats_audit: dict, niveau_rgs: str) -> dict:
 
 ## 10. Références
 
-- **RGS v2.0** : https://www.ssi.gouv.fr/rgs/
-- **Guide d'homologation ANSSI** : https://www.ssi.gouv.fr/guide/lhomologation-de-securite-en-neuf-etapes-simples/
+- **RGS v2.0** : https://cyber.gouv.fr/le-referentiel-general-de-securite-rgs
+- **Guide d'homologation ANSSI** : https://cyber.gouv.fr/lhomologation-de-securite
 - **Templates OSK** : `domaines/gouvernement-rgs/templates/`
 
 ---

@@ -872,8 +872,7 @@ def encrypt_data(data, config=CRYPTO_CONFIG):
 - **v1.0.0** (2025-11-19): Initial template based on ANSSI Mécanismes cryptographiques v2.08 (2024), RGS v2.0 Annexe B4, ANSSI TLS recommendations v1.3 (2024)
 
 **References**:
-- **ANSSI Mécanismes cryptographiques**: https://www.ssi.gouv.fr/uploads/2024/01/anssi-guide-mecanismes_crypto-2.08.pdf
-- **ANSSI TLS Recommendations**: https://www.ssi.gouv.fr/uploads/2024/03/anssi-guide-recommandations_tls-v1.3.pdf
-- **RGS v2.0**: https://www.ssi.gouv.fr/entreprise/reglementation/confiance-numerique/le-referentiel-general-de-securite-rgs/
+- **RGS v2.0**: https://cyber.gouv.fr/le-referentiel-general-de-securite-rgs
+- **Guides et publications ANSSI**: https://cyber.gouv.fr/publications
 - **NIST Post-Quantum Cryptography**: https://csrc.nist.gov/projects/post-quantum-cryptography
 - **eIDAS Regulation**: https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=uriserv:OJ.L_.2014.257.01.0073.01.ENG

@@ -388,7 +388,7 @@ Host: app.franceconnect.gouv.fr
 
 ### 6.1 Design du Bouton FranceConnect
 
-**Directives de Marque Officielles** : https://partenaires.franceconnect.gouv.fr/kit-communication
+**Directives de Marque Officielles** : https://partenaires.franceconnect.gouv.fr/
 
 **Implémentation Requise du Bouton** :
 
@@ -712,6 +712,6 @@ if __name__ == "__main__":
 
 **Références** :
 - Documentation Partenaires FranceConnect : https://partenaires.franceconnect.gouv.fr
-- RGS v2.0 : https://www.ssi.gouv.fr/rgs
+- RGS v2.0 : https://cyber.gouv.fr/le-referentiel-general-de-securite-rgs
 - OpenID Connect Core 1.0 : https://openid.net/specs/openid-connect-core-1_0.html
 - Règlement eIDAS : https://eur-lex.europa.eu/eli/reg/2014/910/oj

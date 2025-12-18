@@ -7,6 +7,7 @@ Ce répertoire contient des modèles pour le **Principe constitutionnel III : s�
 ## Pourquoi des exigences de sécurité ?
 
 Les exigences de sécurité vous aident à :
+
 - **Concevoir la sécurité** dès le départ (pas l'ajouter après coup)
 - **Traduire les menaces en contrôles** (modèle de menaces → exigences)
 - **Communiquer les besoins de sécurité** aux développeurs et architectes
@@ -25,6 +26,7 @@ Les exigences de sécurité vous aident à :
 ## Quand utiliser ces modèles
 
 ### Phase de conception
+
 - ✅ Utiliser la **Checklist OWASP ASVS** pour identifier tous les contrôles de sécurité requis
 - ✅ Utiliser les **Exigences d'Authentification** pour concevoir la connexion, MFA, gestion de sessions
 - ✅ Utiliser les **Exigences d'Autorisation** pour concevoir les rôles, permissions, contrôle d'accès
@@ -65,18 +67,21 @@ Les exigences de sécurité vous aident à :
 ### Besoin d'exigences spécifiques ?
 
 **Authentification** : [modele-exigences-authentification-conception.md](authentication-requirements-template-design.md)
+
 - Politiques de mots de passe, force, stockage (bcrypt)
 - Authentification multi-facteurs (TOTP, SMS)
 - Gestion de sessions (timeouts, cookies)
 - Intégration SSO (OAuth, SAML)
 
 **Autorisation** : [modele-exigences-autorisation-conception.md](authorization-requirements-template-design.md)
+
 - Définitions de rôles (admin, utilisateur, invité)
 - Matrice de permissions (qui peut faire quoi)
 - RBAC vs ABAC
 - Prévention IDOR
 
 **Chiffrement** : [modele-exigences-chiffrement-conception.md](encryption-requirements-template-design.md)
+
 - Configuration TLS (TLS 1.3, suites de chiffrement)
 - Chiffrement de base de données (au repos)
 - Gestion des clés (rotation, stockage)
@@ -87,10 +92,12 @@ Les exigences de sécurité vous aident à :
 Les exigences de sécurité font le lien entre conception et implémentation :
 
 **Entrées** :
+
 - **Principe I (modélisation des menaces)** : Les menaces déterminent quels contrôles sont nécessaires
 - **Principe II (analyse de risques)** : Les risques prioritaires exigent des contrôles plus forts
 
 **Sorties** :
+
 - **Principe IV (tests de sécurité)** : Les exigences deviennent des cas de tests
 - **Phase d'implémentation** : Les exigences guident l'implémentation par les développeurs
 - **Revue de Code** : Vérifier que les exigences sont correctement implémentées
@@ -108,29 +115,34 @@ D'après la constitution SSDLC, le Principe III exige :
 ## Modèles courants d'exigences de sécurité
 
 ### Authentification
+
 - Mot de passe : 12+ caractères, hachage bcrypt, détection de violations
 - MFA : Obligatoire pour admins, optionnel pour utilisateurs
 - Session : Cookies HttpOnly, timeout inactif 30min, timeout absolu
 - SSO : OAuth 2.0 + OIDC
 
 ### Autorisation
+
 - Modèle : RBAC (contrôle d'accès basé sur les rôles)
 - Par défaut : Refus par défaut (autorisation explicite requise)
 - Application : Côté serveur, couche service
 - Prévention : Vérifications IDOR, validation de propriété
 
 ### Chiffrement
+
 - En Transit : TLS 1.3, chiffrements forts uniquement, HSTS
 - Au Repos : AES-256-GCM, TDE base de données, S3 SSE-KMS
 - Clés : Vault/KMS, chiffrement d'enveloppe, rotation (90 jours)
 - Algorithmes : Approuvés NIST uniquement (pas de crypto personnalisé)
 
 ### Validation des entrées
+
 - Stratégie : liste blanche (validation positive)
 - Sanitisation : encodage de sortie contextuel
 - Prévention d'injection : requêtes paramétrées, pas d'eval()
 
 ### Journalisation
+
 - Événements : Authentification, autorisation, accès données, actions admin
 - Pas de PII : Nettoyer les données sensibles des journaux
 - Intégrité : Stockage de journaux immuable (SIEM)
@@ -139,6 +151,7 @@ D'après la constitution SSDLC, le Principe III exige :
 ## Exemples
 
 Voir l'exemple concret :
+
 - [_example-ecommerce-requirements.md](_example-ecommerce-requirements.md) - Exigences de sécurité complètes pour une application e-commerce
 
 ## Mapping de conformité
@@ -154,20 +167,23 @@ Ces modèles aident à satisfaire :
 ## Outils et ressources
 
 ### Outils d'exigences de sécurité
-- **OWASP ASVS** : https://owasp.org/www-project-application-security-verification-standard/
-- **NIST SP 800-53** : https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final
-- **BSIMM** : https://www.bsimm.com/
+
+- **OWASP ASVS** : <https://owasp.org/www-project-application-security-verification-standard/>
+- **NIST SP 800-53** : <https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final>
+- **BSIMM** : <https://www.bsimm.com/>
 
 ### Ressources externes
+
 - [OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/)
 - [NIST Cybersecurity Framework](https://www.nist.gov/cyberframework)
 - [CWE Top 25](https://cwe.mitre.org/top25/)
 
 ## Contribuer
 
-Vous avez des améliorations pour les modèles d'exigences de sécurité ? Voir les [directives de contribution](../../CONTRIBUTING.md).
+Vous avez des améliorations pour les modèles d'exigences de sécurité ? Voir les [directives de contribution](../../CONTRIBUTING.txt).
 
 Contributions précieuses :
+
 - Modèles d'exigences spécifiques aux secteurs (santé, finance)
 - Intégration avec les outils de tests de sécurité
 - Exemples d'exigences pour technologies émergentes (IA/ML, blockchain)

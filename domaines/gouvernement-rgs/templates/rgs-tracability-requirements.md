@@ -974,8 +974,8 @@ rgs_logger.data_access(
 
 ### Documentation ANSSI
 
-- **Guide de journalisation** : https://www.ssi.gouv.fr/guide/recommandations-de-securite-pour-la-mise-en-oeuvre-dun-systeme-de-journalisation/
-- **RGS v2.0 Annexe B5** : https://www.ssi.gouv.fr/rgs/
+- **RGS v2.0 Annexe B5** : https://cyber.gouv.fr/le-referentiel-general-de-securite-rgs
+- **Guides et publications** : https://cyber.gouv.fr/publications
 - **Prestataires d'horodatage qualifiés** : https://www.lsti-certification.fr/
 
 ### Standards

@@ -22,6 +22,7 @@ reviewers:
 ---
 
 # Modèle de Dossier d'Homologation RGS
+
 # Dossier d'Homologation de Sécurité (RGS)
 
 ## Objectif
@@ -41,6 +42,7 @@ Ce modèle fournit une structure complète pour créer un **Dossier d'Homologati
 ## Contexte Réglementaire
 
 ### Base Légale
+
 - **Décret n°2010-112** (2 février 2010) : Obligation d'homologation pour les systèmes gouvernementaux
 - **Arrêté du 13 juin 2014** : Lignes directrices de mise en œuvre
 - **RGS v2.0 - Annexe B1** : Méthodologie d'homologation
@@ -117,6 +119,7 @@ Phase 4 : MCS (Maintien Continu)
 > Exemple : "Cette plateforme fournit aux citoyens français un accès unifié à plus de 150 services publics (actes de naissance, déclarations d'impôts, prestations sociales) via un portail unique authentifié par FranceConnect. Elle dessert 12 millions d'utilisateurs actifs et traite 50 millions de transactions par an."
 
 **Contexte Légal et Réglementaire** :
+
 - [ ] RGPD (Règlement Général sur la Protection des Données)
 - [ ] RGS (Référentiel Général de Sécurité) - Niveau : ☐ RGS\* ☐ RGS\*\* ☐ RGS\*\*\*
 - [ ] RGI (Référentiel Général d'Interopérabilité)
@@ -138,6 +141,7 @@ Phase 4 : MCS (Maintien Continu)
 **Score Total** : ____ / 20
 
 **Classification RGS** :
+
 - ☐ **RGS\*** (Standard) : Score 5-10, services e-gov basiques
 - ☐ **RGS\*\*** (Renforcé) : Score 11-15, données sensibles, base utilisateurs importante
 - ☐ **RGS\*\*\*** (Élevé) : Score 16-20, données classifiées, sécurité nationale
@@ -154,6 +158,7 @@ Basé sur l'Atelier 1 d'EBIOS Risk Manager - évaluer les besoins pour chaque fo
 | **Preuve** | [0-4] | [ex. : "3 - Traçabilité légale requise"] | [ex. : "Conservation des journaux 3 ans, journaux inaltérables"] |
 
 **Légende** :
+
 - **0** : Pas de besoin spécifique
 - **1** : Faible (dégradation acceptable)
 - **2** : Moyen (impact significatif)
@@ -167,6 +172,7 @@ Basé sur l'Atelier 1 d'EBIOS Risk Manager - évaluer les besoins pour chaque fo
 ### 2.1 Périmètre et Limites du Système
 
 **Dans le Périmètre** :
+
 - [x] [Composant 1 : ex. : "Frontend web (React SPA)"]
 - [x] [Composant 2 : ex. : "Passerelle API (Kong)"]
 - [x] [Composant 3 : ex. : "Services backend (Java Spring Boot)"]
@@ -174,10 +180,12 @@ Basé sur l'Atelier 1 d'EBIOS Risk Manager - évaluer les besoins pour chaque fo
 - [x] [Composant 5 : ex. : "Intégration SSO FranceConnect"]
 
 **Hors Périmètre** :
+
 - [ ] [ex. : "Processeur de paiement tiers (homologation séparée)"]
 - [ ] [ex. : "Appareils utilisateurs (BYOD, non contrôlés)"]
 
 **Dépendances Externes** :
+
 1. **FranceConnect** (authentification) : ☐ Homologué ☐ En attente ☐ Non requis
 2. **France Data Centers** (hébergement) : ☐ Homologué ☐ En attente ☐ Non requis
 3. **API France** (interopérabilité) : ☐ Homologué ☐ En attente ☐ Non requis
@@ -222,6 +230,7 @@ Basé sur l'Atelier 1 d'EBIOS Risk Manager - évaluer les besoins pour chaque fo
 ```
 
 **Segmentation Réseau** :
+
 - [ ] Zone externe (face à Internet, confiance minimale)
 - [ ] Zone DMZ (proxy inverse, passerelle d'authentification)
 - [ ] Zone application (services backend, pas d'accès Internet direct)
@@ -261,23 +270,27 @@ Basé sur l'Atelier 1 d'EBIOS Risk Manager - évaluer les besoins pour chaque fo
 ### 2.4 Stack Technologique
 
 **Frontend** :
+
 - Framework : React 18.2.0
 - Langage : TypeScript 5.0
 - Build : Vite 4.3
 - Sécurité : Content-Security-Policy, SRI (Subresource Integrity)
 
 **Backend** :
+
 - Framework : Java Spring Boot 3.1.5
 - Langage : Java 17 LTS
 - API : RESTful (spécification OpenAPI 3.0)
 - Authentification : Spring Security + OAuth2
 
 **Base de Données** :
+
 - Primaire : PostgreSQL 15.3 (chiffré avec LUKS)
 - Cache : Redis 7.0 (chiffré en transit)
 - Recherche : Elasticsearch 8.8 (chiffré au repos)
 
 **Infrastructure** :
+
 - Hébergement : OVHcloud Sovereign Cloud (France)
 - Orchestration conteneurs : Kubernetes 1.27
 - Service mesh : Istio 1.18 (mTLS entre services)
@@ -293,6 +306,7 @@ Basé sur l'Atelier 1 d'EBIOS Risk Manager - évaluer les besoins pour chaque fo
 **Référence** : Voir documentation EBIOS Risk Manager complète (domaines/gouvernement-rgs/templates/ebios-risk-manager-template.md)
 
 **Synthèse Exécutive** :
+
 - **Atelier 1** : 12 actifs essentiels identifiés, besoins DICP évalués
 - **Atelier 2** : 5 catégories d'acteurs menaçants analysées (cybercriminels, États-nations, hacktivistes, initiés, concurrents)
 - **Atelier 3** : 8 scénarios stratégiques identifiés, gravité/vraisemblance évaluées
@@ -337,6 +351,7 @@ Basé sur l'Atelier 1 d'EBIOS Risk Manager - évaluer les besoins pour chaque fo
 **Mécanisme Principal** : **FranceConnect** (homologué ANSSI, certifié RGS\*\*)
 
 **Mise en Œuvre** :
+
 - [x] **Intégration OAuth 2.0 + OpenID Connect** (OIDC)
 - [x] **Fournisseurs d'Identité** : Les 9 IdP FranceConnect supportés (Impots.gouv.fr, Ameli.fr, La Poste, etc.)
 - [x] **Niveau eIDAS** : Substantiel
@@ -346,6 +361,7 @@ Basé sur l'Atelier 1 d'EBIOS Risk Manager - évaluer les besoins pour chaque fo
   - Cookies sécurisés (HttpOnly, Secure, SameSite=Strict)
 
 **Authentification de Secours** (pour utilisateurs admin) :
+
 - [x] **MFA (Authentification Multi-Facteurs)** : TOTP (RFC 6238) via application d'authentification
 - [x] **Politique de Mot de Passe** :
   - Minimum 14 caractères (exigence RGS\*\*)
@@ -355,63 +371,74 @@ Basé sur l'Atelier 1 d'EBIOS Risk Manager - évaluer les besoins pour chaque fo
 - [x] **Verrouillage de Compte** : 5 tentatives échouées → verrouillage 15 minutes
 
 **Conformité** :
+
 - ✅ RGS v2.0 Annexe B2 (Authentification)
 - ✅ Recommandations ANSSI relatives à l'authentification multifacteur (2021)
 
 #### Fonction 2 : Intégrité
 
 **Intégrité des Données** :
+
 - [x] **Niveau base de données** : Contraintes PostgreSQL, clés étrangères, triggers
 - [x] **Niveau application** : Validation des entrées (OWASP ASVS V5), requêtes préparées
 - [x] **Intégrité des fichiers** : Sommes de contrôle SHA-256 pour tous les documents téléversés
 - [x] **Signatures numériques** : XMLDSig pour documents gouvernementaux officiels (algorithmes approuvés ANSSI)
 
 **Intégrité des Communications** :
+
 - [x] **TLS 1.3** pour toutes les communications (TLS 1.2 minimum)
 - [x] **HSTS** (HTTP Strict Transport Security) avec max-age de 1 an
 - [x] **Certificate Pinning** pour les points d'accès API critiques
 
 **Intégrité du Code** :
+
 - [x] **Commits signés** : Signature GPG pour tous les commits de production
 - [x] **Vérification des dépendances** : npm audit, OWASP Dependency-Check
 - [x] **Signature des images conteneur** : Cosign pour images Kubernetes
 
 **Conformité** :
+
 - ✅ RGS v2.0 Annexe B3 (Intégrité)
 - ✅ Recommandations ANSSI de sécurité relatives à TLS (2021)
 
 #### Fonction 3 : Confidentialité
 
 **Chiffrement au Repos** :
+
 - [x] **Base de données** : PostgreSQL Transparent Data Encryption (TDE) avec AES-256
 - [x] **Stockage fichiers** : AES-256-GCM pour tous les documents
 - [x] **Sauvegardes** : Chiffrées avec GPG (clé RSA-4096)
 - [x] **Gestion des Clés** : HashiCorp Vault avec intégration HSM
 
 **Chiffrement en Transit** :
+
 - [x] **Externe** : TLS 1.3 (suite de chiffrement TLS_AES_256_GCM_SHA384)
 - [x] **Interne** : mTLS (TLS mutuel) entre microservices via Istio service mesh
 - [x] **Connexions base de données** : TLS 1.3 pour toutes les connexions
 
 **Contrôle d'Accès** :
+
 - [x] **RBAC (Contrôle d'Accès Basé sur les Rôles)** : 8 rôles définis (Citoyen, Admin, Auditeur, RSSI, etc.)
 - [x] **ABAC (Contrôle d'Accès Basé sur les Attributs)** : Politiques dynamiques pour données sensibles
 - [x] **Minimisation des Données** : Seuls les champs nécessaires exposés par rôle
 - [x] **Pseudonymisation** : ID utilisateurs pseudonymisés dans analytique/journaux
 
 **Algorithmes Cryptographiques** (approuvés ANSSI) :
+
 - ✅ **Symétrique** : AES-256 (modes CBC, GCM)
 - ✅ **Asymétrique** : RSA-4096, ECDSA P-384
 - ✅ **Hachage** : SHA-256, SHA-384, SHA-512
 - ✅ **Dérivation de Clé** : PBKDF2 (minimum 100 000 itérations)
 
 **Conformité** :
+
 - ✅ RGS v2.0 Annexe B4 (Confidentialité)
 - ✅ Mécanismes cryptographiques ANSSI - Règles et recommandations (2021)
 
 #### Fonction 4 : Traçabilité
 
 **Journalisation d'Audit** :
+
 - [x] **Événements journalisés** :
   - Authentification (succès/échec, flux FranceConnect)
   - Autorisation (accès accordé/refusé)
@@ -424,11 +451,13 @@ Basé sur l'Atelier 1 d'EBIOS Risk Manager - évaluer les besoins pour chaque fo
 - [x] **Conservation** : **3 ans minimum** (exigence RGS)
 
 **Intégration SIEM** :
+
 - [x] **Outil** : Stack ELK (Elasticsearch, Logstash, Kibana)
 - [x] **Alertes temps réel** : Événements de sécurité déclenchent alertes (PagerDuty)
 - [x] **Règles de corrélation** : 15 règles pour détection d'anomalies (ex. : voyage impossible, escalade de privilèges)
 
 **Conformité** :
+
 - ✅ RGS v2.0 Annexe B5 (Traçabilité)
 - ✅ Recommandations ANSSI relatives à la journalisation (2021)
 
@@ -454,6 +483,7 @@ Basé sur l'Atelier 1 d'EBIOS Risk Manager - évaluer les besoins pour chaque fo
 **Formule de Risque** : `Score de Risque = Gravité × Vraisemblance`
 
 **Échelle de Gravité (Impact sur DICP)** :
+
 - **1** : Négligeable (pas d'impact significatif)
 - **2** : Limité (dégradation mineure, récupération rapide)
 - **3** : Significatif (interruption de service, exposition de données)
@@ -461,6 +491,7 @@ Basé sur l'Atelier 1 d'EBIOS Risk Manager - évaluer les besoins pour chaque fo
 - **5** : Catastrophique (sécurité nationale, violation massive de données)
 
 **Échelle de Vraisemblance** :
+
 - **1** : Très improbable (< 5% probabilité annuelle)
 - **2** : Improbable (5-25% probabilité annuelle)
 - **3** : Possible (25-50% probabilité annuelle)
@@ -481,6 +512,7 @@ Vraisemblance│  Gravité →
 ```
 
 **Seuils de Risque** :
+
 - **20-25** : Critique → Décision de l'Autorité d'Homologation requise
 - **12-19** : Élevé → Approbation RSSI + plan d'atténuation obligatoire
 - **6-11** : Moyen → Mesures d'atténuation standard
@@ -658,6 +690,7 @@ Vraisemblance│  Gravité →
 | 2024-11-15 | Synacktiv (certifié ANSSI) | Application complète + infrastructure | 12 constats (2 Élevés, 5 Moyens, 5 Faibles) | ✅ 100% remédiés |
 
 **Résumé des Constats** :
+
 - **Gravité Élevée** :
   - H-01 : Limitation de débit manquante sur endpoint réinitialisation mot de passe → **Corrigé** : Implémenté 3 requêtes/heure/email
   - H-02 : Désérialisation non sécurisée dans gestion des sessions → **Corrigé** : Migration vers JWT avec vérification de signature
@@ -685,11 +718,13 @@ Vraisemblance│  Gravité →
 ### 7.2 Audits de Conformité
 
 **Audit RGPD** (CNIL) :
+
 - **Date d'Audit** : 2024-09-20
 - **Résultat** : ✅ Conforme (aucun constat)
 - **Prochain Audit** : 2027-09-20 (cycle 3 ans)
 
 **Audit RGS** (ANSSI) :
+
 - **Date d'Audit** : 2024-10-15
 - **Résultat** : ✅ Certification RGS\*\* accordée
 - **Validité** : 2024-10-15 au 2027-10-15 (3 ans)
@@ -702,16 +737,19 @@ Vraisemblance│  Gravité →
 ### 8.1 Stratégie de Sauvegarde
 
 **Fréquence de Sauvegarde** :
+
 - **Sauvegarde complète** : Hebdomadaire (dimanche 2h00 CET)
 - **Sauvegarde incrémentale** : Quotidienne (2h00 CET)
 - **Journaux de transactions** : Réplication temps réel (réplication streaming PostgreSQL)
 
 **Conservation des Sauvegardes** :
+
 - **Sauvegardes quotidiennes** : 30 jours
 - **Sauvegardes hebdomadaires** : 1 an
 - **Sauvegardes annuelles** : 7 ans (exigence légale)
 
 **Chiffrement des Sauvegardes** :
+
 - ✅ Toutes les sauvegardes chiffrées avec GPG (RSA-4096)
 - ✅ Clés de chiffrement stockées en HSM (Hardware Security Module)
 - ✅ Stockage de sauvegarde hors site (datacenters géographiquement séparés)
@@ -719,15 +757,18 @@ Vraisemblance│  Gravité →
 ### 8.2 Reprise d'Activité
 
 **Objectifs de Récupération** :
+
 - **RTO (Objectif de Temps de Récupération)** : 4 heures
 - **RPO (Objectif de Point de Récupération)** : 1 heure
 
 **Sites de Reprise** :
+
 - **Primaire** : OVH Roubaix (France)
 - **Secondaire** : OVH Strasbourg (France) - distance 400 km
 - **Sauvegarde** : OVH Gravelines (France)
 
 **Tests de Reprise** :
+
 - **Fréquence** : Trimestrielle
 - **Date Dernier Test** : 2025-01-05
 - **Résultat du Test** : ✅ RTO atteint (3,5 heures), RPO atteint (45 minutes)
@@ -735,11 +776,13 @@ Vraisemblance│  Gravité →
 ### 8.3 Continuité d'Activité
 
 **Fonctions Métier Critiques** :
+
 1. **Authentification citoyen** (RTO : 2 heures, RPO : 30 minutes)
 2. **Récupération de documents** (RTO : 4 heures, RPO : 1 heure)
 3. **Soumission de demandes de service** (RTO : 8 heures, RPO : 2 heures)
 
 **Mesures de Continuité** :
+
 - [ ] Connexions Internet redondantes (2 FAI)
 - [ ] Répartition de charge sur 3 zones de disponibilité
 - [ ] Basculement automatique (contrôles de santé toutes les 30 secondes)
@@ -760,6 +803,7 @@ Vraisemblance│  Gravité →
 | **Cloudflare** | CDN + Protection DDoS | ⚠️ Non-UE (société US, résidence données UE) | 2025-06-30 | Moyen |
 
 **Exigences de Sécurité Fournisseurs** :
+
 - [ ] Certification ISO 27001 (obligatoire)
 - [ ] Conformité RGPD (Accord de Traitement de Données signé)
 - [ ] Audits de sécurité annuels (rapports partagés)
@@ -768,12 +812,14 @@ Vraisemblance│  Gravité →
 ### 9.2 Chaîne d'Approvisionnement Logicielle
 
 **Gestion des Dépendances** :
+
 - [ ] SBOM (Software Bill of Materials) généré pour chaque release
 - [ ] Scan de dépendances (OWASP Dependency-Check, Snyk)
 - [ ] Conformité licences (pas de GPL dans code propriétaire)
 - [ ] Surveillance des vulnérabilités (alertes GitHub Dependabot)
 
 **Sécurité des Conteneurs** :
+
 - [ ] Images de base uniquement depuis registres de confiance (Red Hat UBI, Alpine officiel)
 - [ ] Signature des images avec Cosign
 - [ ] Scan de vulnérabilités conteneurs (Trivy)
@@ -796,6 +842,7 @@ Vraisemblance│  Gravité →
 | **Temps de réponse incidents** | < 4h | 2,5h (moy.) | ✅ Dépasse l'objectif |
 
 **Outils de Surveillance** :
+
 - **SIEM** : Stack ELK (surveillance 24/7)
 - **Scanner de Vulnérabilités** : Nessus (scans hebdomadaires)
 - **IDS** : Wazuh (détection d'intrusion temps réel)
@@ -805,30 +852,35 @@ Vraisemblance│  Gravité →
 ### 10.2 Gestion des Correctifs
 
 **SLA de Patch** :
+
 - **Vulnérabilités critiques** : 7 jours
 - **Vulnérabilités élevées** : 30 jours
 - **Vulnérabilités moyennes** : 90 jours
 - **Vulnérabilités faibles** : Prochaine release trimestrielle
 
 **Test des Correctifs** :
+
 1. Test en environnement de développement (24 heures)
 2. Test en environnement de préproduction (48 heures)
 3. Déploiement en production (déploiement graduel, 10% → 50% → 100%)
 4. Surveillance des régressions (période d'observation 48 heures)
 
 **Correctifs Récents** :
+
 - 2025-01-15 : PostgreSQL 15.3 → 15.5 (CVE-2024-XXXX corrigé)
 - 2025-01-10 : Spring Boot 3.1.5 → 3.1.8 (CVE-2024-YYYY corrigé)
 
 ### 10.3 Revues de Sécurité Annuelles
 
 **Planning des Revues** :
+
 - **T1** : Tests d'intrusion (prestataire externe)
 - **T2** : Audit de conformité RGPD (mené par DPO)
 - **T3** : Revue de conformité RGS (menée par RSSI)
 - **T4** : Exercice de continuité d'activité (exercice sur table + test technique PRA)
 
 **Livrables des Revues** :
+
 - Rapport de posture de sécurité (présenté à l'Autorité d'Homologation)
 - Mises à jour du registre des risques
 - Feuille de route sécurité pour l'année suivante
@@ -850,30 +902,35 @@ Vraisemblance│  Gravité →
 ### 11.2 Plan de Réponse aux Incidents
 
 **Phase 1 : Détection et Analyse** (0-1 heure)
+
 - [ ] Alerte déclenchée (SIEM, IDS, signalement manuel)
 - [ ] Classification de l'incident (P0-P3)
 - [ ] Commandant d'incident désigné
 - [ ] Début de collecte des preuves forensiques
 
 **Phase 2 : Confinement** (1-4 heures)
+
 - [ ] Isoler les systèmes affectés (segmentation réseau)
 - [ ] Désactiver les comptes compromis
 - [ ] Déployer correctifs/atténuations d'urgence
 - [ ] Préserver journaux et preuves forensiques
 
 **Phase 3 : Éradication** (4-24 heures)
+
 - [ ] Supprimer malware/portes dérobées
 - [ ] Corriger les vulnérabilités
 - [ ] Réinitialiser les identifiants compromis
 - [ ] Reconstruire les systèmes affectés (si nécessaire)
 
 **Phase 4 : Récupération** (24-48 heures)
+
 - [ ] Restaurer depuis sauvegardes propres
 - [ ] Restauration graduelle du service (10% → 50% → 100%)
 - [ ] Surveillance renforcée contre réinfection
 - [ ] Vérifier l'intégrité du système
 
 **Phase 5 : Post-Incident** (48 heures - 1 semaine)
+
 - [ ] Rapport d'analyse de cause racine
 - [ ] Réunion de retour d'expérience
 - [ ] Mise à jour des mesures de sécurité
@@ -882,16 +939,19 @@ Vraisemblance│  Gravité →
 ### 11.3 Exigences de Notification
 
 **Notification ANSSI** (si infrastructure critique) :
+
 - **Délai** : 24 heures pour incidents significatifs
 - **Méthode** : Portail de signalement d'incidents ANSSI
 - **Contenu** : Nature de l'incident, impact, systèmes affectés, actions de réponse
 
 **Notification CNIL** (si violation de données personnelles) :
+
 - **Délai** : 72 heures après prise de connaissance
 - **Méthode** : Formulaire en ligne CNIL
 - **Contenu** : Catégories de données affectées, nombre de personnes concernées, conséquences de la violation, mesures d'atténuation
 
 **Notification aux Utilisateurs** (si risque élevé pour les personnes concernées) :
+
 - **Délai** : Sans délai excessif
 - **Méthode** : Email, notification in-app, annonce publique
 - **Contenu** : Description en langage clair, point de contact, actions recommandées
@@ -907,6 +967,7 @@ Vraisemblance│  Gravité →
 > "Après examen de l'analyse des risques et des mesures de sécurité mises en œuvre, je, [Nom du RSSI], Responsable de la Sécurité des Systèmes d'Information, recommande **l'homologation** du système pour une période de **3 ans** (2025-01-20 au 2028-01-20).
 >
 > **Justification** :
+>
 > - Tous les risques critiques et élevés ont été atténués à des niveaux acceptables (risque résiduel ≤ 8)
 > - Conformité RGS\*\* obtenue (certification ANSSI #RGS-2024-FR-00123)
 > - Conformité RGPD vérifiée (audit CNIL 2024-09-20, aucun constat)
@@ -914,12 +975,14 @@ Vraisemblance│  Gravité →
 > - Plan de maintien en condition de sécurité (MCS) en place
 >
 > **Conditions** :
+>
 > - Revues de sécurité trimestrielles (T1, T2, T3, T4 2025-2028)
 > - Tests d'intrusion annuels (prochain : T4 2025)
 > - Ré-homologation immédiate si changements majeurs du système
 > - Allocation budgétaire pour mesures d'atténuation (92 000€ approuvés)
 >
 > **Risques résiduels nécessitant acceptation de l'Autorité** :
+>
 > - **R-001** (Bourrage d'identifiants) : Risque résiduel 8 (Moyen) - Accepté avec implémentation MFA
 > - **R-003** (DDoS) : Risque résiduel 8 (Moyen) - Accepté avec Cloudflare Enterprise
 >
@@ -937,6 +1000,7 @@ Vraisemblance│  Gravité →
 > **Autorité d'Homologation** : [Nom, Titre]
 >
 > Après examen du dossier d'homologation préparé par le RSSI, comprenant :
+>
 > - Description et architecture du système
 > - Analyse EBIOS Risk Manager
 > - Plan de traitement des risques et risques résiduels
@@ -953,16 +1017,19 @@ Vraisemblance│  Gravité →
 > **Période de Validité de l'Homologation** : 2025-01-20 au 2028-01-20 (3 ans)
 >
 > **Conditions** (si applicable) :
+>
 > - [ex. : "Implémenter M-007 (atténuation DDoS) d'ici T2 2025"]
 > - [ex. : "Rapports trimestriels de posture de sécurité à présenter à l'Autorité"]
 >
 > **Déclencheurs de Ré-homologation** :
+>
 > - Changements architecturaux majeurs (ex. : migration cloud)
 > - Introduction de nouvelles catégories de données sensibles
 > - Incident de sécurité significatif (P0)
 > - Fin de la période de validité (2028-01-20)
 >
 > **Risques Résiduels Acceptés** :
+>
 > - R-001 (Bourrage d'identifiants, risque résiduel 8) - Accepté
 > - R-003 (DDoS, risque résiduel 8) - Accepté
 >
@@ -997,12 +1064,12 @@ Vraisemblance│  Gravité →
 
 | Rôle | Nom | Email | Téléphone |
 |------|-----|-------|-----------|
-| **RSSI** | [Nom] | rssi@example.gouv.fr | +33 1 XX XX XX XX |
-| **Autorité d'Homologation** | [Nom] | autorite@example.gouv.fr | +33 1 XX XX XX XX |
-| **DPO (Délégué à la Protection des Données)** | [Nom] | dpo@example.gouv.fr | +33 1 XX XX XX XX |
-| **Réponse aux Incidents** | Équipe Sécurité | soc@example.gouv.fr | +33 1 XX XX XX XX (24/7) |
-| **Contact ANSSI** | - | cert-fr@ssi.gouv.fr | +33 1 71 75 84 68 |
-| **Contact CNIL** | - | cnil@cnil.fr | +33 1 53 73 22 22 |
+| **RSSI** | [Nom] | <rssi@example.gouv.fr> | +33 1 XX XX XX XX |
+| **Autorité d'Homologation** | [Nom] | <autorite@example.gouv.fr> | +33 1 XX XX XX XX |
+| **DPO (Délégué à la Protection des Données)** | [Nom] | <dpo@example.gouv.fr> | +33 1 XX XX XX XX |
+| **Réponse aux Incidents** | Équipe Sécurité | <soc@example.gouv.fr> | +33 1 XX XX XX XX (24/7) |
+| **Contact ANSSI** | - | <cert-fr@ssi.gouv.fr> | +33 1 71 75 84 68 |
+| **Contact CNIL** | - | <cnil@cnil.fr> | +33 1 53 73 22 22 |
 
 ---
 
@@ -1034,12 +1101,13 @@ Vraisemblance│  Gravité →
 **Classification** : RGS\*\* (Renforcé)
 **Utilisateurs** : 12 millions de citoyens actifs
 **Sensibilité des Données** : Dossiers médicaux, informations fiscales, prestations sociales
-**RSSI** : Marie Dupont (marie.dupont@dinum.gouv.fr)
+**RSSI** : Marie Dupont (<marie.dupont@dinum.gouv.fr>)
 **Autorité** : Directeur Général, Direction Interministérielle du Numérique
 
 **Décision d'Homologation** : ✅ **APPROUVÉE** (2025-01-20 au 2028-01-20)
 
 **Mesures de Sécurité Clés** :
+
 - Authentification FranceConnect (100% des utilisateurs)
 - Chiffrement AES-256 au repos, TLS 1.3 en transit
 - Conservation des journaux d'audit 3 ans (SIEM)
@@ -1047,6 +1115,7 @@ Vraisemblance│  Gravité →
 - Disponibilité 99,95% (RTO 4h, RPO 1h)
 
 **Risques Résiduels Acceptés** :
+
 - R-001 : Bourrage d'identifiants (risque résiduel 8) - MFA implémenté
 - R-003 : DDoS (risque résiduel 8) - Cloudflare Enterprise déployé
 
@@ -1058,4 +1127,4 @@ Vraisemblance│  Gravité →
 **Dernière Mise à Jour** : 2025-01-19
 **Mainteneur** : SSDLC Toolkit - Domaine Gouvernement-RGS
 
-Pour questions ou contributions, voir [Guide de Contribution](../../../.github/CONTRIBUTING.md).
+Pour questions ou contributions, voir [Guide de Contribution](../../../.github/CONTRIBUTING.txt).

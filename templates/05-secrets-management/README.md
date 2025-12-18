@@ -7,6 +7,7 @@ Ce répertoire contient des modèles pour le **Principe constitutionnel V : gest
 ## Pourquoi la gestion des secrets ?
 
 La gestion des secrets vous protège contre :
+
 - **Fuites de données** : 73% des fuites impliquent des secrets exposés (GitHub Security Report 2024)
 - **Compromission de comptes** : clés API exposées = accès non autorisé
 - **Violations réglementaires** : exposition de secrets = non-conformité RGPD, PCI-DSS
@@ -25,16 +26,19 @@ La gestion des secrets vous protège contre :
 ## Quand utiliser ces templates
 
 ### Phase de planification
+
 - ✅ Définir la **politique de rotation** dès la conception du projet
 - ✅ Identifier les **types de secrets** à gérer (API keys, certificats, tokens, mots de passe)
 - ✅ Choisir le **gestionnaire de secrets** adapté au contexte
 
 ### Phase d'implémentation
+
 - ✅ Intégrer le **gestionnaire de secrets** dans le code (voir vault-integration-guide.md)
 - ✅ Configurer la **détection pré-commit** pour bloquer les commits contenant des secrets
 - ✅ Migrer les secrets existants vers le gestionnaire
 
 ### Phase de maintenance
+
 - ✅ Automatiser la **rotation des secrets** selon la politique définie
 - ✅ Auditer les **accès aux secrets** (qui a accédé à quoi et quand)
 - ✅ Révoquer immédiatement les secrets compromis
@@ -81,19 +85,22 @@ La gestion des secrets vous protège contre :
 
 ## Choisir le bon template
 
-### Utiliser vault-integration-guide.md quand :
+### Utiliser vault-integration-guide.md quand
+
 - ✅ Vous démarrez un nouveau projet
 - ✅ Vous devez migrer depuis des secrets en clair
 - ✅ Vous voulez centraliser la gestion des secrets
 - ✅ Vous devez respecter des exigences de conformité strictes
 
-### Utiliser secrets-rotation-policy-template.md quand :
+### Utiliser secrets-rotation-policy-template.md quand
+
 - ✅ Vous avez déjà un gestionnaire de secrets
 - ✅ Vous devez définir les règles de rotation
 - ✅ Vous préparez un audit de sécurité
 - ✅ Vous voulez automatiser la rotation
 
-### Utiliser secrets-detection-setup.md quand :
+### Utiliser secrets-detection-setup.md quand
+
 - ✅ Vous voulez bloquer les secrets dans les commits (obligatoire pour tous)
 - ✅ Vous devez scanner le code existant
 - ✅ Vous intégrez un nouveau développeur
@@ -120,16 +127,19 @@ La gestion des secrets vous protège contre :
 ## Gestionnaires de secrets recommandés
 
 ### Open source
+
 - **HashiCorp Vault** : solution complète, self-hosted
 - **Mozilla SOPS** : chiffrement de fichiers de configuration
 - **Doppler** : freemium, facile à démarrer
 
 ### Cloud providers
+
 - **Azure Key Vault** : intégré Azure, excellent pour .NET
 - **AWS Secrets Manager** : intégré AWS, rotation automatique
 - **GCP Secret Manager** : intégré Google Cloud
 
 ### CI/CD
+
 - **GitHub Secrets** : pour les workflows GitHub Actions
 - **GitLab CI Variables** : pour les pipelines GitLab
 - **CircleCI Contexts** : pour CircleCI
@@ -137,11 +147,13 @@ La gestion des secrets vous protège contre :
 ## Outils de détection
 
 ### Scan pré-commit
+
 - **gitleaks** : rapide, nombreuses règles prédéfinies
 - **trufflehog** : détection d'entropie élevée (secrets générés)
 - **detect-secrets** : baseline pour ignorer les faux positifs
 
 ### Scan en CI/CD
+
 - **GitGuardian** : SaaS, détection temps réel
 - **Spectral** : open source, intégration CI/CD
 - **gitleaks en CI** : gratuit, efficace
@@ -158,6 +170,7 @@ La gestion des secrets alimente :
 ## Exemples
 
 Voir l'exemple concret :
+
 - [_example-ecommerce-secrets.md](_example-ecommerce-secrets.md) - Gestion complète des secrets pour une application e-commerce (Vault, gitleaks, rotation)
 
 ## Conformité
@@ -183,19 +196,22 @@ Pour mesurer l'efficacité de la gestion des secrets :
 ## Ressources externes
 
 ### Documentation officielle
+
 - [HashiCorp Vault Best Practices](https://learn.hashicorp.com/vault)
 - [AWS Secrets Manager User Guide](https://docs.aws.amazon.com/secretsmanager/)
 - [Azure Key Vault Documentation](https://docs.microsoft.com/azure/key-vault/)
 
 ### Guides et articles
+
 - [OWASP Secret Management Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html)
 - [GitHub Security Best Practices](https://docs.github.com/en/code-security/secret-scanning)
 
 ## Contribuer
 
-Vous avez des améliorations pour ces templates ? Voir les [directives de contribution](../../CONTRIBUTING.md).
+Vous avez des améliorations pour ces templates ? Voir les [directives de contribution](../../CONTRIBUTING.txt).
 
 Contributions courantes :
+
 - Guides d'intégration pour d'autres langages/frameworks
 - Scripts d'automatisation de rotation
 - Exemples de migration depuis secrets en clair
