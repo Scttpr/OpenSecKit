@@ -48,6 +48,29 @@ OBJECTIF
 
    Résultat : Analyse constitutionnelle + conformité aux 7 principes en 5 minutes.
 
+   1.7. Structure des fichiers générés
+
+      docs/
+      ├── context/
+      │   └── meta.md                  # Contexte projet
+      └── security/
+          ├── features/                # Analyses par feature
+          │   └── SEC-*.md
+          ├── risks/                   # Registre des risques
+          │   ├── risk-register.yaml
+          │   └── RISK-REGISTER.md
+          ├── audits/                  # Rapports d'audit
+          │   └── AUDIT-*.md
+          ├── rgs/                     # Documents RGS
+          │   ├── EBIOS-RM-*.md
+          │   └── DOSSIER-HOMOLOGATION-*.md
+          ├── continuity/              # Plans PCA/PRA
+          │   ├── PCA-*.md
+          │   └── PRA-*.md
+          ├── incidents/               # Rapports d'incidents
+          │   └── INC-*.md
+          └── DASHBOARD.md             # Tableau de bord
+
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 

@@ -111,7 +111,7 @@ Passer directement à l'Étape 1.
 
 ## Étape 2: Génération de SEC-[FEATURE].md
 
-**Nom du fichier** : `docs/security/SEC-[NOM-FEATURE].md`
+**Nom du fichier** : `docs/security/features/SEC-[NOM-FEATURE].md`
 
 **Structure STRICTE (toujours identique)** :
 
@@ -382,7 +382,7 @@ logger.info("event_name", extra={
 
 ## Étape 3: Mise à Jour du Risk Register
 
-**Fichier** : `docs/security/risk-register.yaml`
+**Fichier** : `docs/security/risks/risk-register.yaml`
 
 **Si le fichier n'existe pas**, le créer avec cette structure :
 
@@ -504,9 +504,9 @@ recommandations: []
 
 ## Étape 4: Génération RISK-REGISTER.md (Vue Humaine)
 
-**Fichier** : `docs/security/RISK-REGISTER.md`
+**Fichier** : `docs/security/risks/RISK-REGISTER.md`
 
-Générer automatiquement depuis `risk-register.yaml` une vue markdown lisible.
+Générer automatiquement depuis `docs/security/risks/risk-register.yaml` une vue markdown lisible.
 
 **Structure** :
 
@@ -514,7 +514,7 @@ Générer automatiquement depuis `risk-register.yaml` une vue markdown lisible.
 # Registre des Risques
 
 > Dernière mise à jour : [DATE] par /security
-> Source de vérité : risk-register.yaml
+> Source de vérité : docs/security/risks/risk-register.yaml
 
 ## 📊 Vue d'ensemble
 
@@ -573,9 +573,9 @@ Générer automatiquement depuis `risk-register.yaml` une vue markdown lisible.
    ✅ Analyse constitutionnelle terminée
 
    📄 Documents générés :
-   - docs/security/SEC-[FEATURE].md
-   - docs/security/risk-register.yaml (mis à jour)
-   - docs/security/RISK-REGISTER.md (régénéré)
+   - docs/security/features/SEC-[FEATURE].md
+   - docs/security/risks/risk-register.yaml (mis à jour)
+   - docs/security/risks/RISK-REGISTER.md (régénéré)
 
    📊 Conformité : X/7 principes
    🔴 Risques critiques : X
@@ -594,9 +594,9 @@ Générer automatiquement depuis `risk-register.yaml` une vue markdown lisible.
    📄 Documents générés :
    - docs/context/meta.md
    - domaines/[secteur]/context.yaml (si applicable)
-   - docs/security/SEC-[FEATURE].md
-   - docs/security/risk-register.yaml
-   - docs/security/RISK-REGISTER.md
+   - docs/security/features/SEC-[FEATURE].md
+   - docs/security/risks/risk-register.yaml
+   - docs/security/risks/RISK-REGISTER.md
 
    [Suite identique]
    ```

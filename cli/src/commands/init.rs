@@ -37,6 +37,8 @@ pub fn run(client: &Client, force: bool) -> Result<()> {
     println!("   /audit               - Vérification conformité aux 7 principes");
     println!("   /dashboard           - Vue consolidée des métriques");
     println!("   /incident <desc>     - Gestion de crise et plan d'action");
+    println!("   /osk-rgs             - Configuration RGS et EBIOS RM");
+    println!("   /osk-pca-pra         - Plans de continuité et reprise");
     println!("\n💡 Lancez Claude Code et exécutez les slash commands :");
     println!("   claude");
     println!("   >>> /security \"système de login\"");

@@ -566,4 +566,4 @@ Vous disposez des droits suivants selon le RGPD :
 **Dernière mise à jour** : 2025-01-19
 **Mainteneur** : SSDLC Toolkit - Domaine RGPD
 
-For questions or contributions, see [Contributing Guidelines](../../../CONTRIBUTING.md).
+For questions or contributions, see [Contributing Guidelines](../../../CONTRIBUTING.txt).

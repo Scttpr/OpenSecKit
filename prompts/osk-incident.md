@@ -30,7 +30,7 @@ Ton calme est olympien. Ta mission est de guider l'équipe à travers la tempêt
 Génère un **Plan de Bataille & Journal d'Incident** au format Markdown.
 
 *Ajoute cette ligne en tout premier pour guider la sauvegarde :*
-``
+`docs/security/incidents/INC-[DATE]-001.md`
 
 ---
 
@@ -102,7 +102,7 @@ Génère un **Plan de Bataille & Journal d'Incident** au format Markdown.
 
 ## 6. Enregistrement au Risk Register
 
-**Fichier** : `docs/security/risk-register.yaml`
+**Fichier** : `docs/security/risks/risk-register.yaml`
 
 **Ajouter automatiquement à la liste `risques:`** (liste plate) :
 
@@ -146,7 +146,7 @@ risques:
     cve: null
     cwe: null
     owasp: null
-    document_source: "incidents/INC-[DATE].md"
+    document_source: "docs/security/incidents/INC-[DATE].md"
     notes: "Créé automatiquement par /incident"
 ```
 
@@ -154,7 +154,7 @@ risques:
 - `statut` : NON_CONFORME (si incident critique)
 - Ajouter document à la liste
 
-**Si risk-register.yaml n'existe pas** : Le créer avec structure minimale puis ajouter le risque.
+**Si `docs/security/risks/risk-register.yaml` n'existe pas** : Le créer avec structure minimale puis ajouter le risque.
 
 ---
 
@@ -163,7 +163,7 @@ risques:
 Une fois l'incident résolu :
 
 1. Marquer le statut comme **✅ RÉSOLU** dans ce fichier
-2. **Mettre à jour risk-register.yaml** :
+2. **Mettre à jour `docs/security/risks/risk-register.yaml`** :
    - Changer statut : EN_COURS → RESOLU
    - Ajouter date_resolution
    - Documenter mitigation implémentée

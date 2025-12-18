@@ -17,15 +17,18 @@ Ce répertoire contient des extensions spécifiques par domaine qui adaptent les
 ### Par région géographique
 
 **France (Secteur public)** :
+
 - Principal : [gouvernement-rgs/](gouvernement-rgs/) (obligatoire pour les administrations)
 - Secondaire : [rgpd/](rgpd/) (si traitement de données personnelles)
 - Secondaire : [nis2/](nis2/) (si infrastructure critique ou OSE/EE)
 
 **Union Européenne** :
+
 - [rgpd/](rgpd/) (obligatoire pour le traitement de données personnelles)
 - [nis2/](nis2/) (obligatoire pour les entités essentielles/importantes)
 
 **France (Secteur privé - Infrastructure critique)** :
+
 - Principal : [nis2/](nis2/) (si dans le périmètre des secteurs NIS2)
 - Secondaire : [gouvernement-rgs/](gouvernement-rgs/) (principes RGS recommandés)
 - Secondaire : [rgpd/](rgpd/) (si traitement de données personnelles)
@@ -33,23 +36,28 @@ Ce répertoire contient des extensions spécifiques par domaine qui adaptent les
 ### Par secteur d'activité
 
 **Administration publique (France)** :
+
 - ✅ [gouvernement-rgs/](gouvernement-rgs/) - Obligatoire
 - ✅ [rgpd/](rgpd/) - Si traitement de données personnelles
 - ✅ [nis2/](nis2/) - Si entité d'administration publique sous NIS2
 
 **Énergie, Transport, Santé (UE)** :
+
 - ✅ [nis2/](nis2/) - Obligatoire (entités essentielles)
 - ✅ [rgpd/](rgpd/) - Si traitement de données personnelles
 
 **Services numériques, Fournisseurs Cloud (UE)** :
+
 - ✅ [nis2/](nis2/) - Obligatoire (entités essentielles)
 - ✅ [rgpd/](rgpd/) - Obligatoire (traitement de données personnelles)
 
 **E-commerce, SaaS (marché UE)** :
+
 - ✅ [rgpd/](rgpd/) - Obligatoire
 - ⚠️ [nis2/](nis2/) - Si fourniture d'infrastructure/services numériques à grande échelle
 
 **Fabrication, Production alimentaire (UE)** :
+
 - ⚠️ [nis2/](nis2/) - Si "entité importante" (vérifier la liste des secteurs)
 - ✅ [rgpd/](rgpd/) - Si traitement de données employés/clients
 
@@ -75,10 +83,12 @@ De nombreuses organisations doivent se conformer à **plusieurs réglementations
 ### Secteur public français + Données personnelles
 
 **Appliquer** :
+
 1. [gouvernement-rgs/](gouvernement-rgs/) - Cadre principal (RGS obligatoire)
 2. [rgpd/](rgpd/) - Ajouter les exigences spécifiques RGPD (AIPD, droits des personnes concernées)
 
 **Intégration** :
+
 - Utiliser EBIOS RM (RGS) comme cadre de gestion des risques global, compléter avec l'AIPD RGPD.
 - FranceConnect répond à la fois aux exigences d'authentification RGS et de sécurité RGPD.
 - La rétention de 3 ans des journaux RGS dépasse le minimum souvent requis par le RGPD.
@@ -87,10 +97,12 @@ De nombreuses organisations doivent se conformer à **plusieurs réglementations
 ### Infrastructure critique UE + Données personnelles
 
 **Appliquer** :
+
 1. [nis2/](nis2/) - Cadre principal (NIS2 obligatoire pour les entités essentielles)
 2. [rgpd/](rgpd/) - Ajouter les exigences spécifiques RGPD
 
 **Intégration** :
+
 - La gestion des risques NIS2 (Art. 21.2) satisfait l'approche par les risques du RGPD (Art. 32).
 - Signalement d'incidents NIS2 (24h/72h) + notification de violation RGPD (72h) : processus séparés mais complémentaires.
 - Sécurité de la chaîne d'approvisionnement NIS2 + Accords de traitement des données (DPA) RGPD.
@@ -99,11 +111,13 @@ De nombreuses organisations doivent se conformer à **plusieurs réglementations
 ### Secteur public français + Infrastructure critique UE + Données personnelles
 
 **Appliquer** (les trois) :
+
 1. [gouvernement-rgs/](gouvernement-rgs/) - RGS obligatoire pour l'administration française
 2. [nis2/](nis2/) - Si l'entité est dans le périmètre NIS2 (ex : santé, énergie)
 3. [rgpd/](rgpd/) - Pour le traitement de données personnelles
 
 **Intégration** :
+
 - EBIOS RM (RGS) + analyse de risques NIS2 + AIPD RGPD → Évaluation de risques intégrée unique.
 - FranceConnect (RGS) + MFA (NIS2) + sécurité appropriée (RGPD) → Système d'authentification unique.
 - Signalement d'incidents : ANSSI (RGS) + CSIRT National (NIS2) + CNIL (RGPD) - peut nécessiter plusieurs notifications parallèles.
@@ -114,6 +128,7 @@ De nombreuses organisations doivent se conformer à **plusieurs réglementations
 ### Étape 1 : Déterminer les domaines applicables
 
 Demandez-vous :
+
 - ✅ Êtes-vous une entité publique française ? → [gouvernement-rgs/](gouvernement-rgs/)
 - ✅ Êtes-vous une entité essentielle (EE) ou importante (EI) sous NIS2 ? → [nis2/](nis2/)
 - ✅ Traitez-vous des données personnelles de résidents de l'UE ? → [rgpd/](rgpd/)
@@ -121,6 +136,7 @@ Demandez-vous :
 ### Étape 2 : Consulter le README du domaine
 
 Lire le README spécifique au domaine pour :
+
 - Le contexte réglementaire et la base légale ;
 - La correspondance (mapping) avec les principes constitutionnels SSDLC ;
 - Les checklists de conformité ;
@@ -129,6 +145,7 @@ Lire le README spécifique au domaine pour :
 ### Étape 3 : Utiliser les modèles du domaine
 
 Chaque domaine fournit :
+
 - **Des modèles étendus** adaptant les modèles SSDLC de base ;
 - **Des checklists de conformité** spécifiques à la réglementation ;
 - **Des exemples** et des guides.
@@ -138,6 +155,7 @@ Chaque domaine fournit :
 Les extensions de domaine **complètent** (ne remplacent pas) les modèles de base. Il est important de distinguer le niveau stratégique du niveau opérationnel :
 
 **Exemple de workflow** :
+
 1. **Modélisation des menaces (Opérationnel)** : Utiliser le [modèle STRIDE de base](../templates/01-threat-modeling/stride-threat-model-template-planning.md) pour identifier les menaces techniques sur les composants logiciels.
 2. **Ajouter RGS (Stratégique)** : Utiliser [EBIOS RM](gouvernement-rgs/templates/) comme socle d'analyse de risques global (obligatoire pour l'homologation RGS). Les scénarios opérationnels d'EBIOS peuvent être alimentés par l'analyse STRIDE.
 3. **Ajouter RGPD** : Inclure l'[AIPD](rgpd/templates/) si traitement de données personnelles à risque élevé.
@@ -152,9 +170,10 @@ Les extensions de domaine **complètent** (ne remplacent pas) les modèles de ba
 
 ## Contribution
 
-Une extension de domaine est manquante ? Consultez les [Directives de contribution](../CONTRIBUTING.md).
+Une extension de domaine est manquante ? Consultez les [Directives de contribution](../CONTRIBUTING.txt).
 
 **Domaines suggérés** :
+
 - Spécifiques à la santé (HDS pour la France, HIPAA pour les US)
 - Finance (DORA, PCI-DSS, SOX)
 - Gouvernement US (FedRAMP, NIST 800-53)
@@ -165,6 +184,7 @@ Une extension de domaine est manquante ? Consultez les [Directives de contributi
 **Besoin d'aide pour sélectionner les domaines ?**
 
 Ouvrez une [GitHub Discussion](https://github.com/Scttpr/OpenSecKit/issues) avec :
+
 - Votre secteur/industrie ;
 - Votre localisation géographique ;
 - Les types de données traitées ;

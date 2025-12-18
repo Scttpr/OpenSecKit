@@ -82,6 +82,8 @@ DESCRIPTION
       /audit                 Vérification conformité aux 7 principes
       /dashboard             Vue consolidée des métriques
       /incident <desc>       Gestion de crise et plan d'action
+      /osk-rgs               Configuration RGS et EBIOS RM
+      /osk-pca-pra           Plans de continuité et reprise
 
    Voir cli/README.txt pour détails.
 

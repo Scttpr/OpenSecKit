@@ -790,4 +790,4 @@ Cordialement,
 **Dernière mise à jour** : 2025-01-19
 **Mainteneur** : SSDLC Toolkit - Domaine RGPD
 
-Pour toute question ou contribution, voir [Directives de contribution](../../../CONTRIBUTING.md).
+Pour toute question ou contribution, voir [Directives de contribution](../../../CONTRIBUTING.txt).
