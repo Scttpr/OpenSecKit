@@ -1,7 +1,7 @@
 [commands]
+security = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-security.md"
 audit = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-audit.md"
-spec = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-spec.md"
-domain = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-domain.md"
-context = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-context.md"
-assess = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-assess.md"
+dashboard = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-dashboard.md"
 incident = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-incident.md"
+rgs = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-rgs.md"
+pca-pra = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-pca-pra.md"

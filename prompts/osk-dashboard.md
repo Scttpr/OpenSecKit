@@ -11,9 +11,9 @@ Tu es le **Security Dashboard Manager**. Ta mission est de générer une vue con
 
 # Sources de Données
 
-1. **`docs/security/risk-register.yaml`** - Registre centralisé des risques
-2. **`docs/security/SEC-*.md`** - Analyses de sécurité par feature
-3. **`docs/security/AUDIT-*.md`** - Historique des audits
+1. **`docs/security/risks/risk-register.yaml`** - Registre centralisé des risques
+2. **`docs/security/features/SEC-*.md`** - Analyses de sécurité par feature
+3. **`docs/security/audits/AUDIT-*.md`** - Historique des audits
 4. **`docs/context/meta.md`** - Contexte technique du projet
 
 # Processus de Génération
@@ -22,7 +22,7 @@ Tu es le **Security Dashboard Manager**. Ta mission est de générer une vue con
 
 ### 1.1 Charger le Risk Register
 
-**Fichier** : `docs/security/risk-register.yaml`
+**Fichier** : `docs/security/risks/risk-register.yaml`
 
 **Si absent** : Créer un dashboard vide avec message "Aucune analyse de sécurité effectuée. Lancez /security pour démarrer."
 
@@ -45,11 +45,11 @@ Tu es le **Security Dashboard Manager**. Ta mission est de générer une vue con
 
 ### 1.2 Scanner les Documents de Sécurité
 
-**Documents SEC-*.md** :
+**Documents `docs/security/features/SEC-*.md`** :
 - Compter le nombre total de features analysées
 - Identifier les features avec risques critiques non résolus
 
-**Documents AUDIT-*.md** :
+**Documents `docs/security/audits/AUDIT-*.md`** :
 - Récupérer le dernier audit et l'avant-dernier (si existe)
 - Calculer l'évolution de conformité
 
@@ -235,8 +235,8 @@ Risques Critiques (Nombre)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 📄 Rapport complet: docs/security/DASHBOARD.md
-📊 Risk Register: docs/security/risk-register.yaml
-📋 Dernier audit: docs/security/AUDIT-[DATE].md
+📊 Risk Register: docs/security/risks/risk-register.yaml
+📋 Dernier audit: docs/security/audits/AUDIT-[DATE].md
 
 Généré le [DATE] par OpenSecKit /dashboard
 ```
@@ -260,7 +260,7 @@ Généré le [DATE] par OpenSecKit /dashboard
 
 **Projet** : [Nom]
 **Stack** : [Stack technique depuis meta.md]
-**Dernière mise à jour** : [Date risk-register.yaml]
+**Dernière mise à jour** : [Date depuis docs/security/risks/risk-register.yaml]
 **Statut Production** : [✅ VALIDÉ / ⚠️ RISQUES / 🔴 BLOQUÉ]
 
 ---
@@ -364,8 +364,8 @@ VII. Patch mgmt       ✅ Aucun risque
 **XX%** (X features avec SEC-*.md / Y features totales)
 
 [Liste des features analysées]
-- ✅ Login (SEC-LOGIN.md)
-- ✅ API (SEC-API.md)
+- ✅ Login (features/SEC-LOGIN.md)
+- ✅ API (features/SEC-API.md)
 - ❌ Admin (pas d'analyse)
 - ❌ Export PDF (pas d'analyse)
 
@@ -499,11 +499,11 @@ Conformité (%)
 ## Ressources
 
 - **Constitution** : [constitution.md](../../constitution.md)
-- **Risk Register** : [risk-register.yaml](risk-register.yaml)
-- **Dernier Audit** : [AUDIT-[DATE].md](AUDIT-[DATE].md)
+- **Risk Register** : [risk-register.yaml](risks/risk-register.yaml)
+- **Dernier Audit** : [AUDIT-[DATE].md](audits/AUDIT-[DATE].md)
 - **Features Analysées** :
-  - [SEC-LOGIN.md](SEC-LOGIN.md)
-  - [SEC-API.md](SEC-API.md)
+  - [SEC-LOGIN.md](features/SEC-LOGIN.md)
+  - [SEC-API.md](features/SEC-API.md)
 
 ---
 
@@ -568,12 +568,12 @@ Taux = (Risques résolus + acceptés) / Risques totaux × 100
 ### Couverture Fonctionnalités
 
 ```
-Couverture = Nombre de SEC-*.md / Nombre de features totales × 100
+Couverture = Nombre de docs/security/features/SEC-*.md / Nombre de features totales × 100
 ```
 
 **Détecter features** :
 - Scanner le code pour identifier modules/routes/controllers principaux
-- Comparer avec fichiers SEC-*.md existants
+- Comparer avec fichiers `docs/security/features/SEC-*.md` existants
 
 ---
 

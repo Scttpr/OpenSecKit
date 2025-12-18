@@ -49,6 +49,8 @@ SYNOPSIS
       /audit               - Vérification conformité et risk register
       /dashboard           - Tableau de bord et métriques clés
       /incident <desc>     - Gestion de crise et plan d'action
+      /osk-rgs             - Configuration RGS et EBIOS RM
+      /osk-pca-pra         - Plans de continuité et reprise
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -70,10 +72,12 @@ SYNOPSIS
          --force / -f : Force la mise à jour des ressources
 
       Slash commands disponibles après init :
-         /security  - Analyse constitutionnelle de sécurité
-         /audit     - Vérification conformité aux 7 principes
-         /dashboard - Tableau de bord et métriques clés
-         /incident  - Gestion de crise et plan d'action
+         /security   - Analyse constitutionnelle de sécurité
+         /audit      - Vérification conformité aux 7 principes
+         /dashboard  - Tableau de bord et métriques clés
+         /incident   - Gestion de crise et plan d'action
+         /osk-rgs    - Configuration RGS et EBIOS RM
+         /osk-pca-pra - Plans de continuité et reprise
 
       Mise à jour des slash commands :
          $ osk init --force
@@ -178,6 +182,8 @@ SYNOPSIS
 
 7. FICHIERS GÉNÉRÉS
 
+   Par osk init :
+
    .osk/
    ├── config.toml              Configuration
    ├── templates/               Templates téléchargés
@@ -188,7 +194,32 @@ SYNOPSIS
        ├── osk-security.md      → /security
        ├── osk-audit.md         → /audit
        ├── osk-dashboard.md     → /dashboard
-       └── osk-incident.md      → /incident
+       ├── osk-incident.md      → /incident
+       ├── osk-rgs.md           → /osk-rgs
+       └── osk-pca-pra.md       → /osk-pca-pra
+
+   Par les slash commands (via Claude Code) :
+
+   docs/
+   ├── context/
+   │   └── meta.md              Contexte projet (/security init)
+   └── security/
+       ├── features/            Analyses par feature (/security)
+       │   └── SEC-*.md
+       ├── risks/               Registre des risques (/security)
+       │   ├── risk-register.yaml
+       │   └── RISK-REGISTER.md
+       ├── audits/              Rapports d'audit (/audit)
+       │   └── AUDIT-*.md
+       ├── rgs/                 Documents RGS (/audit rgs, /osk-rgs)
+       │   ├── EBIOS-RM-*.md
+       │   └── DOSSIER-HOMOLOGATION-*.md
+       ├── continuity/          Plans PCA/PRA (/osk-pca-pra)
+       │   ├── PCA-*.md
+       │   └── PRA-*.md
+       ├── incidents/           Rapports d'incidents (/incident)
+       │   └── INC-*.md
+       └── DASHBOARD.md         Tableau de bord (/dashboard)
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
