@@ -2,19 +2,26 @@
 # OpenSecKit - Contexte Projet RGS (Référentiel Général de Sécurité)
 # =============================================================================
 #
-# Ce fichier capture les informations organisationnelles nécessaires pour :
-# - Générer le dossier d'homologation RGS
-# - Exécuter l'audit de conformité `osk-audit rgs`
-# - Personnaliser les templates de sécurité
+# ⚠️  FICHIER LEGACY - RÉFÉRENCE POUR MIGRATION V3
 #
-# Les informations techniques (stack, architecture) sont détectées automatiquement
-# par OSK dans `docs/context/meta.md`. Ce fichier complète avec les données
-# organisationnelles non-détectables.
+# En V3, les informations RGS sont stockées dans `.osk/config.toml` sous la
+# section [domains.rgs] et [domains.organisation].
 #
-# Usage :
-#   1. Copier ce fichier dans votre projet : `cp skeleton.yaml .osk/rgs-context.yaml`
-#   2. Compléter les sections marquées [À COMPLÉTER]
-#   3. Lancer `osk-audit rgs` pour vérifier la conformité
+# Ce fichier est conservé comme référence pour :
+# - Migrer les projets existants vers V3
+# - Comprendre la structure complète des données RGS requises
+#
+# Usage V3 :
+#   1. Exécutez `osk init` pour créer `.osk/config.toml`
+#   2. Exécutez `/osk-configure` pour détecter les domaines
+#   3. Exécutez `/osk-rgs` pour configurer le contexte RGS
+#   4. Exécutez `/osk-rgs renew` pour vérifier la conformité
+#
+# Mapping vers config.toml :
+#   systeme.nom           → [project] name
+#   organisation.rssi     → [domains.organisation] rssi
+#   classification        → [domains.rgs] niveau, classification
+#   fournisseurs          → [[domains.suppliers]]
 #
 # =============================================================================
 

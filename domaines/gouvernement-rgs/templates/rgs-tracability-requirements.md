@@ -702,7 +702,7 @@ tags:
 
 ### 8.2 Rapport de Conformité Traçabilité
 
-**Structure du rapport (généré par `osk-audit rgs`)** :
+**Structure du rapport (généré par `/osk-rgs renew`)** :
 
 ```markdown
 # Rapport de Conformité Traçabilité RGS

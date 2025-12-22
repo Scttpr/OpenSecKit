@@ -2,7 +2,7 @@
 title: "Checklist d'Audit de Conformité RGS"
 template_version: "1.0.0"
 domain: "government-rgs"
-purpose: "osk-audit-rgs"
+purpose: "osk-rgs-renew"
 constitutional_principles:
   - "I - Threat Modeling"
   - "II - Risk Analysis"
@@ -23,10 +23,10 @@ ssdlc_phase: "All"
 
 Cette checklist permet d'auditer la conformité RGS d'un système d'information en croisant :
 - Les **exigences réglementaires** du RGS v2.0
-- Les **documents de sécurité** générés par OSK (`docs/security/features/`, `docs/security/risks/`)
-- Le **contexte projet** (`skeleton.yaml` / `.osk/rgs-context.yaml`)
+- Les **documents de sécurité** générés par OSK (`.osk/specs/`, `docs/security/risks/`)
+- Le **contexte projet** (`.osk/config.toml [domains.rgs]`)
 
-Elle est utilisée par la commande **`osk-audit rgs`** pour générer un rapport de conformité.
+Elle est utilisée par la commande **`/osk-rgs renew`** pour générer un rapport de conformité.
 
 ---
 
@@ -53,9 +53,9 @@ AUDIT RGS
 
 | Fichier | Obligatoire | Source | Vérification |
 |---------|-------------|--------|--------------|
-| `.osk/rgs-context.yaml` | ✅ | Manuel (copie de `skeleton.yaml`) | Fichier existe et parsable |
-| `docs/context/meta.md` | ✅ | Auto-généré par `/osk-security` | Fichier existe |
-| `docs/security/risks/risk-register.yaml` | ✅ | Auto-généré par `/osk-security` | Fichier existe |
+| `.osk/config.toml` | ✅ | `osk init` + `/osk-configure` | Fichier existe et parsable |
+| `.osk/memory/context.md` | ✅ | Auto-généré par `/osk-configure` | Fichier existe |
+| `docs/security/risks/risk-register.yaml` | ✅ | Auto-généré par `/osk-analyze` | Fichier existe |
 
 **Critères de validation** :
 
@@ -63,45 +63,45 @@ AUDIT RGS
 # Vérification automatique
 prerequis:
   - id: PRE-001
-    description: "Fichier de contexte RGS présent"
-    verification: "file_exists(.osk/rgs-context.yaml)"
+    description: "Configuration RGS présente"
+    verification: "file_exists(.osk/config.toml) AND config.domains.rgs.enabled"
     criticite: BLOQUANT
-    source_osk: null
-    source_manuelle: "skeleton.yaml"
+    source_osk: "osk init + /osk-configure"
+    source_manuelle: null
 
   - id: PRE-002
     description: "Niveau RGS défini"
-    verification: "rgs_context.classification.niveau_rgs in ['RGS*', 'RGS**', 'RGS***']"
+    verification: "config.domains.rgs.niveau in ['standard', 'renforce', '*']"
     criticite: BLOQUANT
-    source_osk: null
-    source_manuelle: "rgs-context.yaml#classification.niveau_rgs"
+    source_osk: "/osk-configure"
+    source_manuelle: "config.toml#domains.rgs.niveau"
 
   - id: PRE-003
     description: "Autorité d'homologation identifiée"
-    verification: "rgs_context.organisation.autorite_homologation.nom != '[À COMPLÉTER]'"
+    verification: "config.domains.organisation.autorite_homologation != null"
     criticite: BLOQUANT
-    source_osk: null
-    source_manuelle: "rgs-context.yaml#organisation.autorite_homologation"
+    source_osk: "/osk-rgs"
+    source_manuelle: "config.toml#domains.organisation"
 
   - id: PRE-004
     description: "RSSI identifié"
-    verification: "rgs_context.organisation.rssi.nom != '[À COMPLÉTER]'"
+    verification: "config.domains.organisation.rssi != null"
     criticite: IMPORTANT
-    source_osk: null
-    source_manuelle: "rgs-context.yaml#organisation.rssi"
+    source_osk: "/osk-rgs"
+    source_manuelle: "config.toml#domains.organisation.rssi"
 
   - id: PRE-005
-    description: "Méta-données projet générées"
-    verification: "file_exists(docs/context/meta.md)"
+    description: "Contexte projet généré"
+    verification: "file_exists(.osk/memory/context.md)"
     criticite: BLOQUANT
-    source_osk: "/osk-security (première exécution)"
+    source_osk: "/osk-configure"
     source_manuelle: null
 
   - id: PRE-006
     description: "Registre des risques initialisé"
     verification: "file_exists(docs/security/risks/risk-register.yaml)"
     criticite: BLOQUANT
-    source_osk: "/osk-security"
+    source_osk: "/osk-analyze"
     source_manuelle: null
 ```
 
@@ -131,9 +131,9 @@ authentification:
       - "Complexité (majuscule, minuscule, chiffre, spécial)"
       - "Historique des 5 derniers mots de passe"
       - "Expiration configurable (recommandé 90 jours)"
-    verification_auto: "meta.md#patterns_securite.authentification contains 'password_policy'"
-    source_osk: "docs/context/meta.md"
-    source_manuelle: "rgs-context.yaml#fonctions_securite.authentification.politique_mdp"
+    verification_auto: "context.md#patterns_securite.authentification contains 'password_policy'"
+    source_osk: ".osk/memory/context.md"
+    source_manuelle: "config.toml#domains.rgs.authentification.politique_mdp"
     criticite: IMPORTANT
 
   - id: AUTH-002
@@ -143,9 +143,9 @@ authentification:
       - "Verrouillage après 5 tentatives maximum"
       - "Durée de verrouillage minimum 30 minutes"
       - "Journalisation des verrouillages"
-    verification_auto: "SEC-*.md contains 'verrouillage' OR 'account_lockout'"
-    source_osk: "docs/security/features/SEC-*.md"
-    source_manuelle: "rgs-context.yaml#fonctions_securite.authentification.verrouillage"
+    verification_auto: ".osk/specs/*/requirements.md contains 'verrouillage' OR 'account_lockout'"
+    source_osk: ".osk/specs/*/requirements.md"
+    source_manuelle: "config.toml#domains.rgs.authentification.verrouillage"
     criticite: IMPORTANT
 
   - id: AUTH-003
@@ -156,8 +156,8 @@ authentification:
       - "Timeout absolu (4h pour RGS**)"
       - "Invalidation à la déconnexion"
       - "Token de session non prédictible"
-    verification_auto: "SEC-*.md contains 'session' AND 'timeout'"
-    source_osk: "docs/security/features/SEC-*.md (Principe VI)"
+    verification_auto: ".osk/specs/*/requirements.md contains 'session' AND 'timeout'"
+    source_osk: ".osk/specs/*/requirements.md"
     source_manuelle: null
     criticite: IMPORTANT
 
@@ -168,9 +168,9 @@ authentification:
     criteres:
       - "Second facteur obligatoire (TOTP, SMS, clé physique)"
       - "Résistance au phishing (FIDO2 pour RGS***)"
-    verification_auto: "rgs_context.fonctions_securite.authentification.mfa_actif == true"
-    source_osk: null
-    source_manuelle: "rgs-context.yaml#fonctions_securite.authentification.mfa_actif"
+    verification_auto: "config.domains.rgs.authentification.mfa_actif == true"
+    source_osk: "/osk-rgs"
+    source_manuelle: "config.toml#domains.rgs.authentification.mfa_actif"
     criticite: BLOQUANT
 
   - id: AUTH-005
@@ -180,9 +180,9 @@ authentification:
       - "Intégration FranceConnect OU certificat RGS"
       - "Niveau eIDAS Substantial minimum"
       - "Validation du nonce et state (anti-replay, anti-CSRF)"
-    verification_auto: "SEC-*.md contains 'FranceConnect' OR 'certificat RGS'"
-    source_osk: "docs/security/features/SEC-*.md"
-    source_manuelle: "rgs-context.yaml#fonctions_securite.authentification"
+    verification_auto: ".osk/specs/*/requirements.md contains 'FranceConnect' OR 'certificat RGS'"
+    source_osk: ".osk/specs/*/requirements.md"
+    source_manuelle: "config.toml#domains.rgs.authentification"
     template_reference: "rgs-franceconnect-auth-requirements.md"
     criticite: BLOQUANT
 
@@ -194,9 +194,9 @@ authentification:
       - "Certificat délivré par PSCE qualifié"
       - "Niveau eIDAS High"
       - "QSCD (dispositif de création qualifié)"
-    verification_auto: "rgs_context.fonctions_securite.authentification.niveau_eidas == 'High'"
-    source_osk: null
-    source_manuelle: "rgs-context.yaml"
+    verification_auto: "config.domains.rgs.authentification.niveau_eidas == 'High'"
+    source_osk: "/osk-rgs"
+    source_manuelle: "config.toml#domains.rgs.authentification"
     criticite: BLOQUANT
 ```
 
@@ -204,11 +204,11 @@ authentification:
 
 | Exigence | Document OSK | Section | Champ à vérifier |
 |----------|--------------|---------|------------------|
-| AUTH-001 | `meta.md` | Patterns de sécurité | `authentification` |
-| AUTH-002 | `SEC-*.md` | Principe III | Checklist moindre privilège |
-| AUTH-003 | `SEC-*.md` | Principe VI | Gestion des sessions |
-| AUTH-004 | `rgs-context.yaml` | Fonctions sécurité | `mfa_actif` |
-| AUTH-005 | `SEC-auth-*.md` | Analyse feature auth | FranceConnect |
+| AUTH-001 | `.osk/memory/context.md` | Patterns de sécurité | `authentification` |
+| AUTH-002 | `.osk/specs/*/requirements.md` | Exigences | Checklist moindre privilège |
+| AUTH-003 | `.osk/specs/*/requirements.md` | Exigences | Gestion des sessions |
+| AUTH-004 | `.osk/config.toml` | domains.rgs | `mfa_actif` |
+| AUTH-005 | `.osk/specs/*-auth*/requirements.md` | Exigences | FranceConnect |
 
 ---
 
@@ -233,8 +233,8 @@ integrite:
     criteres:
       - "SHA-256 minimum (SHA-384 recommandé)"
       - "MD5 et SHA-1 interdits"
-    verification_auto: "meta.md NOT contains 'MD5' AND NOT contains 'SHA-1'"
-    source_osk: "docs/context/meta.md"
+    verification_auto: "context.md NOT contains 'MD5' AND NOT contains 'SHA-1'"
+    source_osk: ".osk/memory/context.md"
     source_manuelle: null
     template_reference: "rgs-anssi-cryptography-requirements.md"
     criticite: IMPORTANT
@@ -246,8 +246,8 @@ integrite:
       - "Schémas de validation définis (JSON Schema, XSD)"
       - "Validation côté serveur obligatoire"
       - "Liste blanche (pas liste noire)"
-    verification_auto: "SEC-*.md contains 'validation' AND 'schéma'"
-    source_osk: "docs/security/features/SEC-*.md (Principe III)"
+    verification_auto: ".osk/specs/*/requirements.md contains 'validation' AND 'schéma'"
+    source_osk: ".osk/specs/*/requirements.md"
     source_manuelle: null
     template_reference: "rgs-integrity-requirements.md"
     criticite: IMPORTANT
@@ -259,9 +259,9 @@ integrite:
       - "Manifeste d'intégrité pour fichiers de config"
       - "Vérification au démarrage"
       - "Alerting en cas de modification"
-    verification_auto: "SEC-*.md contains 'intégrité' OR 'checksum' OR 'hash'"
-    source_osk: "docs/security/features/SEC-*.md"
-    source_manuelle: "rgs-context.yaml#fonctions_securite.integrite"
+    verification_auto: ".osk/specs/*/requirements.md contains 'intégrité' OR 'checksum' OR 'hash'"
+    source_osk: ".osk/specs/*/requirements.md"
+    source_manuelle: "config.toml#domains.rgs.integrite"
     criticite: IMPORTANT
 
   - id: INT-004
@@ -271,9 +271,9 @@ integrite:
       - "Format PAdES, XAdES ou CAdES"
       - "Profil -B-T minimum (avec horodatage)"
       - "Certificat de PSCE qualifié"
-    verification_auto: "rgs_context.fonctions_securite.integrite.signature_documents != null"
-    source_osk: null
-    source_manuelle: "rgs-context.yaml#fonctions_securite.integrite"
+    verification_auto: "config.domains.rgs.integrite.signature_documents != null"
+    source_osk: "/osk-rgs"
+    source_manuelle: "config.toml#domains.rgs.integrite"
     template_reference: "rgs-integrity-requirements.md"
     criticite: IMPORTANT
 
@@ -284,9 +284,9 @@ integrite:
       - "TSA qualifiée RGS (Certinomis, Universign, etc.)"
       - "RFC 3161 conforme"
       - "Archivage des jetons"
-    verification_auto: "rgs_context.fonctions_securite.integrite.horodatage_qualifie == true"
-    source_osk: null
-    source_manuelle: "rgs-context.yaml#fonctions_securite.integrite"
+    verification_auto: "config.domains.rgs.integrite.horodatage_qualifie == true"
+    source_osk: "/osk-rgs"
+    source_manuelle: "config.toml#domains.rgs.integrite"
     template_reference: "rgs-integrity-requirements.md"
     criticite: BLOQUANT
 
@@ -330,9 +330,9 @@ confidentialite:
       - "TLS 1.0 et 1.1 désactivés"
       - "Cipher suites ECDHE uniquement (PFS)"
       - "HSTS activé"
-    verification_auto: "meta.md contains 'TLS' AND (contains '1.2' OR contains '1.3')"
-    source_osk: "docs/context/meta.md"
-    source_manuelle: "rgs-context.yaml#fonctions_securite.confidentialite.chiffrement_transit"
+    verification_auto: "context.md contains 'TLS' AND (contains '1.2' OR contains '1.3')"
+    source_osk: ".osk/memory/context.md"
+    source_manuelle: "config.toml#domains.rgs.confidentialite.chiffrement_transit"
     template_reference: "rgs-anssi-cryptography-requirements.md"
     criticite: BLOQUANT
 
@@ -343,9 +343,9 @@ confidentialite:
       - "AES-256-GCM pour données sensibles (RGS**+)"
       - "Chiffrement BDD (TDE ou champ)"
       - "Chiffrement disque (LUKS/BitLocker)"
-    verification_auto: "SEC-*.md contains 'chiffrement' OR 'AES'"
-    source_osk: "docs/security/features/SEC-*.md (Principe V)"
-    source_manuelle: "rgs-context.yaml#fonctions_securite.confidentialite"
+    verification_auto: ".osk/specs/*/hardening.md contains 'chiffrement' OR 'AES'"
+    source_osk: ".osk/specs/*/hardening.md"
+    source_manuelle: "config.toml#domains.rgs.confidentialite"
     template_reference: "rgs-anssi-cryptography-requirements.md"
     criticite: IMPORTANT
 
@@ -356,9 +356,9 @@ confidentialite:
       - "Clés stockées dans KMS/HSM (pas en clair)"
       - "Rotation des clés automatisée"
       - "Séparation KEK/DEK (envelope encryption)"
-    verification_auto: "rgs_context.fonctions_securite.confidentialite.gestion_cles != null"
-    source_osk: null
-    source_manuelle: "rgs-context.yaml#fonctions_securite.confidentialite.gestion_cles"
+    verification_auto: "config.domains.rgs.confidentialite.gestion_cles != null"
+    source_osk: "/osk-rgs"
+    source_manuelle: "config.toml#domains.rgs.confidentialite.gestion_cles"
     template_reference: "rgs-anssi-cryptography-requirements.md"
     criticite: BLOQUANT
 
@@ -369,8 +369,8 @@ confidentialite:
       - "Scan gitleaks/trufflehog en CI"
       - "Pre-commit hook actif"
       - "Secrets dans variables d'environnement ou vault"
-    verification_auto: "SEC-*.md (Principe V) contains 'gitleaks' OR 'trufflehog' OR 'vault'"
-    source_osk: "docs/security/features/SEC-*.md (Principe V)"
+    verification_auto: ".osk/specs/*/hardening.md contains 'gitleaks' OR 'trufflehog' OR 'vault'"
+    source_osk: ".osk/specs/*/hardening.md"
     source_manuelle: null
     criticite: BLOQUANT
 
@@ -382,9 +382,9 @@ confidentialite:
       - "RSA-4096 ou ECDSA P-384"
       - "Validité < 13 mois"
       - "OCSP Stapling activé"
-    verification_auto: "rgs_context.fonctions_securite.confidentialite.certificat_tls != null"
-    source_osk: null
-    source_manuelle: "rgs-context.yaml#fonctions_securite.confidentialite.certificat_tls"
+    verification_auto: "config.domains.rgs.confidentialite.certificat_tls != null"
+    source_osk: "/osk-rgs"
+    source_manuelle: "config.toml#domains.rgs.confidentialite.certificat_tls"
     criticite: IMPORTANT
 
   - id: CONF-006
@@ -426,8 +426,8 @@ tracabilite:
       - "AUTH-001 à AUTH-008 implémentés"
       - "Succès et échecs tracés"
       - "IP, timestamp, user_id, user_agent"
-    verification_auto: "SEC-*.md (Principe VI) contains 'authentification' AND 'log'"
-    source_osk: "docs/security/features/SEC-*.md (Principe VI)"
+    verification_auto: ".osk/specs/*/hardening.md contains 'authentification' AND 'log'"
+    source_osk: ".osk/specs/*/hardening.md"
     source_manuelle: null
     template_reference: "rgs-tracability-requirements.md"
     criticite: BLOQUANT
@@ -438,8 +438,8 @@ tracabilite:
     criteres:
       - "Accès autorisés et refusés tracés"
       - "Élévations de privilèges tracées"
-    verification_auto: "SEC-*.md (Principe VI) contains 'autorisation' OR 'RBAC'"
-    source_osk: "docs/security/features/SEC-*.md (Principe VI)"
+    verification_auto: ".osk/specs/*/hardening.md contains 'autorisation' OR 'RBAC'"
+    source_osk: ".osk/specs/*/hardening.md"
     source_manuelle: null
     template_reference: "rgs-tracability-requirements.md"
     criticite: IMPORTANT
@@ -451,8 +451,8 @@ tracabilite:
       - "DATA-001 à DATA-005 implémentés"
       - "Champs accédés identifiés"
       - "Finalité documentée"
-    verification_auto: "SEC-*.md contains 'données personnelles' AND 'log'"
-    source_osk: "docs/security/features/SEC-*.md"
+    verification_auto: ".osk/specs/*/hardening.md contains 'données personnelles' AND 'log'"
+    source_osk: ".osk/specs/*/hardening.md"
     source_manuelle: null
     template_reference: "rgs-tracability-requirements.md"
     criticite: BLOQUANT
@@ -464,9 +464,9 @@ tracabilite:
       - "Format JSON avec champs obligatoires"
       - "timestamp, event.id, actor.user_id, context.trace_id"
       - "Données sensibles masquées"
-    verification_auto: "rgs_context.fonctions_securite.tracabilite.format_logs == 'JSON structuré'"
-    source_osk: null
-    source_manuelle: "rgs-context.yaml#fonctions_securite.tracabilite"
+    verification_auto: "config.domains.rgs.tracabilite.format_logs == 'JSON structuré'"
+    source_osk: "/osk-rgs"
+    source_manuelle: "config.toml#domains.rgs.tracabilite"
     template_reference: "rgs-tracability-requirements.md §3"
     criticite: IMPORTANT
 
@@ -477,9 +477,9 @@ tracabilite:
       - "Politique ILM configurée (hot/warm/cold)"
       - "Rétention ≥ 1095 jours"
       - "Backup des logs"
-    verification_auto: "rgs_context.fonctions_securite.tracabilite.retention_jours >= 1095"
-    source_osk: null
-    source_manuelle: "rgs-context.yaml#fonctions_securite.tracabilite.retention_jours"
+    verification_auto: "config.domains.rgs.tracabilite.retention_jours >= 1095"
+    source_osk: "/osk-rgs"
+    source_manuelle: "config.toml#domains.rgs.tracabilite.retention_jours"
     template_reference: "rgs-tracability-requirements.md §4"
     criticite: BLOQUANT
 
@@ -490,9 +490,9 @@ tracabilite:
       - "Collecte centralisée (ELK, Splunk, DataDog)"
       - "Dashboards de sécurité"
       - "Règles d'alerte configurées"
-    verification_auto: "rgs_context.fonctions_securite.tracabilite.siem != null"
-    source_osk: null
-    source_manuelle: "rgs-context.yaml#fonctions_securite.tracabilite.siem"
+    verification_auto: "config.domains.rgs.tracabilite.siem != null"
+    source_osk: "/osk-rgs"
+    source_manuelle: "config.toml#domains.rgs.tracabilite.siem"
     template_reference: "rgs-tracability-requirements.md §4"
     criticite: IMPORTANT
 
@@ -503,9 +503,9 @@ tracabilite:
       - "WORM storage ou chaînage cryptographique"
       - "Aucune possibilité de suppression"
       - "Accès aux logs journalisé (meta-logging)"
-    verification_auto: "rgs_context.fonctions_securite.tracabilite.protection_logs != null"
-    source_osk: null
-    source_manuelle: "rgs-context.yaml#fonctions_securite.tracabilite.protection_logs"
+    verification_auto: "config.domains.rgs.tracabilite.protection_logs != null"
+    source_osk: "/osk-rgs"
+    source_manuelle: "config.toml#domains.rgs.tracabilite.protection_logs"
     template_reference: "rgs-tracability-requirements.md §6"
     criticite: IMPORTANT
 
@@ -574,7 +574,7 @@ analyse_risques:
     criteres:
       - "Au moins un document SEC-*.md par principe"
       - "Conformité ≥ 6/7 principes"
-    verification_auto: "count(docs/security/features/SEC-*.md) >= 1 AND risk-register.yaml.conformite_globale >= 85%"
+    verification_auto: "count(.osk/specs/*/requirements.md) >= 1 AND risk-register.yaml.conformite_globale >= 85%"
     source_osk: "docs/security/risks/risk-register.yaml#conformite_principes"
     source_manuelle: null
     criticite: IMPORTANT
@@ -596,7 +596,7 @@ homologation:
       - "Périmètre clairement défini"
       - "Analyse de risques intégrée"
     verification_auto: null
-    source_osk: "Généré par osk-audit rgs"
+    source_osk: "Généré par /osk-rgs"
     source_manuelle: "rgs-homologation-dossier-template.md"
     template_reference: "rgs-homologation-dossier-template.md"
     criticite: BLOQUANT
@@ -607,9 +607,9 @@ homologation:
     criteres:
       - "Nom et fonction documentés"
       - "Pouvoir de signature confirmé"
-    verification_auto: "rgs_context.organisation.autorite_homologation.nom != '[À COMPLÉTER]'"
-    source_osk: null
-    source_manuelle: "rgs-context.yaml#organisation.autorite_homologation"
+    verification_auto: "config.domains.organisation.autorite_homologation != null"
+    source_osk: "/osk-rgs"
+    source_manuelle: "config.toml#domains.organisation.autorite_homologation"
     criticite: BLOQUANT
 
   - id: HOMO-003
@@ -618,9 +618,9 @@ homologation:
     criteres:
       - "Date de commission planifiée"
       - "Participants identifiés (RSSI, MOA, MOE)"
-    verification_auto: "rgs_context.homologation.dates.commission_homologation != '[À COMPLÉTER]'"
-    source_osk: null
-    source_manuelle: "rgs-context.yaml#homologation.dates"
+    verification_auto: "config.domains.rgs.homologation.date_commission != null"
+    source_osk: "/osk-rgs"
+    source_manuelle: "config.toml#domains.rgs.homologation"
     criticite: IMPORTANT
 
   - id: HOMO-004
@@ -630,9 +630,9 @@ homologation:
       - "Pentest par prestataire qualifié ANSSI"
       - "Rapport de moins d'un an"
       - "Vulnérabilités critiques corrigées"
-    verification_auto: "rgs_context.mcs.pentest.dernier_audit != '[À COMPLÉTER]'"
-    source_osk: null
-    source_manuelle: "rgs-context.yaml#mcs.pentest + Rapport externe"
+    verification_auto: "config.domains.rgs.mcs.pentest.dernier_audit != null"
+    source_osk: "/osk-rgs"
+    source_manuelle: "config.toml#domains.rgs.mcs.pentest + Rapport externe"
     criticite: BLOQUANT
 
   - id: HOMO-005
@@ -642,9 +642,9 @@ homologation:
       - "Procédures de revue documentées"
       - "Fréquence des audits définie"
       - "Gestion des vulnérabilités"
-    verification_auto: "rgs_context.mcs != null"
-    source_osk: null
-    source_manuelle: "rgs-context.yaml#mcs"
+    verification_auto: "config.domains.rgs.mcs != null"
+    source_osk: "/osk-rgs"
+    source_manuelle: "config.toml#domains.rgs.mcs"
     template_reference: "rgs-mcs-maintenance.md"
     criticite: IMPORTANT
 ```
@@ -664,9 +664,9 @@ mcs:
       - "Fréquence définie (trimestrielle pour RGS**)"
       - "Responsable identifié"
       - "Check-list de revue documentée"
-    verification_auto: "rgs_context.mcs.revue_securite.frequence != null"
-    source_osk: null
-    source_manuelle: "rgs-context.yaml#mcs.revue_securite"
+    verification_auto: "config.domains.rgs.mcs.revue_securite.frequence != null"
+    source_osk: "/osk-rgs"
+    source_manuelle: "config.toml#domains.rgs.mcs.revue_securite"
     template_reference: "rgs-mcs-maintenance.md"
     criticite: IMPORTANT
 
@@ -677,9 +677,9 @@ mcs:
       - "Scan de vulnérabilités régulier (hebdomadaire)"
       - "SLA de correction définis"
       - "Suivi des CVE"
-    verification_auto: "SEC-*.md (Principe VII) contains 'SCA' OR 'vulnérabilités'"
-    source_osk: "docs/security/features/SEC-*.md (Principe VII)"
-    source_manuelle: "rgs-context.yaml#mcs.vulnerabilites"
+    verification_auto: ".osk/specs/*/hardening.md contains 'SCA' OR 'vulnérabilités'"
+    source_osk: ".osk/specs/*/hardening.md"
+    source_manuelle: "config.toml#domains.rgs.mcs.vulnerabilites"
     criticite: IMPORTANT
 
   - id: MCS-003
@@ -689,9 +689,9 @@ mcs:
       - "Critique (CVSS 9-10) : 48h"
       - "Haute (CVSS 7-8.9) : 7 jours"
       - "Moyenne (CVSS 4-6.9) : 30 jours"
-    verification_auto: "rgs_context.mcs.vulnerabilites.sla_critique_heures <= 48"
-    source_osk: null
-    source_manuelle: "rgs-context.yaml#mcs.vulnerabilites"
+    verification_auto: "config.domains.rgs.mcs.vulnerabilites.sla_critique_heures <= 48"
+    source_osk: "/osk-rgs"
+    source_manuelle: "config.toml#domains.rgs.mcs.vulnerabilites"
     criticite: IMPORTANT
 
   - id: MCS-004
@@ -701,9 +701,9 @@ mcs:
       - "Contact d'astreinte défini"
       - "Procédure de notification (ANSSI si OIV/NIS2)"
       - "Délai notification RGPD (72h)"
-    verification_auto: "rgs_context.mcs.incidents.contact_astreinte != '[À COMPLÉTER]'"
-    source_osk: null
-    source_manuelle: "rgs-context.yaml#mcs.incidents"
+    verification_auto: "config.domains.rgs.mcs.incidents.contact_astreinte != null"
+    source_osk: "/osk-rgs"
+    source_manuelle: "config.toml#domains.rgs.mcs.incidents"
     template_reference: "rgs-mcs-maintenance.md"
     criticite: IMPORTANT
 
@@ -714,9 +714,9 @@ mcs:
       - "Formation sécurité annuelle"
       - "Campagnes anti-phishing"
       - "Taux de completion > 80%"
-    verification_auto: "rgs_context.mcs.sensibilisation.taux_completion != '[À COMPLÉTER]'"
-    source_osk: null
-    source_manuelle: "rgs-context.yaml#mcs.sensibilisation"
+    verification_auto: "config.domains.rgs.mcs.sensibilisation.taux_completion != null"
+    source_osk: "/osk-rgs"
+    source_manuelle: "config.toml#domains.rgs.mcs.sensibilisation"
     criticite: RECOMMANDE
 
   - id: MCS-006
@@ -726,9 +726,9 @@ mcs:
       - "Durée de validité définie (3 ou 5 ans)"
       - "Date de ré-homologation planifiée"
       - "Rappel 6 mois avant expiration"
-    verification_auto: "rgs_context.homologation.duree_validite_annees in [3, 5]"
-    source_osk: null
-    source_manuelle: "rgs-context.yaml#homologation"
+    verification_auto: "config.domains.rgs.homologation.duree_validite_annees in [3, 5]"
+    source_osk: "/osk-rgs"
+    source_manuelle: "config.toml#domains.rgs.homologation"
     template_reference: "rgs-mcs-maintenance.md"
     criticite: IMPORTANT
 ```
@@ -842,7 +842,7 @@ def calculer_score_rgs(resultats_audit: dict, niveau_rgs: str) -> dict:
 **Système** : [Nom du système]
 **Niveau RGS cible** : RGS**
 **Date d'audit** : 2025-01-15
-**Auditeur** : OpenSecKit `/osk-audit rgs`
+**Auditeur** : OpenSecKit `/osk-rgs renew`
 
 ---
 

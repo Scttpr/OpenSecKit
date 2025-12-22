@@ -20,8 +20,8 @@ prerequisites:
   - "Architecture système documentée"
   - "Infrastructure as Code disponible"
 auto_fill_sources:
-  - ".osk/rgs-context.yaml"
-  - "docs/context/meta.md"
+  - ".osk/config.toml"
+  - ".osk/memory/context.md"
   - "docker-compose.yml"
   - "terraform/"
   - ".github/workflows/"
@@ -34,8 +34,8 @@ auto_fill_sources:
 INSTRUCTIONS DE PRÉ-REMPLISSAGE AUTOMATIQUE
 
 Ce template peut être partiellement pré-rempli par OSK depuis :
-- .osk/rgs-context.yaml : RTO/RPO, organisation, fournisseurs
-- docs/context/meta.md : Stack technique, services
+- .osk/config.toml [domains.rgs] : RTO/RPO, organisation, fournisseurs
+- .osk/memory/context.md : Stack technique, services
 - docker-compose.yml : Services et dépendances
 - terraform/ : Infrastructure déclarative
 - .github/workflows/ : Pipelines de déploiement
@@ -50,11 +50,11 @@ Les sections marquées [SCRIPT] contiennent des commandes à adapter.
 
 | Champ | Valeur |
 |-------|--------|
-| **Système** | [AUTO: systeme.nom depuis rgs-context.yaml] |
+| **Système** | [AUTO: config.project.name] |
 | **Version du document** | 1.0 |
 | **Date de création** | [DATE] |
 | **Document lié** | PCA - Plan de Continuité d'Activité |
-| **Classification** | [AUTO: classification.classification_donnees] |
+| **Classification** | [AUTO: config.domains.rgs.classification] |
 
 ---
 
@@ -62,17 +62,17 @@ Les sections marquées [SCRIPT] contiennent des commandes à adapter.
 
 ### 1.1 Métriques Cibles
 
-<!-- [AUTO: Extraire de besoins_securite.disponibilite dans rgs-context.yaml] -->
+<!-- [AUTO: Extraire de config.domains.rgs.disponibilite] -->
 
 | Métrique | Valeur | Définition |
 |----------|--------|------------|
-| **RTO** | [AUTO: rto_heures] h | Délai maximum pour restaurer le service |
-| **RPO** | [AUTO: rpo_heures] h | Perte de données maximum tolérée |
+| **RTO** | [AUTO: config.domains.rgs.disponibilite.rto_heures] h | Délai maximum pour restaurer le service |
+| **RPO** | [AUTO: config.domains.rgs.disponibilite.rpo_heures] h | Perte de données maximum tolérée |
 | **MTTR** | [MANUEL] h | Temps moyen de réparation cible |
 
 ### 1.2 Priorité de Restauration
 
-<!-- [AUTO: Déduire de meta.md et docker-compose.yml] -->
+<!-- [AUTO: Déduire de context.md et docker-compose.yml] -->
 
 | Priorité | Composant | RTO Spécifique | Dépendances |
 |----------|-----------|----------------|-------------|
@@ -87,7 +87,7 @@ Les sections marquées [SCRIPT] contiennent des commandes à adapter.
 
 ### 2.1 Architecture du Système
 
-<!-- [AUTO: Extraire de meta.md] -->
+<!-- [AUTO: Extraire de context.md] -->
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -124,7 +124,7 @@ Les sections marquées [SCRIPT] contiennent des commandes à adapter.
 
 ### 2.2 Composants et Versions
 
-<!-- [AUTO: Extraire de meta.md, package.json, docker-compose.yml] -->
+<!-- [AUTO: Extraire de context.md, package.json, docker-compose.yml] -->
 
 | Composant | Version | Image/Package | Port | Criticité |
 |-----------|---------|---------------|------|-----------|
@@ -136,7 +136,7 @@ Les sections marquées [SCRIPT] contiennent des commandes à adapter.
 
 ### 2.3 Services Externes
 
-<!-- [AUTO: Extraire de fournisseurs dans rgs-context.yaml] -->
+<!-- [AUTO: Extraire de config.domains.suppliers] -->
 
 | Service | Fournisseur | Criticité | Fallback | Contact |
 |---------|-------------|-----------|----------|---------|
@@ -254,7 +254,7 @@ aws s3 sync "$SOURCE_BUCKET" "$BACKUP_BUCKET" \
 #!/bin/bash
 # verify-backups.sh
 
-ALERT_EMAIL="[AUTO: organisation.rssi.email]"
+ALERT_EMAIL="[AUTO: config.domains.organisation.rssi.email]"
 ERRORS=()
 
 # Vérifier backup PostgreSQL < 24h
@@ -296,7 +296,7 @@ echo "All backups verified OK"
 
 **Scénario** : Perte totale de l'infrastructure, reconstruction depuis zéro.
 
-**Temps estimé** : [MANUEL] heures (selon RTO: [AUTO: rto_heures]h)
+**Temps estimé** : [MANUEL] heures (selon RTO: [AUTO: config.domains.rgs.disponibilite.rto_heures]h)
 
 #### Étape 1 : Provisionner Infrastructure
 
@@ -762,7 +762,7 @@ Le PRA doit être mis à jour lors de :
 
 ### Annexe A : Variables d'Environnement
 
-<!-- [AUTO: Extraire de .env.example] -->
+<!-- [AUTO: Extraire de .env.example ou config.toml] -->
 
 ```bash
 # Variables critiques pour restauration
@@ -810,15 +810,15 @@ aws s3 ls s3://[BUCKET] --summarize --recursive | tail -2
 
 ### Annexe C : Contacts d'Urgence
 
-<!-- [AUTO: Depuis rgs-context.yaml et fournisseurs] -->
+<!-- [AUTO: Depuis config.domains.organisation et suppliers] -->
 
 | Rôle | Nom | Téléphone | Email |
 |------|-----|-----------|-------|
 | DBA Principal | [MANUEL] | [MANUEL] | [MANUEL] |
 | DevOps Principal | [MANUEL] | [MANUEL] | [MANUEL] |
-| Support Hébergeur | [AUTO] | [MANUEL] | [MANUEL] |
-| Support BDD Managée | [AUTO] | [MANUEL] | [MANUEL] |
-| RSSI | [AUTO: rssi.nom] | [MANUEL] | [AUTO: rssi.email] |
+| Support Hébergeur | [AUTO: config.domains.organisation.exploitant] | [MANUEL] | [MANUEL] |
+| Support BDD Managée | [AUTO: config.domains.suppliers] | [MANUEL] | [MANUEL] |
+| RSSI | [AUTO: config.domains.organisation.rssi] | [MANUEL] | [AUTO: config.domains.organisation.rssi.email] |
 
 ---
 
