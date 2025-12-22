@@ -1,0 +1,227 @@
+# OpenSecKit V3 - Configuration Schema
+# Ce fichier documente la structure attendue de .osk/config.toml
+
+# ============================================================================
+# PROJECT - Informations générales du projet
+# ============================================================================
+[project]
+name = "string"           # Nom du projet (requis)
+version = "string"        # Version du projet (optionnel)
+description = "string"    # Description courte (optionnel)
+
+# ============================================================================
+# STACK - Technologies détectées et personnalisées
+# ============================================================================
+[stack]
+# Technologies détectées automatiquement par le CLI
+detected = [
+    # Valeurs possibles:
+    # - "rust", "nodejs", "typescript", "python", "go", "php", "java", "ruby"
+    # - "nextjs", "express", "fastapi", "django", "laravel", "spring"
+    # - "postgresql", "mysql", "mongodb", "redis", "sqlite"
+    # - "docker", "kubernetes", "terraform", "aws", "gcp", "azure"
+]
+
+# Technologies ajoutées manuellement (non détectées)
+custom = []
+
+# ============================================================================
+# DOMAINS - Domaines réglementaires
+# ============================================================================
+[domains]
+# Liste des domaines actifs
+active = []  # ["rgpd", "nis2", "rgs"]
+
+# ============================================================================
+# ORGANISATION - Informations partagées (utilisées par RGPD et RGS)
+# ============================================================================
+[domains.organisation]
+nom = ""                   # Raison sociale
+siret = ""                 # Numéro SIRET
+adresse = ""               # Adresse postale
+secteur = ""               # Secteur d'activité
+
+# Responsable de traitement / Autorité d'homologation
+[domains.organisation.responsable]
+nom = ""
+fonction = ""
+email = ""
+telephone = ""
+
+# RSSI (partagé RGPD mesures techniques / RGS)
+[domains.organisation.rssi]
+nom = ""
+email = ""
+telephone = ""
+
+# ============================================================================
+# SUPPLIERS - Fournisseurs/Sous-traitants (partagé RGPD Art. 28 / RGS Supply Chain)
+# ============================================================================
+# Cette section est alimentée par /osk-configure, /osk-rgpd et /osk-rgs
+# Elle évite la duplication des informations fournisseurs
+
+[[domains.suppliers]]
+nom = ""                   # Nom du fournisseur
+type = ""                  # "hebergement" | "email" | "monitoring" | "cdn" | "bdd" | "auth" | "paiement" | "autre"
+localisation = ""          # Code pays ISO (FR, US, DE, etc.)
+certification = ""         # "SecNumCloud" | "HDS" | "ISO27001" | "SOC2" | ""
+dpa_signe = false          # Data Processing Agreement signé
+dpa_date = ""              # Date de signature du DPA
+donnees_traitees = []      # Types de données : ["email", "ip", "logs", "toutes"]
+garanties_transfert = ""   # Si hors UE : "cct" | "dpf" | "consentement" | "adequation"
+# Utilisé par :
+# - RGPD : sous-traitants Art. 28, transferts hors UE
+# - RGS : supply chain, analyse fournisseurs
+
+# ============================================================================
+# RGPD - Configuration complète (enrichie par /osk-rgpd)
+# ============================================================================
+[domains.rgpd]
+enabled = false
+niveau = "standard"        # "standard" | "sensible" (Art. 9)
+dpia_required = false      # true si données sensibles ou profilage
+transferts_hors_ue = false
+registre_genere = false    # true si /osk-rgpd a généré le registre
+derniere_maj = ""          # Date dernière mise à jour
+
+# DPO - Délégué à la Protection des Données
+[domains.rgpd.dpo]
+designe = false            # true si DPO désigné
+type = ""                  # "interne" | "externe" | "mutualise"
+nom = ""
+email = ""
+telephone = ""
+
+# Durées de conservation par type de données
+[domains.rgpd.conservation]
+# Clé = type de données, Valeur = durée
+# Exemples standards :
+# donnees_patients = "20 ans"
+# donnees_utilisateurs = "relation + 3 ans"
+# logs_securite = "1 an"
+# prospects = "3 ans"
+
+# Traitements identifiés (registre Art. 30)
+# Alimenté par /osk-rgpd et enrichi par /osk-analyze
+[[domains.rgpd.traitements]]
+id = ""                    # Identifiant unique (ex: "TRT-001")
+nom = ""                   # Nom du traitement
+finalite = ""              # Finalité du traitement
+base_legale = ""           # "consentement" | "contrat" | "obligation_legale" | "interet_legitime" | "mission_publique" | "interets_vitaux"
+categories_personnes = []  # ["utilisateurs", "patients", "employes", "prospects"]
+categories_donnees = []    # ["email", "nom", "adresse", "donnees_sante", "NIR"]
+destinataires = []         # ["interne", "sous_traitants", "partenaires"]
+conservation = ""          # Durée de conservation
+dpia_requis = false        # DPIA obligatoire pour ce traitement
+dpia_realise = false       # DPIA effectué
+feature_source = ""        # Lien vers .osk/specs/XXX si applicable
+
+# ============================================================================
+# NIS2 - Configuration
+# ============================================================================
+[domains.nis2]
+enabled = false
+type_entite = ""           # "essentielle" | "importante"
+secteur = ""               # "energie", "transport", "sante", "finance", "eau", "numerique", etc.
+autorite_competente = ""   # ANSSI pour la France
+notification_delai = 24    # Délai notification incident en heures
+
+# ============================================================================
+# RGS - Configuration complète (enrichie par /osk-rgs)
+# ============================================================================
+[domains.rgs]
+enabled = false
+niveau = ""                # "standard" | "renforce" | "etoile"
+perimetre = ""             # Description du périmètre d'homologation
+contexte_genere = false    # true si /osk-rgs a généré le contexte
+derniere_maj = ""          # Date dernière mise à jour
+
+# Homologation
+[domains.rgs.homologation]
+statut = ""                # "non_demarre" | "en_cours" | "homologue" | "expire" | "renouvellement"
+autorite_nom = ""          # Nom de l'autorité d'homologation
+autorite_fonction = ""     # Fonction
+date_homologation = ""     # Date d'homologation (si homologué)
+date_expiration = ""       # Date d'expiration
+duree_mois = 36            # Durée en mois (défaut: 36)
+
+# Besoins DICP (échelle 0-4)
+[domains.rgs.dicp]
+disponibilite = 0
+disponibilite_justification = ""
+integrite = 0
+integrite_justification = ""
+confidentialite = 0
+confidentialite_justification = ""
+preuve = 0
+preuve_justification = ""
+
+# Fonctions de sécurité
+[domains.rgs.fonctions]
+authentification = ""      # "franceconnect" | "sso_oidc" | "mfa" | "password" | "certificat"
+chiffrement_transit = ""   # "tls13" | "tls12" | "mtls"
+chiffrement_repos = ""     # "aes256" | "aucun"
+gestion_cles = ""          # "hsm" | "vault" | "kms" | "env"
+journalisation = ""        # "siem" | "centralise" | "local"
+
+# ============================================================================
+# PRINCIPLES - Pondération des 7 principes constitutionnels
+# ============================================================================
+[principles]
+# Valeurs: "critical" | "high" | "medium" | "low" | "na"
+
+# I. Modélisation des menaces
+threat_modeling = "high"
+threat_modeling_reason = ""
+
+# II. Analyse de risques
+risk_analysis = "high"
+risk_analysis_reason = ""
+
+# III. Sécurité dès la conception
+security_requirements = "high"
+security_requirements_reason = ""
+
+# IV. Tests de sécurité
+security_testing = "medium"
+security_testing_reason = ""
+
+# V. Gestion des secrets
+secrets_management = "high"
+secrets_management_reason = ""
+
+# VI. Traçabilité et audit
+audit_logging = "medium"
+audit_logging_reason = ""
+
+# VII. Patch management
+patch_management = "medium"
+patch_management_reason = ""
+
+# ============================================================================
+# SPECS - Gestion des spécifications
+# ============================================================================
+[specs]
+# Compteur auto-incrémenté pour les IDs de features
+counter = 1
+
+# Liste des specs existantes (géré automatiquement)
+# Format: { id = "001", name = "login", status = "complete" }
+features = []
+
+# ============================================================================
+# WIZARD - Réponses sauvegardées du wizard (pour réinitialisation)
+# ============================================================================
+[wizard]
+completed = false
+completed_at = ""
+
+# Réponses aux questions du wizard /osk-init
+[wizard.answers]
+has_personal_data = false       # Données personnelles ?
+has_sensitive_data = false      # Données sensibles Art. 9 ?
+sector = ""                     # Secteur d'activité
+is_public_admin = false         # Administration française ?
+has_public_api = false          # API publique ?
+has_external_secrets = false    # Secrets/clés externes ?
+has_centralized_logs = false    # Logs centralisés ?
