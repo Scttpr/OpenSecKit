@@ -1,4 +1,7 @@
-use crate::config::{MemoryConfig, OskConfig, ProjectConfig};
+use crate::config::{
+    DomainsConfig, MemoryConfig, Nis2Config, OskConfig, PrinciplesConfig, ProjectConfig,
+    RgpdConfig, RgsConfig, SpecsConfig, StackConfig,
+};
 use crate::stack;
 use anyhow::Result;
 use dialoguer::{theme::ColorfulTheme, Input};
@@ -6,8 +9,8 @@ use reqwest::blocking::Client;
 use std::fs;
 use std::path::{Path, PathBuf};
 
-pub fn run(client: &Client, force: bool) -> Result<()> {
-    println!("🚀 Initialisation de OpenSecKit...");
+pub fn run(client: &Client, force: bool, default: bool) -> Result<()> {
+    println!("🚀 Initialisation de OpenSecKit V3...");
 
     let config_exists = Path::new(".osk/config.toml").exists();
 
@@ -20,8 +23,14 @@ pub fn run(client: &Client, force: bool) -> Result<()> {
             })
             .unwrap_or_else(|_| {
                 println!("   ⚠️  Config corrompue, création d'une nouvelle...");
-                prompt_configuration().unwrap()
+                if default {
+                    default_configuration()
+                } else {
+                    prompt_configuration().unwrap()
+                }
             })
+    } else if default {
+        default_configuration()
     } else {
         prompt_configuration()?
     };
@@ -31,18 +40,31 @@ pub fn run(client: &Client, force: bool) -> Result<()> {
     install_resources(client, force)?;
     install_slash_commands(force)?;
 
-    println!("\n✅ OpenSecKit initialisé !");
-    println!("\n📂 Slash commands générés dans .claude/commands/");
-    println!("   /security <feature>  - Analyse constitutionnelle de sécurité");
-    println!("   /audit               - Vérification conformité aux 7 principes");
-    println!("   /dashboard           - Vue consolidée des métriques");
-    println!("   /incident <desc>     - Gestion de crise et plan d'action");
-    println!("   /osk-rgs             - Configuration RGS et EBIOS RM");
-    println!("   /osk-pca-pra         - Plans de continuité et reprise");
-    println!("\n💡 Lancez Claude Code et exécutez les slash commands :");
-    println!("   claude");
-    println!("   >>> /security \"système de login\"");
-    println!("   >>> /dashboard");
+    println!("\n✅ OpenSecKit V3 initialisé !");
+    println!("\n📂 Structure créée:");
+    println!("   .osk/config.toml     - Configuration projet et stack");
+    println!("   .osk/memory/         - Mémoire contextuelle");
+    println!("   .osk/specs/          - Spécifications par feature");
+    println!("\n📂 Slash commands disponibles dans .claude/commands/:");
+    println!("\n   Workflow principal:");
+    println!("   /osk-configure           - Configuration intelligente (analyse code, détection domaines)");
+    println!("   /osk-baseline            - État des lieux sécurité (projets existants)");
+    println!("   /osk-analyze <feature>   - Analyse menaces et risques (Principes I & II)");
+    println!("   /osk-specify <feature>   - Exigences et tests (Principes III & IV)");
+    println!("   /osk-harden <feature>    - Durcissement (Principes V, VI & VII)");
+    println!("   /osk-plan <feature>      - Plan d'implémentation consolidé");
+    println!("   /osk-tasks <feature>     - Génération des tâches ordonnées");
+    println!("\n   Domaines réglementaires:");
+    println!("   /osk-rgpd                - Conformité RGPD et registre des traitements");
+    println!("   /osk-rgs                 - Conformité RGS et EBIOS RM");
+    println!("\n   Monitoring et continuité:");
+    println!("   /osk-dashboard           - Vue consolidée des métriques");
+    println!("   /osk-pca-pra             - Plans de continuité et reprise");
+    println!("\n💡 Prochaines étapes:");
+    println!("   1. Lancez Claude Code: claude");
+    println!("   2. Exécutez /osk-configure pour analyser votre code");
+    println!("   3. Pour un projet existant: /osk-baseline");
+    println!("   4. Pour une nouvelle feature: /osk-analyze \"nom-feature\"");
 
     Ok(())
 }
@@ -58,21 +80,70 @@ fn prompt_configuration() -> Result<OskConfig> {
 
     let final_stack: String = Input::with_theme(&ColorfulTheme::default())
         .with_prompt("Stack technique (Validez ou modifiez)")
-        .with_initial_text(detected_stack)
+        .with_initial_text(detected_stack.clone())
         .allow_empty(true)
         .interact_text()?;
 
-    let stack_opt = if final_stack.trim().is_empty() {
-        None
+    let detected_vec: Vec<String> = if detected_stack.trim().is_empty() {
+        vec![]
     } else {
-        Some(final_stack)
+        detected_stack
+            .split(',')
+            .map(|s| s.trim().to_string())
+            .filter(|s| !s.is_empty())
+            .collect()
+    };
+
+    let custom_vec: Vec<String> = if final_stack.trim() == detected_stack.trim() {
+        vec![]
+    } else {
+        final_stack
+            .split(',')
+            .map(|s| s.trim().to_string())
+            .filter(|s| !s.is_empty() && !detected_vec.contains(&s.to_string()))
+            .collect()
     };
 
     let config = OskConfig {
         project: Some(ProjectConfig {
             name: project_name,
+            version: None,
             description: None,
-            stack: stack_opt,
+        }),
+        stack: Some(StackConfig {
+            detected: detected_vec,
+            custom: custom_vec,
+        }),
+        domains: Some(DomainsConfig {
+            active: vec![],
+            rgpd: Some(RgpdConfig {
+                enabled: false,
+                niveau: "standard".to_string(),
+                dpia_required: false,
+            }),
+            nis2: Some(Nis2Config {
+                enabled: false,
+                type_entite: String::new(),
+                secteur: String::new(),
+            }),
+            rgs: Some(RgsConfig {
+                enabled: false,
+                niveau: String::new(),
+                perimetre: String::new(),
+            }),
+        }),
+        principles: Some(PrinciplesConfig {
+            threat_modeling: "high".to_string(),
+            risk_analysis: "high".to_string(),
+            security_requirements: "high".to_string(),
+            security_testing: "medium".to_string(),
+            secrets_management: "high".to_string(),
+            audit_logging: "medium".to_string(),
+            patch_management: "medium".to_string(),
+        }),
+        specs: Some(SpecsConfig {
+            counter: 1,
+            features: vec![],
         }),
         memory: Some(MemoryConfig {
             enabled: true,
@@ -83,10 +154,76 @@ fn prompt_configuration() -> Result<OskConfig> {
     Ok(config)
 }
 
+/// Configuration par défaut sans prompts interactifs (pour CI/tests)
+fn default_configuration() -> OskConfig {
+    println!("   🤖 Mode non-interactif: utilisation des valeurs par défaut");
+
+    println!("   🕵️  Scan de la stack technique (Monorepo supporté)...");
+    let detected_stack = stack::detect();
+
+    let detected_vec: Vec<String> = if detected_stack.trim().is_empty() {
+        vec![]
+    } else {
+        detected_stack
+            .split(',')
+            .map(|s| s.trim().to_string())
+            .filter(|s| !s.is_empty())
+            .collect()
+    };
+
+    OskConfig {
+        project: Some(ProjectConfig {
+            name: "MonProjet".to_string(),
+            version: None,
+            description: None,
+        }),
+        stack: Some(StackConfig {
+            detected: detected_vec,
+            custom: vec![],
+        }),
+        domains: Some(DomainsConfig {
+            active: vec![],
+            rgpd: Some(RgpdConfig {
+                enabled: false,
+                niveau: "standard".to_string(),
+                dpia_required: false,
+            }),
+            nis2: Some(Nis2Config {
+                enabled: false,
+                type_entite: String::new(),
+                secteur: String::new(),
+            }),
+            rgs: Some(RgsConfig {
+                enabled: false,
+                niveau: String::new(),
+                perimetre: String::new(),
+            }),
+        }),
+        principles: Some(PrinciplesConfig {
+            threat_modeling: "high".to_string(),
+            risk_analysis: "high".to_string(),
+            security_requirements: "high".to_string(),
+            security_testing: "medium".to_string(),
+            secrets_management: "high".to_string(),
+            audit_logging: "medium".to_string(),
+            patch_management: "medium".to_string(),
+        }),
+        specs: Some(SpecsConfig {
+            counter: 1,
+            features: vec![],
+        }),
+        memory: Some(MemoryConfig {
+            enabled: true,
+            path: ".osk/memory".to_string(),
+        }),
+    }
+}
+
 fn scaffold_project(config: &OskConfig, force: bool) -> Result<()> {
     fs::create_dir_all(".osk/prompts")?;
     fs::create_dir_all(".osk/templates")?;
     fs::create_dir_all(".osk/memory")?;
+    fs::create_dir_all(".osk/specs")?;
     fs::create_dir_all(".claude/commands")?;
 
     let config_path = Path::new(".osk/config.toml");
