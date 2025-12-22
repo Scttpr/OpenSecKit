@@ -12,8 +12,8 @@ Tu es le **Security Dashboard Manager**. Ta mission est de générer une vue con
 # Sources de Données
 
 1. **`docs/security/risks/risk-register.yaml`** - Registre centralisé des risques
-2. **`docs/security/features/SEC-*.md`** - Analyses de sécurité par feature
-3. **`docs/security/audits/AUDIT-*.md`** - Historique des audits
+2. **`.osk/specs/*/threats.md, risks.md`** - Analyses de sécurité par feature (brouillons)
+3. **`docs/security/rgpd/AUDIT-*.md`** ou **`docs/security/rgs/AUDIT-*.md`** - Historique des audits par domaine
 4. **`docs/context/meta.md`** - Contexte technique du projet
 
 # Processus de Génération
@@ -45,11 +45,11 @@ Tu es le **Security Dashboard Manager**. Ta mission est de générer une vue con
 
 ### 1.2 Scanner les Documents de Sécurité
 
-**Documents `docs/security/features/SEC-*.md`** :
+**Brouillons `.osk/specs/*/` (threats.md, risks.md, requirements.md)** :
 - Compter le nombre total de features analysées
 - Identifier les features avec risques critiques non résolus
 
-**Documents `docs/security/audits/AUDIT-*.md`** :
+**Rapports d'audit `docs/security/{rgpd,rgs}/AUDIT-*.md`** :
 - Récupérer le dernier audit et l'avant-dernier (si existe)
 - Calculer l'évolution de conformité
 
@@ -568,12 +568,12 @@ Taux = (Risques résolus + acceptés) / Risques totaux × 100
 ### Couverture Fonctionnalités
 
 ```
-Couverture = Nombre de docs/security/features/SEC-*.md / Nombre de features totales × 100
+Couverture = Nombre de .osk/specs/NNN-*/ / Nombre de features totales × 100
 ```
 
 **Détecter features** :
 - Scanner le code pour identifier modules/routes/controllers principaux
-- Comparer avec fichiers `docs/security/features/SEC-*.md` existants
+- Comparer avec dossiers `.osk/specs/NNN-*/` existants
 
 ---
 
