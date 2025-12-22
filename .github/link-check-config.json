@@ -10,6 +10,9 @@
       "pattern": "^http://127.0.0.1"
     },
     {
+      "pattern": "^mailto:"
+    },
+    {
       "pattern": "example\\.com"
     },
     {
@@ -20,11 +23,20 @@
     },
     {
       "pattern": "acme\\.com"
+    },
+    {
+      "pattern": "\\[À COMPLÉTER\\]"
+    },
+    {
+      "pattern": "\\[MANUEL\\]"
+    },
+    {
+      "pattern": "\\[AUTO:"
     }
   ],
   "timeout": "20s",
   "retryOn429": true,
   "retryCount": 3,
   "fallbackRetryDelay": "30s",
-  "aliveStatusCodes": [200, 206, 999]
+  "aliveStatusCodes": [200, 202, 206, 301, 302, 999]
 }
