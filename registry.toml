@@ -1,7 +1,299 @@
+# OpenSecKit V3 - Registry
+# Registre des commandes et domaines disponibles
+
+[metadata]
+version = "3.0.0"
+description = "Security as Code, AI-Ready"
+repository = "https://github.com/Scttpr/OpenSecKit"
+
+# ============================================================================
+# COMMANDS - Workflow principal
+# ============================================================================
+
 [commands]
-security = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-security.md"
-audit = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-audit.md"
-dashboard = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-dashboard.md"
-incident = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-incident.md"
-rgs = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-rgs.md"
-pca-pra = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-pca-pra.md"
+
+# Phase 0 : Configuration (après osk init CLI)
+[commands.configure]
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-configure.md"
+version = "3.0"
+phase = "setup"
+description = "Configuration intelligente - analyse code, détection domaines, pondération principes"
+principles = []
+requires = [".osk/config.toml"]  # Généré par CLI osk init
+generates = [".osk/memory/context.md", ".osk/memory/constitution.md"]
+
+# Phase 0.5 : Baseline (pour projets existants)
+[commands.baseline]
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-baseline.md"
+version = "3.0"
+phase = "baseline"
+description = "État des lieux sécurité - inventaire features, scan global, roadmap"
+principles = ["I", "II", "III", "IV", "V", "VI", "VII"]
+requires = [".osk/memory/context.md", ".osk/memory/constitution.md"]
+generates = [".osk/specs/000-baseline/inventory.md", ".osk/specs/000-baseline/features.yaml", ".osk/specs/000-baseline/roadmap.md"]
+
+# Phase 1 : Analyze (Principes I & II)
+[commands.analyze]
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-analyze.md"
+version = "3.0"
+phase = "analyze"
+description = "Analyse des menaces et risques (STRIDE + Risk Scoring)"
+principles = ["I", "II"]
+requires = [".osk/memory/context.md"]
+generates = [
+    ".osk/specs/NNN-{feature}/threats.md",
+    ".osk/specs/NNN-{feature}/risks.md",
+    ".osk/specs/NNN-{feature}/rgpd/dpia.md",
+    ".osk/specs/NNN-{feature}/rgs/ebios.md",
+    "docs/security/risks/risk-register.yaml"
+]
+argument = "feature_name"
+
+# Phase 2 : Specify (Principes III & IV)
+[commands.specify]
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-specify.md"
+version = "3.0"
+phase = "specify"
+description = "Définition des exigences de sécurité et stratégie de tests"
+principles = ["III", "IV"]
+requires = [".osk/specs/NNN-{feature}/threats.md", ".osk/specs/NNN-{feature}/risks.md"]
+generates = [".osk/specs/NNN-{feature}/requirements.md", ".osk/specs/NNN-{feature}/testing.md"]
+argument = "feature_name"
+
+# Phase 3 : Harden (Principes V, VI & VII)
+[commands.harden]
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-harden.md"
+version = "3.0"
+phase = "harden"
+description = "Mesures de durcissement (secrets, logging, patching)"
+principles = ["V", "VI", "VII"]
+requires = [".osk/specs/NNN-{feature}/requirements.md", ".osk/specs/NNN-{feature}/testing.md"]
+generates = [".osk/specs/NNN-{feature}/hardening.md"]
+argument = "feature_name"
+
+# Phase 4 : Plan
+[commands.plan]
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-plan.md"
+version = "3.0"
+phase = "plan"
+description = "Consolidation du plan d'implémentation"
+principles = ["I", "II", "III", "IV", "V", "VI", "VII"]
+requires = [
+    ".osk/specs/NNN-{feature}/threats.md",
+    ".osk/specs/NNN-{feature}/risks.md",
+    ".osk/specs/NNN-{feature}/requirements.md",
+    ".osk/specs/NNN-{feature}/testing.md",
+    ".osk/specs/NNN-{feature}/hardening.md"
+]
+generates = [".osk/specs/NNN-{feature}/plan.md"]
+argument = "feature_name"
+
+# Phase 4 : Tasks
+[commands.tasks]
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-tasks.md"
+version = "3.0"
+phase = "tasks"
+description = "Génération des tâches ordonnées avec dépendances"
+principles = []
+requires = [".osk/specs/NNN-{feature}/plan.md"]
+generates = [".osk/specs/NNN-{feature}/tasks.md", ".osk/specs/NNN-{feature}/tasks.yaml"]
+argument = "feature_name"
+
+# ============================================================================
+# COMMANDS - Utilitaires
+# ============================================================================
+
+# Dashboard
+[commands.dashboard]
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-dashboard.md"
+version = "3.0"
+phase = "monitor"
+description = "Vue consolidée de la posture sécurité"
+principles = []
+requires = ["docs/security/risks/risk-register.yaml", ".osk/config.toml"]
+generates = ["docs/security/DASHBOARD.md"]
+
+# Continuité (PCA/PRA)
+[commands.pca-pra]
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-pca-pra.md"
+version = "2.0"
+phase = "continuity"
+description = "Plans de Continuité et Reprise d'Activité"
+principles = []
+requires = [".osk/memory/context.md"]
+generates = ["docs/security/continuity/PCA-*.md", "docs/security/continuity/PRA-*.md"]
+
+# ============================================================================
+# COMMANDS - Domaines spécifiques
+# ============================================================================
+
+# RGPD (Protection des données personnelles)
+[commands.rgpd]
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-rgpd.md"
+version = "3.0"
+phase = "domain"
+description = "Conformité RGPD - Registre, DPIA, procédures"
+principles = ["II", "III", "VI"]
+requires = [".osk/config.toml", ".osk/memory/context.md"]
+generates = [
+    "docs/security/rgpd/registre-traitements.md",
+    "docs/security/rgpd/dpia-global.md",
+    "docs/security/rgpd/procedure-violation.md",
+    "docs/security/rgpd/politique-conservation.md"
+]
+domain = "rgpd"
+argument = "[audit] - Sans argument: configuration. Avec 'audit': vérification"
+
+# RGS (Administration française)
+[commands.rgs]
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-rgs.md"
+version = "3.0"
+phase = "domain"
+description = "Configuration RGS et EBIOS RM pour homologation"
+principles = ["I", "II", "III", "V", "VI"]
+requires = [".osk/config.toml", ".osk/memory/context.md"]
+generates = [
+    "docs/security/rgs/EBIOS-RM-{systeme}.md",
+    "docs/security/rgs/DOSSIER-HOMOLOGATION-{systeme}.md",
+    "docs/security/rgs/MCS-{systeme}.md"
+]
+domain = "rgs"
+argument = "[renew] - Sans argument: initialisation. Avec 'renew': ré-homologation"
+
+# ============================================================================
+# DOMAINS - Extensions réglementaires
+# ============================================================================
+
+[domains]
+
+[domains.rgpd]
+name = "RGPD / GDPR"
+version = "1.0"
+description = "Règlement Général sur la Protection des Données"
+templates_path = "domaines/rgpd/"
+detection_patterns = [
+    "user", "email", "password", "address", "phone",
+    "date_of_birth", "ip_address", "health", "religion",
+    "biometric", "RGPD", "GDPR", "données personnelles"
+]
+extensions = ["dpia", "breach-notification", "data-subject-rights"]
+articles = ["Art. 25", "Art. 32", "Art. 33", "Art. 35"]
+
+[domains.nis2]
+name = "NIS2"
+version = "1.0"
+description = "Directive 2022/2555 - Cybersécurité UE"
+templates_path = "domaines/nis2/"
+detection_patterns = [
+    "energy", "transport", "banking", "health", "water",
+    "digital", "NIS2", "OIV", "OSE", "entité essentielle"
+]
+extensions = ["risk-management", "supply-chain", "incident-reporting"]
+sectors = ["energie", "transport", "sante", "finance", "eau", "numerique"]
+articles = ["Art. 21", "Art. 23"]
+
+[domains.rgs]
+name = "RGS"
+version = "1.0"
+description = "Référentiel Général de Sécurité (France)"
+templates_path = "domaines/gouvernement-rgs/"
+detection_patterns = [
+    "gouv.fr", "service-public", "franceconnect",
+    "siret", "siren", "administration", "RGS", "ANSSI"
+]
+extensions = ["ebios-rm", "homologation", "crypto-anssi"]
+levels = ["standard", "renforce", "*"]
+
+# ============================================================================
+# PRINCIPLES - Les 7 principes constitutionnels
+# ============================================================================
+
+[principles]
+
+[principles.I]
+name = "Modélisation des menaces"
+description = "Analyse proactive des vecteurs d'attaque"
+templates_path = "templates/01-threat-modeling/"
+methods = ["STRIDE", "DFD", "Attack Trees"]
+
+[principles.II]
+name = "Analyse de risques"
+description = "Scoring et priorisation des risques"
+templates_path = "templates/02-risk-analysis/"
+methods = ["Risk Scoring", "Risk Register"]
+
+[principles.III]
+name = "Sécurité dès la conception"
+description = "Contrôles intégrés dès le début"
+templates_path = "templates/03-security-requirements/"
+methods = ["ASVS", "Security Requirements"]
+
+[principles.IV]
+name = "Tests de sécurité"
+description = "SAST/DAST/SCA automatisés"
+templates_path = "templates/04-security-testing/"
+methods = ["SAST", "DAST", "SCA"]
+
+[principles.V]
+name = "Gestion des secrets"
+description = "Aucun secret dans le code"
+templates_path = "templates/05-secrets-management/"
+methods = ["Vault", "Secret Detection", "Rotation"]
+
+[principles.VI]
+name = "Traçabilité et audit"
+description = "Logs immuables et centralisés"
+templates_path = "templates/06-audit-logging/"
+methods = ["Structured Logging", "SIEM", "Alerting"]
+
+[principles.VII]
+name = "Patch management"
+description = "SLA stricts de mise à jour"
+templates_path = "templates/07-patch-management/"
+methods = ["SCA", "Dependabot", "SLA"]
+
+# ============================================================================
+# WORKFLOW - Définition du flux
+# ============================================================================
+
+[workflow]
+phases = ["setup", "baseline", "analyze", "specify", "harden", "plan", "tasks", "domain", "monitor", "continuity"]
+
+[workflow.setup]
+commands = ["configure"]
+description = "Configuration intelligente du projet (après osk init CLI)"
+
+[workflow.baseline]
+commands = ["baseline"]
+description = "État des lieux pour projets existants (optionnel pour nouveaux projets)"
+
+[workflow.analyze]
+commands = ["analyze"]
+description = "Analyse des menaces et risques"
+principles = ["I", "II"]
+
+[workflow.specify]
+commands = ["specify"]
+description = "Définition des exigences"
+principles = ["III", "IV"]
+
+[workflow.harden]
+commands = ["harden"]
+description = "Mesures de durcissement"
+principles = ["V", "VI", "VII"]
+
+[workflow.plan]
+commands = ["plan", "tasks"]
+description = "Planification et tâches"
+
+[workflow.domain]
+commands = ["rgpd", "rgs"]
+description = "Conformité réglementaire (inclut audit par domaine)"
+
+[workflow.monitor]
+commands = ["dashboard"]
+description = "Suivi continu de la posture sécurité"
+
+[workflow.continuity]
+commands = ["pca-pra"]
+description = "Suivi continu"
