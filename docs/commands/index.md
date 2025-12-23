@@ -32,6 +32,7 @@ graph LR
         J --> L[osk-dashboard]
         K --> L
         L --> M[osk-pca-pra]
+        L --> N[osk-incident]
     end
 ```
 
@@ -77,8 +78,9 @@ graph LR
 
 | Commande | Description |
 |----------|-------------|
-| [`/osk-dashboard`](osk-dashboard.md) | Tableau de bord sécurité |
-| [`/osk-pca-pra`](osk-pca-pra.md) | Plans de continuité |
+| [`/osk-dashboard`](osk-dashboard.md) | Tableau de bord securite |
+| [`/osk-pca-pra`](osk-pca-pra.md) | Plans de continuite |
+| [`/osk-incident`](osk-incident.md) | Reponse a incident |
 
 ## Utilisation
 
@@ -124,6 +126,8 @@ Documentation finale publiable :
 docs/security/
 ├── risks/
 │   └── risk-register.yaml
+├── incidents/
+│   └── INC-*.md
 ├── rgpd/
 │   ├── registre-traitements.md
 │   └── dpia-global.md

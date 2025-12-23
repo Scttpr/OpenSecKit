@@ -107,6 +107,7 @@ nav:
     - Monitoring:
       - /osk-dashboard: commands/osk-dashboard.md
       - /osk-pca-pra: commands/osk-pca-pra.md
+      - /osk-incident: commands/osk-incident.md
   - Domaines:
     - Vue d'ensemble: domains/index.md
     - RGPD: domains/rgpd.md

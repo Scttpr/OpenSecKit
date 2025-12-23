@@ -15,7 +15,7 @@ repository = "https://github.com/Scttpr/OpenSecKit"
 # Phase 0 : Configuration (après osk init CLI)
 [commands.configure]
 url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-configure.md"
-version = "3.0"
+version = "3.0.1"
 phase = "setup"
 description = "Configuration intelligente - analyse code, détection domaines, pondération principes"
 principles = []
@@ -25,7 +25,7 @@ generates = [".osk/memory/context.md", ".osk/memory/constitution.md"]
 # Phase 0.5 : Baseline (pour projets existants)
 [commands.baseline]
 url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-baseline.md"
-version = "3.0"
+version = "3.0.1"
 phase = "baseline"
 description = "État des lieux sécurité - inventaire features, scan global, roadmap"
 principles = ["I", "II", "III", "IV", "V", "VI", "VII"]
@@ -35,7 +35,7 @@ generates = [".osk/specs/000-baseline/inventory.md", ".osk/specs/000-baseline/fe
 # Phase 1 : Analyze (Principes I & II)
 [commands.analyze]
 url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-analyze.md"
-version = "3.0"
+version = "3.0.1"
 phase = "analyze"
 description = "Analyse des menaces et risques (STRIDE + Risk Scoring)"
 principles = ["I", "II"]
@@ -52,7 +52,7 @@ argument = "feature_name"
 # Phase 2 : Specify (Principes III & IV)
 [commands.specify]
 url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-specify.md"
-version = "3.0"
+version = "3.0.1"
 phase = "specify"
 description = "Définition des exigences de sécurité et stratégie de tests"
 principles = ["III", "IV"]
@@ -63,7 +63,7 @@ argument = "feature_name"
 # Phase 3 : Harden (Principes V, VI & VII)
 [commands.harden]
 url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-harden.md"
-version = "3.0"
+version = "3.0.1"
 phase = "harden"
 description = "Mesures de durcissement (secrets, logging, patching)"
 principles = ["V", "VI", "VII"]
@@ -74,7 +74,7 @@ argument = "feature_name"
 # Phase 4 : Plan
 [commands.plan]
 url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-plan.md"
-version = "3.0"
+version = "3.0.1"
 phase = "plan"
 description = "Consolidation du plan d'implémentation"
 principles = ["I", "II", "III", "IV", "V", "VI", "VII"]
@@ -91,7 +91,7 @@ argument = "feature_name"
 # Phase 4 : Tasks
 [commands.tasks]
 url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-tasks.md"
-version = "3.0"
+version = "3.0.1"
 phase = "tasks"
 description = "Génération des tâches ordonnées avec dépendances"
 principles = []
@@ -135,12 +135,23 @@ scans = [
 # Continuité (PCA/PRA)
 [commands.pca-pra]
 url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-pca-pra.md"
-version = "2.0"
+version = "3.0.1"
 phase = "continuity"
 description = "Plans de Continuité et Reprise d'Activité"
 principles = []
 requires = [".osk/memory/context.md"]
 generates = ["docs/security/continuity/PCA-*.md", "docs/security/continuity/PRA-*.md"]
+
+# Incident Response
+[commands.incident]
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-incident.md"
+version = "3.0.1"
+phase = "incident"
+description = "Gestion des incidents de sécurité et réponse à crise"
+principles = ["I", "II", "III", "IV", "V", "VI", "VII"]
+requires = [".osk/memory/context.md"]
+generates = ["docs/security/incidents/INC-*.md", "docs/security/risks/risk-register.yaml"]
+argument = "description_incident"
 
 # ============================================================================
 # COMMANDS - Domaines spécifiques
@@ -149,7 +160,7 @@ generates = ["docs/security/continuity/PCA-*.md", "docs/security/continuity/PRA-
 # RGPD (Protection des données personnelles)
 [commands.rgpd]
 url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-rgpd.md"
-version = "3.0"
+version = "3.0.1"
 phase = "domain"
 description = "Conformité RGPD - Registre, DPIA, procédures"
 principles = ["II", "III", "VI"]
@@ -166,7 +177,7 @@ argument = "[audit] - Sans argument: configuration. Avec 'audit': vérification"
 # RGS (Administration française)
 [commands.rgs]
 url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-rgs.md"
-version = "3.0"
+version = "3.0.1"
 phase = "domain"
 description = "Configuration RGS et EBIOS RM pour homologation"
 principles = ["I", "II", "III", "V", "VI"]
@@ -276,7 +287,7 @@ methods = ["SCA", "Dependabot", "SLA"]
 # ============================================================================
 
 [workflow]
-phases = ["setup", "baseline", "analyze", "specify", "harden", "plan", "tasks", "implement", "domain", "monitor", "continuity"]
+phases = ["setup", "baseline", "analyze", "specify", "harden", "plan", "tasks", "implement", "domain", "monitor", "continuity", "incident"]
 
 [workflow.setup]
 commands = ["configure"]
@@ -320,4 +331,8 @@ description = "Suivi continu de la posture sécurité"
 
 [workflow.continuity]
 commands = ["pca-pra"]
-description = "Suivi continu"
+description = "Plans de continuite et reprise"
+
+[workflow.incident]
+commands = ["incident"]
+description = "Reponse a incident et gestion de crise"
