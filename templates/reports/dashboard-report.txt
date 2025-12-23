@@ -44,6 +44,19 @@ Statut Production: {{production_status}}
 {{/if}}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                           COUVERTURE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+FEATURES
+├── Analysées : {{features.done}}/{{features.total}} ({{coverage_features}}%)
+└── {{features_bar}}
+
+DOCUMENTS CONFORMITÉ
+├── RGPD   : {{rgpd.status}} ({{rgpd.docs}}/4 docs)
+├── RGS    : {{rgs.status}} ({{rgs.docs}}/4 docs)
+└── PCA/PRA: {{continuity.status}} ({{continuity.docs}}/3 docs)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
                             MÉTRIQUES CLÉS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -51,6 +64,7 @@ Statut Production: {{production_status}}
 │ Score Risque Résiduel            │ {{score_residuel}} points        │
 │ Security Debt Score              │ {{debt_score}} points            │
 │ Couverture Features              │ {{coverage_features}}%           │
+│ Couverture Docs                  │ {{coverage_docs}}%               │
 │ MTTR Risques Critiques           │ {{mttr}} jours                   │
 │ Taux de Résolution               │ {{resolution_rate}}%             │
 └─────────────────────────────────────────────────────────────────────┘
@@ -63,15 +77,29 @@ Statut Production: {{production_status}}
 {{#each urgent}}
   {{index}}. [{{id}}] - {{titre}}
 {{/each}}
+{{#unless urgent}}
+  ✅ Aucune action urgente
+{{/unless}}
 
 🟠 IMPORTANT (< 7j)
 {{#each important}}
   {{index}}. {{action}}
 {{/each}}
+{{#unless important}}
+  ✅ Aucune action importante
+{{/unless}}
+
+📋 CONFORMITÉ
+{{#each conformity}}
+  {{index}}. {{action}} ({{domain}})
+{{/each}}
+{{#unless conformity}}
+  ✅ Documentation à jour
+{{/unless}}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-📄 Rapport complet: docs/security/DASHBOARD.md
+📄 Rapport complet: docs/security/dashboard.md
 📊 Risk Register: docs/security/risks/risk-register.yaml
 
-Généré le {{date}} par OpenSecKit /dashboard
+Généré le {{date}} par OpenSecKit /osk-dashboard

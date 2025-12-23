@@ -62,6 +62,44 @@
 ✅ Aucun risque critique ouvert
 {{/if}}
 
+## Couverture des Features
+
+| Feature | Menaces | Risques | Exigences | Tests | Hardening | Plan |
+|---------|---------|---------|-----------|-------|-----------|------|
+{{#each features}}
+| {{name}} | {{threats}} | {{risks}} | {{requirements}} | {{tests}} | {{hardening}} | {{plan}} |
+{{/each}}
+
+**Taux de couverture** : {{coverage_features}}% ({{features_done}}/{{features_total}} features analysées)
+
+## Documents de Conformité
+
+### RGPD
+
+| Document | Statut | Date |
+|----------|--------|------|
+| Registre des traitements | {{rgpd.registre.status}} | {{rgpd.registre.date}} |
+| DPIA Global | {{rgpd.dpia.status}} | {{rgpd.dpia.date}} |
+| Procédure violation | {{rgpd.violation.status}} | {{rgpd.violation.date}} |
+| Dernier audit | {{rgpd.audit.status}} | {{rgpd.audit.date}} |
+
+### RGS
+
+| Document | Statut | Date |
+|----------|--------|------|
+| EBIOS-RM | {{rgs.ebios.status}} | {{rgs.ebios.date}} |
+| Dossier homologation | {{rgs.homologation.status}} | {{rgs.homologation.date}} |
+| MCS | {{rgs.mcs.status}} | {{rgs.mcs.date}} |
+| Dernier audit | {{rgs.audit.status}} | {{rgs.audit.date}} |
+
+### Continuité
+
+| Document | Statut | Date |
+|----------|--------|------|
+| PCA | {{continuity.pca.status}} | {{continuity.pca.date}} |
+| PRA | {{continuity.pra.status}} | {{continuity.pra.date}} |
+| Dernier test PRA | {{continuity.test.status}} | {{continuity.test.date}} |
+
 ## Métriques Clés
 
 | Métrique | Valeur | Cible |
@@ -69,6 +107,7 @@
 | Score Risque Résiduel | {{score_residuel}} | 0 |
 | Security Debt | {{debt_score}} points | 0 |
 | Couverture Features | {{coverage_features}}% | 100% |
+| Couverture Docs | {{coverage_docs}}% | 100% |
 | MTTR Critiques | {{mttr}} jours | < 2 jours |
 | Taux Résolution | {{resolution_rate}}% | > 80% |
 
@@ -81,13 +120,28 @@
    - Risque: {{risk_id}}
    - Impact: {{impact}}
 {{/each}}
+{{#unless urgent}}
+✅ Aucune action urgente
+{{/unless}}
 
 ### 🟠 IMPORTANT (< 7j)
 
 {{#each important}}
 1. {{action}}
 {{/each}}
+{{#unless important}}
+✅ Aucune action importante en attente
+{{/unless}}
+
+### 📋 CONFORMITÉ
+
+{{#each conformity_actions}}
+1. {{action}} - {{domain}}
+{{/each}}
+{{#unless conformity_actions}}
+✅ Documentation de conformité à jour
+{{/unless}}
 
 ---
 
-*Généré le {{date}} par OpenSecKit /dashboard*
+*Généré le {{date}} par OpenSecKit /osk-dashboard*

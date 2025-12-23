@@ -121,12 +121,20 @@ argument = "risk_id"
 # Dashboard
 [commands.dashboard]
 url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-dashboard.md"
-version = "3.0"
+version = "3.0.1"
 phase = "monitor"
 description = "Vue consolidée de la posture sécurité"
 principles = []
 requires = ["docs/security/risks/risk-register.yaml", ".osk/config.toml"]
-generates = ["docs/security/DASHBOARD.md"]
+generates = ["docs/security/dashboard.md"]
+scans = [
+    "docs/security/risks/risk-register.yaml",
+    ".osk/specs/*/",
+    ".osk/memory/",
+    "docs/security/rgpd/",
+    "docs/security/rgs/",
+    "docs/security/continuity/"
+]
 
 # Continuité (PCA/PRA)
 [commands.pca-pra]
