@@ -6,35 +6,35 @@ Le workflow OpenSecKit V3 est conçu pour intégrer la sécurité à chaque éta
 
 ```mermaid
 graph TB
-    subgraph "Phase 0: Configuration"
-        A[osk init] --> B[/osk-configure]
+    subgraph Phase0[Phase 0: Configuration]
+        A[osk init] --> B[osk-configure]
         B --> C{Projet existant?}
-        C -->|Oui| D[/osk-baseline]
+        C -->|Oui| D[osk-baseline]
     end
 
-    subgraph "Phases 1-4: Analyse par Feature"
-        C -->|Non| E[/osk-analyze]
+    subgraph Phase1[Phases 1-4: Analyse par Feature]
+        C -->|Non| E[osk-analyze]
         D --> E
-        E --> F[/osk-specify]
-        F --> G[/osk-harden]
-        G --> H[/osk-plan]
-        H --> I[/osk-tasks]
+        E --> F[osk-specify]
+        F --> G[osk-harden]
+        G --> H[osk-plan]
+        H --> I[osk-tasks]
     end
 
-    subgraph "Phase 5: Implémentation"
-        I --> J[/osk-implement]
+    subgraph Phase5[Phase 5: Implementation]
+        I --> J[osk-implement]
         J --> K[risk-register.yaml]
     end
 
-    subgraph "Phase 6: Conformité"
-        K --> L[/osk-rgpd]
-        K --> M[/osk-rgs]
+    subgraph Phase6[Phase 6: Conformite]
+        K --> L[osk-rgpd]
+        K --> M[osk-rgs]
     end
 
-    subgraph "Monitoring"
-        L --> N[/osk-dashboard]
+    subgraph Monitor[Monitoring]
+        L --> N[osk-dashboard]
         M --> N
-        N --> O[/osk-pca-pra]
+        N --> O[osk-pca-pra]
     end
 ```
 
@@ -192,11 +192,11 @@ Génère les plans de continuité et reprise d'activité.
 
 ```mermaid
 stateDiagram-v2
-    [*] --> OUVERT: Détection
+    [*] --> OUVERT: Detection
     OUVERT --> EN_COURS: Prise en charge
     EN_COURS --> RESOLU: Correction
     RESOLU --> VERIFIE: Validation
-    EN_COURS --> ACCEPTE: Risque accepté
+    EN_COURS --> ACCEPTE: Risque accepte
     VERIFIE --> [*]
     ACCEPTE --> [*]
 ```

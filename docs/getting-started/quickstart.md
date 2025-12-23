@@ -101,22 +101,22 @@ Affiche le tableau de bord de sécurité avec :
 
 ```mermaid
 graph TD
-    A[osk init] --> B[/osk-configure]
+    A[osk init] --> B[osk-configure]
     B --> C{Projet existant?}
-    C -->|Oui| D[/osk-baseline]
-    C -->|Non| E[/osk-analyze feature]
+    C -->|Oui| D[osk-baseline]
+    C -->|Non| E[osk-analyze]
     D --> E
-    E --> F[/osk-specify feature]
-    F --> G[/osk-harden feature]
-    G --> H[/osk-plan feature]
-    H --> I[/osk-tasks feature]
-    I --> J[/osk-implement feature]
-    J --> K[/osk-dashboard]
+    E --> F[osk-specify]
+    F --> G[osk-harden]
+    G --> H[osk-plan]
+    H --> I[osk-tasks]
+    I --> J[osk-implement]
+    J --> K[osk-dashboard]
     K --> L{Autre feature?}
     L -->|Oui| E
-    L -->|Non| M[Conformité]
-    M --> N[/osk-rgpd]
-    M --> O[/osk-rgs]
+    L -->|Non| M[Conformite]
+    M --> N[osk-rgpd]
+    M --> O[osk-rgs]
 ```
 
 ## Prochaines étapes

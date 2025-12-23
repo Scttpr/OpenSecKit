@@ -36,15 +36,15 @@ claude
 
 ```mermaid
 graph LR
-    A[osk init] --> B[/osk-configure]
-    B --> C[/osk-baseline]
-    C --> D[/osk-analyze]
-    D --> E[/osk-specify]
-    E --> F[/osk-harden]
-    F --> G[/osk-plan]
-    G --> H[/osk-tasks]
-    H --> I[/osk-implement]
-    I --> J[/osk-dashboard]
+    A[osk init] --> B[osk-configure]
+    B --> C[osk-baseline]
+    C --> D[osk-analyze]
+    D --> E[osk-specify]
+    E --> F[osk-harden]
+    F --> G[osk-plan]
+    G --> H[osk-tasks]
+    H --> I[osk-implement]
+    I --> J[osk-dashboard]
 ```
 
 ## Les 7 Principes

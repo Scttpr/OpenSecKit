@@ -85,11 +85,11 @@ risks:
 
 ```mermaid
 stateDiagram-v2
-    [*] --> OUVERT: /osk-analyze
+    [*] --> OUVERT: osk-analyze
     OUVERT --> EN_COURS: Assignation
-    EN_COURS --> RESOLU: /osk-implement
+    EN_COURS --> RESOLU: osk-implement
     RESOLU --> VERIFIE: Audit
-    EN_COURS --> ACCEPTE: Validation Direction
+    EN_COURS --> ACCEPTE: Validation
     VERIFIE --> [*]
     ACCEPTE --> [*]
 ```

@@ -7,31 +7,31 @@ OpenSecKit fournit des slash commands pour Claude Code organisées par phase.
 ```mermaid
 graph LR
     subgraph Configuration
-        A[osk init] --> B[/osk-configure]
-        B --> C[/osk-baseline]
+        A[osk init] --> B[osk-configure]
+        B --> C[osk-baseline]
     end
 
     subgraph Analyse
-        C --> D[/osk-analyze]
-        D --> E[/osk-specify]
-        E --> F[/osk-harden]
+        C --> D[osk-analyze]
+        D --> E[osk-specify]
+        E --> F[osk-harden]
     end
 
     subgraph Planification
-        F --> G[/osk-plan]
-        G --> H[/osk-tasks]
-        H --> I[/osk-implement]
+        F --> G[osk-plan]
+        G --> H[osk-tasks]
+        H --> I[osk-implement]
     end
 
-    subgraph Conformité
-        I --> J[/osk-rgpd]
-        I --> K[/osk-rgs]
+    subgraph Conformite
+        I --> J[osk-rgpd]
+        I --> K[osk-rgs]
     end
 
     subgraph Monitoring
-        J --> L[/osk-dashboard]
+        J --> L[osk-dashboard]
         K --> L
-        L --> M[/osk-pca-pra]
+        L --> M[osk-pca-pra]
     end
 ```
 

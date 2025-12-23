@@ -126,13 +126,13 @@ Chaque domaine contient :
 
 ```mermaid
 graph TD
-    A[CLI: osk init] --> B[Télécharge prompts/templates]
-    B --> C[.osk/ créé]
+    A[CLI: osk init] --> B[Telecharge prompts]
+    B --> C[.osk cree]
     C --> D[Claude Code]
-    D --> E[/osk-configure]
-    E --> F[.osk/memory/]
-    F --> G[/osk-analyze]
-    G --> H[.osk/specs/]
+    D --> E[osk-configure]
+    E --> F[.osk/memory]
+    F --> G[osk-analyze]
+    G --> H[.osk/specs]
     G --> I[risk-register.yaml]
 ```
 
