@@ -1,0 +1,29 @@
+# OpenSecKit - Schéma Feature Entry
+# Version: 3.0.1
+# Usage: Format d'une feature dans features.yaml
+
+id: "[identifiant court]"           # ex: auth, payments, admin
+name: "[Nom lisible]"               # ex: Authentification
+description: "[Description courte]"
+criticite: "[critical|high|medium|low]"
+status: "[pending|analyzed|secured]"
+
+# Raison de la criticité
+raison_criticite: "[Pourquoi cette criticité]"
+
+# Fichiers source
+files:
+  - "[glob pattern]"                # ex: src/auth/**/*.ts
+
+# Endpoints API
+endpoints:
+  - method: "[GET|POST|PUT|DELETE]"
+    path: "[/api/...]"
+
+# Modèles de données
+models:
+  - "[Nom du modèle]"
+
+# Flags
+sensitive_data: true|false
+next_command: "/osk-analyze [id]"

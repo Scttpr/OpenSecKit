@@ -1,0 +1,60 @@
+============================================================
+  AUDIT RGPD - Rapport de Conformité
+============================================================
+
+Projet: {{project}}
+Date: {{date}}
+Score Conformité: {{score}}%
+
+DONNÉES PERSONNELLES DÉTECTÉES
+──────────────────────────────
+{{#each personal_data}}
+• {{field}} ({{location}}) {{#if sensitive}}⚠️ Art. 9{{/if}}
+{{/each}}
+
+SOUS-TRAITANTS
+──────────────
+{{#each processors}}
+• {{name}} ({{purpose}}) - DPA: {{dpa_status}}
+{{/each}}
+
+MATRICE DE CONFORMITÉ
+─────────────────────
+
+PRINCIPES (Art. 5)
+{{#each principles}}
+├── {{name}} : {{status}}
+{{/each}}
+
+DROITS (Art. 12-22)
+{{#each rights}}
+├── {{name}} : {{status}}
+{{/each}}
+
+DOCUMENTATION
+{{#each docs}}
+├── {{name}} : {{status}}
+{{/each}}
+
+ÉCARTS IDENTIFIÉS
+─────────────────
+{{#each gaps}}
+{{priority}} {{id}} : {{description}}
+   Action: {{action}}
+   Effort: {{effort}}
+{{/each}}
+
+PLAN DE REMÉDIATION
+───────────────────
+Phase 1 (Urgent)  : {{phase1.count}} actions
+Phase 2 (Court)   : {{phase2.count}} actions
+Phase 3 (Moyen)   : {{phase3.count}} actions
+
+FICHIERS GÉNÉRÉS
+────────────────
+├── docs/security/rgpd/AUDIT-{{date}}.md
+├── docs/security/rgpd/registre-traitements.md
+├── docs/security/rgpd/dpia-global.md
+└── docs/security/rgpd/procedure-violation.md
+
+============================================================

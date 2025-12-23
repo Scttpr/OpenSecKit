@@ -1,0 +1,93 @@
+# Security Dashboard
+
+> Tableau de bord de sécurité du projet
+> Généré automatiquement par OpenSecKit
+> Date: {{date}}
+
+## Vue d'Ensemble
+
+| Attribut | Valeur |
+|----------|--------|
+| Projet | {{project}} |
+| Stack | {{stack}} |
+| Dernière mise à jour | {{last_updated}} |
+| Statut Production | {{production_status}} |
+
+## Conformité Constitutionnelle
+
+### Score Global
+
+**{{score_global}}%** de conformité aux 7 principes
+
+```
+{{progress_bar}} {{score_global}}%
+```
+
+### Détail par Principe
+
+| Principe | Statut | Couverture | Risques Ouverts |
+|----------|--------|------------|-----------------|
+{{#each principles}}
+| {{name}} | {{status}} | {{coverage}} | {{open_risks}} |
+{{/each}}
+
+## Registre des Risques
+
+### Vue d'Ensemble
+
+| Sévérité | Ouverts | En cours | Résolus | Vérifiés | Acceptés | Total |
+|----------|---------|----------|---------|----------|----------|-------|
+{{#each severity_rows}}
+| {{name}} | {{open}} | {{progress}} | {{resolved}} | {{verified}} | {{accepted}} | {{total}} |
+{{/each}}
+
+### Risques Critiques Ouverts
+
+{{#if critical_open}}
+{{#each critical_open}}
+#### {{id}} - {{titre}}
+
+| Attribut | Valeur |
+|----------|--------|
+| Score | {{score}} |
+| Statut | 🔴 OUVERT |
+| Échéance | {{echeance}} |
+| Principe | {{principe}} |
+
+**Mitigation** : {{mitigation}}
+
+---
+{{/each}}
+{{else}}
+✅ Aucun risque critique ouvert
+{{/if}}
+
+## Métriques Clés
+
+| Métrique | Valeur | Cible |
+|----------|--------|-------|
+| Score Risque Résiduel | {{score_residuel}} | 0 |
+| Security Debt | {{debt_score}} points | 0 |
+| Couverture Features | {{coverage_features}}% | 100% |
+| MTTR Critiques | {{mttr}} jours | < 2 jours |
+| Taux Résolution | {{resolution_rate}}% | > 80% |
+
+## Recommandations
+
+### 🔴 URGENT (< 48h)
+
+{{#each urgent}}
+1. **{{action}}**
+   - Risque: {{risk_id}}
+   - Impact: {{impact}}
+{{/each}}
+
+### 🟠 IMPORTANT (< 7j)
+
+{{#each important}}
+1. {{action}}
+{{/each}}
+
+---
+
+*Généré le {{date}} par OpenSecKit /dashboard*

@@ -1,0 +1,38 @@
+# .osk/specs/000-baseline/features.yaml
+# Liste des features pour les commandes /osk-analyze
+# Généré par /osk-baseline le {{date}}
+
+metadata:
+  generated: "{{date}}"
+  validated: true
+  total_features: {{total}}
+
+features:
+{{#each features}}
+  - id: "{{id}}"
+    name: "{{name}}"
+    description: "{{description}}"
+    criticite: "{{criticite}}"
+    status: "pending"
+    files:
+{{#each files}}
+      - "{{this}}"
+{{/each}}
+    endpoints:
+{{#each endpoints}}
+      - method: "{{method}}"
+        path: "{{path}}"
+{{/each}}
+    models:
+{{#each models}}
+      - "{{this}}"
+{{/each}}
+    sensitive_data: {{sensitive_data}}
+    next_command: "/osk-analyze {{id}}"
+{{/each}}
+
+# Ordre recommandé d'analyse (par criticité)
+analysis_order:
+{{#each analysis_order}}
+  - "{{this}}"
+{{/each}}
