@@ -60,15 +60,15 @@ DESCRIPTION
    │  │  /osk-analyze ──▶ /osk-specify ──▶ /osk-harden             ││
    │  │       │                                                     ││
    │  │       ▼                                                     ││
-   │  │  /osk-plan ──▶ /osk-tasks                                  ││
+   │  │  /osk-plan ──▶ /osk-tasks ──▶ /osk-implement                ││
    │  └─────────────────────────────────────────────────────────────┘│
    │                     │                                           │
    │                     ▼                                           │
    │  ┌─────────────────────────────────────────────────────────────┐│
-   │  │              GESTION DES RISQUES                            ││
+   │  │              IMPLÉMENTATION & RISQUES                       ││
    │  │                                                             ││
-   │  │  /osk-resolve ──────────────▶ risk-register.yaml (mise à   ││
-   │  │       │                        jour statut avec traçabilité)││
+   │  │  /osk-implement exécute tâches une par une                 ││
+   │  │       │ → met à jour risk-register.yaml automatiquement    ││
    │  │       ▼                                                     ││
    │  │  OUVERT → EN_COURS → RESOLU → VERIFIE                      ││
    │  │                   ↘ ACCEPTE                                 ││
@@ -106,11 +106,11 @@ DESCRIPTION
       /osk-plan [feature]      Tous → plan.md
       /osk-tasks [feature]     → tasks.md, tasks.yaml
 
-   PHASE 5 : GESTION DES RISQUES
+   PHASE 5 : IMPLÉMENTATION
 
-      /osk-resolve [RISK-ID]   Marquer un risque résolu (commit, PR, contrôles)
-      /osk-resolve --reopen    Ré-ouvrir un risque fermé
-      /osk-resolve --bulk      Résolution en masse
+      /osk-implement [feature]   Exécute tâches une par une avec commits
+                                 → Met à jour risk-register automatiquement
+                                 → Options: --auto, --dry-run, --task T001
 
    PHASE 6 : CONFORMITÉ
 
@@ -185,7 +185,7 @@ DESCRIPTION
    - Date et auteur
    - Justification (si accepté)
 
-   Commande : /osk-resolve RISK-AUTH-001
+   Mise à jour automatique via : /osk-implement [feature]
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

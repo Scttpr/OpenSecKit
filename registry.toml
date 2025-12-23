@@ -99,20 +99,16 @@ requires = [".osk/specs/NNN-{feature}/plan.md"]
 generates = [".osk/specs/NNN-{feature}/tasks.md", ".osk/specs/NNN-{feature}/tasks.yaml"]
 argument = "feature_name"
 
-# ============================================================================
-# COMMANDS - Gestion des risques
-# ============================================================================
-
-# Resolve - Marquer un risque résolu
-[commands.resolve]
-url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-resolve.md"
+# Phase 5 : Implement
+[commands.implement]
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-implement.md"
 version = "3.0.1"
-phase = "resolve"
-description = "Marquer un risque comme résolu avec traçabilité (commit, PR, contrôles)"
-principles = ["II"]
-requires = ["docs/security/risks/risk-register.yaml"]
+phase = "implement"
+description = "Implémentation des tâches avec mise à jour automatique du risk-register"
+principles = ["I", "II", "III", "IV", "V", "VI", "VII"]
+requires = [".osk/specs/NNN-{feature}/tasks.yaml"]
 generates = ["docs/security/risks/risk-register.yaml", ".osk/specs/NNN-{feature}/risks.md"]
-argument = "risk_id"
+argument = "feature_name"
 
 # ============================================================================
 # COMMANDS - Utilitaires
@@ -280,7 +276,7 @@ methods = ["SCA", "Dependabot", "SLA"]
 # ============================================================================
 
 [workflow]
-phases = ["setup", "baseline", "analyze", "specify", "harden", "plan", "tasks", "resolve", "domain", "monitor", "continuity"]
+phases = ["setup", "baseline", "analyze", "specify", "harden", "plan", "tasks", "implement", "domain", "monitor", "continuity"]
 
 [workflow.setup]
 commands = ["configure"]
@@ -309,10 +305,10 @@ principles = ["V", "VI", "VII"]
 commands = ["plan", "tasks"]
 description = "Planification et tâches"
 
-[workflow.resolve]
-commands = ["resolve"]
-description = "Résolution et suivi des risques"
-principles = ["II"]
+[workflow.implement]
+commands = ["implement"]
+description = "Implémentation des tâches et mise à jour du risk-register"
+principles = ["I", "II", "III", "IV", "V", "VI", "VII"]
 
 [workflow.domain]
 commands = ["rgpd", "rgs"]

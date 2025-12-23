@@ -17,13 +17,14 @@ des prompts pour une meilleure maintenabilité.
 
 NOUVELLES FONCTIONNALITÉS
 
-   ✨ /osk-resolve - Résolution des Risques
+   ✨ /osk-implement - Implémentation des Tâches
 
-      • Nouvelle commande pour marquer un risque comme résolu
-      • Traçabilité complète : commit, PR, contrôles implémentés
-      • Workflow : OUVERT → EN_COURS → RESOLU → VERIFIE (ou ACCEPTE)
-      • Options : --reopen (ré-ouvrir), --bulk (masse)
-      • Mise à jour automatique des métriques (MTTR, taux résolution)
+      • Exécute les tâches de tasks.yaml une par une
+      • Un commit par tâche (traçabilité maximale)
+      • Mise à jour automatique du risk-register.yaml
+      • Workflow risques : OUVERT → EN_COURS → RESOLU → VERIFIE
+      • Options : --auto (sans confirmation), --dry-run, --task T001
+      • Respecte l'ordre des dépendances (depends_on)
 
    ✨ Analyse STRIDE Système dans /osk-baseline
 
@@ -64,7 +65,7 @@ FICHIERS MODIFIÉS
       • osk-harden.md       809 → 91  (-89%)
       • osk-pca-pra.md      727 → 107 (-85%)
       • osk-plan.md         594 → 112 (-81%)
-      • osk-resolve.md      (NOUVEAU - 136 lignes)
+      • osk-implement.md    (NOUVEAU - 113 lignes)
       • osk-rgpd.md         865 → 136 (-84%)
       • osk-rgs.md         1850 → 150 (-92%)
       • osk-specify.md      683 → 104 (-85%)
@@ -76,10 +77,10 @@ FICHIERS MODIFIÉS
       • templates/reports/*.txt      (14 fichiers)
 
    Documentation :
-      • README.txt                   (workflow, /osk-resolve)
+      • README.txt                   (workflow, /osk-implement)
       • README-DEV.txt               (architecture prompts)
       • templates/README.md          (documentation complète)
-      • registry.toml                (version 3.0.1, /osk-resolve)
+      • registry.toml                (version 3.0.1, /osk-implement)
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -95,10 +96,10 @@ MIGRATION v3.0.0 → v3.0.1
    3. Les fichiers risks.md existants restent valides
       → Ils seront régénérés comme vues du risk-register
 
-   4. Nouveau workflow de résolution :
-      >>> /osk-resolve RISK-AUTH-001
-      → Sélectionner commit/PR
-      → Documenter contrôles implémentés
+   4. Nouveau workflow d'implémentation :
+      >>> /osk-implement auth
+      → Exécute tâches de tasks.yaml une par une
+      → Met à jour risk-register automatiquement
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

@@ -1,0 +1,58 @@
+============================================================
+  /osk-implement {{feature}} - Implémentation Terminée
+============================================================
+
+RÉSUMÉ
+──────
+Tâches exécutées : {{done}}/{{total}}
+Temps total      : {{duration}}
+Commits créés    : {{commits}}
+
+TÂCHES COMPLÉTÉES
+─────────────────
+{{#each completed}}
+✅ {{id}} : {{title}}
+   Commit: {{commit}}
+   Risques résolus: {{risks}}
+{{/each}}
+
+{{#if skipped}}
+TÂCHES IGNORÉES
+───────────────
+{{#each skipped}}
+⏭️ {{id}} : {{title}} ({{reason}})
+{{/each}}
+{{/if}}
+
+{{#if failed}}
+TÂCHES EN ERREUR
+────────────────
+{{#each failed}}
+❌ {{id}} : {{title}}
+   Erreur: {{error}}
+{{/each}}
+{{/if}}
+
+IMPACT SUR LE RISK REGISTER
+───────────────────────────
+Risques résolus     : {{risks.resolved}}
+Risques en cours    : {{risks.in_progress}}
+Score résiduel      : {{risks.before}} → {{risks.after}} (↓{{risks.reduction}})
+Taux résolution     : {{risks.rate_before}}% → {{risks.rate_after}}%
+
+FICHIERS MODIFIÉS
+─────────────────
+{{#each files}}
+├── {{path}} ({{action}})
+{{/each}}
+
+PROCHAINES ÉTAPES
+─────────────────
+{{#if remaining}}
+→ {{remaining}} tâches restantes, relancer /osk-implement {{feature}}
+{{else}}
+→ Toutes les tâches complétées !
+→ /osk-dashboard pour voir l'impact global
+{{/if}}
+
+============================================================
