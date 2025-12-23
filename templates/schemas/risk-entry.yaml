@@ -1,0 +1,79 @@
+# OpenSecKit - Schéma Risk Entry
+# Version: 3.0.1
+# Usage: Format d'un risque dans risk-register.yaml
+
+# Identification
+id: "RISK-[FEATURE]-[NNN]"        # ou RISK-SYS-NNN, VULN-BASELINE-NNN
+source: "[/osk-baseline|/osk-analyze feature]"
+type: "[systeme|feature|vulnerabilite]"
+feature: "[nom_feature]"
+titre: "[Titre court]"
+description: "[Description détaillée]"
+
+# Classification
+categorie_stride: "[S|T|R|I|D|E]"
+severite: "[CRITIQUE|IMPORTANT|MINEUR]"
+priorite: "[P0|P1|P2|P3|P4]"
+# P0: score >= 80, P1: 49-79, P2: 25-48, P3: 11-24, P4: 1-10
+
+# Scoring (formule: Impact × Probabilité × Exposition)
+impact: 1-5              # 1=Négligeable, 5=Critique
+probabilite: 1-5         # 1=Rare, 5=Quasi-certain
+exposition: 1-5          # 1=Interne isolé, 5=Internet public
+score_initial: 1-125     # Calculé
+score_residuel: 1-125    # Égal à initial tant que non résolu
+
+# Localisation
+fichiers:
+  - "[chemin:ligne]"
+asset_menace: "[Asset concerné]"
+vecteur_attaque: "[Description du vecteur]"
+
+# Contrôles
+controles_existants: []
+controles_requis:
+  - "[Contrôle 1]"
+  - "[Contrôle 2]"
+
+# Conformité
+principe_viole: "[I|II|III|IV|V|VI|VII]"
+cwe: "[CWE-XXX]"
+owasp: "[A0X:2021]"
+
+# Workflow de résolution
+# Statuts: OUVERT → EN_COURS → RESOLU → VERIFIE
+#          OUVERT → ACCEPTE (si risque accepté)
+statut: "OUVERT"
+
+dates:
+  detection: "[DATE ISO]"
+  echeance: "[DATE ISO]"           # SLA: P0=48h, P1=7j, P2=30j, P3=90j
+  prise_en_charge: null            # Date passage EN_COURS
+  resolution: null                 # Date passage RESOLU
+  verification: null               # Date passage VERIFIE
+
+assignee: null                     # Email ou ID du responsable
+equipe: null                       # Équipe responsable
+
+# Résolution (rempli par /osk-resolve)
+resolution:
+  commit: null                     # SHA du commit de fix
+  pr: null                         # Numéro de PR (#123)
+  description: null                # Description de la correction
+  controles_implementes: []        # Liste des contrôles ajoutés
+
+# Vérification (rempli par /osk-verify)
+verification:
+  sast_pass: null
+  dast_pass: null
+  tests_pass: null
+  revue_code: null
+  verificateur: null
+  commentaire: null
+
+# Si ACCEPTE
+acceptation:
+  valideur: null
+  date: null
+  justification: null
+  revue_prevue: null

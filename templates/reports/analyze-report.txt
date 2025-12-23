@@ -1,0 +1,52 @@
+============================================================
+  /osk-analyze {{feature}} - Analyse Terminée
+============================================================
+
+FEATURE ANALYSÉE
+├── Nom         : {{feature}}
+├── Fichiers    : {{files_count}} fichiers analysés
+├── Endpoints   : {{endpoints}}
+└── Modèles     : {{models}}
+
+MENACES IDENTIFIÉES (STRIDE)
+├── Spoofing              : {{stride.S}} menaces
+├── Tampering             : {{stride.T}} menaces
+├── Repudiation           : {{stride.R}} menaces
+├── Information Disclosure: {{stride.I}} menaces
+├── Denial of Service     : {{stride.D}} menaces
+└── Elevation of Privilege: {{stride.E}} menaces
+
+RISQUES AJOUTÉS AU REGISTRE
+├── Critiques (P0-P1) : {{risks.critical}} (score: {{scores.critical}})
+├── Importants (P2)   : {{risks.important}} (score: {{scores.important}})
+└── Mineurs (P3-P4)   : {{risks.minor}} (score: {{scores.minor}})
+
+SOURCE DE VÉRITÉ
+└── docs/security/risks/risk-register.yaml
+    ├── Risques ajoutés   : +{{risks.added}}
+    ├── Total registre    : {{risks.total}} risques
+    ├── Score total       : {{score.total}} (+{{score.delta}})
+    └── Taux résolution   : {{resolution_rate}}%
+
+FICHIERS GÉNÉRÉS
+├── .osk/specs/{{spec_id}}-{{feature}}/threats.md
+├── .osk/specs/{{spec_id}}-{{feature}}/risks.md
+{{#if dpia}}
+├── .osk/specs/{{spec_id}}-{{feature}}/rgpd/dpia.md
+{{/if}}
+{{#if ebios}}
+├── .osk/specs/{{spec_id}}-{{feature}}/rgs/ebios-rm.md
+{{/if}}
+└── docs/security/risks/risk-register.yaml
+
+TOP 3 RISQUES À TRAITER
+{{#each top_risks}}
+{{index}}. {{id}} : {{titre}} (Score: {{score}}, Échéance: {{echeance}}) {{icon}}
+{{/each}}
+
+ACTIONS DISPONIBLES
+├── /osk-specify {{feature}}  → Définir exigences de sécurité
+├── /osk-resolve RISK-ID      → Marquer un risque résolu
+├── /osk-verify               → Vérifier les corrections
+└── /osk-dashboard            → Vue consolidée
+============================================================

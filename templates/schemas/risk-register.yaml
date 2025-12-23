@@ -1,0 +1,61 @@
+# OpenSecKit - Schéma Risk Register
+# Version: 3.0.1
+# Usage: Structure du fichier docs/security/risks/risk-register.yaml
+
+metadata:
+  version: "3.0.1"
+  created_by: "[/osk-baseline ou /osk-analyze]"
+  created_at: "[DATE ISO]"
+  last_updated: "[DATE ISO]"
+  projet: "[NOM PROJET]"
+
+stats:
+  total: 0
+  par_statut:
+    ouverts: 0
+    en_cours: 0
+    resolus: 0
+    verifies: 0
+    acceptes: 0
+  par_severite:
+    critiques: 0    # P0: score >= 80
+    importants: 0   # P1: score 49-79
+    mineurs: 0      # P2-P4: score < 49
+  score_total: 0
+  score_residuel: 0
+
+metriques:
+  mttr_critique: null      # Mean Time To Resolve (jours)
+  mttr_important: null
+  taux_resolution: 0       # Pourcentage
+  derniere_resolution: null
+
+conformite:
+  I_threat_modeling:
+    score: 0
+    statut: "EN_ATTENTE"   # EN_ATTENTE | INITIAL | PARTIEL | CONFORME
+    detail: null
+    features_analysees: []
+  II_risk_analysis:
+    score: 0
+    statut: "EN_ATTENTE"
+    detail: null
+    features_analysees: []
+  III_security_design:
+    score: 0
+    statut: "EN_ATTENTE"
+  IV_security_testing:
+    score: 0
+    statut: "EN_ATTENTE"
+  V_secrets_management:
+    score: 0
+    statut: "EN_ATTENTE"
+  VI_audit_logging:
+    score: 0
+    statut: "EN_ATTENTE"
+  VII_patch_management:
+    score: 0
+    statut: "EN_ATTENTE"
+
+risques: []
+# Voir templates/schemas/risk-entry.yaml pour le format de chaque entrée

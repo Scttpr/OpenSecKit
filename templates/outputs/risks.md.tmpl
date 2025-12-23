@@ -1,0 +1,87 @@
+# Risques - {{feature}}
+
+> **Vue générée** depuis `docs/security/risks/risk-register.yaml`
+> Généré par `/osk-analyze` le {{date}}
+> Principe II - Risk Analysis
+>
+> Ne pas modifier ce fichier directement.
+> Source unique : `docs/security/risks/risk-register.yaml`
+
+## Résumé
+
+| Métrique | Valeur |
+|----------|--------|
+| Total risques | {{total}} |
+| Critiques (P0-P1) | {{critical}} |
+| Importants (P2) | {{important}} |
+| Mineurs (P3-P4) | {{minor}} |
+| Score total | {{score_total}} |
+
+### Statut de résolution
+
+| Statut | Count |
+|--------|-------|
+| OUVERT | {{status.open}} |
+| EN_COURS | {{status.in_progress}} |
+| RESOLU | {{status.resolved}} |
+| VERIFIE | {{status.verified}} |
+| ACCEPTE | {{status.accepted}} |
+
+## Risques Critiques
+
+{{#each risks_critical}}
+### {{id}} - {{titre}}
+
+| Attribut | Valeur |
+|----------|--------|
+| Catégorie STRIDE | {{categorie_stride}} |
+| Priorité | {{priorite}} |
+| Score | **{{score}}** (I:{{impact}} × P:{{probabilite}} × E:{{exposition}}) |
+| Statut | {{statut}} |
+| Échéance | {{dates.echeance}} |
+| Assigné | {{assignee}} |
+
+**Asset menacé** : {{asset_menace}}
+**Vecteur d'attaque** : {{vecteur_attaque}}
+
+**Contrôles requis :**
+{{#each controles_requis}}
+- [ ] {{this}}
+{{/each}}
+
+**Conformité** : {{cwe}} | {{owasp}} | Principe {{principe_viole}}
+
+---
+{{/each}}
+
+## Risques Importants
+
+{{#each risks_important}}
+### {{id}} - {{titre}}
+
+| Attribut | Valeur |
+|----------|--------|
+| Score | **{{score}}** | Statut | {{statut}} | Échéance | {{dates.echeance}} |
+
+{{description}}
+
+---
+{{/each}}
+
+## Risques Mineurs
+
+| ID | Titre | Score | Statut | Échéance |
+|----|-------|-------|--------|----------|
+{{#each risks_minor}}
+| {{id}} | {{titre}} | {{score}} | {{statut}} | {{dates.echeance}} |
+{{/each}}
+
+## Actions
+
+- Pour résoudre un risque : `/osk-resolve RISK-[ID]`
+- Pour vérifier les corrections : `/osk-verify`
+- Pour voir le dashboard complet : `/osk-dashboard`
+
+## Prochaine Étape
+
+→ Lancer `/osk-specify {{feature}}` pour définir les exigences de sécurité
