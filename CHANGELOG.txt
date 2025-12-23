@@ -6,6 +6,94 @@
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+VERSION 3.0.0 - 2025-12-23
+
+REFONTE MAJEURE - Workflow Orienté Feature
+
+Cette version restructure complètement le workflow autour des features
+et introduit une séparation claire entre brouillons (.osk/) et docs finales.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+BREAKING CHANGES
+
+   🔴 Slash Commands : Refonte complète
+
+   SUPPRIMÉES :
+      ❌ /security       → Remplacée par /osk-analyze + /osk-specify + /osk-harden
+      ❌ /audit          → Remplacée par /osk-rgpd audit et /osk-rgs renew
+
+   NOUVELLES :
+      ✅ /osk-configure           Configuration intelligente, détection domaines
+      ✅ /osk-baseline            État des lieux (projets existants)
+      ✅ /osk-analyze [feature]   Menaces et risques (Principes I, II)
+      ✅ /osk-specify [feature]   Exigences et tests (Principes III, IV)
+      ✅ /osk-harden [feature]    Durcissement (Principes V, VI, VII)
+      ✅ /osk-plan [feature]      Plan d'implémentation consolidé
+      ✅ /osk-tasks [feature]     Génération tâches ordonnées
+      ✅ /osk-rgpd                Conformité RGPD, registre Art. 30
+      ✅ /osk-rgs                 Conformité RGS, EBIOS RM
+
+   CONSERVÉES (mises à jour) :
+      ✅ /osk-dashboard           Vue consolidée métriques
+      ✅ /osk-pca-pra             Plans de continuité
+
+   🔴 Structure Fichiers
+
+   AVANT (V2) :
+      docs/security/features/SEC-*.md
+      docs/security/risks/risk-register.yaml
+
+   APRÈS (V3) :
+      .osk/specs/NNN-feature/          # Brouillons internes
+      docs/security/                   # Documents finaux publiables
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+NOUVELLES FONCTIONNALITÉS
+
+   ✨ Workflow Orienté Feature
+
+      • Chaque feature a son dossier .osk/specs/NNN-feature/
+      • Brouillons DPIA et EBIOS par feature
+      • Consolidation automatique vers docs/security/
+
+   ✨ CLI --default
+
+      • Mode non-interactif pour CI/scripts
+      • $ osk init --default
+
+   ✨ Scripts de Test
+
+      • ./scripts/test-local.sh    Test complet avant push
+      • ./scripts/check-links.sh   Vérification liens morts
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+MIGRATION v2 → v3
+
+   1. Mettre à jour le CLI :
+      $ cd OpenSecKit/cli && git pull && cargo install --path .
+
+   2. Réinstaller les slash commands :
+      $ cd votre-projet/ && osk init --force
+
+   3. Migrer les fichiers :
+      • docs/security/features/SEC-*.md → .osk/specs/NNN-*/
+      • Utiliser /osk-configure pour reconfigurer
+
+   4. Nouveau workflow :
+      $ claude
+      >>> /osk-configure              # Analyse initiale
+      >>> /osk-analyze "ma-feature"   # Par feature
+      >>> /osk-rgpd                   # Conformité RGPD
+      >>> /osk-rgs                    # Conformité RGS
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 VERSION 2.0.0 - 2025-01-15
 
 REFONTE MAJEURE - Architecture Constitutionnelle

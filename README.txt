@@ -1,185 +1,186 @@
-┌─────────────────────────────────────────────────────────────────────────┐
-│                                                                         │
-│   ██████╗ ██████╗ ███████╗███╗   ██╗███████╗███████╗ ██████╗          │
-│  ██╔═══██╗██╔══██╗██╔════╝████╗  ██║██╔════╝██╔════╝██╔════╝          │
-│  ██║   ██║██████╔╝█████╗  ██╔██╗ ██║███████╗█████╗  ██║               │
-│  ██║   ██║██╔═══╝ ██╔══╝  ██║╚██╗██║╚════██║██╔══╝  ██║               │
-│  ╚██████╔╝██║     ███████╗██║ ╚████║███████║███████╗╚██████╗          │
-│   ╚═════╝ ╚═╝     ╚══════╝╚═╝  ╚═══╝╚══════╝╚══════╝ ╚═════╝          │
-│                                                                         │
-│                    ██╗  ██╗██╗████████╗                                │
-│                    ██║ ██╔╝██║╚══██╔══╝                                │
-│                    █████╔╝ ██║   ██║                                   │
-│                    ██╔═██╗ ██║   ██║                                   │
-│                    ██║  ██╗██║   ██║                                   │
-│                    ╚═╝  ╚═╝╚═╝   ╚═╝                                   │
-│                                                                         │
-│                        Version 2.0.0                                    │
-│                  Security as Code, AI-Ready                             │
-│                                                                         │
-└─────────────────────────────────────────────────────────────────────────┘
+╔══════════════════════════════════════════════════════════════════════════╗
+║                                                                          ║
+║   ██████╗ ██████╗ ███████╗███╗   ██╗███████╗███████╗ ██████╗            ║
+║  ██╔═══██╗██╔══██╗██╔════╝████╗  ██║██╔════╝██╔════╝██╔════╝            ║
+║  ██║   ██║██████╔╝█████╗  ██╔██╗ ██║███████╗█████╗  ██║                 ║
+║  ██║   ██║██╔═══╝ ██╔══╝  ██║╚██╗██║╚════██║██╔══╝  ██║                 ║
+║  ╚██████╔╝██║     ███████╗██║ ╚████║███████║███████╗╚██████╗            ║
+║   ╚═════╝ ╚═╝     ╚══════╝╚═╝  ╚═══╝╚══════╝╚══════╝ ╚═════╝            ║
+║                                                                          ║
+║                    ██╗  ██╗██╗████████╗                                  ║
+║                    ██║ ██╔╝██║╚══██╔══╝                                  ║
+║                    █████╔╝ ██║   ██║                                     ║
+║                    ██╔═██╗ ██║   ██║                                     ║
+║                    ██║  ██╗██║   ██║                                     ║
+║                    ╚═╝  ╚═╝╚═╝   ╚═╝                                     ║
+║                                                                          ║
+║                        Version 3.0.0                                     ║
+║                  Security as Code, AI-Ready                              ║
+║                                                                          ║
+╚══════════════════════════════════════════════════════════════════════════╝
 
 
 NAME
     OpenSecKit - Framework de sécurité applicative
 
 SYNOPSIS
-    Templates + CLI + Intégration Claude Code
+    CLI Rust + Templates + Intégration Claude Code
 
 DESCRIPTION
-    Framework complet pour intégrer la sécurité dans vos projets.
-
-    - 40 templates markdown organisés selon 7 principes
-    - CLI Rust pour automatiser la génération de contexte
-    - Intégration Claude Code via slash commands
-    - Agnostique du langage
+    OpenSecKit structure la sécurité via 7 principes fondamentaux
+    et des workflows guidés par IA.
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-1. DÉMARRAGE RAPIDE
+1. INSTALLATION
 
-   Installation :
+   # CLI Rust
+   $ cargo install osk
 
-      $ git clone https://github.com/Scttpr/OpenSecKit
-      $ cd OpenSecKit/cli
-      $ cargo install --path .
-
-   Utilisation :
-
-      $ cd /mon-projet
-      $ osk init
-      $ claude
-      >>> /security "système de login"
-
-   Voir QUICK-START.txt pour le guide complet.
+   # Initialiser un projet
+   $ cd mon-projet/
+   $ osk init
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-2. LES 7 PRINCIPES
+2. WORKFLOW PRINCIPAL
 
-    I    - Modélisation des menaces
-    II   - Analyse de risques
-    III  - Sécurité dès la conception
-    IV   - Tests de sécurité
-    V    - Gestion des secrets
-    VI   - Journalisation d'audit
-    VII  - Patch management
-
-   Voir constitution.md pour les détails.
-
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-3. COMMANDES CLI
-
-   osk init          Initialiser + installer slash commands
-   osk ingest        Export contexte (CI/CD)
-
-   Slash commands disponibles après init :
-      /security <feature>    Analyse constitutionnelle de sécurité
-      /audit                 Vérification conformité aux 7 principes
-      /dashboard             Vue consolidée des métriques
-      /incident <desc>       Gestion de crise et plan d'action
-      /osk-rgs               Configuration RGS et EBIOS RM
-      /osk-pca-pra           Plans de continuité et reprise
-
-   Voir cli/README.txt pour détails.
-
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-4. STRUCTURE
-
-   OpenSecKit/
-   ├── cli/                   CLI Rust
-   ├── templates/             Templates par principe (40 templates)
-   │   ├── 01-threat-modeling/
-   │   ├── 02-risk-analysis/
-   │   ├── 03-security-requirements/
-   │   ├── 04-security-testing/
-   │   ├── 05-secrets-management/
-   │   ├── 06-audit-logging/
-   │   └── 07-patch-management/
-   ├── domaines/              RGPD, NIS2, RGS (13 templates)
-   ├── prompts/               Prompts pour Claude Code
-   └── docs/                  Documentation
+   ┌─────────────────────────────────────────────────────────────────┐
+   │                      WORKFLOW OPENSECKIT V3                      │
+   ├─────────────────────────────────────────────────────────────────┤
+   │                                                                 │
+   │  osk init ──▶ /osk-configure ──▶ /osk-baseline (projet existant)│
+   │                     │                                           │
+   │                     ▼                                           │
+   │  ┌─────────────────────────────────────────────────────────┐    │
+   │  │              POUR CHAQUE FEATURE                         │    │
+   │  │                                                         │    │
+   │  │  /osk-analyze ──▶ /osk-specify ──▶ /osk-harden          │    │
+   │  │       │                                                 │    │
+   │  │       ▼                                                 │    │
+   │  │  /osk-plan ──▶ /osk-tasks                               │    │
+   │  └─────────────────────────────────────────────────────────┘    │
+   │                     │                                           │
+   │                     ▼                                           │
+   │  ┌─────────────────────────────────────────────────────────┐    │
+   │  │              CONFORMITÉ RÉGLEMENTAIRE                    │    │
+   │  │                                                         │    │
+   │  │  /osk-rgpd ──────────────▶ docs/security/rgpd/          │    │
+   │  │  /osk-rgs  ──────────────▶ docs/security/rgs/           │    │
+   │  └─────────────────────────────────────────────────────────┘    │
+   │                     │                                           │
+   │                     ▼                                           │
+   │  /osk-dashboard (monitoring) + /osk-pca-pra (continuité)        │
+   │                                                                 │
+   └─────────────────────────────────────────────────────────────────┘
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-5. MODES D'UTILISATION
+3. COMMANDES
 
-   5.1. Avec Claude Code (recommandé)
+   PHASE 0 : CONFIGURATION
 
-      $ osk init
-      $ claude
-      >>> /audit
+      osk init              Crée .osk/config.toml et télécharge templates
+      /osk-configure        Analyse le code, détecte domaines, pondère principes
+      /osk-baseline         État des lieux sécurité (projets existants)
 
-      Avantages : Modifications automatiques, pas de clés API
+   PHASE 1-4 : ANALYSE PAR FEATURE
 
-   5.2. Export contexte
+      /osk-analyze [feature]   Principes I, II  → threats.md, risks.md
+      /osk-specify [feature]   Principes III, IV → requirements.md, testing.md
+      /osk-harden [feature]    Principes V-VII → hardening.md
+      /osk-plan [feature]      Tous → plan.md
+      /osk-tasks [feature]     → tasks.md, tasks.yaml
 
-      $ osk ingest -p . -o context.txt
+   PHASE 5 : CONFORMITÉ
 
-      Usage : Copier-coller dans n'importe quel LLM
+      /osk-rgpd             RGPD : Registre Art. 30, DPIA, procédures
+      /osk-rgpd audit       RGPD : Rapport d'audit conformité
+      /osk-rgs              RGS : EBIOS RM, contexte homologation
+      /osk-rgs renew        RGS : Rapport de ré-homologation
 
-   5.3. CI/CD
+   UTILITAIRES
 
-      Intégration GitHub Actions / GitLab CI pour génération automatique.
-      Voir cli/README.txt section CI/CD pour exemples.
-
-   5.4. Templates manuels
-
-      Utiliser directement les templates markdown sans CLI.
-
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-6. DOMAINES SECTORIELS
-
-   domaines/rgpd/              Conformité RGPD (UE)
-   domaines/nis2/              Directive NIS2
-   domaines/gouvernement-rgs/  RGS (secteur public français)
-
-   Utilisation :
-
-      Détection automatique dans /security si données personnelles,
-      paiements, ou santé détectés.
-
-      Templates manuels disponibles dans domaines/{secteur}/
+      /osk-dashboard        Vue consolidée de la posture sécurité
+      /osk-pca-pra          Plans de Continuité et Reprise d'Activité
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-7. DOCUMENTATION
+4. STRUCTURE DES FICHIERS
 
-   QUICK-START.txt       Guide 10 min avec exemple e-commerce
-   constitution.md      Les 7 principes détaillés
-   FAQ.txt               Questions fréquentes
-   cli/README.txt        Documentation CLI
-   CONTRIBUTING.txt      Guide contribution
+   projet/
+   ├── .osk/                           # Espace de travail interne
+   │   ├── config.toml                 # Configuration (source de vérité)
+   │   ├── memory/
+   │   │   ├── context.md              # Faits techniques détectés
+   │   │   └── constitution.md         # Principes pondérés
+   │   ├── specs/                      # Brouillons par feature
+   │   │   └── NNN-feature/
+   │   │       ├── threats.md
+   │   │       ├── risks.md
+   │   │       ├── requirements.md
+   │   │       ├── testing.md
+   │   │       ├── hardening.md
+   │   │       ├── plan.md
+   │   │       ├── rgpd/dpia.md        # Brouillon DPIA
+   │   │       └── rgs/ebios.md        # Brouillon EBIOS
+   │   └── templates/                  # Templates téléchargés
+   │
+   └── docs/security/                  # Documentation finale (publiable)
+       ├── risks/
+       │   └── risk-register.yaml      # Registre central des risques
+       ├── rgpd/
+       │   ├── registre-traitements.md # Art. 30
+       │   ├── dpia-global.md          # DPIA consolidé
+       │   ├── procedure-violation.md  # Art. 33-34
+       │   └── AUDIT-YYYY-MM-DD.md
+       ├── rgs/
+       │   ├── EBIOS-RM-[SYSTEME].md   # EBIOS consolidé
+       │   ├── DOSSIER-HOMOLOGATION.md
+       │   └── AUDIT-YYYY-MM-DD.md
+       └── continuity/
+           ├── PCA-*.md
+           └── PRA-*.md
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-8. SUPPORT
+5. LES 7 PRINCIPES
 
-   Issues       https://github.com/Scttpr/OpenSecKit/issues
-   Discussions  https://github.com/Scttpr/OpenSecKit/discussions
-
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-9. LICENCE
-
-   MIT License
+   I    Threat Modeling      Analyse proactive des menaces (STRIDE)
+   II   Risk Analysis        Scoring et priorisation des risques
+   III  Security by Design   Exigences de sécurité dès la conception
+   IV   Security Testing     Tests SAST/DAST/SCA automatisés
+   V    Secrets Management   Aucun secret dans le code
+   VI   Audit Logging        Logs immuables et centralisés
+   VII  Patch Management     SLA stricts de mise à jour
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-   OpenSecKit v2.0.0
-   https://github.com/Scttpr/OpenSecKit
+6. DOMAINES RÉGLEMENTAIRES
+
+   RGPD     Protection des données personnelles       /osk-rgpd
+   RGS      Référentiel Général de Sécurité (France)  /osk-rgs
+   NIS2     Directive cybersécurité UE                (en cours)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+7. LIENS
+
+   constitution.md         Les 7 principes détaillés
+   cli/README.txt          Documentation du CLI
+   CONTRIBUTING.txt        Guide de contribution
+   domaines/README.md      Domaines réglementaires
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+OpenSecKit v3.0.0
+https://github.com/Scttpr/OpenSecKit
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

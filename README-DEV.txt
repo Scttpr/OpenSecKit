@@ -1,7 +1,7 @@
 ╔══════════════════════════════════════════════════════════════════════════╗
 ║                       OPENSECKIT - DEV GUIDE                             ║
 ║                       Guide développeur                                  ║
-║                          Version 2.0.0                                   ║
+║                          Version 3.0.0                                   ║
 ╚══════════════════════════════════════════════════════════════════════════╝
 
 
@@ -31,12 +31,21 @@ NAME
    $ npm run check:rust                 # Rust linting
 
 
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+3. TEST LOCAL
+
+   $ ./scripts/test-local.sh            # Crée projet test + osk init
+   $ ./scripts/test-local.sh /path      # Teste sur projet existant
+   $ ./scripts/test-local.sh --clean    # Nettoie projets test
+
+
 NOTE
    Tout est installé localement. Rien de global.
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-OpenSecKit Dev Guide v2.0.0
+OpenSecKit Dev Guide v3.0.0
 https://github.com/Scttpr/OpenSecKit
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
