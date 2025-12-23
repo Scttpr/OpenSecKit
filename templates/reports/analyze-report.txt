@@ -44,9 +44,9 @@ TOP 3 RISQUES À TRAITER
 {{index}}. {{id}} : {{titre}} (Score: {{score}}, Échéance: {{echeance}}) {{icon}}
 {{/each}}
 
-ACTIONS DISPONIBLES
+PROCHAINES ÉTAPES
 ├── /osk-specify {{feature}}  → Définir exigences de sécurité
-├── /osk-resolve RISK-ID      → Marquer un risque résolu
-├── /osk-verify               → Vérifier les corrections
-└── /osk-dashboard            → Vue consolidée
+├── /osk-harden {{feature}}   → Mesures de durcissement
+├── /osk-plan {{feature}}     → Consolider le plan
+└── /osk-tasks {{feature}}    → Générer les tâches
 ============================================================

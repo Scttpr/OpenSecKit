@@ -18,7 +18,6 @@ templates/
 │   ├── patch-entry.yaml      # Format dépendance à patcher
 │   ├── plan-action.yaml      # Format action du plan
 │   ├── task-entry.yaml       # Format tâche atomique
-│   ├── resolution-entry.yaml # Format résolution risque
 │   └── rgpd-treatment.yaml   # Format traitement RGPD
 │
 ├── outputs/              # Templates de fichiers générés
@@ -42,7 +41,7 @@ templates/
     ├── harden-report.txt     # Rapport durcissement
     ├── plan-report.txt       # Rapport plan
     ├── tasks-report.txt      # Rapport tâches
-    ├── resolve-report.txt    # Rapport résolution
+    ├── implement-report.txt  # Rapport implémentation
     ├── dashboard-report.txt  # Rapport dashboard
     ├── configure-report.txt  # Rapport configuration
     ├── pca-pra-report.txt    # Rapport PCA/PRA

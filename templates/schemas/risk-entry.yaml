@@ -55,14 +55,14 @@ dates:
 assignee: null                     # Email ou ID du responsable
 equipe: null                       # Équipe responsable
 
-# Résolution (rempli par /osk-resolve)
+# Résolution (rempli automatiquement par /osk-implement)
 resolution:
   commit: null                     # SHA du commit de fix
   pr: null                         # Numéro de PR (#123)
   description: null                # Description de la correction
   controles_implementes: []        # Liste des contrôles ajoutés
 
-# Vérification (rempli par /osk-verify)
+# Vérification (audit manuel ou CI/CD)
 verification:
   sast_pass: null
   dast_pass: null
