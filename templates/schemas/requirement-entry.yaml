@@ -1,5 +1,5 @@
 # OpenSecKit - Schéma Requirement Entry
-# Version: 3.0.1
+# Version: 3.1.0
 # Usage: Format d'une exigence de sécurité (Principe III)
 
 id: "[AUTH|AUTHZ|VAL|CRYPTO]-[FEATURE]-[NNN]"

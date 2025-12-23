@@ -5,7 +5,7 @@ Initialise un projet avec OpenSecKit.
 ## Synopsis
 
 ```bash
-osk init [--force]
+osk init [OPTIONS]
 ```
 
 ## Description
@@ -14,24 +14,78 @@ osk init [--force]
 
 1. Crée la structure `.osk/`
 2. Télécharge les templates et prompts
-3. Installe les slash commands dans `.claude/commands/`
-4. Détecte automatiquement la stack technique
+3. Détecte automatiquement la stack technique
+4. Configure l'agent AI de votre choix (Claude Code, Copilot, Cursor, Gemini)
 
 ## Options
 
 | Option | Description |
 |--------|-------------|
 | `--force`, `-f` | Force la mise à jour des ressources |
+| `--default`, `-d` | Mode non-interactif avec valeurs par défaut (pour CI) |
+| `--agent <AGENT>`, `-a` | Agent AI cible : `claude-code`, `copilot`, `cursor`, `gemini` |
+| `--all-agents` | Installe la configuration pour tous les agents |
+
+## Agents Supportés
+
+| Agent | Fichiers générés |
+|-------|------------------|
+| `claude-code` | `.claude/commands/*.md` (slash commands) |
+| `copilot` | `.github/copilot-instructions.md` |
+| `cursor` | `.cursor/rules/openseckit.md` |
+| `gemini` | `.gemini/instructions.md` |
 
 ## Exemples
 
 ```bash
-# Installation initiale
+# Installation interactive (sélection d'agent)
 cd mon-projet/
 osk init
 
+# Installation avec agent spécifique
+osk init --agent copilot
+osk init --agent cursor
+
+# Installation pour tous les agents
+osk init --all-agents
+
+# Mode CI (non-interactif, Claude Code par défaut)
+osk init --default
+
 # Mise à jour forcée
-osk init --force
+osk init --force --agent claude-code
+```
+
+## Sélection Interactive
+
+Sans l'option `--agent`, une sélection interactive s'affiche :
+
+```
+? Quel agent AI voulez-vous configurer ?
+❯ Claude Code ✓
+  GitHub Copilot ✓
+  Cursor (non détecté)
+  Gemini (non détecté)
+```
+
+Les agents installés sur le système sont marqués avec ✓.
+
+## Output
+
+L'installation affiche un résumé condensé par module :
+
+```
+🚀 Initialisation de OpenSecKit v3.1.0
+
+   📦 Modules chargés:
+      ✓ Core          13 prompts, 11 schemas, 12 outputs
+      ✓ RGPD          8 fichiers
+      ✓ RGS           12 fichiers
+
+   🤖 Agent(s) configuré(s):
+      ✓ Claude Code → .claude/commands/ (13 slash commands)
+
+✅ OpenSecKit prêt !
 ```
 
 ## Fichiers Créés
@@ -50,15 +104,20 @@ osk init --force
 └── specs/               # Spécifications par feature
 ```
 
-### Structure `.claude/`
+### Fichiers Agent (selon choix)
 
 ```
-.claude/
-└── commands/            # Slash commands installés
-    ├── osk-configure.md
-    ├── osk-baseline.md
-    ├── osk-analyze.md
-    └── ...
+# Claude Code
+.claude/commands/*.md
+
+# GitHub Copilot
+.github/copilot-instructions.md
+
+# Cursor
+.cursor/rules/openseckit.md
+
+# Gemini
+.gemini/instructions.md
 ```
 
 ## Comportement avec `--force`
@@ -67,20 +126,32 @@ osk init --force
 |----------|--------------|
 | `.osk/prompts/` | ✅ Écrasé |
 | `.osk/templates/` | ✅ Écrasé |
-| `.claude/commands/` | ✅ Écrasé |
+| Fichiers agent | ✅ Écrasé |
 | `.osk/config.toml` | ✅ Re-demandé |
 | `docs/security/` | ❌ Préservé |
 | `.osk/memory/` | ❌ Préservé |
 | `.osk/specs/` | ❌ Préservé |
 
 !!! warning "Attention"
-    Si vous avez modifié manuellement les slash commands dans `.claude/commands/`, ces modifications seront perdues avec `--force`.
+    Si vous avez modifié manuellement les fichiers agent, ces modifications seront perdues avec `--force`.
 
 ## Prochaine étape
 
-Après `osk init`, lancez Claude Code et configurez le projet :
+Après `osk init`, lancez votre agent AI et configurez le projet :
 
-```bash
-claude
->>> /osk-configure
-```
+=== "Claude Code"
+    ```bash
+    claude
+    >>> /osk-configure
+    ```
+
+=== "GitHub Copilot"
+    ```
+    Ouvrez VS Code avec GitHub Copilot et demandez :
+    "Analyse la sécurité de ce projet avec OpenSecKit"
+    ```
+
+=== "Cursor"
+    ```
+    Ouvrez Cursor, les règles OSK sont chargées automatiquement
+    ```

@@ -1,5 +1,5 @@
 # OpenSecKit - Schéma Plan Action
-# Version: 3.0.1
+# Version: 3.1.0
 # Usage: Format d'une action dans le plan d'implémentation
 
 id: "P[PHASE]-[NNN]"

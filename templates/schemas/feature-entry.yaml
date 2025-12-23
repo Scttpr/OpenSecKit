@@ -1,5 +1,5 @@
 # OpenSecKit - Schéma Feature Entry
-# Version: 3.0.1
+# Version: 3.1.0
 # Usage: Format d'une feature dans features.yaml
 
 id: "[identifiant court]"           # ex: auth, payments, admin

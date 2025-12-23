@@ -16,7 +16,7 @@ docs/security/risks/risk-register.yaml
 ```yaml
 # docs/security/risks/risk-register.yaml
 metadata:
-  version: "3.0.1"
+  version: "3.1.0"
   last_updated: "2025-01-15T14:30:00Z"
 
 stats:

@@ -7,7 +7,12 @@ use reqwest::blocking::Client;
 
 pub fn handle(command: Commands, client: &Client) -> Result<()> {
     match command {
-        Commands::Init { force, default } => init::run(client, force, default),
+        Commands::Init {
+            force,
+            default,
+            agent,
+            all_agents,
+        } => init::run(client, force, default, agent, all_agents),
         Commands::Ingest { output, path } => ingest::run(&output, true, &path),
     }
 }

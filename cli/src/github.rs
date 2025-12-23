@@ -96,12 +96,5 @@ pub fn download_file(
     let content = resp.text().context("Erreur lecture content")?;
     fs::write(local_path, content).context("Erreur écriture disque")?;
 
-    println!(
-        "   📄 Installé : {:?}",
-        local_path
-            .file_name()
-            .unwrap_or(std::ffi::OsStr::new("inconnu"))
-    );
-
     Ok(())
 }

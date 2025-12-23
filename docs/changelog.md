@@ -2,6 +2,40 @@
 
 Historique des versions OpenSecKit.
 
+## Version 3.1.0 - 2025-12-23
+
+### Nouvelles fonctionnalités
+
+- **Support Multi-Agent**
+    - Claude Code (slash commands)
+    - GitHub Copilot (instructions)
+    - Cursor (rules)
+    - Gemini (instructions)
+
+- **Sélection interactive d'agent**
+    - `osk init` affiche un menu de sélection
+    - Détection automatique des agents installés
+    - Option `--agent <nom>` pour sélection directe
+    - Option `--all-agents` pour tous les agents
+
+- **Rôles de sécurité** (inspirés de SpecKit)
+    - Risk Owner, Security Architect, Security Engineer
+    - Security Reviewer, Privacy Analyst, Compliance Officer
+    - SecOps Engineer
+    - Chaque commande mappée à un rôle
+
+### Améliorations
+
+- **Output condensé** lors de `osk init`
+    - Résumé par module au lieu de liste de fichiers
+    - Affichage clair des agents configurés
+
+- **Registry enrichi**
+    - Champs `agents` et `roles` par commande
+    - Section `[roles]` avec définitions
+
+---
+
 ## Version 3.0.1 - 2025-12-23
 
 ### Nouvelles fonctionnalités

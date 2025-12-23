@@ -1,8 +1,8 @@
 # OpenSecKit
 
 <div align="center">
-<h2>Security as Code, AI-Ready</h2>
-<p><strong>Version 3.0.1</strong></p>
+<h2>Security as Code, Multi-Agent Ready</h2>
+<p><strong>Version 3.1.0</strong></p>
 </div>
 
 ---

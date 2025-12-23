@@ -1,10 +1,10 @@
 <p align="center">
   <h1 align="center">OpenSecKit</h1>
   <p align="center">
-    <strong>Security as Code, AI-Ready</strong>
+    <strong>Security as Code, Multi-Agent Ready</strong>
   </p>
   <p align="center">
-    Framework de sécurité applicative avec intégration Claude Code
+    Framework de sécurité applicative multi-agent (Claude Code, Copilot, Cursor, Gemini)
   </p>
 </p>
 
@@ -20,7 +20,7 @@
 ## Pourquoi OpenSecKit ?
 
 - 🛡️ **7 principes constitutionnels** pour une sécurité complète
-- 🤖 **Intégration Claude Code** via slash commands
+- 🤖 **Multi-Agent** : Claude Code, GitHub Copilot, Cursor, Gemini
 - 📄 **Documentation as Code** générée automatiquement
 - ⚖️ **Conformité RGPD/RGS** intégrée
 
@@ -30,9 +30,14 @@
 # Installer le CLI
 cargo install osk
 
-# Initialiser un projet
+# Initialiser un projet (sélection interactive d'agent)
 cd mon-projet/
 osk init
+
+# Ou spécifier l'agent directement
+osk init --agent copilot
+osk init --agent cursor
+osk init --all-agents
 ```
 
 ## Quickstart

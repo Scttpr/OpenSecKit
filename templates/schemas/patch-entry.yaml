@@ -1,5 +1,5 @@
 # OpenSecKit - Schéma Patch Entry
-# Version: 3.0.1
+# Version: 3.1.0
 # Usage: Format d'une dépendance à patcher (Principe VII)
 
 package: "[nom du package]"

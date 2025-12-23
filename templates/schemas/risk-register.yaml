@@ -1,9 +1,9 @@
 # OpenSecKit - Schéma Risk Register
-# Version: 3.0.1
+# Version: 3.1.0
 # Usage: Structure du fichier docs/security/risks/risk-register.yaml
 
 metadata:
-  version: "3.0.1"
+  version: "3.1.0"
   created_by: "[/osk-baseline ou /osk-analyze]"
   created_at: "[DATE ISO]"
   last_updated: "[DATE ISO]"
