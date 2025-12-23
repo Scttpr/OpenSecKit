@@ -1,11 +1,12 @@
 {
   "name": "openseckit",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "private": true,
   "description": "Security as Code framework - Dev dependencies",
   "scripts": {
     "check:links": "markdown-link-check --config .github/link-check-config.json",
-    "check:links:all": "git ls-files '*.md' | xargs -n1 npm run check:links --",
+    "check:links:all": "./scripts/check-links.sh",
+    "check:links:file": "markdown-link-check --config .github/link-check-config.json",
     "check:frontmatter": "bash -c 'source .venv/bin/activate && python3 scripts/validate-frontmatter.py'",
     "check:rust": "cd cli && cargo fmt -- --check && cargo clippy",
     "lint": "npm run check:links:all && npm run check:frontmatter && npm run check:rust",

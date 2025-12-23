@@ -1127,4 +1127,4 @@ Vraisemblance│  Gravité →
 **Dernière Mise à Jour** : 2025-01-19
 **Mainteneur** : SSDLC Toolkit - Domaine Gouvernement-RGS
 
-Pour questions ou contributions, voir [Guide de Contribution](../../../.github/CONTRIBUTING.txt).
+Pour questions ou contributions, voir [Guide de Contribution](../../../CONTRIBUTING.txt).

@@ -1,87 +1,173 @@
-# Domaine RGPD – Conformité opérationnelle
+# Domaine RGPD
 
-Ce module fournit un kit complet pour mettre en œuvre la conformité RGPD (Règlement (UE) 2016/679) au sein de vos projets logiciels.
+Conformité au Règlement Général sur la Protection des Données (UE 2016/679).
 
-L'objectif est de passer d'une conformité « théorique » à une conformité **opérationnelle**, alignée avec la réalité technique de votre code.
+## Commande
 
-## ⚡️ Modes d'utilisation
-
-Choisissez l'approche qui correspond à votre maturité et à vos outils :
-
-### 🤖 Option A : Workflow automatisé (Agent IA)
-*Idéal pour : Équipes Tech, CI/CD, Projets complexes.*
-
-1.  **Extraction** : Un agent IA analyse votre code pour préremplir le contexte.
-2.  **Centralisation** : Vous validez un fichier unique (`gdpr-context.yaml`).
-3.  **Génération** : Les documents sont générés automatiquement depuis ce contexte.
-
-### ✍️ Option B : Workflow manuel (Classique)
-*Idéal pour : Petits projets, DPO sans accès au code, Démarrage rapide.*
-
-1.  **Sélection** : Choisissez le modèle pertinent dans le catalogue ci-dessous.
-2.  **Édition** : Recherchez les textes entre crochets `[...]` et remplacez-les par vos informations.
-3.  **Validation** : Relisez et exportez le document final.
-
----
-
-## 🛠️ Le système de configuration (Pour l'option A)
-
-### 1. La source de vérité : `gdpr-context.yaml`
-
-Si vous choisissez l'automatisation, ce fichier (à placer à la racine, ex : `.github/compliance/`) centralise toutes les données variables. Il permet de mettre à jour cinq documents en ne modifiant qu'une seule ligne.
-
-### 2. Comment générer le contexte (Prompt système)
-
-Fournissez ce prompt à votre assistant IA (Claude, GPT-4o, etc.) avec votre code et le fichier `gdpr-context.skeleton.yaml` :
-
-```text
-Rôle : Expert en audit de conformité technique.
-Tâche : Générer le fichier 'gdpr-context.yaml' via l'analyse du code.
-Instructions :
-1. IDENTITÉ : Scanne README/LICENSE pour le nom légal et les contacts.
-2. INFRA : Scanne Terraform/Docker pour le chiffrement et les backups.
-3. SOUS-TRAITANTS : Scanne package.json/go.mod pour les services tiers (AWS, Stripe...).
-4. DONNÉES : Scanne les schémas BDD pour les champs personnels (PII).
-5. FORMAT : Remplis le template squelette. Utilise <HUMAN_INPUT_REQUIRED> si l'information est inconnue.
+```bash
+/osk-rgpd           # Configuration et génération documents
+/osk-rgpd audit     # Audit de conformité
 ```
 
-## 📂 Catalogue des modèles
+## Workflow V3
 
-Ces modèles sont conçus pour être juridiquement robustes tout en restant compréhensibles pour des équipes techniques.
+```
+┌─────────────────────────────────────────────────────────────┐
+│  BROUILLONS PAR FEATURE                                     │
+│                                                             │
+│  /osk-analyze [feature]                                     │
+│       │                                                     │
+│       └──▶ .osk/specs/NNN-feature/rgpd/dpia.md             │
+│            (DPIA brouillon par feature)                     │
+└─────────────────────────────────────────────────────────────┘
+                          │
+                          ▼
+┌─────────────────────────────────────────────────────────────┐
+│  CONSOLIDATION RGPD                                         │
+│                                                             │
+│  /osk-rgpd                                                  │
+│       │                                                     │
+│       ├──▶ Extraction données depuis .osk/config.toml      │
+│       ├──▶ Consolidation DPIA → dpia-global.md             │
+│       └──▶ Génération documents finaux                      │
+└─────────────────────────────────────────────────────────────┘
+```
 
-| Fichier | Titre | Usage / Obligation RGPD |
-| :--- | :--- | :--- |
-| [`gdpr-privacy-notice-template.md`](templates/gdpr-privacy-notice-template.md) | **Avis de confidentialité** | **Public**. Informe les utilisateurs (Art. 13-14). À publier sur le site/app. |
-| [`gdpr-records-of-processing.md`](templates/gdpr-records-of-processing.md) | **Registre des traitements** | **Interne**. Inventaire obligatoire des flux de données (Art. 30). À présenter à la CNIL sur demande. |
-| [`gdpr-data-processing-agreement.md`](templates/gdpr-data-processing-agreement.md) | **DPA (Accord de traitement)** | **Contractuel**. À signer avec chaque sous-traitant ou client B2B (Art. 28). |
-| [`gdpr-breach-notification-template.md`](templates/gdpr-breach-notification-template.md) | **Notification de violation** | **Urgence**. Procédure et modèle pour la réponse aux incidents sous 72 h (Art. 33-34). |
-| [`gdpr-dpia-template.md`](templates/gdpr-dpia-template.md) | **AIPD (Analyse d'impact)** | **Risque**. Obligatoire pour les traitements à haut risque (Art. 35). |
+## Documents Générés
 
----
+| Fichier | Article RGPD | Description |
+|---------|--------------|-------------|
+| `registre-traitements.md` | Art. 30 | Inventaire des traitements |
+| `dpia-global.md` | Art. 35 | Analyse d'impact consolidée |
+| `procedure-violation.md` | Art. 33-34 | Notification en 72h |
+| `politique-conservation.md` | Art. 5 | Durées de conservation |
+| `mentions-legales.md` | Art. 13-14 | Transparence utilisateurs |
+| `AUDIT-*.md` | - | Rapports d'audit |
 
-## 🔗 Correspondance avec OpenSecKit
+Tous les fichiers sont générés dans `docs/security/rgpd/`.
 
-La conformité RGPD s'appuie sur les principes de sécurité constitutionnels du framework :
+## Configuration
 
-| Principe SSDLC | Exigence RGPD | Implémentation |
-| :--- | :--- | :--- |
-| **I - Threat Modeling** | Privacy by Design (Art. 25) | Intégré dans l'AIPD |
-| **II - Risk Analysis** | Approche par les risques | Matrice de risques dans l'AIPD |
-| **III - Security by Design** | Mesures techniques (Art. 32) | Annexe B du DPA et Registre |
-| **V - Secrets Management** | Chiffrement / Pseudonymisation | Vérification technique |
-| **VI - Audit Logging** | Responsabilité (Accountability) | Registre (RoPA) et logs d'incidents |
+Les données RGPD sont stockées dans `.osk/config.toml` :
 
----
+```toml
+[domains.rgpd]
+enabled = true
+niveau = "sensible"           # standard | sensible | special
 
-## 🚦 Premiers pas
+# DPO
+dpo_nom = "Jean Dupont"
+dpo_email = "dpo@example.com"
+dpo_telephone = "+33 1 23 45 67 89"
 
-**Pour l'option automatisée :**
-1.  Copiez `gdpr-context.skeleton.yaml` dans votre projet.
-2.  Lancez le prompt système sur votre code.
-3.  Validez le YAML généré.
-4.  Injectez les variables dans les modèles.
+# Conservation
+durees_conservation = [
+  { type = "logs_connexion", duree = "1 an" },
+  { type = "donnees_client", duree = "3 ans après fin contrat" }
+]
 
-**Pour l'option manuelle :**
-1.  Ouvrez le fichier [`gdpr-records-of-processing.md`](templates/gdpr-records-of-processing.md) pour commencer votre inventaire.
-2.  Recherchez `[...` dans votre éditeur pour trouver les champs à remplir.
-3.  Supprimez les sections non pertinentes (ex : supprimez la partie « Sous-traitant » si vous êtes « Responsable »).
+# Traitements principaux
+[[domains.rgpd.traitements]]
+nom = "Gestion des utilisateurs"
+finalite = "Authentification et gestion des comptes"
+base_legale = "contrat"
+donnees = ["nom", "email", "mot_de_passe_hash"]
+destinataires = ["Service technique"]
+```
+
+## Données Partagées
+
+Ces sections de config sont partagées avec `/osk-rgs` :
+
+```toml
+[domains.organisation]
+nom = "Mon Organisation"
+siret = "123 456 789 00000"
+adresse = "1 rue Example, 75001 Paris"
+
+[[domains.suppliers]]         # Art. 28 - Sous-traitants
+nom = "OVH"
+type = "hebergement"
+localisation = "France"
+dpa_signe = true
+contact = "dpo@ovh.com"
+```
+
+## Articles Clés
+
+### Art. 30 - Registre des Traitements
+
+**Obligatoire pour :**
+- Organisations > 250 employés
+- Traitements non occasionnels
+- Données sensibles ou relatives à des condamnations
+
+### Art. 35 - DPIA
+
+**Obligatoire si :**
+- Évaluation systématique (profilage)
+- Traitement grande échelle de données sensibles
+- Surveillance systématique de zones publiques
+
+### Art. 33-34 - Violation de Données
+
+| Délai | Action |
+|-------|--------|
+| 72h | Notification CNIL (si risque) |
+| Sans délai | Notification personnes (si risque élevé) |
+
+## Checklist Conformité
+
+```
+PRE-PRODUCTION
+─────────────
+[ ] Registre des traitements complet
+[ ] Base légale identifiée par traitement
+[ ] DPO désigné (si requis)
+[ ] Mentions légales publiées
+[ ] DPIA réalisée (si risque élevé)
+
+CONTRATS
+────────
+[ ] DPA signés avec sous-traitants
+[ ] Clauses RGPD dans CGV/CGU
+[ ] Transferts hors UE encadrés
+
+TECHNIQUE
+─────────
+[ ] Chiffrement données sensibles
+[ ] Logs d'accès aux données personnelles
+[ ] Procédure de réponse aux demandes (accès, effacement)
+[ ] Procédure de notification violation
+```
+
+## Détection Automatique
+
+`/osk-configure` détecte les patterns RGPD dans le code :
+
+```
+Patterns détectés → Domaine RGPD activé automatiquement :
+  • "user", "email", "password"
+  • "date_of_birth", "address", "phone"
+  • "ip_address", "health", "religion"
+  • "biometric", "RGPD", "GDPR"
+```
+
+## Templates
+
+Les templates RGPD sont dans `domaines/rgpd/templates/` :
+
+| Template | Usage |
+|----------|-------|
+| `registre-traitements-template.md` | Format registre Art. 30 |
+| `dpia-template.md` | Méthodologie DPIA CNIL |
+| `procedure-violation-template.md` | Notification Art. 33-34 |
+| `dpa-template.md` | Accord sous-traitance Art. 28 |
+
+> `/osk-rgpd` utilise ces templates automatiquement.
+
+## Références
+
+- [CNIL - Guide RGPD](https://www.cnil.fr/fr/rgpd-de-quoi-parle-t-on)
+- [CNIL - Méthodologie DPIA](https://www.cnil.fr/fr/ce-quil-faut-savoir-sur-lanalyse-dimpact-relative-la-protection-des-donnees-dpia)
+- [EUR-Lex - Règlement 2016/679](https://eur-lex.europa.eu/legal-content/FR/TXT/?uri=CELEX%3A32016R0679)

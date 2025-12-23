@@ -21,7 +21,7 @@ Tu es le **Business Continuity Architect**. Ta mission est de générer des docu
 
 ```yaml
 sources_primaires:
-  - path: ".osk/rgs-context.yaml"
+  - path: ".osk/config.toml [domains.rgs]"
     extrait:
       - systeme.nom
       - systeme.description
@@ -101,7 +101,7 @@ Sources analysées :
 ┌─────────────────────────────────────────────────────────────────┐
 │ Source                      │ Statut │ Données extraites        │
 ├─────────────────────────────┼────────┼──────────────────────────┤
-│ .osk/rgs-context.yaml       │ ✅     │ RTO=4h, RPO=1h, 8 contacts│
+│ .osk/config.toml [domains.rgs]       │ ✅     │ RTO=4h, RPO=1h, 8 contacts│
 │ docs/context/meta.md        │ ✅     │ Stack: Python/FastAPI    │
 │ docs/security/risks/risk-register │ ✅     │ 12 risques identifiés    │
 │ docs/security/rgs/EBIOS-RM-*    │ ✅     │ 5 scénarios sinistre     │
@@ -143,7 +143,7 @@ Le wizard va compléter les informations manquantes.
 ```
 ⏱️ Métriques de Continuité
 
-Valeurs extraites de rgs-context.yaml :
+Valeurs extraites de config.toml [domains.rgs] :
   • RTO (Recovery Time Objective) : [AUTO: rto_heures] heures
   • RPO (Recovery Point Objective) : [AUTO: rpo_heures] heures
   • SLA Disponibilité : [AUTO: sla_disponibilite]
@@ -356,7 +356,7 @@ questions:
 **Afficher les contacts extraits** :
 
 ```
-👥 Contacts extraits de rgs-context.yaml
+👥 Contacts extraits de config.toml [domains.rgs]
 
 • Autorité d'homologation : [AUTO: nom] - [AUTO: email]
 • RSSI : [AUTO: nom] - [AUTO: email]
@@ -724,4 +724,4 @@ curl -f http://localhost/health || exit 1
 5. **Testabilité** : Les scripts générés doivent être testables immédiatement
 6. **Cohérence RGS** : S'assurer que les métriques sont cohérentes avec le niveau RGS cible
 7. **Deux documents** : Toujours générer PCA ET PRA ensemble (complémentaires)
-8. **Mise à jour contexte** : Proposer de mettre à jour `.osk/rgs-context.yaml` avec les nouvelles informations collectées
+8. **Mise à jour contexte** : Proposer de mettre à jour `.osk/config.toml [domains.rgs]` avec les nouvelles informations collectées

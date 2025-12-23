@@ -13,6 +13,9 @@ pub enum Commands {
     Init {
         #[arg(long, short)]
         force: bool,
+        /// Mode non-interactif avec valeurs par défaut (pour CI/tests)
+        #[arg(long, short)]
+        default: bool,
     },
 
     Ingest {

@@ -1,7 +1,7 @@
 ╔══════════════════════════════════════════════════════════════════════════╗
 ║                         OPENSECKIT - CLI                                 ║
 ║              CLI pour générer des slash commands                         ║
-║                          Version 2.0.0                                   ║
+║                          Version 3.0.0                                   ║
 ╚══════════════════════════════════════════════════════════════════════════╝
 
 
@@ -35,22 +35,36 @@ SYNOPSIS
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-3. WORKFLOW TYPIQUE
+3. WORKFLOW V3
 
-   [1] osk init              Initialise + installe slash commands
-   [2] claude                Lancer Claude Code
-   [3] /security "login"     Analyser sécurité d'une fonctionnalité
-   [4] /audit                Vérifier conformité aux 7 principes
-   [5] /dashboard            Vue consolidée des métriques
-   [6] /incident "..."       Gérer un incident de sécurité
+   [1] osk init                   Initialise le projet + installe slash commands
+   [2] claude                     Lancer Claude Code
+   [3] /osk-configure             Configuration intelligente (analyse code)
+   [4] /osk-baseline              État des lieux sécurité (projets existants)
+   [5] /osk-analyze "feature"     Analyse menaces et risques
+   [6] /osk-specify "feature"     Exigences de sécurité
+   [7] /osk-harden "feature"      Durcissement
+   [8] /osk-plan "feature"        Plan d'implémentation
+   [9] /osk-tasks "feature"       Génération des tâches
 
    Slash commands disponibles :
-      /security <feature>  - Analyse constitutionnelle complète
-      /audit               - Vérification conformité et risk register
-      /dashboard           - Tableau de bord et métriques clés
-      /incident <desc>     - Gestion de crise et plan d'action
-      /osk-rgs             - Configuration RGS et EBIOS RM
-      /osk-pca-pra         - Plans de continuité et reprise
+
+      Workflow principal :
+      /osk-configure      - Configuration intelligente (analyse code, domaines)
+      /osk-baseline       - État des lieux sécurité (projets existants)
+      /osk-analyze        - Analyse menaces et risques (Principes I & II)
+      /osk-specify        - Exigences et tests (Principes III & IV)
+      /osk-harden         - Durcissement (Principes V, VI & VII)
+      /osk-plan           - Plan d'implémentation consolidé
+      /osk-tasks          - Génération des tâches ordonnées
+
+      Domaines réglementaires :
+      /osk-rgpd           - Conformité RGPD et registre des traitements
+      /osk-rgs            - Conformité RGS et EBIOS RM
+
+      Monitoring et continuité :
+      /osk-dashboard      - Tableau de bord et métriques clés
+      /osk-pca-pra        - Plans de continuité et reprise
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -71,14 +85,6 @@ SYNOPSIS
       Options :
          --force / -f : Force la mise à jour des ressources
 
-      Slash commands disponibles après init :
-         /security   - Analyse constitutionnelle de sécurité
-         /audit      - Vérification conformité aux 7 principes
-         /dashboard  - Tableau de bord et métriques clés
-         /incident   - Gestion de crise et plan d'action
-         /osk-rgs    - Configuration RGS et EBIOS RM
-         /osk-pca-pra - Plans de continuité et reprise
-
       Mise à jour des slash commands :
          $ osk init --force
 
@@ -96,6 +102,7 @@ SYNOPSIS
          Code source du projet
          Historique git
          .osk/memory/            Mémoire conversations
+         .osk/specs/             Spécifications features
 
       Attention : Si vous avez modifié manuellement les slash commands dans
       .claude/commands/, ces modifications seront perdues. Versionnez-les
@@ -172,10 +179,21 @@ SYNOPSIS
 
       [project]
       name = "mon-projet"
-      stack = ["rust", "node"]
 
-      [memory]
-      max_tokens = 100000
+      [stack]
+      detected = ["rust", "node"]
+      custom = []
+
+      [domains]
+      active = ["rgpd", "rgs"]
+
+      [domains.rgpd]
+      enabled = true
+      niveau = "standard"
+
+      [domains.rgs]
+      enabled = true
+      niveau = "standard"
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -185,41 +203,56 @@ SYNOPSIS
    Par osk init :
 
    .osk/
-   ├── config.toml              Configuration
-   ├── templates/               Templates téléchargés
-   └── prompts/                 Prompts sources
+   ├── config.toml              Configuration projet
+   ├── registry.toml            Registre des commandes
+   ├── constitution.md          Constitution sécurité
+   ├── prompts/                  Prompts sources
+   ├── templates/                Templates
+   ├── domaines/                 Domaines réglementaires
+   ├── memory/                   Mémoire contextuelle
+   │   ├── context.md           Contexte projet (/osk-configure)
+   │   └── constitution.md      Constitution pondérée (/osk-configure)
+   └── specs/                    Spécifications par feature
+       └── NNN-feature/         Dossier feature (/osk-analyze)
+           ├── analysis.md      Analyse menaces et risques
+           ├── requirements.md  Exigences de sécurité
+           ├── hardening.md     Mesures de durcissement
+           ├── plan.md          Plan d'implémentation
+           ├── tasks.md         Tâches ordonnées
+           ├── rgpd/dpia.md     Brouillon DPIA
+           └── rgs/ebios.md     Brouillon EBIOS
 
    .claude/
-   └── commands/                Slash commands installés par init
-       ├── osk-security.md      → /security
-       ├── osk-audit.md         → /audit
-       ├── osk-dashboard.md     → /dashboard
-       ├── osk-incident.md      → /incident
+   └── commands/                Slash commands installés
+       ├── osk-configure.md     → /osk-configure
+       ├── osk-baseline.md      → /osk-baseline
+       ├── osk-analyze.md       → /osk-analyze
+       ├── osk-specify.md       → /osk-specify
+       ├── osk-harden.md        → /osk-harden
+       ├── osk-plan.md          → /osk-plan
+       ├── osk-tasks.md         → /osk-tasks
+       ├── osk-rgpd.md          → /osk-rgpd
        ├── osk-rgs.md           → /osk-rgs
+       ├── osk-dashboard.md     → /osk-dashboard
        └── osk-pca-pra.md       → /osk-pca-pra
 
    Par les slash commands (via Claude Code) :
 
-   docs/
-   ├── context/
-   │   └── meta.md              Contexte projet (/security init)
-   └── security/
-       ├── features/            Analyses par feature (/security)
-       │   └── SEC-*.md
-       ├── risks/               Registre des risques (/security)
-       │   ├── risk-register.yaml
-       │   └── RISK-REGISTER.md
-       ├── audits/              Rapports d'audit (/audit)
-       │   └── AUDIT-*.md
-       ├── rgs/                 Documents RGS (/audit rgs, /osk-rgs)
-       │   ├── EBIOS-RM-*.md
-       │   └── DOSSIER-HOMOLOGATION-*.md
-       ├── continuity/          Plans PCA/PRA (/osk-pca-pra)
-       │   ├── PCA-*.md
-       │   └── PRA-*.md
-       ├── incidents/           Rapports d'incidents (/incident)
-       │   └── INC-*.md
-       └── DASHBOARD.md         Tableau de bord (/dashboard)
+   docs/security/
+   ├── risks/                   Registre des risques
+   │   └── risk-register.yaml   Fichier consolidé
+   ├── rgpd/                    Documents RGPD (/osk-rgpd)
+   │   ├── registre-traitements.md
+   │   ├── dpia-global.md       DPIA consolidé
+   │   └── procedure-violation.md
+   ├── rgs/                     Documents RGS (/osk-rgs)
+   │   ├── EBIOS-RM-*.md        Analyse EBIOS consolidée
+   │   ├── DOSSIER-HOMOLOGATION-*.md
+   │   └── MCS-*.md
+   ├── continuity/              Plans PCA/PRA (/osk-pca-pra)
+   │   ├── PCA-*.md
+   │   └── PRA-*.md
+   └── DASHBOARD.md             Tableau de bord (/osk-dashboard)
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -238,7 +271,7 @@ SYNOPSIS
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-OpenSecKit CLI v2.0.0
+OpenSecKit CLI v3.0.0
 https://github.com/Scttpr/OpenSecKit
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

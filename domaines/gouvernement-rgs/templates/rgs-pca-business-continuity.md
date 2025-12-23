@@ -19,8 +19,8 @@ prerequisites:
   - "DICP évalués"
   - "Architecture système documentée"
 auto_fill_sources:
-  - ".osk/rgs-context.yaml"
-  - "docs/context/meta.md"
+  - ".osk/config.toml"
+  - ".osk/memory/context.md"
   - "docs/security/risks/risk-register.yaml"
   - "docs/security/rgs/EBIOS-RM-*.md"
 ---
@@ -32,10 +32,10 @@ auto_fill_sources:
 INSTRUCTIONS DE PRÉ-REMPLISSAGE AUTOMATIQUE
 
 Ce template peut être partiellement pré-rempli par OSK depuis :
-- .osk/rgs-context.yaml : Organisation, DICP, RTO/RPO, contacts
-- docs/context/meta.md : Infrastructure, stack technique
+- .osk/config.toml [domains.rgs] : Organisation, DICP, RTO/RPO, contacts
+- .osk/memory/context.md : Infrastructure, stack technique
 - docs/security/risk-register.yaml : Scénarios de risques
-- Étape 6 du wizard /osk-rgs : Fournisseurs et hébergement
+- /osk-rgs : Fournisseurs et hébergement
 
 Les sections marquées [AUTO] peuvent être extraites automatiquement.
 Les sections marquées [MANUEL] nécessitent une saisie humaine.
@@ -46,12 +46,12 @@ Les sections marquées [MANUEL] nécessitent une saisie humaine.
 
 | Champ | Valeur |
 |-------|--------|
-| **Système** | [AUTO: systeme.nom depuis rgs-context.yaml] |
+| **Système** | [AUTO: config.project.name] |
 | **Version du document** | 1.0 |
 | **Date de création** | [DATE] |
 | **Dernière mise à jour** | [DATE] |
 | **Prochaine revue** | [DATE + 1 an] |
-| **Classification** | [AUTO: classification.classification_donnees] |
+| **Classification** | [AUTO: config.domains.rgs.classification] |
 | **Statut** | BROUILLON / VALIDÉ / EN VIGUEUR |
 
 ### Historique des Versions
@@ -64,8 +64,8 @@ Les sections marquées [MANUEL] nécessitent une saisie humaine.
 
 | Rôle | Nom | Date | Signature |
 |------|-----|------|-----------|
-| RSSI | [AUTO: organisation.rssi.nom] | | |
-| Autorité d'homologation | [AUTO: organisation.autorite_homologation.nom] | | |
+| RSSI | [AUTO: config.domains.organisation.rssi] | | |
+| Autorité d'homologation | [AUTO: config.domains.organisation.autorite_homologation] | | |
 | Direction Métier | [MANUEL] | | |
 
 ---
@@ -74,36 +74,36 @@ Les sections marquées [MANUEL] nécessitent une saisie humaine.
 
 ### 1.1 Objet du Document
 
-Ce Plan de Continuité d'Activité (PCA) définit les dispositions permettant d'assurer la continuité des activités critiques du système **[AUTO: systeme.nom]** en cas de sinistre majeur affectant son fonctionnement normal.
+Ce Plan de Continuité d'Activité (PCA) définit les dispositions permettant d'assurer la continuité des activités critiques du système **[AUTO: config.project.name]** en cas de sinistre majeur affectant son fonctionnement normal.
 
 ### 1.2 Périmètre
 
-**Système concerné** : [AUTO: systeme.nom]
+**Système concerné** : [AUTO: config.project.name]
 
-**Description** : [AUTO: systeme.description]
+**Description** : [AUTO: config.project.description]
 
-**URL de production** : [AUTO: systeme.url_production]
+**URL de production** : [AUTO: config.domains.rgs.url_production]
 
 **Composants inclus** :
-<!-- [AUTO: Extraire de perimetre.inclus dans rgs-context.yaml] -->
+<!-- [AUTO: Extraire de config.domains.rgs.perimetre] -->
 - [ ] [Composant 1]
 - [ ] [Composant 2]
 - [ ] [Composant 3]
 
 **Composants exclus** :
-<!-- [AUTO: Extraire de perimetre.exclus dans rgs-context.yaml] -->
+<!-- [AUTO: Extraire de config.domains.rgs.perimetre.exclus] -->
 - [ ] [Composant exclu 1]
 - [ ] [Composant exclu 2]
 
 ### 1.3 Objectifs de Continuité
 
-<!-- [AUTO: Extraire de besoins_securite.disponibilite dans rgs-context.yaml] -->
+<!-- [AUTO: Extraire de config.domains.rgs.disponibilite] -->
 
 | Métrique | Objectif | Justification |
 |----------|----------|---------------|
-| **RTO** (Recovery Time Objective) | [AUTO: besoins_securite.disponibilite.rto_heures] heures | Délai maximum acceptable d'interruption |
-| **RPO** (Recovery Point Objective) | [AUTO: besoins_securite.disponibilite.rpo_heures] heures | Perte de données maximum acceptable |
-| **SLA Disponibilité** | [AUTO: besoins_securite.disponibilite.sla_disponibilite] | Taux de disponibilité cible |
+| **RTO** (Recovery Time Objective) | [AUTO: config.domains.rgs.disponibilite.rto_heures] heures | Délai maximum acceptable d'interruption |
+| **RPO** (Recovery Point Objective) | [AUTO: config.domains.rgs.disponibilite.rpo_heures] heures | Perte de données maximum acceptable |
+| **SLA Disponibilité** | [AUTO: config.domains.rgs.disponibilite.sla] | Taux de disponibilité cible |
 | **MTPD** (Maximum Tolerable Period of Disruption) | [MANUEL] heures | Durée maximale tolérable d'interruption |
 
 ---
@@ -129,24 +129,24 @@ Ce Plan de Continuité d'Activité (PCA) définit les dispositions permettant d'
 
 #### 2.2.1 Infrastructure Technique
 
-<!-- [AUTO: Extraire de meta.md et fournisseurs dans rgs-context.yaml] -->
+<!-- [AUTO: Extraire de context.md et config.domains.suppliers] -->
 
 | Ressource | Fournisseur | Criticité | Redondance | Contact Support |
 |-----------|-------------|-----------|------------|-----------------|
-| Hébergement | [AUTO: organisation.exploitant.nom] | CRITIQUE | [Oui/Non] | [Contact] |
-| Base de données | [AUTO: depuis meta.md] | CRITIQUE | [Oui/Non] | [Contact] |
+| Hébergement | [AUTO: config.domains.organisation.exploitant] | CRITIQUE | [Oui/Non] | [Contact] |
+| Base de données | [AUTO: depuis context.md] | CRITIQUE | [Oui/Non] | [Contact] |
 | Stockage fichiers | [MANUEL] | IMPORTANT | [Oui/Non] | [Contact] |
-| CDN | [AUTO: depuis fournisseurs] | IMPORTANT | [Oui/Non] | [Contact] |
+| CDN | [AUTO: depuis config.domains.suppliers] | IMPORTANT | [Oui/Non] | [Contact] |
 | DNS | [MANUEL] | CRITIQUE | [Oui/Non] | [Contact] |
-| Email | [AUTO: depuis fournisseurs] | STANDARD | [Oui/Non] | [Contact] |
+| Email | [AUTO: depuis config.domains.suppliers] | STANDARD | [Oui/Non] | [Contact] |
 
 #### 2.2.2 Ressources Humaines Clés
 
-<!-- [AUTO: Extraire de organisation dans rgs-context.yaml] -->
+<!-- [AUTO: Extraire de config.domains.organisation] -->
 
 | Rôle | Titulaire | Suppléant | Compétences Critiques |
 |------|-----------|-----------|----------------------|
-| RSSI | [AUTO: organisation.rssi.nom] | [MANUEL] | Gestion de crise sécurité |
+| RSSI | [AUTO: config.domains.organisation.rssi] | [MANUEL] | Gestion de crise sécurité |
 | Responsable Technique | [MANUEL] | [MANUEL] | Administration système |
 | DBA | [MANUEL] | [MANUEL] | Restauration bases de données |
 | DevOps | [MANUEL] | [MANUEL] | Déploiement, infrastructure |
@@ -184,7 +184,7 @@ Ce Plan de Continuité d'Activité (PCA) définit les dispositions permettant d'
 
 #### S1 : Panne Hébergeur Majeure
 
-**Description** : Indisponibilité totale de l'infrastructure hébergée chez [AUTO: organisation.exploitant.nom].
+**Description** : Indisponibilité totale de l'infrastructure hébergée chez [AUTO: config.domains.organisation.exploitant].
 
 **Causes possibles** :
 - Incident datacenter (incendie, inondation, coupure électrique)
@@ -238,7 +238,7 @@ Ce Plan de Continuité d'Activité (PCA) définit les dispositions permettant d'
 
 ### 4.1 Stratégie Hébergement
 
-<!-- [AUTO: Adapter selon organisation.exploitant.type dans rgs-context.yaml] -->
+<!-- [AUTO: Adapter selon config.domains.organisation.exploitant.type] -->
 
 #### Option A : Multi-AZ (Availability Zones)
 
@@ -368,7 +368,7 @@ Ce Plan de Continuité d'Activité (PCA) définit les dispositions permettant d'
 
 ### 5.1 Cellule de Crise
 
-<!-- [AUTO: Extraire de organisation dans rgs-context.yaml] -->
+<!-- [AUTO: Extraire de config.domains.organisation] -->
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -378,8 +378,8 @@ Ce Plan de Continuité d'Activité (PCA) définit les dispositions permettant d'
 │                 ┌──────────────────┐                            │
 │                 │ Directeur de     │                            │
 │                 │ Crise            │                            │
-│                 │ [AUTO: autorite_ │                            │
-│                 │  homologation]   │                            │
+│                 │ [AUTO: autorite  │                            │
+│                 │  _homologation]  │                            │
 │                 └────────┬─────────┘                            │
 │                          │                                       │
 │         ┌────────────────┼────────────────┐                     │
@@ -402,14 +402,14 @@ Ce Plan de Continuité d'Activité (PCA) définit les dispositions permettant d'
 
 ### 5.2 Contacts d'Urgence
 
-<!-- [AUTO: Extraire de organisation dans rgs-context.yaml + fournisseurs] -->
+<!-- [AUTO: Extraire de config.domains.organisation + suppliers] -->
 
 | Rôle | Nom | Téléphone | Email | Astreinte |
 |------|-----|-----------|-------|-----------|
-| Directeur de crise | [AUTO: autorite_homologation.nom] | [MANUEL] | [AUTO: email] | 24/7 |
-| RSSI | [AUTO: organisation.rssi.nom] | [MANUEL] | [AUTO: email] | 24/7 |
+| Directeur de crise | [AUTO: config.domains.organisation.autorite_homologation] | [MANUEL] | [AUTO: email] | 24/7 |
+| RSSI | [AUTO: config.domains.organisation.rssi] | [MANUEL] | [AUTO: email] | 24/7 |
 | Responsable Technique | [MANUEL] | [MANUEL] | [MANUEL] | 24/7 |
-| Support Hébergeur | [AUTO: exploitant.nom] | [MANUEL] | [MANUEL] | 24/7 |
+| Support Hébergeur | [AUTO: config.domains.organisation.exploitant] | [MANUEL] | [MANUEL] | 24/7 |
 | Support BDD | [MANUEL] | [MANUEL] | [MANUEL] | HO |
 | ANSSI (si incident majeur) | CERT-FR | 01 71 75 84 68 | cert-fr@ssi.gouv.fr | 24/7 |
 
@@ -586,9 +586,9 @@ Nous vous prions de nous excuser pour la gêne occasionnée.
 OBJET: [NOTIF INCIDENT] - [NOM_ORGANISME] - [NOM_SYSTÈME]
 
 1. IDENTIFICATION
-   - Organisme : [AUTO: organisation.entite_responsable.nom]
-   - Système : [AUTO: systeme.nom]
-   - Contact : [AUTO: organisation.rssi]
+   - Organisme : [AUTO: config.domains.organisation.entite_responsable]
+   - Système : [AUTO: config.project.name]
+   - Contact : [AUTO: config.domains.organisation.rssi]
 
 2. DESCRIPTION INCIDENT
    - Date/heure détection : [DATE]
@@ -684,7 +684,7 @@ CLÔTURE
 
 ### Annexe B : Contacts Fournisseurs Critiques
 
-<!-- [AUTO: Extraire de fournisseurs dans rgs-context.yaml] -->
+<!-- [AUTO: Extraire de config.domains.suppliers] -->
 
 | Fournisseur | Service | Contact Support | SLA | Escalade |
 |-------------|---------|-----------------|-----|----------|
@@ -708,7 +708,7 @@ CLÔTURE
 - **RGS v2.0** - Référentiel Général de Sécurité
 - **ISO 22301** - Systèmes de management de la continuité d'activité
 - **Guide ANSSI** - Recommandations pour la mise en place d'un PCA
-- **EBIOS RM** - [AUTO: Lien vers docs/security/EBIOS-RM-*.md]
+- **EBIOS RM** - [AUTO: Lien vers docs/security/rgs/EBIOS-RM-*.md]
 
 ---
 
