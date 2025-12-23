@@ -1,0 +1,35 @@
+============================================================
+  /osk-specify {{feature}} - Spécifications Terminées
+============================================================
+
+EXIGENCES DÉFINIES
+├── Authentification : {{auth.count}} ({{auth.must}} must, {{auth.should}} should)
+├── Autorisation     : {{authz.count}} exigences
+├── Validation       : {{val.count}} exigences
+├── Chiffrement      : {{crypto.count}} exigences
+└── Total            : {{total.count}} exigences
+
+RISQUES COUVERTS
+{{#each risks_covered}}
+├── {{risk_id}} → {{controls}}
+{{/each}}
+└── {{coverage.count}}/{{coverage.total}} risques ont des contrôles
+
+CONFORMITÉ ASVS
+├── Niveau cible : L{{asvs.level}}
+├── Couverture   : {{asvs.coverage}}%
+└── Gaps         : {{asvs.gaps}}
+
+STRATÉGIE DE TESTS
+├── SAST : {{sast.tool}} - {{sast.rules}} règles
+├── DAST : {{dast.tool}} - {{dast.endpoints}} endpoints
+├── SCA  : {{sca.tool}} - politique définie
+└── Unit : {{unit.count}} tests à implémenter
+
+FICHIERS GÉNÉRÉS
+├── .osk/specs/{{spec_dir}}/requirements.md
+└── .osk/specs/{{spec_dir}}/testing.md
+
+PROCHAINE ÉTAPE
+→ /osk-harden {{feature}} pour le durcissement
+============================================================

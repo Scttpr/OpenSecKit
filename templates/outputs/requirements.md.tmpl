@@ -1,0 +1,87 @@
+# Exigences de Sécurité - {{feature}}
+
+> Généré par `/osk-specify` le {{date}}
+> Principe III - Security by Design
+
+## Résumé
+
+| Catégorie | Exigences | Must | Should | May |
+|-----------|-----------|------|--------|-----|
+| Authentification | {{auth.total}} | {{auth.must}} | {{auth.should}} | {{auth.may}} |
+| Autorisation | {{authz.total}} | {{authz.must}} | {{authz.should}} | {{authz.may}} |
+| Validation | {{val.total}} | {{val.must}} | {{val.should}} | {{val.may}} |
+| Chiffrement | {{crypto.total}} | {{crypto.must}} | {{crypto.should}} | {{crypto.may}} |
+| **Total** | **{{total}}** | **{{must}}** | **{{should}}** | **{{may}}** |
+
+---
+
+## Authentification
+
+{{#each auth.requirements}}
+### {{id}} - {{title}}
+
+| Attribut | Valeur |
+|----------|--------|
+| Criticité | **{{criticality}}** |
+| Risques adressés | {{risks}} |
+| Vérification | {{verification}} |
+
+**Description :**
+{{description}}
+
+**Implémentation :**
+```{{lang}}
+{{implementation}}
+```
+
+---
+{{/each}}
+
+## Autorisation
+
+{{#each authz.requirements}}
+### {{id}} - {{title}}
+
+| Attribut | Valeur |
+|----------|--------|
+| Criticité | **{{criticality}}** |
+| Risques adressés | {{risks}} |
+
+{{description}}
+
+---
+{{/each}}
+
+## Validation
+
+{{#each val.requirements}}
+### {{id}} - {{title}}
+
+{{description}}
+
+---
+{{/each}}
+
+## Chiffrement
+
+{{#each crypto.requirements}}
+### {{id}} - {{title}}
+
+{{description}}
+
+---
+{{/each}}
+
+## Conformité ASVS
+
+| Catégorie | Niveau L{{level}} | Statut |
+|-----------|-------------------|--------|
+{{#each asvs}}
+| {{category}} | {{required}}/{{total}} | {{status}} |
+{{/each}}
+
+---
+
+## Prochaine Étape
+
+→ `/osk-harden {{feature}}` pour le durcissement

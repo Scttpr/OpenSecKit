@@ -1,0 +1,37 @@
+============================================================
+  /osk-plan {{feature}} - Plan Consolidé
+============================================================
+
+CONSOLIDATION
+├── Risques agrégés      : {{risks.count}} (Score total: {{risks.score}})
+├── Exigences            : {{req.must}} MUST, {{req.should}} SHOULD, {{req.may}} MAY
+├── Actions hardening    : {{hardening.count}}
+└── Total actions        : {{actions.total}}
+
+PRIORISATION
+├── P0 (Bloquant)   : {{p0.count}} actions
+├── P1 (Urgent)     : {{p1.count}} actions
+├── P2 (Important)  : {{p2.count}} actions
+├── P3 (Normal)     : {{p3.count}} actions
+└── P4 (Backlog)    : {{p4.count}} actions
+
+PHASES D'IMPLÉMENTATION
+├── Phase 1 - Fondations  : {{phase1.count}} actions, ~{{phase1.hours}}h
+├── Phase 2 - Core        : {{phase2.count}} actions, ~{{phase2.hours}}h
+├── Phase 3 - Hardening   : {{phase3.count}} actions, ~{{phase3.hours}}h
+├── Phase 4 - Validation  : {{phase4.count}} actions, ~{{phase4.hours}}h
+└── Phase 5 - Conformité  : {{phase5.count}} actions, ~{{phase5.hours}}h
+    ─────────────────────────────────────
+    Total                 : {{total.count}} actions, ~{{total.hours}}h
+
+OBJECTIFS
+├── Score risque    : {{before.score}} → {{after.score}} (-{{reduction}}%)
+├── Risques critiques : {{before.critical}} → 0
+└── Conformité      : {{before.principles}}/7 → 7/7
+
+FICHIERS GÉNÉRÉS
+└── .osk/specs/{{spec_dir}}/plan.md
+
+PROCHAINE ÉTAPE
+→ /osk-tasks {{feature}} pour générer les tâches détaillées
+============================================================

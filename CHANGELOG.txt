@@ -6,6 +6,103 @@
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+VERSION 3.0.1 - 2025-12-23
+
+AMÉLIORATIONS DU WORKFLOW
+
+Cette version améliore la gestion des risques et refactorise l'architecture
+des prompts pour une meilleure maintenabilité.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+NOUVELLES FONCTIONNALITÉS
+
+   ✨ /osk-resolve - Résolution des Risques
+
+      • Nouvelle commande pour marquer un risque comme résolu
+      • Traçabilité complète : commit, PR, contrôles implémentés
+      • Workflow : OUVERT → EN_COURS → RESOLU → VERIFIE (ou ACCEPTE)
+      • Options : --reopen (ré-ouvrir), --bulk (masse)
+      • Mise à jour automatique des métriques (MTTR, taux résolution)
+
+   ✨ Analyse STRIDE Système dans /osk-baseline
+
+      • Phase 2 ajoutée : STRIDE au niveau système
+      • Principes I et II démarrent à 30% (au lieu de 0%)
+      • Identification précoce des menaces architecturales
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+AMÉLIORATIONS
+
+   📄 Risk Register - Source Unique
+
+      • docs/security/risks/risk-register.yaml = SOURCE UNIQUE
+      • Les fichiers .osk/specs/*/risks.md sont des VUES générées
+      • Fin de la duplication entre risks.md et risk-register
+
+   🏗️ Architecture Templates Refactorisée
+
+      • Prompts réduits de ~800 lignes à ~100 lignes
+      • Templates séparés dans 3 dossiers :
+        - schemas/   → Structures YAML (14 fichiers)
+        - outputs/   → Templates fichiers générés (13 fichiers)
+        - reports/   → Rapports terminaux (14 fichiers)
+      • Réduction totale : 13855 → 1598 lignes (-88%)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+FICHIERS MODIFIÉS
+
+   Prompts (réduction lignes) :
+      • osk-analyze.md      824 → 126 (-85%)
+      • osk-baseline.md    1247 → 165 (-87%)
+      • osk-configure.md    452 → 101 (-78%)
+      • osk-dashboard.md    658 → 94  (-86%)
+      • osk-harden.md       809 → 91  (-89%)
+      • osk-pca-pra.md      727 → 107 (-85%)
+      • osk-plan.md         594 → 112 (-81%)
+      • osk-resolve.md      (NOUVEAU - 136 lignes)
+      • osk-rgpd.md         865 → 136 (-84%)
+      • osk-rgs.md         1850 → 150 (-92%)
+      • osk-specify.md      683 → 104 (-85%)
+      • osk-tasks.md        496 → 93  (-81%)
+
+   Nouveaux Templates :
+      • templates/schemas/*.yaml     (14 fichiers)
+      • templates/outputs/*.tmpl     (13 fichiers)
+      • templates/reports/*.txt      (14 fichiers)
+
+   Documentation :
+      • README.txt                   (workflow, /osk-resolve)
+      • README-DEV.txt               (architecture prompts)
+      • templates/README.md          (documentation complète)
+      • registry.toml                (version 3.0.1, /osk-resolve)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+MIGRATION v3.0.0 → v3.0.1
+
+   1. Mettre à jour les fichiers :
+      $ cd OpenSecKit && git pull
+
+   2. Réinstaller templates (si osk init déjà fait) :
+      $ osk init --force
+
+   3. Les fichiers risks.md existants restent valides
+      → Ils seront régénérés comme vues du risk-register
+
+   4. Nouveau workflow de résolution :
+      >>> /osk-resolve RISK-AUTH-001
+      → Sélectionner commit/PR
+      → Documenter contrôles implémentés
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 VERSION 3.0.0 - 2025-12-23
 
 REFONTE MAJEURE - Workflow Orienté Feature

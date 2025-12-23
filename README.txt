@@ -14,7 +14,7 @@
 ║                    ██║  ██╗██║   ██║                                     ║
 ║                    ╚═╝  ╚═╝╚═╝   ╚═╝                                     ║
 ║                                                                          ║
-║                        Version 3.0.0                                     ║
+║                        Version 3.0.1                                     ║
 ║                  Security as Code, AI-Ready                              ║
 ║                                                                          ║
 ╚══════════════════════════════════════════════════════════════════════════╝
@@ -54,25 +54,36 @@ DESCRIPTION
    │  osk init ──▶ /osk-configure ──▶ /osk-baseline (projet existant)│
    │                     │                                           │
    │                     ▼                                           │
-   │  ┌─────────────────────────────────────────────────────────┐    │
-   │  │              POUR CHAQUE FEATURE                         │    │
-   │  │                                                         │    │
-   │  │  /osk-analyze ──▶ /osk-specify ──▶ /osk-harden          │    │
-   │  │       │                                                 │    │
-   │  │       ▼                                                 │    │
-   │  │  /osk-plan ──▶ /osk-tasks                               │    │
-   │  └─────────────────────────────────────────────────────────┘    │
+   │  ┌─────────────────────────────────────────────────────────────┐│
+   │  │              POUR CHAQUE FEATURE                            ││
+   │  │                                                             ││
+   │  │  /osk-analyze ──▶ /osk-specify ──▶ /osk-harden             ││
+   │  │       │                                                     ││
+   │  │       ▼                                                     ││
+   │  │  /osk-plan ──▶ /osk-tasks                                  ││
+   │  └─────────────────────────────────────────────────────────────┘│
    │                     │                                           │
    │                     ▼                                           │
-   │  ┌─────────────────────────────────────────────────────────┐    │
-   │  │              CONFORMITÉ RÉGLEMENTAIRE                    │    │
-   │  │                                                         │    │
-   │  │  /osk-rgpd ──────────────▶ docs/security/rgpd/          │    │
-   │  │  /osk-rgs  ──────────────▶ docs/security/rgs/           │    │
-   │  └─────────────────────────────────────────────────────────┘    │
+   │  ┌─────────────────────────────────────────────────────────────┐│
+   │  │              GESTION DES RISQUES                            ││
+   │  │                                                             ││
+   │  │  /osk-resolve ──────────────▶ risk-register.yaml (mise à   ││
+   │  │       │                        jour statut avec traçabilité)││
+   │  │       ▼                                                     ││
+   │  │  OUVERT → EN_COURS → RESOLU → VERIFIE                      ││
+   │  │                   ↘ ACCEPTE                                 ││
+   │  └─────────────────────────────────────────────────────────────┘│
    │                     │                                           │
    │                     ▼                                           │
-   │  /osk-dashboard (monitoring) + /osk-pca-pra (continuité)        │
+   │  ┌─────────────────────────────────────────────────────────────┐│
+   │  │              CONFORMITÉ RÉGLEMENTAIRE                       ││
+   │  │                                                             ││
+   │  │  /osk-rgpd ──────────────▶ docs/security/rgpd/             ││
+   │  │  /osk-rgs  ──────────────▶ docs/security/rgs/              ││
+   │  └─────────────────────────────────────────────────────────────┘│
+   │                     │                                           │
+   │                     ▼                                           │
+   │  /osk-dashboard (monitoring) + /osk-pca-pra (continuité)       │
    │                                                                 │
    └─────────────────────────────────────────────────────────────────┘
 
@@ -85,7 +96,7 @@ DESCRIPTION
 
       osk init              Crée .osk/config.toml et télécharge templates
       /osk-configure        Analyse le code, détecte domaines, pondère principes
-      /osk-baseline         État des lieux sécurité (projets existants)
+      /osk-baseline         État des lieux sécurité + STRIDE système (I & II)
 
    PHASE 1-4 : ANALYSE PAR FEATURE
 
@@ -95,7 +106,13 @@ DESCRIPTION
       /osk-plan [feature]      Tous → plan.md
       /osk-tasks [feature]     → tasks.md, tasks.yaml
 
-   PHASE 5 : CONFORMITÉ
+   PHASE 5 : GESTION DES RISQUES
+
+      /osk-resolve [RISK-ID]   Marquer un risque résolu (commit, PR, contrôles)
+      /osk-resolve --reopen    Ré-ouvrir un risque fermé
+      /osk-resolve --bulk      Résolution en masse
+
+   PHASE 6 : CONFORMITÉ
 
       /osk-rgpd             RGPD : Registre Art. 30, DPIA, procédures
       /osk-rgpd audit       RGPD : Rapport d'audit conformité
@@ -121,25 +138,26 @@ DESCRIPTION
    │   ├── specs/                      # Brouillons par feature
    │   │   └── NNN-feature/
    │   │       ├── threats.md
-   │   │       ├── risks.md
+   │   │       ├── risks.md            # Vue générée (risk-register = source)
    │   │       ├── requirements.md
    │   │       ├── testing.md
    │   │       ├── hardening.md
    │   │       ├── plan.md
-   │   │       ├── rgpd/dpia.md        # Brouillon DPIA
-   │   │       └── rgs/ebios.md        # Brouillon EBIOS
+   │   │       └── tasks.md
    │   └── templates/                  # Templates téléchargés
+   │       ├── schemas/                # Schémas YAML
+   │       ├── outputs/                # Templates fichiers générés
+   │       └── reports/                # Rapports terminaux
    │
    └── docs/security/                  # Documentation finale (publiable)
        ├── risks/
-       │   └── risk-register.yaml      # Registre central des risques
+       │   └── risk-register.yaml      # ★ SOURCE UNIQUE DES RISQUES ★
        ├── rgpd/
-       │   ├── registre-traitements.md # Art. 30
-       │   ├── dpia-global.md          # DPIA consolidé
-       │   ├── procedure-violation.md  # Art. 33-34
+       │   ├── registre-traitements.md
+       │   ├── dpia-global.md
        │   └── AUDIT-YYYY-MM-DD.md
        ├── rgs/
-       │   ├── EBIOS-RM-[SYSTEME].md   # EBIOS consolidé
+       │   ├── EBIOS-RM-[SYSTEME].md
        │   ├── DOSSIER-HOMOLOGATION.md
        │   └── AUDIT-YYYY-MM-DD.md
        └── continuity/
@@ -149,7 +167,30 @@ DESCRIPTION
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-5. LES 7 PRINCIPES
+5. RISK REGISTER - SOURCE UNIQUE
+
+   Le fichier docs/security/risks/risk-register.yaml est la SOURCE UNIQUE
+   pour tous les risques. Les fichiers .osk/specs/*/risks.md sont des VUES
+   générées automatiquement.
+
+   WORKFLOW DE RÉSOLUTION :
+
+      OUVERT ────────▶ EN_COURS ────────▶ RESOLU ────────▶ VERIFIE
+                              │
+                              └──────────▶ ACCEPTE (risque accepté)
+
+   Chaque transition est tracée avec :
+   - Commit/PR de la correction
+   - Contrôles implémentés
+   - Date et auteur
+   - Justification (si accepté)
+
+   Commande : /osk-resolve RISK-AUTH-001
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+6. LES 7 PRINCIPES
 
    I    Threat Modeling      Analyse proactive des menaces (STRIDE)
    II   Risk Analysis        Scoring et priorisation des risques
@@ -162,7 +203,31 @@ DESCRIPTION
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-6. DOMAINES RÉGLEMENTAIRES
+7. ARCHITECTURE TEMPLATES
+
+   Les prompts (skills) sont légers et référencent des templates :
+
+   templates/
+   ├── schemas/              # Schémas YAML (structures de données)
+   │   ├── risk-register.yaml    # Structure du registre central
+   │   ├── risk-entry.yaml       # Format d'un risque
+   │   ├── requirement-entry.yaml
+   │   ├── task-entry.yaml
+   │   └── ...
+   ├── outputs/              # Templates de fichiers générés
+   │   ├── threats.md.tmpl
+   │   ├── risks.md.tmpl
+   │   ├── plan.md.tmpl
+   │   └── ...
+   └── reports/              # Rapports terminaux
+       ├── analyze-report.txt
+       ├── dashboard-report.txt
+       └── ...
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+8. DOMAINES RÉGLEMENTAIRES
 
    RGPD     Protection des données personnelles       /osk-rgpd
    RGS      Référentiel Général de Sécurité (France)  /osk-rgs
@@ -171,16 +236,18 @@ DESCRIPTION
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-7. LIENS
+9. LIENS
 
    constitution.md         Les 7 principes détaillés
    cli/README.txt          Documentation du CLI
+   templates/README.md     Architecture des templates
    CONTRIBUTING.txt        Guide de contribution
    domaines/README.md      Domaines réglementaires
+   CHANGELOG.txt           Historique des versions
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-OpenSecKit v3.0.0
+OpenSecKit v3.0.1
 https://github.com/Scttpr/OpenSecKit
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

@@ -1,0 +1,32 @@
+# OpenSecKit - Schéma Requirement Entry
+# Version: 3.0.1
+# Usage: Format d'une exigence de sécurité (Principe III)
+
+id: "[AUTH|AUTHZ|VAL|CRYPTO]-[FEATURE]-[NNN]"
+titre: "[Titre court]"
+description: "[Description détaillée]"
+criticite: "[must|should|may]"  # RFC 2119
+risques_adresses:
+  - "RISK-[XXX]"
+verification: "[Comment vérifier]"
+
+# Implémentation
+implementation:
+  pattern: "[Code pattern recommandé]"
+  exemple: |
+    // Code exemple
+
+# Catégories
+categories:
+  - authentification   # AUTH-*
+  - autorisation       # AUTHZ-*
+  - validation         # VAL-*
+  - chiffrement        # CRYPTO-*
+
+# Niveaux authentification
+niveaux_auth:
+  none: "Endpoints publics"
+  basic: "API Key, Basic Auth"
+  standard: "JWT/Session"
+  strong: "MFA optionnel"
+  mfa: "MFA obligatoire"

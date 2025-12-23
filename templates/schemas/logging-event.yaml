@@ -1,0 +1,24 @@
+# OpenSecKit - Schéma Logging Event
+# Version: 3.0.1
+# Usage: Format d'un événement à logger (Principe VI)
+
+event: "[namespace.action.result]"
+niveau: "[debug|info|warn|error|fatal]"
+donnees:
+  - "[champ1]"
+  - "[champ2]"
+retention: "[90j|1an|3ans|5ans]"
+alerte: true|false
+seuil_alerte: "[condition si alerte, ex: 5 en 5min]"
+
+# Exemple format log JSON
+exemple_log: |
+  {
+    "timestamp": "ISO 8601",
+    "level": "[niveau]",
+    "event": "[event]",
+    "trace_id": "UUID",
+    "service": "[feature]",
+    "user_id": "si authentifié",
+    "metadata": {}
+  }

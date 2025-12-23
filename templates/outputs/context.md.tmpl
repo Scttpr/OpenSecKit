@@ -1,0 +1,55 @@
+# Contexte Projet
+
+> Généré par `/osk-configure` le {{date}}
+> Source de vérité factuelle du projet
+
+## Identité
+
+- **Nom** : {{project.name}}
+- **Description** : {{project.description}}
+- **Repository** : {{project.repository}}
+
+## Stack Technique
+
+> Détecté par `osk init` (CLI)
+
+| Technologie | Version | Source |
+|-------------|---------|--------|
+{{#each stack}}
+| {{name}} | {{version}} | {{source}} |
+{{/each}}
+
+## Domaines Réglementaires
+
+> Analysé par `/osk-configure` - Validé par utilisateur
+
+| Domaine | Statut | Niveau | Justification |
+|---------|--------|--------|---------------|
+{{#each domains}}
+| {{name}} | {{status}} | {{level}} | {{justification}} |
+{{/each}}
+
+### Indices Détectés
+
+{{#each domains}}
+{{#if indices}}
+**{{name}} :**
+{{#each indices}}
+- `{{location}}` → `{{finding}}`
+{{/each}}
+{{/if}}
+{{/each}}
+
+## Patterns de Sécurité Existants
+
+| Catégorie | État | Détails |
+|-----------|------|---------|
+{{#each security_patterns}}
+| {{category}} | {{status}} | {{details}} |
+{{/each}}
+
+## Alertes Initiales
+
+{{#each alerts}}
+- [ ] {{this}}
+{{/each}}

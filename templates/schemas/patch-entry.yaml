@@ -1,0 +1,19 @@
+# OpenSecKit - Schéma Patch Entry
+# Version: 3.0.1
+# Usage: Format d'une dépendance à patcher (Principe VII)
+
+package: "[nom du package]"
+version_actuelle: "[X.Y.Z]"
+version_cible: "[X.Y.Z]"
+vulnerabilites:
+  - cve: "[CVE-XXXX-XXXXX]"
+    cvss: "[0.0-10.0]"
+    description: "[Description]"
+criticite: "[critical|high|medium|low|none]"
+
+# SLA selon criticité
+sla:
+  critical: "48h"   # CVSS 9.0-10.0
+  high: "7j"        # CVSS 7.0-8.9
+  medium: "30j"     # CVSS 4.0-6.9
+  low: "90j"        # CVSS < 4.0

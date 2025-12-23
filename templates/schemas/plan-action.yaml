@@ -1,0 +1,33 @@
+# OpenSecKit - Schéma Plan Action
+# Version: 3.0.1
+# Usage: Format d'une action dans le plan d'implémentation
+
+id: "P[PHASE]-[NNN]"
+titre: "[Titre de l'action]"
+description: "[Description détaillée]"
+
+# Traçabilité
+risques_adresses:
+  - "RISK-[XXX]"
+exigences_satisfaites:
+  - "[AUTH|VAL]-[XXX]"
+principe: "[I-VII]"
+
+# Priorisation (score = impact×3 + reduction×2 + effort_inverse)
+priorite: "[P0|P1|P2|P3|P4]"
+impact_securite: "[1-5]"      # 5=bloque vuln critique
+reduction_risque: "[1-5]"     # score_risque/25
+effort_inverse: "[1-5]"       # 5=<1h, 1=>1sem
+
+# Effort
+effort: "[XS|S|M|L|XL]"
+effort_heures: "[range]"
+# XS:<2h, S:2-4h, M:4-8h, L:1-3j, XL:>3j
+
+# Dépendances
+depends_on: []
+blocks: []
+
+# Phase
+phase: "[1-5]"
+# 1=Fondations, 2=Core, 3=Hardening, 4=Validation, 5=Conformité

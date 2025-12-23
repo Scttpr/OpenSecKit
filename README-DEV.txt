@@ -1,7 +1,7 @@
 ╔══════════════════════════════════════════════════════════════════════════╗
 ║                       OPENSECKIT - DEV GUIDE                             ║
 ║                       Guide développeur                                  ║
-║                          Version 3.0.0                                   ║
+║                          Version 3.0.1                                   ║
 ╚══════════════════════════════════════════════════════════════════════════╝
 
 
@@ -40,12 +40,45 @@ NAME
    $ ./scripts/test-local.sh --clean    # Nettoie projets test
 
 
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+4. ARCHITECTURE DES PROMPTS
+
+   Les prompts sont légers (~100 lignes) et référencent des templates :
+
+   prompts/
+   ├── osk-analyze.md       # 126 lignes
+   ├── osk-configure.md     # 101 lignes
+   ├── osk-dashboard.md     # 94 lignes
+   └── ...
+
+   templates/
+   ├── schemas/             # Structures YAML
+   ├── outputs/             # Templates fichiers générés (.tmpl)
+   └── reports/             # Rapports terminaux (.txt)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+5. AJOUTER UN NOUVEAU PROMPT
+
+   1. Créer prompts/osk-xxx.md (court, ~100 lignes)
+   2. Créer templates si besoin :
+      - schemas/xxx-entry.yaml
+      - outputs/xxx.md.tmpl
+      - reports/xxx-report.txt
+   3. Ajouter dans registry.toml
+   4. Tester avec ./scripts/test-local.sh
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 NOTE
    Tout est installé localement. Rien de global.
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-OpenSecKit Dev Guide v3.0.0
+OpenSecKit Dev Guide v3.0.1
 https://github.com/Scttpr/OpenSecKit
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

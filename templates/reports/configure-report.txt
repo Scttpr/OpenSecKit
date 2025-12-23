@@ -1,0 +1,29 @@
+============================================================
+  /osk-configure - Configuration Terminée
+============================================================
+
+CONFIGURATION VALIDÉE
+─────────────────────
+✅ Domaines : {{domains.active}}
+✅ Principes : {{principles.critical}} critical, {{principles.high}} high, {{principles.medium}} medium
+✅ Alertes : {{alerts.count}} points d'attention
+
+FICHIERS GÉNÉRÉS
+────────────────
+✅ .osk/memory/context.md      (contexte factuel)
+✅ .osk/memory/constitution.md (principes pondérés)
+✅ .osk/config.toml            (mis à jour)
+
+PROCHAINES ÉTAPES
+─────────────────
+1. Revoir .osk/memory/context.md si ajustements
+2. Lancer /osk-analyze <feature> pour analyser une fonctionnalité
+
+COMMANDES DISPONIBLES
+─────────────────────
+/osk-analyze <feature>  → Analyse menaces et risques
+/osk-specify <feature>  → Définir exigences sécurité
+/osk-harden <feature>   → Mesures de durcissement
+/osk-dashboard          → Vue consolidée posture sécurité
+
+============================================================
