@@ -27,21 +27,24 @@ Tu es le **Security Dashboard Manager**. Ta mission est de générer une vue con
 **Si absent** : Créer un dashboard vide avec message "Aucune analyse de sécurité effectuée. Lancez /security pour démarrer."
 
 **Extraire** :
-- `metadata.derniere_mise_a_jour`
-- `metadata.risques_totaux`
-- `metadata.risques_ouverts`, `risques_en_cours`, `risques_resolus`, `risques_acceptes`
-- `metadata.score_risque_residuel_total`
-- `metadata.conformite_globale`
-- `conformite_principes` : Pour chaque principe :
-  - `statut` (CONFORME/PARTIEL/NON_CONFORME)
-  - `couverture` (si applicable)
-  - `documents` (liste des SEC-*.md)
-- `risques` : Liste plate de tous les risques avec :
+- `metadata.last_updated`
+- `stats.total`
+- `stats.par_statut` : ouverts, en_cours, resolus, verifies, acceptes
+- `stats.par_severite` : critiques, importants, mineurs
+- `stats.score_total` et `stats.score_residuel`
+- `conformite` : Pour chaque principe (I à VII) :
+  - `statut` (CONFORME/PARTIEL/EN_ATTENTE/NON_CONFORME)
+  - `score` (pourcentage)
+  - `features` (liste des features couvertes)
+- `risques` : Liste de tous les risques avec :
   - `score_initial` et `score_residuel` pour calculer réduction
   - `severite` (CRITIQUE/IMPORTANT/MINEUR)
-  - `statut` (OUVERT/EN_COURS/RESOLU/ACCEPTE)
+  - `priorite` (P0/P1/P2/P3/P4)
+  - `statut` (OUVERT/EN_COURS/RESOLU/VERIFIE/ACCEPTE)
   - `principe_viole` pour répartition par principe
-- `metriques` : MTTR, taux de résolution, reduction_globale
+  - `dates.echeance` pour SLA
+  - `assignee` pour tracking
+- `metriques` : mttr_critique, mttr_important, taux_resolution, derniere_resolution
 
 ### 1.2 Scanner les Documents de Sécurité
 
@@ -107,7 +110,8 @@ Conformité: X/7 principes (XX%)  [↗️ +X% / → stable / ↘️ -X%]
 ├──────────────────┼──────────┼───────────┼────────┼──────────────────┤
 │ 🔴 Ouverts       │    X     │     X     │   X    │   X              │
 │ 🟡 En cours      │    X     │     X     │   X    │   X              │
-│ ✅ Résolus       │    X     │     X     │   X    │   X              │
+│ 🟢 Résolus       │    X     │     X     │   X    │   X              │
+│ ✅ Vérifiés      │    X     │     X     │   X    │   X              │
 │ ⚪ Acceptés      │    X     │     X     │   X    │   X              │
 ├──────────────────┼──────────┼───────────┼────────┼──────────────────┤
 │ TOTAL            │    X     │     X     │   X    │   X              │
@@ -297,12 +301,12 @@ Généré le [DATE] par OpenSecKit /dashboard
 
 ### Vue d'Ensemble
 
-| Sévérité | Ouverts | En cours | Résolus | Acceptés | Total |
-|----------|---------|----------|---------|----------|-------|
-| 🔴 Critique | X | X | X | X | X |
-| 🟠 Important | X | X | X | X | X |
-| 🟡 Mineur | X | X | X | X | X |
-| **TOTAL** | **X** | **X** | **X** | **X** | **X** |
+| Sévérité | Ouverts | En cours | Résolus | Vérifiés | Acceptés | Total |
+|----------|---------|----------|---------|----------|----------|-------|
+| 🔴 Critique | X | X | X | X | X | X |
+| 🟠 Important | X | X | X | X | X | X |
+| 🟡 Mineur | X | X | X | X | X | X |
+| **TOTAL** | **X** | **X** | **X** | **X** | **X** | **X** |
 
 ### Risques Critiques Ouverts (X)
 
@@ -562,8 +566,10 @@ MTTR = (2 + 5 + 1) / 3 = 2.67 jours
 ### Taux de Résolution
 
 ```
-Taux = (Risques résolus + acceptés) / Risques totaux × 100
+Taux = (Risques résolus + vérifiés + acceptés) / Risques totaux × 100
 ```
+
+> Note : Les risques "vérifiés" sont ceux qui ont été corrigés ET validés par tests/revue.
 
 ### Couverture Fonctionnalités
 

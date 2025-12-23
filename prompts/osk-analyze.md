@@ -423,38 +423,45 @@ RISK-001 : [Titre actuel]
 → Lancer `/osk-specify [feature]` pour définir les exigences de sécurité
 ```
 
-### 6.3 Format `risks.md`
+### 6.3 Format `risks.md` (VUE GÉNÉRÉE)
+
+> **⚠️ IMPORTANT : SOURCE UNIQUE DE VÉRITÉ**
+>
+> Le fichier `risks.md` est une **VUE FILTRÉE** du registre central `docs/security/risks/risk-register.yaml`.
+> Il n'est PAS une source de données indépendante.
+>
+> **Règle** : Toute modification de risque doit être faite dans `risk-register.yaml`.
+> Le fichier `risks.md` est regénéré automatiquement depuis le registre.
 
 ```markdown
-# Registre des Risques - [Feature]
+# Risques - [Feature]
 
+> **Vue générée** depuis `docs/security/risks/risk-register.yaml`
 > Généré par `/osk-analyze` le [DATE]
 > Principe II - Risk Analysis
+>
+> ⚠️ Ne pas modifier ce fichier directement.
+> Source unique : `docs/security/risks/risk-register.yaml`
 
 ## Résumé
 
 | Métrique | Valeur |
 |----------|--------|
 | Total risques | [Count] |
-| 🔴 Critiques | [Count] |
-| 🟠 Importants | [Count] |
-| 🟡 Mineurs | [Count] |
+| 🔴 Critiques (P0-P1) | [Count] |
+| 🟠 Importants (P2) | [Count] |
+| 🟡 Mineurs (P3-P4) | [Count] |
 | Score total | [Sum] |
 
-## Matrice de Risques
+### Statut de résolution
 
-```
-        │ Impact
-Proba   │  1    2    3    4    5
-────────┼─────────────────────────
-   5    │  5   10   15   20   25
-   4    │  4    8   12   16   20
-   3    │  3    6    9   12   15
-   2    │  2    4    6    8   10
-   1    │  1    2    3    4    5
-
-× Exposition (1-5) pour score final
-```
+| Statut | Count |
+|--------|-------|
+| 🔴 OUVERT | [X] |
+| 🟡 EN_COURS | [X] |
+| ✅ RESOLU | [X] |
+| ✅ VERIFIE | [X] |
+| ⚪ ACCEPTE | [X] |
 
 ## Risques Critiques 🔴
 
@@ -463,24 +470,20 @@ Proba   │  1    2    3    4    5
 | Attribut | Valeur |
 |----------|--------|
 | Catégorie STRIDE | [S/T/R/I/D/E] |
-| Impact | [X]/5 - [Justification] |
-| Probabilité | [X]/5 - [Justification] |
-| Exposition | [X]/5 - [Justification] |
-| **Score** | **[XX]** |
-| Asset menacé | [Asset] |
-| Vecteur d'attaque | [Description] |
+| Priorité | [P0/P1] |
+| Score | **[XX]** (I:[X] × P:[X] × E:[X]) |
+| Statut | 🔴 OUVERT |
+| Échéance | [DATE] |
+| Assigné | [Assignee ou "Non assigné"] |
 
-**Contrôles existants :**
-- [Liste ou "Aucun"]
+**Asset menacé** : [Asset]
+**Vecteur d'attaque** : [Description]
 
 **Contrôles requis :**
 - [ ] [Contrôle 1]
 - [ ] [Contrôle 2]
 
-**Impact réglementaire :**
-- RGPD : [Article concerné ou N/A]
-- NIS2 : [Article concerné ou N/A]
-- RGS : [Exigence concernée ou N/A]
+**Conformité** : CWE-[XXX] | OWASP [A0X:2021] | Principe [X]
 
 ---
 
@@ -492,7 +495,15 @@ Proba   │  1    2    3    4    5
 
 ## Risques Mineurs 🟡
 
-[Liste simple]
+| ID | Titre | Score | Statut | Échéance |
+|----|-------|-------|--------|----------|
+| RISK-XXX | [Titre] | [XX] | [Statut] | [Date] |
+
+## Actions
+
+- Pour résoudre un risque : `/osk-resolve RISK-[ID]`
+- Pour vérifier les corrections : `/osk-verify`
+- Pour voir le dashboard complet : `/osk-dashboard`
 
 ## Prochaine Étape
 
@@ -514,10 +525,11 @@ Proba   │  1    2    3    4    5
 
 ```yaml
 # Registre des Risques - OpenSecKit
+# SOURCE UNIQUE DE VÉRITÉ - Les fichiers risks.md sont des vues générées
 # Créé par /osk-analyze [feature] le [DATE]
 
 metadata:
-  version: "3.0"
+  version: "3.0.1"
   created_by: "/osk-analyze [feature]"
   created_at: "[DATE]"
   last_updated: "[DATE]"
@@ -525,20 +537,32 @@ metadata:
 
 stats:
   total: [X]
-  critiques: [X]
-  importants: [X]
-  mineurs: [X]
-  ouverts: [X]
-  resolus: 0
+  par_statut:
+    ouverts: [X]
+    en_cours: 0
+    resolus: 0
+    verifies: 0
+    acceptes: 0
+  par_severite:
+    critiques: [X]
+    importants: [X]
+    mineurs: [X]
   score_total: [XXX]
+  score_residuel: [XXX]
+
+metriques:
+  mttr_critique: null      # Mean Time To Resolve (jours) - calculé auto
+  mttr_important: null
+  taux_resolution: 0       # Pourcentage
+  derniere_resolution: null
 
 conformite:
   I_threat_modeling:
-    score: 100  # Analyse faite
+    score: 100
     statut: "CONFORME"
     features: ["[feature]"]
   II_risk_analysis:
-    score: 100  # Risques identifiés
+    score: 100
     statut: "CONFORME"
     features: ["[feature]"]
   III_security_design:
@@ -562,7 +586,7 @@ risques:
     source: "/osk-analyze [feature]"
     feature: "[feature]"
     titre: "[Titre du risque]"
-    # ... format complet
+    # ... format complet (voir ci-dessous)
 ```
 
 #### Si le fichier EXISTE (projet avec /osk-baseline ou features déjà analysées) :
@@ -585,30 +609,76 @@ risques:
     titre: "[Titre]"
     description: "[Description]"
 
+    # Classification
     categorie_stride: "[S/T/R/I/D/E]"
     severite: "[CRITIQUE/IMPORTANT/MINEUR]"
+    priorite: "[P0/P1/P2/P3/P4]"  # P0: >=80, P1: 49-79, P2: 25-48, P3: 11-24, P4: 1-10
 
+    # Scoring
     impact: [1-5]
     probabilite: [1-5]
     exposition: [1-5]
-    score: [Calculé]
+    score_initial: [Calculé]
+    score_residuel: [Calculé]  # Égal à score_initial tant que non résolu
 
+    # Localisation
     fichiers:
       - "[chemin:ligne]"
+    asset_menace: "[Asset concerné]"
+    vecteur_attaque: "[Description du vecteur]"
 
-    statut: "OUVERT"
-    date_detection: "[DATE]"
-    sla: "[48h/7j/30j selon sévérité]"
-    date_echeance: "[DATE + SLA]"
-
+    # Contrôles
     controles_existants: []
     controles_requis:
       - "[Contrôle 1]"
       - "[Contrôle 2]"
 
+    # Conformité
     principe_viole: "[I-VII]"
     cwe: "[CWE-XXX]"
     owasp: "[A0X:2021]"
+
+    # ============================================
+    # WORKFLOW DE RÉSOLUTION (Source unique)
+    # ============================================
+    # Statuts: OUVERT → EN_COURS → RESOLU → VERIFIE
+    #          OUVERT → ACCEPTE (si risque accepté)
+    statut: "OUVERT"
+
+    # Dates du cycle de vie
+    dates:
+      detection: "[DATE]"
+      echeance: "[DATE + SLA]"      # SLA: P0=48h, P1=7j, P2=30j, P3=90j
+      prise_en_charge: null         # Date passage EN_COURS
+      resolution: null              # Date passage RESOLU
+      verification: null            # Date passage VERIFIE
+
+    # Assignation
+    assignee: null                  # Email ou ID du responsable
+    equipe: null                    # Équipe responsable
+
+    # Résolution (rempli par /osk-resolve)
+    resolution:
+      commit: null                  # SHA du commit de fix
+      pr: null                      # Numéro de PR (#123)
+      description: null             # Description de la correction
+      controles_implementes: []     # Liste des contrôles ajoutés
+
+    # Vérification (rempli par /osk-verify)
+    verification:
+      sast_pass: null               # Résultat SAST
+      dast_pass: null               # Résultat DAST
+      tests_pass: null              # Tests de sécurité passés
+      revue_code: null              # Code review effectuée
+      verificateur: null            # Qui a vérifié
+      commentaire: null
+
+    # Si ACCEPTE
+    acceptation:
+      valideur: null                # Qui a accepté le risque
+      date: null
+      justification: null           # Pourquoi le risque est accepté
+      revue_prevue: null            # Date de re-revue
 
   - id: "RISK-[FEATURE]-002"
     # ...
@@ -616,12 +686,16 @@ risques:
 
 **Mettre à jour les stats :**
 - Incrémenter `stats.total`
-- Recalculer `stats.critiques`, `stats.importants`, `stats.mineurs`
-- Recalculer `stats.score_total`
+- Recalculer `stats.par_statut.ouverts` (nouveaux risques = OUVERT)
+- Recalculer `stats.par_severite.critiques`, `.importants`, `.mineurs`
+- Recalculer `stats.score_total` et `stats.score_residuel`
 
 **Mettre à jour la conformité :**
 - Ajouter la feature à `conformite.I_threat_modeling.features`
 - Ajouter la feature à `conformite.II_risk_analysis.features`
+
+**Mettre à jour les métriques :**
+- `metriques.taux_resolution` = (resolus + verifies + acceptes) / total × 100
 
 ---
 
@@ -646,34 +720,39 @@ MENACES IDENTIFIÉES (STRIDE)
 ├── Denial of Service     : [X] menaces
 └── Elevation of Privilege: [X] menaces
 
-RISQUES
-├── 🔴 Critiques  : [X] (score total: XXX)
-├── 🟠 Importants : [X] (score total: XXX)
-└── 🟡 Mineurs    : [X] (score total: XXX)
+RISQUES AJOUTÉS AU REGISTRE
+├── 🔴 Critiques (P0-P1) : [X] (score: XXX)
+├── 🟠 Importants (P2)   : [X] (score: XXX)
+└── 🟡 Mineurs (P3-P4)   : [X] (score: XXX)
+
+SOURCE DE VÉRITÉ
+└── docs/security/risks/risk-register.yaml
+    ├── Risques ajoutés   : +[X]
+    ├── Total registre    : [XXX] risques
+    ├── Score total       : [XXX] (+[YY])
+    └── Taux résolution   : [XX]%
 
 FICHIERS GÉNÉRÉS
-├── .osk/specs/[NNN]-[feature]/threats.md
-├── .osk/specs/[NNN]-[feature]/risks.md
+├── .osk/specs/[NNN]-[feature]/threats.md      (analyse STRIDE)
+├── .osk/specs/[NNN]-[feature]/risks.md        (vue filtrée du registre)
 {{#if dpia_generated}}
 ├── .osk/specs/[NNN]-[feature]/rgpd/dpia.md
 {{/if}}
 {{#if ebios_generated}}
 ├── .osk/specs/[NNN]-[feature]/rgs/ebios-rm.md
 {{/if}}
-└── docs/security/risks/risk-register.yaml (créé/mis à jour)
-
-RISK-REGISTER
-├── Risques ajoutés : [X]
-├── Score total     : [XXX] (+[YY] depuis cette analyse)
-└── Features couvertes : [Liste des features dans le registre]
+└── docs/security/risks/risk-register.yaml     (source unique)
 
 TOP 3 RISQUES À TRAITER
-1. RISK-[FEATURE]-001 : [Titre] (Score: XX) 🔴
-2. RISK-[FEATURE]-002 : [Titre] (Score: XX) 🔴
-3. RISK-[FEATURE]-003 : [Titre] (Score: XX) 🟠
+1. RISK-[FEATURE]-001 : [Titre] (Score: XX, Échéance: [DATE]) 🔴
+2. RISK-[FEATURE]-002 : [Titre] (Score: XX, Échéance: [DATE]) 🔴
+3. RISK-[FEATURE]-003 : [Titre] (Score: XX, Échéance: [DATE]) 🟠
 
-PROCHAINE ÉTAPE
-→ /osk-specify [feature] pour définir les exigences de sécurité
+ACTIONS DISPONIBLES
+├── /osk-specify [feature]  → Définir exigences de sécurité
+├── /osk-resolve RISK-ID    → Marquer un risque résolu
+├── /osk-verify             → Vérifier les corrections
+└── /osk-dashboard          → Vue consolidée
 ============================================================
 ```
 
