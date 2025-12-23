@@ -108,9 +108,166 @@ features:
 
 ---
 
-## Phase 2 : Scan Sécurité Global
+## Phase 2 : Analyse STRIDE Système (Principes I & II)
 
-### 2.1 Évaluer chaque principe
+> **Cette phase réalise une analyse de menaces et risques de HAUT NIVEAU sur le système global.**
+> Elle donne un score initial aux principes I et II. L'analyse détaillée par feature sera faite par `/osk-analyze`.
+
+### 2.1 Modélisation des menaces système (Principe I)
+
+**Analyser l'architecture globale pour identifier les menaces systémiques :**
+
+```yaml
+analyse_stride_systeme:
+  # Vue d'ensemble du système
+  architecture:
+    type: "[monolithe|microservices|serverless]"
+    exposition: "[internet|intranet|hybride]"
+    composants_principaux:
+      - nom: "API Backend"
+        technologie: "[Express|FastAPI|etc.]"
+        exposition: "internet"
+      - nom: "Base de données"
+        technologie: "[PostgreSQL|MongoDB|etc.]"
+        exposition: "interne"
+      - nom: "Cache/Session"
+        technologie: "[Redis|Memcached|etc.]"
+        exposition: "interne"
+
+  # Frontières de confiance
+  trust_boundaries:
+    - id: "TB-01"
+      nom: "Internet → API Gateway"
+      risque: "Exposition publique"
+    - id: "TB-02"
+      nom: "API → Base de données"
+      risque: "Accès données sensibles"
+    - id: "TB-03"
+      nom: "API → Services externes"
+      risque: "Dépendance tierce"
+
+  # Menaces STRIDE par composant
+  menaces_systeme:
+    spoofing:
+      - "Usurpation d'identité sur l'API publique"
+      - "Tokens JWT forgés ou volés"
+      composants_concernes: ["API Backend", "Auth"]
+
+    tampering:
+      - "Modification de données en transit"
+      - "Altération de cache/session"
+      composants_concernes: ["API Backend", "Cache"]
+
+    repudiation:
+      - "Actions non tracées"
+      - "Logs insuffisants ou altérables"
+      composants_concernes: ["Tous"]
+
+    information_disclosure:
+      - "Fuite de données via erreurs"
+      - "Exposition de secrets dans logs/config"
+      - "Données sensibles en clair"
+      composants_concernes: ["API Backend", "DB"]
+
+    denial_of_service:
+      - "Absence de rate limiting"
+      - "Requêtes coûteuses non limitées"
+      composants_concernes: ["API Backend"]
+
+    elevation_of_privilege:
+      - "IDOR sur ressources"
+      - "Escalade admin"
+      - "Injection (SQL, NoSQL, Command)"
+      composants_concernes: ["API Backend", "DB"]
+```
+
+### 2.2 Analyse de risques système (Principe II)
+
+**Scorer les risques systémiques identifiés :**
+
+```yaml
+risques_systeme:
+  - id: "RISK-SYS-001"
+    titre: "Exposition API publique sans WAF"
+    categorie_stride: "D"  # DoS
+
+    impact: 4
+    probabilite: 3
+    exposition: 5
+    score: 60
+    severite: "IMPORTANT"
+
+    description: "L'API est exposée directement sur internet sans WAF ni rate limiting global"
+    vecteur: "Attaquant envoie requêtes massives ou malformées"
+
+    controles_existants: []
+    controles_requis:
+      - "Rate limiting global"
+      - "WAF ou protection DDoS"
+
+    principe_viole: "III"
+
+  - id: "RISK-SYS-002"
+    titre: "Authentification centralisée critique"
+    categorie_stride: "S"  # Spoofing
+
+    impact: 5
+    probabilite: 3
+    exposition: 5
+    score: 75
+    severite: "CRITIQUE"
+
+    description: "Toute l'application repose sur un seul mécanisme d'authentification"
+    vecteur: "Compromission du système d'auth = accès total"
+
+    controles_existants:
+      - "[JWT/Session détecté]"
+    controles_requis:
+      - "MFA"
+      - "Détection anomalies"
+      - "Révocation tokens"
+
+    principe_viole: "III"
+
+  # Ajouter 3-5 risques systémiques selon l'architecture détectée
+```
+
+### 2.3 Diagramme de flux simplifié
+
+**Générer un DFD textuel du système :**
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        INTERNET                                  │
+└───────────────────────────┬─────────────────────────────────────┘
+                            │
+                    ════════╪════════  TB-01: Trust Boundary
+                            │
+                            ▼
+                ┌───────────────────────┐
+                │    API Backend        │
+                │    [Express/etc.]     │
+                └───────────┬───────────┘
+                            │
+        ┌───────────────────┼───────────────────┐
+        │                   │                   │
+════════╪═══════    ════════╪════════   ════════╪════════
+        │                   │                   │
+        ▼                   ▼                   ▼
+┌───────────────┐   ┌───────────────┐   ┌───────────────┐
+│  Database     │   │  Cache/Redis  │   │  Services     │
+│  [PostgreSQL] │   │  [Sessions]   │   │  [Externes]   │
+└───────────────┘   └───────────────┘   └───────────────┘
+
+Légende:
+════ = Trust Boundary (frontière de confiance)
+```
+
+---
+
+## Phase 3 : Scan Sécurité Global
+
+### 3.1 Évaluer chaque principe
 
 **Pour chaque principe, scanner le code et évaluer :**
 
@@ -118,33 +275,58 @@ features:
 
 ```yaml
 principe_I:
-  statut: "[conforme|partiel|absent]"
-  score: "[0-100]%"
+  statut: "[conforme|partiel|initial]"
+  score: "[30-100]%"  # Minimum 30% car analyse système faite en Phase 2
+
+  # Score = analyse_systeme (30%) + documentation_existante (20%) + features_analysees (50%)
+  scoring:
+    analyse_systeme: 30        # Toujours 30% après Phase 2
+    documentation_existante: "[0-20]%"  # Docs menaces trouvées dans le projet
+    features_analysees: 0      # Sera incrémenté par /osk-analyze
 
   verification:
+    # Analyse système (Phase 2)
+    stride_systeme: "FAIT"     # Toujours fait par baseline
+    dfd_systeme: "FAIT"        # Généré en Phase 2
+    trust_boundaries: "[X] identifiées"
+
+    # Documentation existante (bonus)
     documentation_menaces: "[trouvé|absent]"
     fichiers_trouves: ["docs/security/threats/*"]
 
-  constat: "[Description de l'état actuel]"
+  constat: "Analyse système initiale réalisée. [X] features identifiées pour analyse détaillée."
 
-  lacunes:
-    - "[Lacune 1]"
-    - "[Lacune 2]"
+  prochaines_etapes:
+    - "/osk-analyze [feature] pour chaque feature critique"
 ```
 
 #### Principe II - Analyse de risques
 
 ```yaml
 principe_II:
-  statut: "[conforme|partiel|absent]"
-  score: "[0-100]%"
+  statut: "[conforme|partiel|initial]"
+  score: "[30-100]%"  # Minimum 30% car risques système identifiés en Phase 2
+
+  # Score = risques_systeme (30%) + registre_existant (20%) + features_analysees (50%)
+  scoring:
+    risques_systeme: 30        # Toujours 30% après Phase 2
+    registre_existant: "[0-20]%"  # Registre trouvé dans le projet
+    features_analysees: 0      # Sera incrémenté par /osk-analyze
 
   verification:
+    # Risques système (Phase 2)
+    risques_identifies: "[X] risques système"
+    risques_critiques: "[X]"
+    risques_importants: "[X]"
+
+    # Documentation existante (bonus)
     registre_risques: "[trouvé|absent]"
     fichiers_trouves: ["docs/security/risks/*"]
 
-  constat: "[Description]"
-  lacunes: []
+  constat: "[X] risques système identifiés et scorés. Registre central créé."
+
+  prochaines_etapes:
+    - "/osk-analyze [feature] pour identifier les risques par feature"
 ```
 
 #### Principe III - Sécurité dès la conception
@@ -368,26 +550,38 @@ vulnerabilites_immediates:
 ```yaml
 scoring:
   par_principe:
-    I_threat_modeling: 0      # 0-100
-    II_risk_analysis: 0       # 0-100
+    I_threat_modeling: 30     # Minimum 30% après analyse système (Phase 2)
+    II_risk_analysis: 30      # Minimum 30% après risques système (Phase 2)
     III_security_design: 45   # 0-100
     IV_security_testing: 30   # 0-100
     V_secrets_management: 15  # 0-100
     VI_audit_logging: 40      # 0-100
     VII_patch_management: 60  # 0-100
 
-  score_global: 27  # Moyenne pondérée
+  score_global: 36  # Moyenne pondérée (meilleur qu'avant grâce à I et II)
 
   niveau:
-    score: 27
+    score: 36
     label: "À risque"
-    description: "Lacunes significatives sur plusieurs principes"
+    description: "Analyse système initiale faite, features à analyser"
+
+  progression:
+    baseline: 36           # Score après baseline
+    cible_phase1: 50       # Après quick wins + fondations
+    cible_phase2: 70       # Après features critiques
+    cible_finale: 85       # Couverture complète
 
 # Échelle :
 # 0-25   : Critique - Action immédiate requise
 # 26-50  : À risque - Plan de remédiation nécessaire
 # 51-75  : Acceptable - Améliorations recommandées
 # 76-100 : Mature - Maintenance continue
+
+# Note: Les principes I et II commencent à 30% car :
+# - Analyse STRIDE système réalisée (Phase 2)
+# - Risques système identifiés et scorés
+# - Registre central créé
+# Les 70% restants viendront de /osk-analyze par feature
 ```
 
 ### 3.2 Générer la roadmap
@@ -485,17 +679,20 @@ FEATURES IDENTIFIÉES
 
 CONFORMITÉ AUX 7 PRINCIPES
 ──────────────────────────
-│ Principe                    │ Score │ Statut          │
-├─────────────────────────────┼───────┼─────────────────┤
-│ I.   Modélisation menaces   │   0%  │ ❌ ABSENT       │
-│ II.  Analyse risques        │   0%  │ ❌ ABSENT       │
-│ III. Sécurité conception    │  45%  │ ⚠️ PARTIEL      │
-│ IV.  Tests sécurité         │  30%  │ ⚠️ PARTIEL      │
-│ V.   Gestion secrets        │  15%  │ 🔴 CRITIQUE     │
-│ VI.  Traçabilité            │  40%  │ ⚠️ PARTIEL      │
-│ VII. Patch management       │  60%  │ ⚠️ ATTENTION    │
-├─────────────────────────────┼───────┼─────────────────┤
-│ SCORE GLOBAL                │  27%  │ 🔴 À RISQUE     │
+│ Principe                    │ Score │ Statut          │ Note                    │
+├─────────────────────────────┼───────┼─────────────────┼─────────────────────────┤
+│ I.   Modélisation menaces   │  30%  │ 🟡 INITIAL      │ Analyse système faite   │
+│ II.  Analyse risques        │  30%  │ 🟡 INITIAL      │ Risques système scorés  │
+│ III. Sécurité conception    │  45%  │ ⚠️ PARTIEL      │                         │
+│ IV.  Tests sécurité         │  30%  │ ⚠️ PARTIEL      │                         │
+│ V.   Gestion secrets        │  15%  │ 🔴 CRITIQUE     │                         │
+│ VI.  Traçabilité            │  40%  │ ⚠️ PARTIEL      │                         │
+│ VII. Patch management       │  60%  │ ⚠️ ATTENTION    │                         │
+├─────────────────────────────┼───────┼─────────────────┼─────────────────────────┤
+│ SCORE GLOBAL                │  36%  │ 🟠 À RISQUE     │ +9% vs sans baseline    │
+
+→ Les principes I et II sont à 30% (analyse système)
+→ /osk-analyze [feature] augmentera ces scores (jusqu'à 100%)
 
 VULNÉRABILITÉS IMMÉDIATES
 ─────────────────────────
@@ -616,13 +813,18 @@ stats:
   score_total: [XXX]
 
 # Conformité par principe (baseline initial)
+# Note: I et II à 30% minimum car analyse système faite
 conformite:
   I_threat_modeling:
-    score: 0
-    statut: "ABSENT"
+    score: 30
+    statut: "INITIAL"
+    detail: "Analyse STRIDE système réalisée"
+    features_analysees: []
   II_risk_analysis:
-    score: 0
-    statut: "ABSENT"
+    score: 30
+    statut: "INITIAL"
+    detail: "Risques système identifiés et scorés"
+    features_analysees: []
   III_security_design:
     score: 45
     statut: "PARTIEL"
@@ -640,10 +842,24 @@ conformite:
     statut: "ATTENTION"
 
 # Liste des risques
-# Source: /osk-baseline (vulnérabilités initiales)
+# Source: /osk-baseline (vulnérabilités + risques système)
 # Enrichi par: /osk-analyze <feature> (risques par feature)
 risques:
-  # Vulnérabilités détectées par baseline
+  # ================================================
+  # RISQUES SYSTÈME (identifiés en Phase 2)
+  # ================================================
+  - id: "RISK-SYS-001"
+    source: "/osk-baseline"
+    type: "systeme"
+    titre: "[Risque système identifié]"
+    description: "[Description du risque système]"
+    categorie_stride: "[S/T/R/I/D/E]"
+    severite: "[CRITIQUE/IMPORTANT/MINEUR]"
+    # ... format complet comme /osk-analyze
+
+  # ================================================
+  # VULNÉRABILITÉS IMMÉDIATES (détectées en Phase 3)
+  # ================================================
   - id: "VULN-BASELINE-001"
     source: "/osk-baseline"
     titre: "Secret committé dans le repository"
