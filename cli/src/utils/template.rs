@@ -21,7 +21,11 @@ pub fn render(content: &str, variables: &[(&str, &str)]) -> String {
     result
 }
 
-pub fn create_from_template(dst: &str, template_content: &str, variables: &[(&str, &str)]) -> Result<()> {
+pub fn create_from_template(
+    dst: &str,
+    template_content: &str,
+    variables: &[(&str, &str)],
+) -> Result<()> {
     let rendered = render(template_content, variables);
 
     if let Some(parent) = Path::new(dst).parent() {

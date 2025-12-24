@@ -13,7 +13,12 @@ pub fn is_git_repo() -> bool {
 
 pub fn create_branch(name: &str) -> Result<()> {
     let check = Command::new("git")
-        .args(["show-ref", "--verify", "--quiet", &format!("refs/heads/{}", name)])
+        .args([
+            "show-ref",
+            "--verify",
+            "--quiet",
+            &format!("refs/heads/{}", name),
+        ])
         .status()
         .context("Failed to check branch")?;
 
@@ -71,7 +76,9 @@ fn commit(message: &str) -> Result<String> {
         .output()
         .context("Failed to get commit SHA")?;
 
-    Ok(String::from_utf8_lossy(&sha_output.stdout).trim().to_string())
+    Ok(String::from_utf8_lossy(&sha_output.stdout)
+        .trim()
+        .to_string())
 }
 
 pub fn add_and_commit(paths: &[&str], message: &str) -> Result<String> {

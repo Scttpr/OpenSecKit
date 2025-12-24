@@ -4,11 +4,10 @@ use anyhow::{Context, Result};
 use std::fs;
 
 pub fn validate(path: &str) -> Result<bool> {
-    let content = fs::read_to_string(path)
-        .with_context(|| format!("Cannot read {}", path))?;
+    let content = fs::read_to_string(path).with_context(|| format!("Cannot read {}", path))?;
 
-    let _: serde_yaml::Value = serde_yaml::from_str(&content)
-        .with_context(|| format!("Invalid YAML in {}", path))?;
+    let _: serde_yaml::Value =
+        serde_yaml::from_str(&content).with_context(|| format!("Invalid YAML in {}", path))?;
 
     Ok(true)
 }

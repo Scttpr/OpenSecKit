@@ -56,14 +56,13 @@ pub fn parse_prompt_file(path: &Path) -> Result<PromptInfo> {
     let content = fs::read_to_string(path)
         .with_context(|| format!("Impossible de lire {}", path.display()))?;
 
-    let filename = path.file_name()
+    let filename = path
+        .file_name()
         .and_then(|s| s.to_str())
         .unwrap_or("unknown.md")
         .to_string();
 
-    let name = filename
-        .trim_end_matches(".md")
-        .to_string();
+    let name = filename.trim_end_matches(".md").to_string();
 
     let (description, argument) = parse_frontmatter(&content);
     let phase = extract_phase(&name);
@@ -173,10 +172,7 @@ fn extract_requires(content: &str) -> Vec<String> {
 
 fn extract_outputs(content: &str) -> Vec<String> {
     let mut outputs = Vec::new();
-    let patterns = [
-        r"`(\.osk/specs/[^`]+)`",
-        r"`(docs/security/[^`]+)`",
-    ];
+    let patterns = [r"`(\.osk/specs/[^`]+)`", r"`(docs/security/[^`]+)`"];
 
     for pattern in patterns {
         if let Ok(re) = Regex::new(pattern) {

@@ -61,11 +61,9 @@ pub fn load_agents_config(osk_dir: &Path) -> Result<AgentsConfig> {
         anyhow::bail!("agents.toml non trouvé dans {}", osk_dir.display());
     }
 
-    let content = fs::read_to_string(&config_path)
-        .context("Impossible de lire agents.toml")?;
+    let content = fs::read_to_string(&config_path).context("Impossible de lire agents.toml")?;
 
-    let config: AgentsConfig = toml::from_str(&content)
-        .context("Erreur de parsing agents.toml")?;
+    let config: AgentsConfig = toml::from_str(&content).context("Erreur de parsing agents.toml")?;
 
     Ok(config)
 }
@@ -120,9 +118,13 @@ fn generate_slash_commands(
     tera: &Tera,
     _version: &str,
 ) -> Result<usize> {
-    let output_dir = agent.output_dir.as_ref()
+    let output_dir = agent
+        .output_dir
+        .as_ref()
         .ok_or_else(|| anyhow::anyhow!("output_dir requis pour format slash-command"))?;
-    let pattern = agent.file_pattern.as_ref()
+    let pattern = agent
+        .file_pattern
+        .as_ref()
         .ok_or_else(|| anyhow::anyhow!("file_pattern requis pour format slash-command"))?;
 
     fs::create_dir_all(output_dir)?;
@@ -151,7 +153,9 @@ fn generate_single_file(
     version: &str,
     domains: &DomainsInfo,
 ) -> Result<usize> {
-    let output_file = agent.output_file.as_ref()
+    let output_file = agent
+        .output_file
+        .as_ref()
         .ok_or_else(|| anyhow::anyhow!("output_file requis pour format single-file"))?;
 
     if let Some(parent) = Path::new(output_file).parent() {
@@ -176,9 +180,13 @@ fn generate_rules_dir(
     version: &str,
     domains: &DomainsInfo,
 ) -> Result<usize> {
-    let output_dir = agent.output_dir.as_ref()
+    let output_dir = agent
+        .output_dir
+        .as_ref()
         .ok_or_else(|| anyhow::anyhow!("output_dir requis pour format rules-dir"))?;
-    let pattern = agent.file_pattern.as_ref()
+    let pattern = agent
+        .file_pattern
+        .as_ref()
         .ok_or_else(|| anyhow::anyhow!("file_pattern requis pour format rules-dir"))?;
 
     fs::create_dir_all(output_dir)?;

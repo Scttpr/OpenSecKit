@@ -119,11 +119,10 @@ fn update_stats(json: bool) -> Result<()> {
     }
 
     // Lire le fichier
-    let content = fs::read_to_string(register_path)
-        .context("Failed to read risk-register.yaml")?;
+    let content = fs::read_to_string(register_path).context("Failed to read risk-register.yaml")?;
 
-    let mut register: RiskRegister = serde_yaml::from_str(&content)
-        .context("Failed to parse risk-register.yaml")?;
+    let mut register: RiskRegister =
+        serde_yaml::from_str(&content).context("Failed to parse risk-register.yaml")?;
 
     // Calculer les stats
     let old_total = register.stats.total;
@@ -208,12 +207,14 @@ fn update_stats(json: bool) -> Result<()> {
     } else {
         println!("📊 Updated stats in {}", register_path);
         println!("   Total: {} risks", register.stats.total);
-        println!("   Open: {}, In progress: {}, Resolved: {}",
+        println!(
+            "   Open: {}, In progress: {}, Resolved: {}",
             register.stats.par_statut.ouverts,
             register.stats.par_statut.en_cours,
             register.stats.par_statut.resolus
         );
-        println!("   Critical: {}, Important: {}, Minor: {}",
+        println!(
+            "   Critical: {}, Important: {}, Minor: {}",
             register.stats.par_severite.critiques,
             register.stats.par_severite.importants,
             register.stats.par_severite.mineurs
@@ -276,8 +277,9 @@ fn update_task(id: &str, done: bool, json: bool) -> Result<()> {
     let commit_sha = if git::is_git_repo() {
         git::add_and_commit(
             &[&file_path],
-            &format!("chore(security): mark task {} as done", id)
-        ).ok()
+            &format!("chore(security): mark task {} as done", id),
+        )
+        .ok()
     } else {
         None
     };
@@ -374,7 +376,12 @@ fn update_risk(id: &str, status: &str, json: bool) -> Result<()> {
             command: "update risk".to_string(),
             updated_files: vec![register_path.to_string()],
             changes,
-            message: format!("Risk {} updated: {} → {}", id, old_status.unwrap_or_default(), status_upper),
+            message: format!(
+                "Risk {} updated: {} → {}",
+                id,
+                old_status.unwrap_or_default(),
+                status_upper
+            ),
         };
         println!("{}", serde_json::to_string_pretty(&result)?);
     } else {
@@ -416,11 +423,7 @@ fn update_dashboard(json: bool) -> Result<()> {
     let incident_count = if std::path::Path::new("docs/security/incidents").exists() {
         fs::read_dir("docs/security/incidents")?
             .filter_map(|e| e.ok())
-            .filter(|e| {
-                e.file_name()
-                    .to_string_lossy()
-                    .starts_with("INC-")
-            })
+            .filter(|e| e.file_name().to_string_lossy().starts_with("INC-"))
             .count()
     } else {
         0
@@ -516,7 +519,10 @@ Resolved:  {resolved_bar}  {resolved}
     } else {
         println!("📊 Dashboard regenerated: {}", dashboard_path);
         println!("   {} risks ({} open, {} resolved)", total, open, resolved);
-        println!("   {} features, {} incidents", feature_count, incident_count);
+        println!(
+            "   {} features, {} incidents",
+            feature_count, incident_count
+        );
     }
 
     Ok(())

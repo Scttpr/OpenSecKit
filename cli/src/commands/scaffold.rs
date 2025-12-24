@@ -20,9 +20,10 @@ pub struct ScaffoldResult {
 pub fn run(command: ScaffoldCommands, json: bool) -> Result<()> {
     match command {
         ScaffoldCommands::Feature { name, no_branch } => scaffold_feature(&name, no_branch, json),
-        ScaffoldCommands::Incident { description, severity } => {
-            scaffold_incident(&description, &severity, json)
-        }
+        ScaffoldCommands::Incident {
+            description,
+            severity,
+        } => scaffold_incident(&description, &severity, json),
         ScaffoldCommands::Rgpd => scaffold_rgpd(json),
         ScaffoldCommands::Rgs { system } => scaffold_rgs(&system, json),
     }
@@ -34,17 +35,37 @@ fn scaffold_feature(name: &str, no_branch: bool, json: bool) -> Result<()> {
     let dir_name = format!("{:03}-{}", num, slug);
     let spec_dir = format!(".osk/specs/{}", dir_name);
 
-    fs::create_dir_all(&spec_dir)
-        .with_context(|| format!("Impossible de créer {}", spec_dir))?;
+    fs::create_dir_all(&spec_dir).with_context(|| format!("Impossible de créer {}", spec_dir))?;
 
     let template_files = [
-        ("threats.md", include_str!("../../templates/feature/threats.md.tmpl")),
-        ("risks.md", include_str!("../../templates/feature/risks.md.tmpl")),
-        ("requirements.md", include_str!("../../templates/feature/requirements.md.tmpl")),
-        ("testing.md", include_str!("../../templates/feature/testing.md.tmpl")),
-        ("hardening.md", include_str!("../../templates/feature/hardening.md.tmpl")),
-        ("plan.md", include_str!("../../templates/feature/plan.md.tmpl")),
-        ("tasks.yaml", include_str!("../../templates/feature/tasks.yaml.tmpl")),
+        (
+            "threats.md",
+            include_str!("../../templates/feature/threats.md.tmpl"),
+        ),
+        (
+            "risks.md",
+            include_str!("../../templates/feature/risks.md.tmpl"),
+        ),
+        (
+            "requirements.md",
+            include_str!("../../templates/feature/requirements.md.tmpl"),
+        ),
+        (
+            "testing.md",
+            include_str!("../../templates/feature/testing.md.tmpl"),
+        ),
+        (
+            "hardening.md",
+            include_str!("../../templates/feature/hardening.md.tmpl"),
+        ),
+        (
+            "plan.md",
+            include_str!("../../templates/feature/plan.md.tmpl"),
+        ),
+        (
+            "tasks.yaml",
+            include_str!("../../templates/feature/tasks.yaml.tmpl"),
+        ),
     ];
 
     let variables = [
@@ -180,9 +201,18 @@ fn scaffold_rgpd(json: bool) -> Result<()> {
     fs::create_dir_all(rgpd_dir)?;
 
     let files = [
-        ("registre-traitements.md", "# Registre des Traitements (Art. 30)\n\nTODO: Documenter les traitements"),
-        ("dpia-global.md", "# DPIA Global (Art. 35)\n\nTODO: Analyse d'impact"),
-        ("procedure-violation.md", "# Procédure de Violation de Données\n\nTODO: Procédure notification"),
+        (
+            "registre-traitements.md",
+            "# Registre des Traitements (Art. 30)\n\nTODO: Documenter les traitements",
+        ),
+        (
+            "dpia-global.md",
+            "# DPIA Global (Art. 35)\n\nTODO: Analyse d'impact",
+        ),
+        (
+            "procedure-violation.md",
+            "# Procédure de Violation de Données\n\nTODO: Procédure notification",
+        ),
     ];
 
     let mut created_files = Vec::new();
@@ -224,9 +254,21 @@ fn scaffold_rgs(system: &str, json: bool) -> Result<()> {
 
     let slug = counter::slugify(system);
     let files = [
-        (format!("EBIOS-RM-{}.md", slug), format!("# EBIOS RM - {}\n\nTODO: Analyse de risques", system)),
-        (format!("DOSSIER-HOMOLOGATION-{}.md", slug), format!("# Dossier d'Homologation - {}\n\nTODO: Dossier SSI", system)),
-        (format!("MCS-{}.md", slug), format!("# Maintien en Conditions de Sécurité - {}\n\nTODO: Plan MCS", system)),
+        (
+            format!("EBIOS-RM-{}.md", slug),
+            format!("# EBIOS RM - {}\n\nTODO: Analyse de risques", system),
+        ),
+        (
+            format!("DOSSIER-HOMOLOGATION-{}.md", slug),
+            format!("# Dossier d'Homologation - {}\n\nTODO: Dossier SSI", system),
+        ),
+        (
+            format!("MCS-{}.md", slug),
+            format!(
+                "# Maintien en Conditions de Sécurité - {}\n\nTODO: Plan MCS",
+                system
+            ),
+        ),
     ];
 
     let mut created_files = Vec::new();

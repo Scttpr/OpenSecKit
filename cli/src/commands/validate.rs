@@ -96,7 +96,10 @@ fn validate_yaml(json: bool) -> Result<()> {
         }
     }
 
-    let error_count = checked_files.iter().filter(|f| f.status == "invalid").count();
+    let error_count = checked_files
+        .iter()
+        .filter(|f| f.status == "invalid")
+        .count();
     let valid_count = checked_files.iter().filter(|f| f.status == "valid").count();
 
     if json {
@@ -114,10 +117,17 @@ fn validate_yaml(json: bool) -> Result<()> {
             if file.status == "valid" {
                 println!("✅ {}", file.path);
             } else {
-                println!("❌ {}: {}", file.path, file.error.as_deref().unwrap_or("unknown error"));
+                println!(
+                    "❌ {}: {}",
+                    file.path,
+                    file.error.as_deref().unwrap_or("unknown error")
+                );
             }
         }
-        println!("\n📊 {} files validated, {} errors", valid_count, error_count);
+        println!(
+            "\n📊 {} files validated, {} errors",
+            valid_count, error_count
+        );
     }
 
     if error_count > 0 {
@@ -174,7 +184,10 @@ fn validate_deps(feature: &str, json: bool) -> Result<()> {
             message: if has_cycle {
                 format!("Circular dependency detected: {}", cycle_path.join(" → "))
             } else {
-                format!("No circular dependencies ({} tasks checked)", tasks_file.tasks.len())
+                format!(
+                    "No circular dependencies ({} tasks checked)",
+                    tasks_file.tasks.len()
+                )
             },
         };
         println!("{}", serde_json::to_string_pretty(&result)?);
@@ -223,7 +236,11 @@ fn detect_cycles(tasks: &[Task]) -> (bool, Vec<String>, Vec<String>) {
     }
 
     #[derive(Clone, Copy, PartialEq)]
-    enum Color { White, Gray, Black }
+    enum Color {
+        White,
+        Gray,
+        Black,
+    }
 
     let mut colors: HashMap<&str, Color> = task_ids.iter().map(|&id| (id, Color::White)).collect();
     let mut path: Vec<&str> = Vec::new();
@@ -242,7 +259,8 @@ fn detect_cycles(tasks: &[Task]) -> (bool, Vec<String>, Vec<String>) {
                 match colors.get(neighbor) {
                     Some(Color::Gray) => {
                         let cycle_start = path.iter().position(|&n| n == neighbor).unwrap();
-                        let mut cycle: Vec<String> = path[cycle_start..].iter().map(|s| s.to_string()).collect();
+                        let mut cycle: Vec<String> =
+                            path[cycle_start..].iter().map(|s| s.to_string()).collect();
                         cycle.push(neighbor.to_string());
                         return Some(cycle);
                     }
@@ -307,7 +325,10 @@ fn validate_workflow(feature: &str, json: bool) -> Result<()> {
             if next_command.is_none() {
                 next_command = Some(format!("{} {}", command, feature));
             }
-            ("incomplete".to_string(), Some("contains TODO or empty".to_string()))
+            (
+                "incomplete".to_string(),
+                Some("contains TODO or empty".to_string()),
+            )
         } else {
             if next_command.is_none() {
                 next_command = Some(format!("{} {}", command, feature));
@@ -363,9 +384,18 @@ mod tests {
     #[test]
     fn test_detect_cycles_no_cycle() {
         let tasks = vec![
-            Task { id: "T001".to_string(), depends_on: vec![] },
-            Task { id: "T002".to_string(), depends_on: vec!["T001".to_string()] },
-            Task { id: "T003".to_string(), depends_on: vec!["T002".to_string()] },
+            Task {
+                id: "T001".to_string(),
+                depends_on: vec![],
+            },
+            Task {
+                id: "T002".to_string(),
+                depends_on: vec!["T001".to_string()],
+            },
+            Task {
+                id: "T003".to_string(),
+                depends_on: vec!["T002".to_string()],
+            },
         ];
         let (has_cycle, _, _) = detect_cycles(&tasks);
         assert!(!has_cycle);
@@ -374,8 +404,14 @@ mod tests {
     #[test]
     fn test_detect_cycles_simple_cycle() {
         let tasks = vec![
-            Task { id: "T001".to_string(), depends_on: vec!["T002".to_string()] },
-            Task { id: "T002".to_string(), depends_on: vec!["T001".to_string()] },
+            Task {
+                id: "T001".to_string(),
+                depends_on: vec!["T002".to_string()],
+            },
+            Task {
+                id: "T002".to_string(),
+                depends_on: vec!["T001".to_string()],
+            },
         ];
         let (has_cycle, cycle_path, _) = detect_cycles(&tasks);
         assert!(has_cycle);
@@ -384,9 +420,10 @@ mod tests {
 
     #[test]
     fn test_detect_cycles_self_reference() {
-        let tasks = vec![
-            Task { id: "T001".to_string(), depends_on: vec!["T001".to_string()] },
-        ];
+        let tasks = vec![Task {
+            id: "T001".to_string(),
+            depends_on: vec!["T001".to_string()],
+        }];
         let (has_cycle, cycle_path, _) = detect_cycles(&tasks);
         assert!(has_cycle);
         assert_eq!(cycle_path, vec!["T001", "T001"]);
@@ -394,9 +431,10 @@ mod tests {
 
     #[test]
     fn test_detect_cycles_unknown_dep() {
-        let tasks = vec![
-            Task { id: "T001".to_string(), depends_on: vec!["T999".to_string()] },
-        ];
+        let tasks = vec![Task {
+            id: "T001".to_string(),
+            depends_on: vec!["T999".to_string()],
+        }];
         let (has_cycle, _, warnings) = detect_cycles(&tasks);
         assert!(!has_cycle);
         assert_eq!(warnings.len(), 1);
@@ -406,10 +444,22 @@ mod tests {
     #[test]
     fn test_detect_cycles_complex() {
         let tasks = vec![
-            Task { id: "T001".to_string(), depends_on: vec![] },
-            Task { id: "T002".to_string(), depends_on: vec!["T001".to_string()] },
-            Task { id: "T003".to_string(), depends_on: vec!["T002".to_string(), "T004".to_string()] },
-            Task { id: "T004".to_string(), depends_on: vec!["T003".to_string()] },
+            Task {
+                id: "T001".to_string(),
+                depends_on: vec![],
+            },
+            Task {
+                id: "T002".to_string(),
+                depends_on: vec!["T001".to_string()],
+            },
+            Task {
+                id: "T003".to_string(),
+                depends_on: vec!["T002".to_string(), "T004".to_string()],
+            },
+            Task {
+                id: "T004".to_string(),
+                depends_on: vec!["T003".to_string()],
+            },
         ];
         let (has_cycle, cycle_path, _) = detect_cycles(&tasks);
         assert!(has_cycle);

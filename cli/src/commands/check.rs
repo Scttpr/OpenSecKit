@@ -211,7 +211,9 @@ fn get_feature_dir(feature: &str, result: &mut CheckResult) -> Result<Option<Str
             Ok(Some(dir))
         }
         None => {
-            result.missing.push(format!(".osk/specs/*-{} (feature not found)", feature));
+            result
+                .missing
+                .push(format!(".osk/specs/*-{} (feature not found)", feature));
             result.ready = false;
             Ok(None)
         }
@@ -221,8 +223,8 @@ fn get_feature_dir(feature: &str, result: &mut CheckResult) -> Result<Option<Str
 #[cfg(test)]
 mod tests {
     use super::*;
-    use tempfile::tempdir;
     use std::fs;
+    use tempfile::tempdir;
 
     #[test]
     fn test_check_configure_missing() {
