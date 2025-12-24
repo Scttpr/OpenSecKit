@@ -73,6 +73,26 @@ ssdlc_phase: "planning"        # planning, design, implementation, all
 ---
 ```
 
+### Ajouter un nouvel agent
+
+OpenSecKit utilise une architecture data-driven. Pour ajouter un agent :
+
+1. Ajouter une section dans `agents.toml` :
+```toml
+[agents.mon-agent]
+name = "Mon Agent"
+format = "single-file"  # ou slash-command, rules-dir
+output_file = ".mon-agent/instructions.md"
+template = "mon-agent.tera"
+enabled = true
+```
+
+2. Créer le template `templates/agents/mon-agent.tera`
+
+3. Aucun code Rust requis
+
+Voir [Architecture](architecture.md#ajouter-un-nouvel-agent) pour les détails.
+
 ## Checklist PR
 
 - [ ] `cargo build` compile sans erreur

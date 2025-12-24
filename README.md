@@ -20,7 +20,8 @@
 ## Pourquoi OpenSecKit ?
 
 - 🛡️ **7 principes constitutionnels** pour une sécurité complète
-- 🤖 **Multi-Agent** : Claude Code, GitHub Copilot, Cursor, Gemini
+- 🤖 **Multi-Agent** : Claude Code, GitHub Copilot, Cursor, Gemini + `AGENTS.md` universel
+- 🔌 **Extensible** : Ajouter un agent = 1 fichier config + 1 template (zéro code)
 - 📄 **Documentation as Code** générée automatiquement
 - ⚖️ **Conformité RGPD/RGS** intégrée
 
