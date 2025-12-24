@@ -1,14 +1,23 @@
+//! Commande osk init
+//!
+//! Initialise un projet avec OpenSecKit et configure les agents AI.
+
+use crate::agents::{self, AgentConfig, AgentsConfig, DomainsInfo};
 use crate::args::Agent;
 use crate::config::{
     DomainsConfig, MemoryConfig, Nis2Config, OskConfig, PrinciplesConfig, ProjectConfig,
     RgpdConfig, RgsConfig, SpecsConfig, StackConfig,
 };
+use crate::prompts;
 use crate::stack;
 use anyhow::Result;
 use dialoguer::{theme::ColorfulTheme, Input, Select};
 use reqwest::blocking::Client;
+use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
+
+const VERSION: &str = "3.1.0";
 
 /// Statistiques d'installation pour l'affichage condensé
 #[derive(Default)]
@@ -20,14 +29,16 @@ struct InstallStats {
     rgpd: usize,
     rgs: usize,
     nis2: usize,
+    agents_templates: usize,
     errors: Vec<String>,
 }
 
-/// Information sur un agent détecté
-struct AgentInfo {
-    agent: Agent,
-    name: &'static str,
-    available: bool,
+/// Résultat de l'installation d'un agent
+struct AgentInstallResult {
+    agent_id: String,
+    agent_name: String,
+    files_count: usize,
+    output_path: String,
 }
 
 pub fn run(
@@ -37,117 +48,303 @@ pub fn run(
     agent: Option<Agent>,
     all_agents: bool,
 ) -> Result<()> {
-    println!("🚀 Initialisation de OpenSecKit v3.1.0\n");
+    println!("🚀 Initialisation de OpenSecKit v{}\n", VERSION);
 
     // Configuration projet
-    let config_exists = Path::new(".osk/config.toml").exists();
-    let config = if config_exists && !force {
-        println!("   ℹ️  Configuration existante détectée.");
-        fs::read_to_string(".osk/config.toml")
-            .and_then(|s| {
-                toml::from_str(&s)
-                    .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))
-            })
-            .unwrap_or_else(|_| {
-                println!("   ⚠️  Config corrompue, création d'une nouvelle...");
-                if default {
-                    default_configuration()
-                } else {
-                    prompt_configuration().unwrap()
-                }
-            })
-    } else if default {
-        default_configuration()
-    } else {
-        prompt_configuration()?
-    };
+    let config = load_or_create_config(force, default)?;
 
-    // Sélection des agents
-    let selected_agents = select_agents(default, agent, all_agents)?;
-
-    // Scaffold et installation
+    // Scaffold et téléchargement des ressources
     scaffold_project(&config, force)?;
     let stats = install_resources(client, force)?;
 
-    // Installation des configurations agents
-    for agent in &selected_agents {
-        install_agent_config(agent, &stats, force)?;
+    // Charger la configuration des agents
+    let osk_dir = PathBuf::from(".osk");
+    let agents_config = load_agents_config_or_fallback(&osk_dir)?;
+
+    // Sélection des agents à installer
+    let selected_agents = select_agents(&agents_config, default, agent, all_agents)?;
+
+    // Parser les prompts pour extraire les métadonnées
+    let prompts_dir = osk_dir.join("prompts");
+    let prompts_info = prompts::parse_prompts_dir(&prompts_dir)?;
+
+    // Détecter les domaines actifs
+    let domains = detect_domains(&stats);
+
+    // Installer les configurations pour chaque agent sélectionné
+    let templates_dir = osk_dir.join("templates");
+    let mut agent_results = Vec::new();
+
+    for agent_id in &selected_agents {
+        if let Some(agent_config) = agents_config.agents.get(agent_id) {
+            match install_agent(
+                agent_id,
+                agent_config,
+                &prompts_info,
+                &templates_dir,
+                &domains,
+            ) {
+                Ok(result) => agent_results.push(result),
+                Err(e) => eprintln!("   ⚠️  Erreur {}: {}", agent_id, e),
+            }
+        }
     }
 
-    // Affichage du résumé
-    print_summary(&stats, &selected_agents);
+    // Générer AGENTS.md si configuré
+    if let Some(ref universal) = agents_config.universal {
+        if universal.enabled {
+            if let Err(e) = agents::generate_agents_md(
+                universal,
+                &prompts_info,
+                &templates_dir,
+                VERSION,
+                &domains,
+            ) {
+                eprintln!("   ⚠️  Erreur AGENTS.md: {}", e);
+            }
+        }
+    }
+
+    // Afficher le résumé
+    print_summary(&stats, &agent_results, agents_config.universal.as_ref());
 
     Ok(())
 }
 
-/// Sélectionne les agents à configurer
-fn select_agents(default: bool, agent: Option<Agent>, all_agents: bool) -> Result<Vec<Agent>> {
-    if all_agents {
-        Ok(Agent::all())
-    } else if let Some(a) = agent {
-        Ok(vec![a])
+/// Charge ou crée la configuration projet
+fn load_or_create_config(force: bool, default: bool) -> Result<OskConfig> {
+    let config_path = Path::new(".osk/config.toml");
+    let config_exists = config_path.exists();
+
+    if config_exists && !force {
+        println!("   ℹ️  Configuration existante détectée.");
+        fs::read_to_string(config_path)
+            .and_then(|s| {
+                toml::from_str(&s)
+                    .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))
+            })
+            .or_else(|_| {
+                println!("   ⚠️  Config corrompue, création d'une nouvelle...");
+                if default {
+                    Ok(default_configuration())
+                } else {
+                    prompt_configuration()
+                }
+            })
     } else if default {
-        // Mode CI: Claude Code par défaut
-        Ok(vec![Agent::ClaudeCode])
+        Ok(default_configuration())
     } else {
-        // Mode interactif: sélection
-        let selected = prompt_agent_selection()?;
-        Ok(vec![selected])
+        prompt_configuration()
     }
 }
 
-/// Détecte les agents disponibles sur le système
-fn detect_available_agents() -> Vec<AgentInfo> {
-    vec![
-        AgentInfo {
-            agent: Agent::ClaudeCode,
-            name: "Claude Code",
-            available: which::which("claude").is_ok(),
-        },
-        AgentInfo {
-            agent: Agent::Copilot,
-            name: "GitHub Copilot",
-            available: Path::new(".github").exists() || which::which("gh").is_ok(),
-        },
-        AgentInfo {
-            agent: Agent::Cursor,
-            name: "Cursor",
-            available: which::which("cursor").is_ok() || Path::new(".cursor").exists(),
-        },
-        AgentInfo {
-            agent: Agent::Gemini,
-            name: "Gemini",
-            available: which::which("gemini").is_ok(),
-        },
-    ]
+/// Charge la config agents ou utilise un fallback
+fn load_agents_config_or_fallback(osk_dir: &Path) -> Result<AgentsConfig> {
+    match agents::load_agents_config(osk_dir) {
+        Ok(config) => Ok(config),
+        Err(_) => {
+            // Fallback: configuration par défaut embarquée
+            Ok(default_agents_config())
+        }
+    }
 }
 
-/// Affiche un menu de sélection d'agent
-fn prompt_agent_selection() -> Result<Agent> {
-    let agents = detect_available_agents();
+/// Configuration agents par défaut (fallback)
+fn default_agents_config() -> AgentsConfig {
+    let mut agents = HashMap::new();
 
-    let items: Vec<String> = agents
+    agents.insert(
+        "claude-code".to_string(),
+        AgentConfig {
+            name: "Claude Code".to_string(),
+            description: "Slash commands natifs".to_string(),
+            format: "slash-command".to_string(),
+            output_dir: Some(".claude/commands".to_string()),
+            output_file: None,
+            file_pattern: Some("{command}.md".to_string()),
+            detect_cmd: Some("claude".to_string()),
+            detect_path: None,
+            template: "claude-code.tera".to_string(),
+            enabled: true,
+        },
+    );
+
+    agents.insert(
+        "copilot".to_string(),
+        AgentConfig {
+            name: "GitHub Copilot".to_string(),
+            description: "Instructions Copilot".to_string(),
+            format: "single-file".to_string(),
+            output_dir: None,
+            output_file: Some(".github/copilot-instructions.md".to_string()),
+            file_pattern: None,
+            detect_cmd: Some("gh".to_string()),
+            detect_path: Some(".github".to_string()),
+            template: "copilot.tera".to_string(),
+            enabled: true,
+        },
+    );
+
+    agents.insert(
+        "cursor".to_string(),
+        AgentConfig {
+            name: "Cursor".to_string(),
+            description: "Règles Cursor".to_string(),
+            format: "rules-dir".to_string(),
+            output_dir: Some(".cursor/rules".to_string()),
+            output_file: None,
+            file_pattern: Some("osk-{command}.md".to_string()),
+            detect_cmd: Some("cursor".to_string()),
+            detect_path: Some(".cursor".to_string()),
+            template: "cursor.tera".to_string(),
+            enabled: true,
+        },
+    );
+
+    agents.insert(
+        "gemini".to_string(),
+        AgentConfig {
+            name: "Gemini".to_string(),
+            description: "Instructions Gemini".to_string(),
+            format: "single-file".to_string(),
+            output_dir: None,
+            output_file: Some(".gemini/instructions.md".to_string()),
+            file_pattern: None,
+            detect_cmd: Some("gemini".to_string()),
+            detect_path: None,
+            template: "gemini.tera".to_string(),
+            enabled: true,
+        },
+    );
+
+    AgentsConfig {
+        meta: agents::MetaConfig {
+            version: VERSION.to_string(),
+            default_agent: "claude-code".to_string(),
+        },
+        agents,
+        universal: Some(agents::UniversalConfig {
+            enabled: true,
+            output_file: "AGENTS.md".to_string(),
+            template: "AGENTS.md.tera".to_string(),
+        }),
+    }
+}
+
+/// Sélectionne les agents à installer
+fn select_agents(
+    config: &AgentsConfig,
+    default: bool,
+    agent: Option<Agent>,
+    all_agents: bool,
+) -> Result<Vec<String>> {
+    if all_agents {
+        // Tous les agents activés
+        Ok(config
+            .agents
+            .iter()
+            .filter(|(_, a)| a.enabled)
+            .map(|(id, _)| id.clone())
+            .collect())
+    } else if let Some(a) = agent {
+        // Agent spécifié en CLI
+        Ok(vec![agent_to_id(&a)])
+    } else if default {
+        // Mode CI: agent par défaut
+        Ok(vec![config.meta.default_agent.clone()])
+    } else {
+        // Mode interactif
+        let selected_id = prompt_agent_selection(config)?;
+        Ok(vec![selected_id])
+    }
+}
+
+/// Convertit l'enum Agent en ID string
+fn agent_to_id(agent: &Agent) -> String {
+    match agent {
+        Agent::ClaudeCode => "claude-code".to_string(),
+        Agent::Copilot => "copilot".to_string(),
+        Agent::Cursor => "cursor".to_string(),
+        Agent::Gemini => "gemini".to_string(),
+    }
+}
+
+/// Affiche le menu de sélection d'agent
+fn prompt_agent_selection(config: &AgentsConfig) -> Result<String> {
+    let mut items: Vec<(String, String)> = config
+        .agents
         .iter()
-        .map(|info| {
-            if info.available {
-                format!("{} ✓", info.name)
+        .filter(|(_, a)| a.enabled)
+        .map(|(id, a)| {
+            let available = agents::is_agent_available(a);
+            let label = if available {
+                format!("{} ✓", a.name)
             } else {
-                format!("{} (non détecté)", info.name)
-            }
+                format!("{} (non détecté)", a.name)
+            };
+            (id.clone(), label)
         })
         .collect();
 
+    items.sort_by(|a, b| a.1.cmp(&b.1));
+
+    let labels: Vec<&str> = items.iter().map(|(_, l)| l.as_str()).collect();
+
     let selection = Select::with_theme(&ColorfulTheme::default())
         .with_prompt("Quel agent AI voulez-vous configurer ?")
-        .items(&items)
+        .items(&labels)
         .default(0)
         .interact()?;
 
-    Ok(agents[selection].agent)
+    Ok(items[selection].0.clone())
 }
 
-/// Affiche le résumé d'installation condensé
-fn print_summary(stats: &InstallStats, agents: &[Agent]) {
+/// Installe la configuration pour un agent
+fn install_agent(
+    agent_id: &str,
+    agent_config: &AgentConfig,
+    prompts_info: &[prompts::PromptInfo],
+    templates_dir: &Path,
+    domains: &DomainsInfo,
+) -> Result<AgentInstallResult> {
+    let files_count = agents::generate_agent_files(
+        agent_id,
+        agent_config,
+        prompts_info,
+        templates_dir,
+        VERSION,
+        domains,
+    )?;
+
+    let output_path = agent_config
+        .output_dir
+        .clone()
+        .or_else(|| agent_config.output_file.clone())
+        .unwrap_or_default();
+
+    Ok(AgentInstallResult {
+        agent_id: agent_id.to_string(),
+        agent_name: agent_config.name.clone(),
+        files_count,
+        output_path,
+    })
+}
+
+/// Détecte les domaines actifs depuis les stats
+fn detect_domains(stats: &InstallStats) -> DomainsInfo {
+    DomainsInfo {
+        rgpd: stats.rgpd > 0,
+        rgs: stats.rgs > 0,
+        nis2: stats.nis2 > 0,
+    }
+}
+
+/// Affiche le résumé d'installation
+fn print_summary(
+    stats: &InstallStats,
+    agent_results: &[AgentInstallResult],
+    universal: Option<&agents::UniversalConfig>,
+) {
     println!("\n   📦 Modules chargés:");
     println!(
         "      ✓ Core          {} prompts, {} schemas, {} outputs",
@@ -163,33 +360,21 @@ fn print_summary(stats: &InstallStats, agents: &[Agent]) {
     if stats.nis2 > 0 {
         println!("      ✓ NIS2          {} fichiers", stats.nis2);
     }
+    if stats.agents_templates > 0 {
+        println!("      ✓ Templates     {} agents", stats.agents_templates);
+    }
 
     println!("\n   🤖 Agent(s) configuré(s):");
-    for agent in agents {
-        match agent {
-            Agent::ClaudeCode => {
-                println!(
-                    "      ✓ {} → .claude/commands/ ({} slash commands)",
-                    agent.display_name(),
-                    stats.prompts
-                )
-            }
-            Agent::Copilot => {
-                println!(
-                    "      ✓ {} → .github/copilot-instructions.md",
-                    agent.display_name()
-                )
-            }
-            Agent::Cursor => {
-                println!(
-                    "      ✓ {} → .cursor/rules/ ({} règles)",
-                    agent.display_name(),
-                    stats.prompts
-                )
-            }
-            Agent::Gemini => {
-                println!("      ✓ {} → .gemini/instructions.md", agent.display_name())
-            }
+    for result in agent_results {
+        println!(
+            "      ✓ {} → {} ({} fichiers)",
+            result.agent_name, result.output_path, result.files_count
+        );
+    }
+
+    if let Some(u) = universal {
+        if u.enabled {
+            println!("      ✓ AGENTS.md (universel)");
         }
     }
 
@@ -202,273 +387,36 @@ fn print_summary(stats: &InstallStats, agents: &[Agent]) {
 
     println!("\n✅ OpenSecKit prêt !");
 
-    // Instructions selon l'agent principal
-    if let Some(agent) = agents.first() {
-        match agent {
-            Agent::ClaudeCode => {
+    // Instructions selon le premier agent
+    if let Some(first) = agent_results.first() {
+        match first.agent_id.as_str() {
+            "claude-code" => {
                 println!("\n💡 Prochaines étapes:");
                 println!("   1. Lancez Claude Code: claude");
                 println!("   2. Exécutez /osk-configure pour analyser votre code");
             }
-            Agent::Copilot => {
+            "copilot" => {
                 println!("\n💡 Prochaines étapes:");
                 println!("   1. Ouvrez VS Code avec GitHub Copilot");
-                println!("   2. Demandez à Copilot d'analyser la sécurité de votre projet");
+                println!("   2. Demandez à Copilot d'analyser la sécurité du projet");
             }
-            Agent::Cursor => {
+            "cursor" => {
                 println!("\n💡 Prochaines étapes:");
                 println!("   1. Ouvrez Cursor dans ce projet");
-                println!("   2. Les règles OSK seront automatiquement chargées");
+                println!("   2. Les règles OSK sont automatiquement chargées");
             }
-            Agent::Gemini => {
+            "gemini" => {
                 println!("\n💡 Prochaines étapes:");
-                println!("   1. Utilisez Gemini avec le contexte .gemini/instructions.md");
+                println!("   1. Utilisez Gemini avec le contexte du projet");
             }
+            _ => {}
         }
     }
 }
 
-/// Installe la configuration pour un agent spécifique
-fn install_agent_config(agent: &Agent, stats: &InstallStats, force: bool) -> Result<()> {
-    match agent {
-        Agent::ClaudeCode => install_claude_code(force),
-        Agent::Copilot => install_copilot(stats),
-        Agent::Cursor => install_cursor(stats),
-        Agent::Gemini => install_gemini(stats),
-    }
-}
-
-/// Installation Claude Code (slash commands)
-fn install_claude_code(force: bool) -> Result<()> {
-    let prompts_dir = PathBuf::from(".osk/prompts");
-    let commands_dir = PathBuf::from(".claude/commands");
-
-    if !prompts_dir.exists() {
-        return Ok(());
-    }
-
-    fs::create_dir_all(&commands_dir)?;
-
-    for entry in fs::read_dir(prompts_dir)? {
-        let entry = entry?;
-        let path = entry.path();
-
-        if path.extension().and_then(|s| s.to_str()) == Some("md") {
-            if let Some(filename) = path.file_name() {
-                let dest = commands_dir.join(filename);
-                if !dest.exists() || force {
-                    fs::copy(&path, &dest)?;
-                }
-            }
-        }
-    }
-
-    Ok(())
-}
-
-/// Installation GitHub Copilot
-fn install_copilot(stats: &InstallStats) -> Result<()> {
-    fs::create_dir_all(".github")?;
-
-    let content = generate_copilot_instructions(stats);
-    fs::write(".github/copilot-instructions.md", content)?;
-
-    Ok(())
-}
-
-/// Installation Cursor
-fn install_cursor(stats: &InstallStats) -> Result<()> {
-    fs::create_dir_all(".cursor/rules")?;
-
-    // Règle principale OSK
-    let content = generate_cursor_rules(stats);
-    fs::write(".cursor/rules/openseckit.md", content)?;
-
-    Ok(())
-}
-
-/// Installation Gemini
-fn install_gemini(stats: &InstallStats) -> Result<()> {
-    fs::create_dir_all(".gemini")?;
-
-    let content = generate_gemini_instructions(stats);
-    fs::write(".gemini/instructions.md", content)?;
-
-    Ok(())
-}
-
-/// Génère les instructions pour GitHub Copilot
-fn generate_copilot_instructions(stats: &InstallStats) -> String {
-    format!(
-        r#"# OpenSecKit Security Instructions
-
-This project uses OpenSecKit for security-as-code workflows.
-
-## Project Structure
-
-- `.osk/config.toml` - Project configuration and detected stack
-- `.osk/memory/` - Persistent context between sessions
-- `.osk/specs/` - Security specifications per feature
-- `docs/security/risks/risk-register.yaml` - Central risk registry
-
-## Security Workflow
-
-When asked about security, follow this workflow:
-
-### 1. Configuration (`/osk-configure` equivalent)
-- Analyze the codebase to detect the technology stack
-- Identify applicable compliance domains (RGPD, RGS, NIS2)
-- Update `.osk/config.toml` with findings
-
-### 2. Threat Analysis (`/osk-analyze` equivalent)
-- Apply STRIDE methodology for threat modeling
-- Score risks using Impact × Probability × Exposure (1-125 scale)
-- Document in `.osk/specs/NNN-feature/threats.md` and `risks.md`
-
-### 3. Security Requirements (`/osk-specify` equivalent)
-- Define security requirements based on identified risks
-- Create test strategies for validation
-- Document in `.osk/specs/NNN-feature/requirements.md`
-
-### 4. Hardening (`/osk-harden` equivalent)
-- Propose hardening measures for Principles V, VI, VII
-- Secrets management, audit logging, patch management
-- Document in `.osk/specs/NNN-feature/hardening.md`
-
-### 5. Implementation (`/osk-implement` equivalent)
-- Execute tasks from `.osk/specs/NNN-feature/tasks.yaml`
-- Update risk-register.yaml with resolutions
-- Mark risks as RESOLU when mitigated
-
-## Available Resources
-
-- {} prompts defining security workflows
-- {} schemas for structured output
-- {} output templates
-
-## Compliance Domains
-
-{}{}{}
-
-## Important Rules
-
-1. Never skip threat modeling before implementation
-2. Always update the risk register after implementing mitigations
-3. Follow the 7 security principles defined in constitution.md
-4. Use YAML format for structured data (risks, tasks, requirements)
-"#,
-        stats.prompts,
-        stats.schemas,
-        stats.outputs,
-        if stats.rgpd > 0 {
-            "- RGPD: Data protection and privacy\n"
-        } else {
-            ""
-        },
-        if stats.rgs > 0 {
-            "- RGS: French government security (EBIOS RM)\n"
-        } else {
-            ""
-        },
-        if stats.nis2 > 0 {
-            "- NIS2: EU cybersecurity directive\n"
-        } else {
-            ""
-        },
-    )
-}
-
-/// Génère les règles pour Cursor
-fn generate_cursor_rules(stats: &InstallStats) -> String {
-    format!(
-        r#"# OpenSecKit Security Rules for Cursor
-
-## Context
-
-This project uses OpenSecKit v3.1.0 for security-as-code.
-- Configuration: `.osk/config.toml`
-- Specifications: `.osk/specs/`
-- Risk Registry: `docs/security/risks/risk-register.yaml`
-
-## Security Analysis Rules
-
-When analyzing code for security:
-
-1. **Threat Modeling**: Apply STRIDE (Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, Elevation of Privilege)
-
-2. **Risk Scoring**: Use the formula `Impact × Probability × Exposure` (scale 1-125)
-   - CRITIQUE: score ≥ 64
-   - IMPORTANT: score 27-63
-   - MINEUR: score < 27
-
-3. **Output Format**: Always use the schemas in `.osk/templates/schemas/`
-
-## Available Commands (conceptual)
-
-- `osk-configure`: Analyze codebase and detect stack
-- `osk-analyze <feature>`: Threat model a feature
-- `osk-specify <feature>`: Define security requirements
-- `osk-harden <feature>`: Propose hardening measures
-- `osk-implement <feature>`: Execute security tasks
-
-## Resources Loaded
-
-- {} security prompts
-- {} data schemas
-- {} output templates
-
-## Compliance
-
-{}{}{}
-"#,
-        stats.prompts,
-        stats.schemas,
-        stats.outputs,
-        if stats.rgpd > 0 { "- RGPD enabled\n" } else { "" },
-        if stats.rgs > 0 { "- RGS enabled\n" } else { "" },
-        if stats.nis2 > 0 { "- NIS2 enabled\n" } else { "" },
-    )
-}
-
-/// Génère les instructions pour Gemini
-fn generate_gemini_instructions(stats: &InstallStats) -> String {
-    format!(
-        r#"# OpenSecKit Security Context for Gemini
-
-## Overview
-
-This project uses OpenSecKit for structured security analysis.
-
-## Key Files
-
-- `.osk/config.toml`: Project configuration
-- `.osk/specs/`: Feature-specific security specs
-- `docs/security/risks/risk-register.yaml`: Risk tracking
-
-## Methodology
-
-1. STRIDE threat modeling
-2. Risk scoring (Impact × Probability × Exposure, 1-125)
-3. Security requirements definition
-4. Hardening recommendations
-5. Implementation with risk resolution
-
-## Resources
-
-{} prompts | {} schemas | {} templates
-
-## Active Domains
-
-{}{}{}
-"#,
-        stats.prompts,
-        stats.schemas,
-        stats.outputs,
-        if stats.rgpd > 0 { "RGPD " } else { "" },
-        if stats.rgs > 0 { "RGS " } else { "" },
-        if stats.nis2 > 0 { "NIS2" } else { "" },
-    )
-}
+// =============================================================================
+// Configuration et téléchargement (code existant simplifié)
+// =============================================================================
 
 fn prompt_configuration() -> Result<OskConfig> {
     let project_name: String = Input::with_theme(&ColorfulTheme::default())
@@ -485,25 +433,8 @@ fn prompt_configuration() -> Result<OskConfig> {
         .allow_empty(true)
         .interact_text()?;
 
-    let detected_vec: Vec<String> = if detected_stack.trim().is_empty() {
-        vec![]
-    } else {
-        detected_stack
-            .split(',')
-            .map(|s| s.trim().to_string())
-            .filter(|s| !s.is_empty())
-            .collect()
-    };
-
-    let custom_vec: Vec<String> = if final_stack.trim() == detected_stack.trim() {
-        vec![]
-    } else {
-        final_stack
-            .split(',')
-            .map(|s| s.trim().to_string())
-            .filter(|s| !s.is_empty() && !detected_vec.contains(&s.to_string()))
-            .collect()
-    };
+    let detected_vec = parse_stack(&detected_stack);
+    let custom_vec = parse_custom_stack(&final_stack, &detected_vec);
 
     Ok(build_config(project_name, detected_vec, custom_vec))
 }
@@ -513,17 +444,29 @@ fn default_configuration() -> OskConfig {
     println!("   🔍 Scan de la stack technique...");
 
     let detected_stack = stack::detect();
-    let detected_vec: Vec<String> = if detected_stack.trim().is_empty() {
+    let detected_vec = parse_stack(&detected_stack);
+
+    build_config("MonProjet".to_string(), detected_vec, vec![])
+}
+
+fn parse_stack(stack: &str) -> Vec<String> {
+    if stack.trim().is_empty() {
         vec![]
     } else {
-        detected_stack
+        stack
             .split(',')
             .map(|s| s.trim().to_string())
             .filter(|s| !s.is_empty())
             .collect()
-    };
+    }
+}
 
-    build_config("MonProjet".to_string(), detected_vec, vec![])
+fn parse_custom_stack(final_stack: &str, detected: &[String]) -> Vec<String> {
+    final_stack
+        .split(',')
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty() && !detected.contains(s))
+        .collect()
 }
 
 fn build_config(name: String, detected: Vec<String>, custom: Vec<String>) -> OskConfig {
@@ -584,6 +527,7 @@ fn scaffold_project(config: &OskConfig, force: bool) -> Result<()> {
         fs::write(config_path, toml_string)?;
     }
 
+    // Gitignore
     if Path::new(".gitignore").exists() {
         let content = fs::read_to_string(".gitignore")?;
         if !content.contains(".osk/memory/") {
@@ -618,6 +562,14 @@ fn install_resources(client: &Client, force: bool) -> Result<InstallStats> {
         }
     }
 
+    // Agents config
+    let agents_dest = PathBuf::from(".osk/agents.toml");
+    if !agents_dest.exists() || force {
+        if let Err(e) = github::download_file(client, &tag, "agents.toml", &agents_dest) {
+            stats.errors.push(format!("agents.toml: {}", e));
+        }
+    }
+
     // Fetch tree and download resources
     let tree_items = match github::fetch_repo_tree(client, &tag) {
         Ok(items) => items,
@@ -634,12 +586,10 @@ fn install_resources(client: &Client, force: bool) -> Result<InstallStats> {
 
         let dest = PathBuf::from(".osk").join(&item.path);
         if dest.exists() && !force {
-            // Count existing files
             count_resource(&item.path, &mut stats);
             continue;
         }
 
-        // Download and count
         if item.path.starts_with("prompts/")
             || item.path.starts_with("templates/")
             || item.path.starts_with("domaines/")
@@ -656,7 +606,6 @@ fn install_resources(client: &Client, force: bool) -> Result<InstallStats> {
     Ok(stats)
 }
 
-/// Compte les ressources par catégorie
 fn count_resource(path: &str, stats: &mut InstallStats) {
     if path.starts_with("prompts/") && path.ends_with(".md") {
         stats.prompts += 1;
@@ -666,6 +615,8 @@ fn count_resource(path: &str, stats: &mut InstallStats) {
         stats.outputs += 1;
     } else if path.starts_with("templates/reports/") {
         stats.reports += 1;
+    } else if path.starts_with("templates/agents/") {
+        stats.agents_templates += 1;
     } else if path.starts_with("domaines/rgpd/") {
         stats.rgpd += 1;
     } else if path.starts_with("domaines/gouvernement-rgs/") {

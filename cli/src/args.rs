@@ -14,6 +14,7 @@ pub enum Agent {
 }
 
 impl Agent {
+    #[allow(dead_code)]
     pub fn display_name(&self) -> &'static str {
         match self {
             Agent::ClaudeCode => "Claude Code",
@@ -23,6 +24,7 @@ impl Agent {
         }
     }
 
+    #[allow(dead_code)]
     pub fn all() -> Vec<Agent> {
         vec![Agent::ClaudeCode, Agent::Copilot, Agent::Cursor, Agent::Gemini]
     }

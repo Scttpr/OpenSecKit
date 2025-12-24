@@ -1,9 +1,11 @@
 #![warn(clippy::all)]
 
+mod agents;
 mod args;
 mod commands;
 mod config;
 mod github;
+mod prompts;
 mod stack;
 
 use anyhow::Result;

@@ -1,0 +1,60 @@
+# {{ prompt.name }}
+
+> {{ prompt.description }}
+
+## Context
+
+This project uses **OpenSecKit** for security-as-code.
+- Configuration: `.osk/config.toml`
+- Specifications: `.osk/specs/`
+- Risk Registry: `docs/security/risks/risk-register.yaml`
+
+{% if prompt.argument -%}
+## Usage
+
+```
+{{ prompt.name }} {{ prompt.argument }}
+```
+{% endif %}
+
+{% if prompt.principles | length > 0 -%}
+## Security Principles
+
+This command implements:
+{% for principle in prompt.principles -%}
+- Principle {{ principle }}
+{% endfor %}
+{% endif %}
+
+{% if prompt.requires | length > 0 -%}
+## Prerequisites
+
+Requires these files to exist:
+{% for req in prompt.requires -%}
+- `{{ req }}`
+{% endfor %}
+{% endif %}
+
+## Instructions
+
+{{ prompt.instructions }}
+
+{% if prompt.outputs | length > 0 -%}
+## Expected Outputs
+
+Generate these files:
+{% for output in prompt.outputs -%}
+- `{{ output }}`
+{% endfor %}
+{% endif %}
+
+{% if prompt.steps | length > 0 -%}
+## Steps
+
+{% for step in prompt.steps -%}
+{{ loop.index }}. {{ step }}
+{% endfor %}
+{% endif %}
+
+---
+*OpenSecKit v{{ version }} - {{ prompt.phase }} phase*
