@@ -197,8 +197,12 @@ TODO: Analyse post-mortem après résolution
 }
 
 fn scaffold_rgpd(json: bool) -> Result<()> {
-    let rgpd_dir = "docs/security/rgpd";
-    fs::create_dir_all(rgpd_dir)?;
+    scaffold_rgpd_in(std::path::Path::new("."), json)
+}
+
+fn scaffold_rgpd_in(base: &std::path::Path, json: bool) -> Result<()> {
+    let rgpd_dir = base.join("docs/security/rgpd");
+    fs::create_dir_all(&rgpd_dir)?;
 
     let files = [
         (
@@ -217,18 +221,20 @@ fn scaffold_rgpd(json: bool) -> Result<()> {
 
     let mut created_files = Vec::new();
     for (filename, content) in files {
-        let path = format!("{}/{}", rgpd_dir, filename);
-        if !std::path::Path::new(&path).exists() {
+        let path = rgpd_dir.join(filename);
+        if !path.exists() {
             fs::write(&path, content)?;
-            created_files.push(path);
+            created_files.push(path.to_string_lossy().to_string());
         }
     }
+
+    let rgpd_dir_str = rgpd_dir.to_string_lossy().to_string();
 
     if json {
         let result = ScaffoldResult {
             success: true,
             command: "scaffold rgpd".to_string(),
-            created_dir: Some(rgpd_dir.to_string()),
+            created_dir: Some(rgpd_dir_str),
             created_files,
             branch: None,
             next_command: Some("/osk-rgpd".to_string()),
@@ -236,7 +242,7 @@ fn scaffold_rgpd(json: bool) -> Result<()> {
         };
         println!("{}", serde_json::to_string_pretty(&result)?);
     } else {
-        println!("📁 Created {}/", rgpd_dir);
+        println!("📁 Created {}/", rgpd_dir.display());
         for file in &created_files {
             let filename = file.split('/').next_back().unwrap_or(file);
             println!("   ├── {}", filename);
@@ -249,8 +255,12 @@ fn scaffold_rgpd(json: bool) -> Result<()> {
 }
 
 fn scaffold_rgs(system: &str, json: bool) -> Result<()> {
-    let rgs_dir = "docs/security/rgs";
-    fs::create_dir_all(rgs_dir)?;
+    scaffold_rgs_in(std::path::Path::new("."), system, json)
+}
+
+fn scaffold_rgs_in(base: &std::path::Path, system: &str, json: bool) -> Result<()> {
+    let rgs_dir = base.join("docs/security/rgs");
+    fs::create_dir_all(&rgs_dir)?;
 
     let slug = counter::slugify(system);
     let files = [
@@ -273,18 +283,20 @@ fn scaffold_rgs(system: &str, json: bool) -> Result<()> {
 
     let mut created_files = Vec::new();
     for (filename, content) in files {
-        let path = format!("{}/{}", rgs_dir, filename);
-        if !std::path::Path::new(&path).exists() {
+        let path = rgs_dir.join(&filename);
+        if !path.exists() {
             fs::write(&path, content)?;
-            created_files.push(path);
+            created_files.push(path.to_string_lossy().to_string());
         }
     }
+
+    let rgs_dir_str = rgs_dir.to_string_lossy().to_string();
 
     if json {
         let result = ScaffoldResult {
             success: true,
             command: "scaffold rgs".to_string(),
-            created_dir: Some(rgs_dir.to_string()),
+            created_dir: Some(rgs_dir_str),
             created_files,
             branch: None,
             next_command: Some("/osk-rgs".to_string()),
@@ -292,7 +304,7 @@ fn scaffold_rgs(system: &str, json: bool) -> Result<()> {
         };
         println!("{}", serde_json::to_string_pretty(&result)?);
     } else {
-        println!("📁 Created {}/", rgs_dir);
+        println!("📁 Created {}/", rgs_dir.display());
         for file in &created_files {
             let filename = file.split('/').next_back().unwrap_or(file);
             println!("   ├── {}", filename);
@@ -302,4 +314,83 @@ fn scaffold_rgs(system: &str, json: bool) -> Result<()> {
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tempfile::tempdir;
+
+    #[test]
+    fn test_scaffold_rgpd_creates_files() {
+        let dir = tempdir().unwrap();
+        scaffold_rgpd_in(dir.path(), false).unwrap();
+
+        assert!(dir
+            .path()
+            .join("docs/security/rgpd/registre-traitements.md")
+            .exists());
+        assert!(dir
+            .path()
+            .join("docs/security/rgpd/dpia-global.md")
+            .exists());
+        assert!(dir
+            .path()
+            .join("docs/security/rgpd/procedure-violation.md")
+            .exists());
+    }
+
+    #[test]
+    fn test_scaffold_rgpd_idempotent() {
+        let dir = tempdir().unwrap();
+        scaffold_rgpd_in(dir.path(), false).unwrap();
+
+        let first_content = fs::read_to_string(
+            dir.path()
+                .join("docs/security/rgpd/registre-traitements.md"),
+        )
+        .unwrap();
+
+        scaffold_rgpd_in(dir.path(), false).unwrap();
+
+        let second_content = fs::read_to_string(
+            dir.path()
+                .join("docs/security/rgpd/registre-traitements.md"),
+        )
+        .unwrap();
+
+        assert_eq!(first_content, second_content);
+    }
+
+    #[test]
+    fn test_scaffold_rgs_creates_files() {
+        let dir = tempdir().unwrap();
+        scaffold_rgs_in(dir.path(), "MonSysteme", false).unwrap();
+
+        assert!(dir
+            .path()
+            .join("docs/security/rgs/EBIOS-RM-monsysteme.md")
+            .exists());
+        assert!(dir
+            .path()
+            .join("docs/security/rgs/DOSSIER-HOMOLOGATION-monsysteme.md")
+            .exists());
+        assert!(dir
+            .path()
+            .join("docs/security/rgs/MCS-monsysteme.md")
+            .exists());
+    }
+
+    #[test]
+    fn test_scaffold_rgs_content() {
+        let dir = tempdir().unwrap();
+        scaffold_rgs_in(dir.path(), "API Gateway", false).unwrap();
+
+        let content =
+            fs::read_to_string(dir.path().join("docs/security/rgs/EBIOS-RM-api-gateway.md"))
+                .unwrap();
+
+        assert!(content.contains("# EBIOS RM - API Gateway"));
+        assert!(content.contains("TODO: Analyse de risques"));
+    }
 }

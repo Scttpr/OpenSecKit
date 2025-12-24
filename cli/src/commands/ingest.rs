@@ -110,3 +110,98 @@ fn is_binary(path: &Path) -> bool {
 
     buffer[..n].contains(&0)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tempfile::tempdir;
+
+    #[test]
+    fn test_is_binary_by_extension() {
+        let dir = tempdir().unwrap();
+
+        let png_path = dir.path().join("test.png");
+        fs::write(&png_path, "fake content").unwrap();
+        assert!(is_binary(&png_path));
+
+        let txt_path = dir.path().join("test.txt");
+        fs::write(&txt_path, "hello world").unwrap();
+        assert!(!is_binary(&txt_path));
+    }
+
+    #[test]
+    fn test_is_binary_by_content() {
+        let dir = tempdir().unwrap();
+
+        let binary_path = dir.path().join("test.dat");
+        fs::write(&binary_path, &[0x00, 0x01, 0x02, 0x03]).unwrap();
+        assert!(is_binary(&binary_path));
+
+        let text_path = dir.path().join("test.log");
+        fs::write(&text_path, "just text").unwrap();
+        assert!(!is_binary(&text_path));
+    }
+
+    #[test]
+    fn test_get_file_tree() {
+        let dir = tempdir().unwrap();
+        let base = dir.path();
+
+        fs::create_dir_all(base.join("src")).unwrap();
+        fs::write(base.join("src/main.rs"), "fn main() {}").unwrap();
+        fs::write(base.join("README.md"), "# Test").unwrap();
+
+        let tree = get_file_tree(&base.to_string_lossy());
+
+        assert!(tree.contains("src/main.rs") || tree.contains("main.rs"));
+        assert!(tree.contains("README.md"));
+    }
+
+    #[test]
+    fn test_get_file_tree_excludes_git() {
+        let dir = tempdir().unwrap();
+        let base = dir.path();
+
+        fs::create_dir_all(base.join(".git/objects")).unwrap();
+        fs::write(base.join(".git/config"), "git config").unwrap();
+        fs::write(base.join("code.rs"), "fn test() {}").unwrap();
+
+        let tree = get_file_tree(&base.to_string_lossy());
+
+        assert!(!tree.contains(".git"));
+        assert!(tree.contains("code.rs"));
+    }
+
+    #[test]
+    fn test_get_files_content() {
+        let dir = tempdir().unwrap();
+        let base = dir.path();
+
+        let file1 = base.join("file1.txt");
+        let file2 = base.join("file2.txt");
+        fs::write(&file1, "content one").unwrap();
+        fs::write(&file2, "content two").unwrap();
+
+        let content = get_files_content(&[
+            file1.to_string_lossy().to_string(),
+            file2.to_string_lossy().to_string(),
+        ]);
+
+        assert!(content.contains("content one"));
+        assert!(content.contains("content two"));
+        assert!(content.contains("## Fichier :"));
+    }
+
+    #[test]
+    fn test_get_files_content_binary() {
+        let dir = tempdir().unwrap();
+        let base = dir.path();
+
+        let binary_file = base.join("image.png");
+        fs::write(&binary_file, &[0x89, 0x50, 0x4E, 0x47]).unwrap();
+
+        let content = get_files_content(&[binary_file.to_string_lossy().to_string()]);
+
+        assert!(content.contains("[Fichier binaire ou trop volumineux"));
+    }
+}

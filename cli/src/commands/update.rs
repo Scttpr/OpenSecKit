@@ -395,10 +395,14 @@ fn update_risk(id: &str, status: &str, json: bool) -> Result<()> {
 }
 
 fn update_dashboard(json: bool) -> Result<()> {
-    let register_path = "docs/security/risks/risk-register.yaml";
-    let dashboard_path = "docs/security/dashboard.md";
+    update_dashboard_in(std::path::Path::new("."), json)
+}
 
-    let (total, open, resolved, critical) = if std::path::Path::new(register_path).exists() {
+fn update_dashboard_in(base: &std::path::Path, json: bool) -> Result<()> {
+    let register_path = base.join("docs/security/risks/risk-register.yaml");
+    let dashboard_path = base.join("docs/security/dashboard.md");
+
+    let (total, open, resolved, critical) = if register_path.exists() {
         let content = fs::read_to_string(register_path)?;
         let register: RiskRegister = serde_yaml::from_str(&content)?;
         (
@@ -411,8 +415,9 @@ fn update_dashboard(json: bool) -> Result<()> {
         (0, 0, 0, 0)
     };
 
-    let feature_count = if std::path::Path::new(".osk/specs").exists() {
-        fs::read_dir(".osk/specs")?
+    let specs_dir = base.join(".osk/specs");
+    let feature_count = if specs_dir.exists() {
+        fs::read_dir(&specs_dir)?
             .filter_map(|e| e.ok())
             .filter(|e| e.file_type().map(|t| t.is_dir()).unwrap_or(false))
             .count()
@@ -420,8 +425,9 @@ fn update_dashboard(json: bool) -> Result<()> {
         0
     };
 
-    let incident_count = if std::path::Path::new("docs/security/incidents").exists() {
-        fs::read_dir("docs/security/incidents")?
+    let incidents_dir = base.join("docs/security/incidents");
+    let incident_count = if incidents_dir.exists() {
+        fs::read_dir(&incidents_dir)?
             .filter_map(|e| e.ok())
             .filter(|e| e.file_name().to_string_lossy().starts_with("INC-"))
             .count()
@@ -490,17 +496,19 @@ Resolved:  {resolved_bar}  {resolved}
         resolved_bar = "█".repeat(resolved.min(20) as usize),
     );
 
-    if let Some(parent) = std::path::Path::new(dashboard_path).parent() {
+    if let Some(parent) = dashboard_path.parent() {
         fs::create_dir_all(parent)?;
     }
 
-    fs::write(dashboard_path, &dashboard)?;
+    fs::write(&dashboard_path, &dashboard)?;
+
+    let dashboard_path_str = dashboard_path.to_string_lossy().to_string();
 
     if json {
         let result = UpdateResult {
             success: true,
             command: "update dashboard".to_string(),
-            updated_files: vec![dashboard_path.to_string()],
+            updated_files: vec![dashboard_path_str.clone()],
             changes: vec![
                 Change {
                     field: "total_risks".to_string(),
@@ -517,7 +525,7 @@ Resolved:  {resolved_bar}  {resolved}
         };
         println!("{}", serde_json::to_string_pretty(&result)?);
     } else {
-        println!("📊 Dashboard regenerated: {}", dashboard_path);
+        println!("📊 Dashboard regenerated: {}", dashboard_path_str);
         println!("   {} risks ({} open, {} resolved)", total, open, resolved);
         println!(
             "   {} features, {} incidents",
@@ -526,4 +534,95 @@ Resolved:  {resolved_bar}  {resolved}
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tempfile::tempdir;
+
+    #[test]
+    fn test_update_dashboard_empty() {
+        let dir = tempdir().unwrap();
+        update_dashboard_in(dir.path(), false).unwrap();
+
+        let dashboard = dir.path().join("docs/security/dashboard.md");
+        assert!(dashboard.exists());
+
+        let content = fs::read_to_string(dashboard).unwrap();
+        assert!(content.contains("# Security Dashboard"));
+        assert!(content.contains("Total Risks | 0"));
+        assert!(content.contains("0 feature(s)"));
+    }
+
+    #[test]
+    fn test_update_dashboard_with_features() {
+        let dir = tempdir().unwrap();
+        let base = dir.path();
+
+        fs::create_dir_all(base.join(".osk/specs/001-auth")).unwrap();
+        fs::create_dir_all(base.join(".osk/specs/002-api")).unwrap();
+
+        update_dashboard_in(base, false).unwrap();
+
+        let content = fs::read_to_string(base.join("docs/security/dashboard.md")).unwrap();
+        assert!(content.contains("2 feature(s)"));
+    }
+
+    #[test]
+    fn test_update_dashboard_with_incidents() {
+        let dir = tempdir().unwrap();
+        let base = dir.path();
+
+        fs::create_dir_all(base.join("docs/security/incidents")).unwrap();
+        fs::write(
+            base.join("docs/security/incidents/INC-2025-01-01-001.md"),
+            "",
+        )
+        .unwrap();
+        fs::write(
+            base.join("docs/security/incidents/INC-2025-01-01-002.md"),
+            "",
+        )
+        .unwrap();
+
+        update_dashboard_in(base, false).unwrap();
+
+        let content = fs::read_to_string(base.join("docs/security/dashboard.md")).unwrap();
+        assert!(content.contains("2 incident(s)"));
+    }
+
+    #[test]
+    fn test_update_dashboard_with_risks() {
+        let dir = tempdir().unwrap();
+        let base = dir.path();
+
+        fs::create_dir_all(base.join("docs/security/risks")).unwrap();
+        let risk_register = r#"
+metadata:
+  version: "1.0"
+stats:
+  total: 5
+  par_statut:
+    ouverts: 3
+    resolus: 2
+  par_severite:
+    critiques: 1
+    importants: 2
+    mineurs: 2
+risques: []
+"#;
+        fs::write(
+            base.join("docs/security/risks/risk-register.yaml"),
+            risk_register,
+        )
+        .unwrap();
+
+        update_dashboard_in(base, false).unwrap();
+
+        let content = fs::read_to_string(base.join("docs/security/dashboard.md")).unwrap();
+        assert!(content.contains("Total Risks | 5"));
+        assert!(content.contains("Open | 3"));
+        assert!(content.contains("Resolved | 2"));
+    }
 }

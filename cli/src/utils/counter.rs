@@ -137,6 +137,13 @@ mod tests {
     }
 
     #[test]
+    fn test_slugify_special_chars() {
+        assert_eq!(slugify("Test@#$%Feature"), "test-feature");
+        assert_eq!(slugify("___underscores___"), "underscores");
+        assert_eq!(slugify(""), "");
+    }
+
+    #[test]
     fn test_next_feature_number_empty() {
         let dir = tempdir().unwrap();
         let num = next_feature_number_in(dir.path()).unwrap();
@@ -154,5 +161,54 @@ mod tests {
 
         let num = next_feature_number_in(base).unwrap();
         assert_eq!(num, 6);
+    }
+
+    #[test]
+    fn test_next_incident_number_empty() {
+        let dir = tempdir().unwrap();
+        let num = next_incident_number_in(dir.path(), "2025-01-01").unwrap();
+        assert_eq!(num, 1);
+    }
+
+    #[test]
+    fn test_next_incident_number_with_existing() {
+        let dir = tempdir().unwrap();
+        let base = dir.path();
+
+        fs::create_dir_all(base.join("docs/security/incidents")).unwrap();
+        fs::write(
+            base.join("docs/security/incidents/INC-2025-01-01-001.md"),
+            "",
+        )
+        .unwrap();
+        fs::write(
+            base.join("docs/security/incidents/INC-2025-01-01-002.md"),
+            "",
+        )
+        .unwrap();
+        fs::write(
+            base.join("docs/security/incidents/INC-2025-01-02-001.md"),
+            "",
+        )
+        .unwrap();
+
+        let num = next_incident_number_in(base, "2025-01-01").unwrap();
+        assert_eq!(num, 3);
+    }
+
+    #[test]
+    fn test_next_incident_number_different_date() {
+        let dir = tempdir().unwrap();
+        let base = dir.path();
+
+        fs::create_dir_all(base.join("docs/security/incidents")).unwrap();
+        fs::write(
+            base.join("docs/security/incidents/INC-2025-01-01-005.md"),
+            "",
+        )
+        .unwrap();
+
+        let num = next_incident_number_in(base, "2025-01-02").unwrap();
+        assert_eq!(num, 1);
     }
 }
