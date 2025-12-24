@@ -40,6 +40,7 @@ pub struct Cli {
 
 #[derive(Subcommand)]
 pub enum Commands {
+    /// Initialiser un projet avec OpenSecKit
     Init {
         /// Forcer la réinstallation même si les fichiers existent
         #[arg(long, short)]
@@ -55,10 +56,144 @@ pub enum Commands {
         all_agents: bool,
     },
 
+    /// Exporter le contexte du projet
     Ingest {
         #[arg(short, long, default_value = "context.txt")]
         output: String,
         #[arg(short, long, default_value = ".")]
         path: String,
+    },
+
+    /// Vérifier les prérequis pour une commande
+    Check {
+        #[command(subcommand)]
+        command: CheckCommands,
+        /// Afficher le résultat en JSON
+        #[arg(long)]
+        json: bool,
+    },
+
+    /// Créer des structures de fichiers
+    Scaffold {
+        #[command(subcommand)]
+        command: ScaffoldCommands,
+    },
+
+    /// Mettre à jour les fichiers mécaniquement
+    Update {
+        #[command(subcommand)]
+        command: UpdateCommands,
+    },
+
+    /// Valider la cohérence des fichiers
+    Validate {
+        #[command(subcommand)]
+        command: ValidateCommands,
+    },
+}
+
+/// Sous-commandes pour osk check
+#[derive(Subcommand)]
+pub enum CheckCommands {
+    /// Vérifier les prérequis pour /osk-configure
+    Configure,
+    /// Vérifier les prérequis pour /osk-analyze
+    Analyze,
+    /// Vérifier les prérequis pour /osk-specify
+    Specify {
+        /// Nom de la feature
+        feature: String,
+    },
+    /// Vérifier les prérequis pour /osk-harden
+    Harden {
+        /// Nom de la feature
+        feature: String,
+    },
+    /// Vérifier les prérequis pour /osk-plan
+    Plan {
+        /// Nom de la feature
+        feature: String,
+    },
+    /// Vérifier les prérequis pour /osk-tasks
+    Tasks {
+        /// Nom de la feature
+        feature: String,
+    },
+    /// Vérifier les prérequis pour /osk-implement
+    Implement {
+        /// Nom de la feature
+        feature: String,
+    },
+    /// Vérifier les prérequis pour /osk-dashboard
+    Dashboard,
+}
+
+/// Sous-commandes pour osk scaffold
+#[derive(Subcommand)]
+pub enum ScaffoldCommands {
+    /// Créer la structure d'une nouvelle feature
+    Feature {
+        /// Nom de la feature
+        name: String,
+        /// Ne pas créer de branche git
+        #[arg(long)]
+        no_branch: bool,
+    },
+    /// Créer un rapport d'incident
+    Incident {
+        /// Description de l'incident
+        description: String,
+        /// Sévérité (CRITIQUE, IMPORTANT, MODERE, MINEUR)
+        #[arg(long, default_value = "IMPORTANT")]
+        severity: String,
+    },
+    /// Créer la structure RGPD
+    Rgpd,
+    /// Créer la structure RGS
+    Rgs {
+        /// Nom du système
+        system: String,
+    },
+}
+
+/// Sous-commandes pour osk update
+#[derive(Subcommand)]
+pub enum UpdateCommands {
+    /// Recalculer les statistiques du risk-register
+    Stats,
+    /// Mettre à jour le statut d'une tâche
+    Task {
+        /// ID de la tâche (ex: T001)
+        id: String,
+        /// Marquer comme terminée
+        #[arg(long)]
+        done: bool,
+    },
+    /// Mettre à jour le statut d'un risque
+    Risk {
+        /// ID du risque (ex: RISK-AUTH-001)
+        id: String,
+        /// Nouveau statut
+        #[arg(long)]
+        status: String,
+    },
+    /// Régénérer le dashboard
+    Dashboard,
+}
+
+/// Sous-commandes pour osk validate
+#[derive(Subcommand)]
+pub enum ValidateCommands {
+    /// Valider la syntaxe des fichiers YAML
+    Yaml,
+    /// Vérifier les dépendances des tâches
+    Deps {
+        /// Nom de la feature
+        feature: String,
+    },
+    /// Vérifier la complétude du workflow
+    Workflow {
+        /// Nom de la feature
+        feature: String,
     },
 }
