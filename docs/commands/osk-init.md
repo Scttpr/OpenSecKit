@@ -32,8 +32,10 @@ osk init [OPTIONS]
 |-------|------------------|
 | `claude-code` | `.claude/commands/*.md` (slash commands) |
 | `copilot` | `.github/copilot-instructions.md` |
-| `cursor` | `.cursor/rules/openseckit.md` |
+| `cursor` | `.cursor/rules/*.md` (une règle par commande) |
 | `gemini` | `.gemini/instructions.md` |
+
+En plus des fichiers spécifiques à chaque agent, `AGENTS.md` est généré à la racine du projet (format universel compatible avec tous les agents).
 
 ## Exemples
 
@@ -114,10 +116,13 @@ L'installation affiche un résumé condensé par module :
 .github/copilot-instructions.md
 
 # Cursor
-.cursor/rules/openseckit.md
+.cursor/rules/*.md
 
 # Gemini
 .gemini/instructions.md
+
+# Universel (toujours généré)
+AGENTS.md
 ```
 
 ## Comportement avec `--force`

@@ -11,6 +11,13 @@ Historique des versions OpenSecKit.
     - GitHub Copilot (instructions)
     - Cursor (rules)
     - Gemini (instructions)
+    - AGENTS.md (format universel)
+
+- **Architecture data-driven**
+    - `agents.toml` : configuration déclarative des agents
+    - Templates Tera dans `templates/agents/`
+    - Ajouter un agent = config + template (zéro code Rust)
+    - 3 formats : `slash-command`, `single-file`, `rules-dir`
 
 - **Sélection interactive d'agent**
     - `osk init` affiche un menu de sélection
@@ -18,11 +25,9 @@ Historique des versions OpenSecKit.
     - Option `--agent <nom>` pour sélection directe
     - Option `--all-agents` pour tous les agents
 
-- **Rôles de sécurité** (inspirés de SpecKit)
-    - Risk Owner, Security Architect, Security Engineer
-    - Security Reviewer, Privacy Analyst, Compliance Officer
-    - SecOps Engineer
-    - Chaque commande mappée à un rôle
+- **Nouveaux modules CLI**
+    - `agents.rs` : gestion multi-agent
+    - `prompts.rs` : parsing des prompts (frontmatter, steps, outputs)
 
 ### Améliorations
 
@@ -30,9 +35,10 @@ Historique des versions OpenSecKit.
     - Résumé par module au lieu de liste de fichiers
     - Affichage clair des agents configurés
 
-- **Registry enrichi**
-    - Champs `agents` et `roles` par commande
-    - Section `[roles]` avec définitions
+- **Nouvelles dépendances Rust**
+    - `tera` : moteur de templates
+    - `regex` : parsing frontmatter
+    - `which` : détection agents
 
 ---
 

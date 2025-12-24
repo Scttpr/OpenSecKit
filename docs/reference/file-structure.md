@@ -9,6 +9,7 @@ projet/
 ├── .osk/                           # Espace de travail interne
 │   ├── config.toml                 # Configuration projet
 │   ├── registry.toml               # Registre des commandes
+│   ├── agents.toml                 # Configuration multi-agent
 │   ├── memory/                     # Mémoire contextuelle
 │   │   ├── context.md              # Faits techniques
 │   │   └── constitution.md         # Principes pondérés
@@ -22,17 +23,28 @@ projet/
 │   │       ├── plan.md
 │   │       └── tasks.yaml
 │   ├── templates/                  # Templates
+│   │   ├── agents/                # Templates Tera par agent
 │   │   ├── schemas/
 │   │   ├── outputs/
 │   │   └── reports/
 │   ├── prompts/                    # Prompts sources
 │   └── domaines/                   # Domaines réglementaires
 │
-├── .claude/
-│   └── commands/                   # Slash commands
-│       ├── osk-configure.md
-│       ├── osk-analyze.md
-│       └── ...
+├── AGENTS.md                       # Format universel (tous agents)
+│
+├── .claude/commands/               # Claude Code
+│   ├── osk-configure.md
+│   └── ...
+│
+├── .github/                        # GitHub Copilot
+│   └── copilot-instructions.md
+│
+├── .cursor/rules/                  # Cursor
+│   ├── osk-analyze.md
+│   └── ...
+│
+├── .gemini/                        # Gemini
+│   └── instructions.md
 │
 └── docs/security/                  # Documentation finale
     ├── risks/
@@ -118,9 +130,29 @@ Plans de continuité :
 - `PCA-*.md` - Plan de Continuité d'Activité
 - `PRA-*.md` - Plan de Reprise d'Activité
 
-## `.claude/commands/`
+## Fichiers Agent
 
-Slash commands installés pour Claude Code. Générés automatiquement par `osk init`.
+Générés automatiquement par `osk init` selon l'agent sélectionné.
+
+### AGENTS.md
+
+Format universel compatible avec tous les agents AI. Toujours généré.
+
+### .claude/commands/
+
+Slash commands pour Claude Code (un fichier par commande).
+
+### .github/copilot-instructions.md
+
+Instructions consolidées pour GitHub Copilot.
+
+### .cursor/rules/
+
+Règles de projet pour Cursor (un fichier par commande).
+
+### .gemini/instructions.md
+
+Instructions pour Google Gemini.
 
 !!! tip "Mise à jour"
-    Utilisez `osk init --force` pour mettre à jour les commandes.
+    Utilisez `osk init --force` pour mettre à jour les fichiers agent.
