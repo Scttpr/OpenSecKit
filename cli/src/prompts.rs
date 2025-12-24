@@ -1,7 +1,4 @@
-//! Module de parsing des prompts OpenSecKit
-//!
-//! Parse les fichiers .md des prompts pour extraire les métadonnées
-//! (description, argument, principes, prérequis, outputs, etc.)
+//! Prompt parsing module
 
 use anyhow::{Context, Result};
 use lazy_static::lazy_static;
@@ -11,15 +8,11 @@ use std::fs;
 use std::path::Path;
 
 lazy_static! {
-    // Regex pour le frontmatter YAML
     static ref FRONTMATTER_RE: Regex = Regex::new(r"(?s)^---\n(.*?)\n---").unwrap();
-
-    // Regex pour extraire les champs du frontmatter (avec ou sans guillemets)
     static ref DESCRIPTION_RE: Regex = Regex::new(r#"description:\s*"?([^"\n]+)"?"#).unwrap();
     static ref ARGUMENT_RE: Regex = Regex::new(r#"argument:\s*"?([^"\n]+)"?"#).unwrap();
 }
 
-/// Information extraite d'un prompt
 #[derive(Debug, Clone, Serialize)]
 pub struct PromptInfo {
     pub name: String,
@@ -35,7 +28,6 @@ pub struct PromptInfo {
     pub raw_content: String,
 }
 
-/// Parse tous les prompts d'un dossier
 pub fn parse_prompts_dir(prompts_dir: &Path) -> Result<Vec<PromptInfo>> {
     let mut prompts = Vec::new();
 
@@ -55,13 +47,11 @@ pub fn parse_prompts_dir(prompts_dir: &Path) -> Result<Vec<PromptInfo>> {
         }
     }
 
-    // Trier par nom
     prompts.sort_by(|a, b| a.name.cmp(&b.name));
 
     Ok(prompts)
 }
 
-/// Parse un fichier prompt individuel
 pub fn parse_prompt_file(path: &Path) -> Result<PromptInfo> {
     let content = fs::read_to_string(path)
         .with_context(|| format!("Impossible de lire {}", path.display()))?;
@@ -71,15 +61,11 @@ pub fn parse_prompt_file(path: &Path) -> Result<PromptInfo> {
         .unwrap_or("unknown.md")
         .to_string();
 
-    // Extraire le nom (sans extension, sans préfixe osk-)
     let name = filename
         .trim_end_matches(".md")
         .to_string();
 
-    // Parser le frontmatter YAML
     let (description, argument) = parse_frontmatter(&content);
-
-    // Extraire les sections du contenu
     let phase = extract_phase(&name);
     let principles = extract_principles(&content);
     let requires = extract_requires(&content);
@@ -102,7 +88,6 @@ pub fn parse_prompt_file(path: &Path) -> Result<PromptInfo> {
     })
 }
 
-/// Parse le frontmatter YAML pour description et argument
 fn parse_frontmatter(content: &str) -> (String, Option<String>) {
     let description = DESCRIPTION_RE
         .captures(content)
@@ -118,7 +103,6 @@ fn parse_frontmatter(content: &str) -> (String, Option<String>) {
     (description, argument)
 }
 
-/// Détermine la phase depuis le nom de la commande
 fn extract_phase(name: &str) -> String {
     match name {
         "osk-configure" => "setup",
@@ -138,11 +122,8 @@ fn extract_phase(name: &str) -> String {
     .to_string()
 }
 
-/// Extrait les principes mentionnés dans le contenu
 fn extract_principles(content: &str) -> Vec<String> {
     let mut principles = Vec::new();
-
-    // Chercher les patterns comme "Principe I", "Principes I, II", etc.
     let patterns = [
         ("I", r"(?i)principe\s+I\b"),
         ("II", r"(?i)principe\s+II\b"),
@@ -161,9 +142,7 @@ fn extract_principles(content: &str) -> Vec<String> {
         }
     }
 
-    // Aussi chercher dans les commentaires YAML
     if content.contains("principles = [") || content.contains("Principes:") {
-        // Parser la liste des principes du registry
         for num in ["I", "II", "III", "IV", "V", "VI", "VII"] {
             let pattern = format!(r#""{}"#, num);
             if content.contains(&pattern) && !principles.contains(&num.to_string()) {
@@ -175,11 +154,8 @@ fn extract_principles(content: &str) -> Vec<String> {
     principles
 }
 
-/// Extrait les fichiers requis mentionnés
 fn extract_requires(content: &str) -> Vec<String> {
     let mut requires = Vec::new();
-
-    // Chercher les patterns de fichiers .osk/ ou docs/
     let re = Regex::new(r"`(\.osk/[^`]+|docs/[^`]+)`").unwrap();
 
     for cap in re.captures_iter(content) {
@@ -191,16 +167,12 @@ fn extract_requires(content: &str) -> Vec<String> {
         }
     }
 
-    // Limiter à 5 max
     requires.truncate(5);
     requires
 }
 
-/// Extrait les fichiers générés mentionnés
 fn extract_outputs(content: &str) -> Vec<String> {
     let mut outputs = Vec::new();
-
-    // Chercher les patterns de fichiers générés
     let patterns = [
         r"`(\.osk/specs/[^`]+)`",
         r"`(docs/security/[^`]+)`",
@@ -219,16 +191,12 @@ fn extract_outputs(content: &str) -> Vec<String> {
         }
     }
 
-    // Limiter à 5 max
     outputs.truncate(5);
     outputs
 }
 
-/// Extrait les étapes principales du workflow
 fn extract_steps(content: &str) -> Vec<String> {
     let mut steps = Vec::new();
-
-    // Chercher les listes numérotées (1. Step, 2. Step, etc.)
     let re = Regex::new(r"^\d+\.\s+\*\*([^*]+)\*\*").unwrap();
 
     for line in content.lines() {
@@ -239,7 +207,6 @@ fn extract_steps(content: &str) -> Vec<String> {
         }
     }
 
-    // Si pas trouvé, chercher les headers ##
     if steps.is_empty() {
         let re = Regex::new(r"^##\s+(?:Phase\s+\d+\s*[:.]?\s*)?(.+)$").unwrap();
         for line in content.lines() {
@@ -254,17 +221,12 @@ fn extract_steps(content: &str) -> Vec<String> {
         }
     }
 
-    // Limiter à 6 max
     steps.truncate(6);
     steps
 }
 
-/// Extrait les instructions principales (après le frontmatter)
 fn extract_instructions(content: &str) -> String {
-    // Retirer le frontmatter
     let without_frontmatter = FRONTMATTER_RE.replace(content, "");
-
-    // Prendre les premiers paragraphes significatifs
     let mut instructions = String::new();
     let mut in_paragraph = false;
     let mut paragraph_count = 0;
@@ -281,12 +243,10 @@ fn extract_instructions(content: &str) -> String {
             continue;
         }
 
-        // Ignorer les headers et les blocs de code
         if trimmed.starts_with('#') || trimmed.starts_with("```") {
             continue;
         }
 
-        // Prendre les 3 premiers paragraphes
         if paragraph_count < 3 {
             if !instructions.is_empty() && !instructions.ends_with('\n') {
                 instructions.push(' ');
@@ -296,7 +256,6 @@ fn extract_instructions(content: &str) -> String {
         }
     }
 
-    // Tronquer si trop long
     if instructions.len() > 500 {
         instructions.truncate(500);
         instructions.push_str("...");

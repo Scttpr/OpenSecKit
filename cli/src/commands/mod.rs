@@ -5,7 +5,7 @@ pub mod scaffold;
 pub mod update;
 pub mod validate;
 
-use crate::args::{Commands, CheckCommands, ScaffoldCommands, UpdateCommands, ValidateCommands};
+use crate::args::Commands;
 use anyhow::Result;
 use reqwest::blocking::Client;
 
@@ -22,10 +22,10 @@ pub fn handle(command: Commands, client: &Client) -> Result<()> {
 
         Commands::Check { command, json } => check::run(command, json),
 
-        Commands::Scaffold { command } => scaffold::run(command),
+        Commands::Scaffold { command, json } => scaffold::run(command, json),
 
-        Commands::Update { command } => update::run(command),
+        Commands::Update { command, json } => update::run(command, json),
 
-        Commands::Validate { command } => validate::run(command),
+        Commands::Validate { command, json } => validate::run(command, json),
     }
 }

@@ -108,6 +108,11 @@ nav:
       - /osk-dashboard: commands/osk-dashboard.md
       - /osk-pca-pra: commands/osk-pca-pra.md
       - /osk-incident: commands/osk-incident.md
+    - CLI Scriptables:
+      - osk check: commands/osk-check.md
+      - osk scaffold: commands/osk-scaffold.md
+      - osk update: commands/osk-update.md
+      - osk validate: commands/osk-validate.md
   - Domaines:
     - Vue d'ensemble: domains/index.md
     - RGPD: domains/rgpd.md

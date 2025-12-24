@@ -13,23 +13,6 @@ pub enum Agent {
     Gemini,
 }
 
-impl Agent {
-    #[allow(dead_code)]
-    pub fn display_name(&self) -> &'static str {
-        match self {
-            Agent::ClaudeCode => "Claude Code",
-            Agent::Copilot => "GitHub Copilot",
-            Agent::Cursor => "Cursor",
-            Agent::Gemini => "Gemini",
-        }
-    }
-
-    #[allow(dead_code)]
-    pub fn all() -> Vec<Agent> {
-        vec![Agent::ClaudeCode, Agent::Copilot, Agent::Cursor, Agent::Gemini]
-    }
-}
-
 #[derive(Parser)]
 #[command(name = "osk")]
 #[command(version, about = "OpenSecKit - Security as Code CLI", long_about = None)]
@@ -77,18 +60,27 @@ pub enum Commands {
     Scaffold {
         #[command(subcommand)]
         command: ScaffoldCommands,
+        /// Afficher le résultat en JSON (pour agents AI)
+        #[arg(long)]
+        json: bool,
     },
 
     /// Mettre à jour les fichiers mécaniquement
     Update {
         #[command(subcommand)]
         command: UpdateCommands,
+        /// Afficher le résultat en JSON (pour agents AI)
+        #[arg(long)]
+        json: bool,
     },
 
     /// Valider la cohérence des fichiers
     Validate {
         #[command(subcommand)]
         command: ValidateCommands,
+        /// Afficher le résultat en JSON (pour agents AI)
+        #[arg(long)]
+        json: bool,
     },
 }
 

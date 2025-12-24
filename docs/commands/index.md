@@ -82,6 +82,17 @@ graph LR
 | [`/osk-pca-pra`](osk-pca-pra.md) | Plans de continuite |
 | [`/osk-incident`](osk-incident.md) | Reponse a incident |
 
+### CLI Scriptables (v3.2.0)
+
+Commandes exécutables en ligne de commande avec sortie JSON pour agents AI.
+
+| Commande | Description | Flag JSON |
+|----------|-------------|-----------|
+| [`osk check`](osk-check.md) | Vérifier prérequis | `--json` |
+| [`osk scaffold`](osk-scaffold.md) | Créer structures fichiers | `--json` |
+| [`osk update`](osk-update.md) | Mises à jour mécaniques | `--json` |
+| [`osk validate`](osk-validate.md) | Valider cohérence | `--json` |
+
 ## Utilisation
 
 Les slash commands s'utilisent dans Claude Code :

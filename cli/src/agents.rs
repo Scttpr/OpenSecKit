@@ -1,7 +1,4 @@
-//! Module de gestion des agents AI
-//!
-//! Ce module lit la configuration des agents depuis agents.toml
-//! et génère les fichiers appropriés pour chaque agent.
+//! Multi-agent configuration and file generation
 
 use anyhow::{Context, Result};
 use serde::Deserialize;
@@ -12,7 +9,6 @@ use tera::{Context as TeraContext, Tera};
 
 use crate::prompts::PromptInfo;
 
-/// Configuration globale des agents
 #[derive(Debug, Deserialize)]
 pub struct AgentsConfig {
     pub meta: MetaConfig,
@@ -22,6 +18,7 @@ pub struct AgentsConfig {
 
 #[derive(Debug, Deserialize)]
 pub struct MetaConfig {
+    #[serde(default)]
     #[allow(dead_code)]
     pub version: String,
     pub default_agent: String,
@@ -30,6 +27,7 @@ pub struct MetaConfig {
 #[derive(Debug, Deserialize)]
 pub struct AgentConfig {
     pub name: String,
+    #[serde(default)]
     #[allow(dead_code)]
     pub description: String,
     pub format: String,
@@ -49,25 +47,13 @@ pub struct UniversalConfig {
     pub template: String,
 }
 
-/// Information sur les domaines actifs
-#[derive(Debug, Clone, serde::Serialize)]
+#[derive(Debug, Clone, Default, serde::Serialize)]
 pub struct DomainsInfo {
     pub rgpd: bool,
     pub rgs: bool,
     pub nis2: bool,
 }
 
-impl Default for DomainsInfo {
-    fn default() -> Self {
-        Self {
-            rgpd: false,
-            rgs: false,
-            nis2: false,
-        }
-    }
-}
-
-/// Charge la configuration des agents depuis agents.toml
 pub fn load_agents_config(osk_dir: &Path) -> Result<AgentsConfig> {
     let config_path = osk_dir.join("agents.toml");
 
@@ -84,26 +70,20 @@ pub fn load_agents_config(osk_dir: &Path) -> Result<AgentsConfig> {
     Ok(config)
 }
 
-/// Détecte si un agent est disponible sur le système
 pub fn is_agent_available(agent: &AgentConfig) -> bool {
-    // Vérifier la commande CLI
     if let Some(cmd) = &agent.detect_cmd {
         if which::which(cmd).is_ok() {
             return true;
         }
     }
-
-    // Vérifier le chemin
     if let Some(path) = &agent.detect_path {
         if Path::new(path).exists() {
             return true;
         }
     }
-
     false
 }
 
-/// Génère les fichiers pour un agent spécifique
 pub fn generate_agent_files(
     agent_id: &str,
     agent: &AgentConfig,
@@ -134,7 +114,6 @@ pub fn generate_agent_files(
     }
 }
 
-/// Format slash-command: un fichier par commande (Claude Code)
 fn generate_slash_commands(
     agent: &AgentConfig,
     prompts: &[PromptInfo],
@@ -165,7 +144,6 @@ fn generate_slash_commands(
     Ok(count)
 }
 
-/// Format single-file: toutes les commandes dans un fichier (Copilot, Gemini)
 fn generate_single_file(
     agent: &AgentConfig,
     prompts: &[PromptInfo],
@@ -176,7 +154,6 @@ fn generate_single_file(
     let output_file = agent.output_file.as_ref()
         .ok_or_else(|| anyhow::anyhow!("output_file requis pour format single-file"))?;
 
-    // Créer le dossier parent si nécessaire
     if let Some(parent) = Path::new(output_file).parent() {
         fs::create_dir_all(parent)?;
     }
@@ -192,7 +169,6 @@ fn generate_single_file(
     Ok(1)
 }
 
-/// Format rules-dir: un fichier de règle par commande (Cursor)
 fn generate_rules_dir(
     agent: &AgentConfig,
     prompts: &[PromptInfo],
@@ -225,7 +201,6 @@ fn generate_rules_dir(
     Ok(count)
 }
 
-/// Génère le fichier AGENTS.md universel
 pub fn generate_agents_md(
     config: &UniversalConfig,
     prompts: &[PromptInfo],
