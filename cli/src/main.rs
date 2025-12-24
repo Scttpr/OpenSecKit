@@ -14,7 +14,7 @@ use clap::Parser;
 use reqwest::blocking::Client;
 
 fn main() -> Result<()> {
-    dotenv::dotenv().ok();
+    dotenvy::dotenv().ok();
 
     let cli = args::Cli::parse();
     let client = Client::builder().user_agent(config::USER_AGENT).build()?;

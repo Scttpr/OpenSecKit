@@ -83,6 +83,7 @@ pub fn detect() -> String {
     stack_vec.join(", ")
 }
 
+#[cfg(test)]
 fn detect_in(base: &std::path::Path) -> String {
     let mut stack = HashSet::new();
 
