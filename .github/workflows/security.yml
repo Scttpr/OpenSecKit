@@ -1,0 +1,32 @@
+name: 🔒 Security Audit
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+    schedule:
+        - cron: "0 0 * * 1" # Weekly on Monday
+
+jobs:
+    audit:
+        name: Dependencies Audit
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Install Rust
+              uses: dtolnay/rust-toolchain@stable
+
+            - name: Install cargo-audit
+              run: cargo install cargo-audit
+
+            - name: Install cargo-deny
+              run: cargo install cargo-deny
+
+            - name: Audit CVEs
+              working-directory: ./cli
+              run: cargo audit
+
+            - name: Check Licenses & Bans
+              working-directory: ./cli
+              run: cargo deny check
