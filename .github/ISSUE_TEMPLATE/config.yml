@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+    - name: 💬 Questions
+      url: https://github.com/Scttpr/OpenSecKit/discussions
+      about: Pour les questions générales, utilise les Discussions
+    - name: 🔒 Vulnérabilité
+      url: https://github.com/Scttpr/OpenSecKit/security/advisories/new
+      about: Pour signaler une faille de sécurité (privé)

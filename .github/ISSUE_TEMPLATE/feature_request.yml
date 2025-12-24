@@ -1,0 +1,52 @@
+name: 💡 Feature Request
+description: Propose a new feature
+labels: ["enhancement"]
+body:
+    - type: markdown
+      attributes:
+          value: |
+              Merci de proposer une amélioration !
+
+    - type: textarea
+      id: problem
+      attributes:
+          label: Problème ou besoin
+          description: Quel problème cette feature résoudrait ?
+          placeholder: "Je suis frustré quand..."
+      validations:
+          required: true
+
+    - type: textarea
+      id: solution
+      attributes:
+          label: Solution proposée
+          description: Décris ta solution idéale
+      validations:
+          required: true
+
+    - type: textarea
+      id: alternatives
+      attributes:
+          label: Alternatives considérées
+          description: As-tu envisagé d'autres approches ?
+
+    - type: dropdown
+      id: scope
+      attributes:
+          label: Scope
+          description: Quelle partie du projet ?
+          options:
+              - CLI (osk)
+              - Prompts
+              - Documentation
+              - CI/CD
+              - Autre
+      validations:
+          required: true
+
+    - type: checkboxes
+      id: contribution
+      attributes:
+          label: Contribution
+          options:
+              - label: Je suis prêt à implémenter cette feature

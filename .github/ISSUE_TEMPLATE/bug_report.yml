@@ -1,0 +1,62 @@
+name: 🐛 Bug Report
+description: Report a bug in OpenSecKit
+labels: ["bug", "triage"]
+body:
+    - type: markdown
+      attributes:
+          value: |
+              Merci de signaler ce bug !
+
+    - type: input
+      id: version
+      attributes:
+          label: Version OSK
+          description: "Résultat de `osk --version`"
+          placeholder: "3.2.0"
+      validations:
+          required: true
+
+    - type: dropdown
+      id: os
+      attributes:
+          label: Système d'exploitation
+          options:
+              - Linux
+              - macOS
+              - Windows
+      validations:
+          required: true
+
+    - type: textarea
+      id: description
+      attributes:
+          label: Description du bug
+          description: Décris clairement le problème
+      validations:
+          required: true
+
+    - type: textarea
+      id: steps
+      attributes:
+          label: Étapes pour reproduire
+          description: Comment reproduire le bug ?
+          placeholder: |
+              1. Exécuter `osk init`
+              2. ...
+      validations:
+          required: true
+
+    - type: textarea
+      id: expected
+      attributes:
+          label: Comportement attendu
+          description: Que devrait-il se passer ?
+      validations:
+          required: true
+
+    - type: textarea
+      id: logs
+      attributes:
+          label: Logs / Erreurs
+          description: Colle les logs ou messages d'erreur
+          render: shell
