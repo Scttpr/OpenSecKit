@@ -579,3 +579,96 @@ fn count_resource(path: &str, stats: &mut InstallStats) {
         stats.nis2 += 1;
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_parse_stack_empty() {
+        assert!(parse_stack("").is_empty());
+        assert!(parse_stack("   ").is_empty());
+    }
+
+    #[test]
+    fn test_parse_stack_single() {
+        let result = parse_stack("rust");
+        assert_eq!(result, vec!["rust"]);
+    }
+
+    #[test]
+    fn test_parse_stack_multiple() {
+        let result = parse_stack("rust, python, typescript");
+        assert_eq!(result, vec!["rust", "python", "typescript"]);
+    }
+
+    #[test]
+    fn test_parse_custom_stack() {
+        let detected = vec!["rust".to_string(), "python".to_string()];
+        let result = parse_custom_stack("rust, go, python, java", &detected);
+        assert_eq!(result, vec!["go", "java"]);
+    }
+
+    #[test]
+    fn test_agent_to_id() {
+        assert_eq!(agent_to_id(&Agent::ClaudeCode), "claude-code");
+        assert_eq!(agent_to_id(&Agent::Copilot), "copilot");
+        assert_eq!(agent_to_id(&Agent::Cursor), "cursor");
+        assert_eq!(agent_to_id(&Agent::Gemini), "gemini");
+    }
+
+    #[test]
+    fn test_count_resource_prompts() {
+        let mut stats = InstallStats::default();
+        count_resource("prompts/osk-analyze.md", &mut stats);
+        count_resource("prompts/osk-configure.md", &mut stats);
+        assert_eq!(stats.prompts, 2);
+    }
+
+    #[test]
+    fn test_count_resource_templates() {
+        let mut stats = InstallStats::default();
+        count_resource("templates/schemas/context.yaml", &mut stats);
+        count_resource("templates/outputs/report.md", &mut stats);
+        count_resource("templates/agents/cursor.tera", &mut stats);
+        assert_eq!(stats.schemas, 1);
+        assert_eq!(stats.outputs, 1);
+        assert_eq!(stats.agents_templates, 1);
+    }
+
+    #[test]
+    fn test_count_resource_domains() {
+        let mut stats = InstallStats::default();
+        count_resource("domaines/rgpd/checklist.md", &mut stats);
+        count_resource("domaines/gouvernement-rgs/guide.md", &mut stats);
+        count_resource("domaines/nis2/requirements.md", &mut stats);
+        assert_eq!(stats.rgpd, 1);
+        assert_eq!(stats.rgs, 1);
+        assert_eq!(stats.nis2, 1);
+    }
+
+    #[test]
+    fn test_detect_domains() {
+        let stats = InstallStats {
+            rgpd: 3,
+            rgs: 0,
+            nis2: 1,
+            ..Default::default()
+        };
+        let domains = detect_domains(&stats);
+        assert!(domains.rgpd);
+        assert!(!domains.rgs);
+        assert!(domains.nis2);
+    }
+
+    #[test]
+    fn test_default_agents_config() {
+        let config = default_agents_config();
+        assert_eq!(config.meta.default_agent, "claude-code");
+        assert!(config.agents.contains_key("claude-code"));
+        assert!(config.agents.contains_key("copilot"));
+        assert!(config.agents.contains_key("cursor"));
+        assert!(config.agents.contains_key("gemini"));
+        assert!(config.universal.is_some());
+    }
+}

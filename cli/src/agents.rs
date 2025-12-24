@@ -237,3 +237,96 @@ pub fn generate_agents_md(
 
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tempfile::tempdir;
+
+    #[test]
+    fn test_domains_info_default() {
+        let domains = DomainsInfo::default();
+        assert!(!domains.rgpd);
+        assert!(!domains.rgs);
+        assert!(!domains.nis2);
+    }
+
+    #[test]
+    fn test_load_agents_config_missing() {
+        let dir = tempdir().unwrap();
+        let result = load_agents_config(dir.path());
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_load_agents_config_valid() {
+        let dir = tempdir().unwrap();
+        let config_content = r#"
+[meta]
+version = "1.0"
+default_agent = "test-agent"
+
+[agents.test-agent]
+name = "Test Agent"
+description = "A test agent"
+format = "single-file"
+output_file = "test.md"
+template = "test.tera"
+enabled = true
+"#;
+        fs::write(dir.path().join("agents.toml"), config_content).unwrap();
+
+        let config = load_agents_config(dir.path()).unwrap();
+        assert_eq!(config.meta.default_agent, "test-agent");
+        assert!(config.agents.contains_key("test-agent"));
+    }
+
+    #[test]
+    fn test_load_agents_config_invalid_toml() {
+        let dir = tempdir().unwrap();
+        fs::write(dir.path().join("agents.toml"), "invalid { toml }").unwrap();
+
+        let result = load_agents_config(dir.path());
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_is_agent_available_with_path() {
+        let dir = tempdir().unwrap();
+        let detect_path = dir.path().join("marker");
+        fs::write(&detect_path, "").unwrap();
+
+        let agent = AgentConfig {
+            name: "Test".to_string(),
+            description: String::new(),
+            format: "single-file".to_string(),
+            output_dir: None,
+            output_file: Some("out.md".to_string()),
+            file_pattern: None,
+            detect_cmd: None,
+            detect_path: Some(detect_path.to_string_lossy().to_string()),
+            template: "t.tera".to_string(),
+            enabled: true,
+        };
+
+        assert!(is_agent_available(&agent));
+    }
+
+    #[test]
+    fn test_is_agent_available_missing() {
+        let agent = AgentConfig {
+            name: "Test".to_string(),
+            description: String::new(),
+            format: "single-file".to_string(),
+            output_dir: None,
+            output_file: Some("out.md".to_string()),
+            file_pattern: None,
+            detect_cmd: Some("nonexistent-command-xyz".to_string()),
+            detect_path: Some("/nonexistent/path/xyz".to_string()),
+            template: "t.tera".to_string(),
+            enabled: true,
+        };
+
+        assert!(!is_agent_available(&agent));
+    }
+}

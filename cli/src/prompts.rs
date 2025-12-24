@@ -259,3 +259,134 @@ fn extract_instructions(content: &str) -> String {
 
     instructions.trim().to_string()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tempfile::tempdir;
+
+    #[test]
+    fn test_extract_phase() {
+        assert_eq!(extract_phase("osk-configure"), "setup");
+        assert_eq!(extract_phase("osk-analyze"), "analyze");
+        assert_eq!(extract_phase("osk-specify"), "specify");
+        assert_eq!(extract_phase("osk-dashboard"), "monitor");
+        assert_eq!(extract_phase("osk-incident"), "incident");
+        assert_eq!(extract_phase("unknown-command"), "unknown");
+    }
+
+    #[test]
+    fn test_extract_principles() {
+        let content = "Ce prompt couvre le Principe I et le Principe III.";
+        let principles = extract_principles(content);
+        assert!(principles.contains(&"I".to_string()));
+        assert!(principles.contains(&"III".to_string()));
+        assert!(!principles.contains(&"II".to_string()));
+    }
+
+    #[test]
+    fn test_extract_principles_from_array() {
+        let content = r#"principles = ["I", "II", "V"]"#;
+        let principles = extract_principles(content);
+        assert!(principles.contains(&"I".to_string()));
+        assert!(principles.contains(&"II".to_string()));
+        assert!(principles.contains(&"V".to_string()));
+    }
+
+    #[test]
+    fn test_extract_requires() {
+        let content = "Requires `.osk/context.yaml` and `.osk/config.toml` files.";
+        let requires = extract_requires(content);
+        assert!(requires.iter().any(|r| r.contains("context")));
+        assert!(requires.iter().any(|r| r.contains("config")));
+    }
+
+    #[test]
+    fn test_extract_outputs() {
+        let content = "Creates `.osk/specs/001-auth/threats.md` and `docs/security/report.md`.";
+        let outputs = extract_outputs(content);
+        assert!(outputs.iter().any(|o| o.contains(".osk/specs")));
+        assert!(outputs.iter().any(|o| o.contains("docs/security")));
+    }
+
+    #[test]
+    fn test_extract_steps() {
+        let content = r#"
+## Workflow
+
+1. **Analyze threats** using STRIDE
+2. **Evaluate risks** with scoring
+3. **Generate report** in markdown
+"#;
+        let steps = extract_steps(content);
+        assert_eq!(steps.len(), 3);
+        assert!(steps[0].contains("Analyze threats"));
+        assert!(steps[1].contains("Evaluate risks"));
+    }
+
+    #[test]
+    fn test_parse_frontmatter() {
+        let content = r#"---
+description: "Test description"
+argument: "feature_name"
+---
+# Content
+"#;
+        let (desc, arg) = parse_frontmatter(content);
+        assert_eq!(desc, "Test description");
+        assert_eq!(arg, Some("feature_name".to_string()));
+    }
+
+    #[test]
+    fn test_parse_prompt_file() {
+        let dir = tempdir().unwrap();
+        let path = dir.path().join("osk-test.md");
+        fs::write(
+            &path,
+            r#"---
+description: "Test prompt"
+---
+# Test
+
+This is the Principe I implementation.
+
+1. **First step** do something
+2. **Second step** do more
+"#,
+        )
+        .unwrap();
+
+        let info = parse_prompt_file(&path).unwrap();
+        assert_eq!(info.name, "osk-test");
+        assert_eq!(info.description, "Test prompt");
+        assert!(info.principles.contains(&"I".to_string()));
+        assert!(!info.steps.is_empty());
+    }
+
+    #[test]
+    fn test_parse_prompts_dir_empty() {
+        let dir = tempdir().unwrap();
+        let prompts = parse_prompts_dir(dir.path()).unwrap();
+        assert!(prompts.is_empty());
+    }
+
+    #[test]
+    fn test_parse_prompts_dir_with_files() {
+        let dir = tempdir().unwrap();
+        fs::write(
+            dir.path().join("osk-a.md"),
+            "---\ndescription: \"A\"\n---\n# A",
+        )
+        .unwrap();
+        fs::write(
+            dir.path().join("osk-b.md"),
+            "---\ndescription: \"B\"\n---\n# B",
+        )
+        .unwrap();
+
+        let prompts = parse_prompts_dir(dir.path()).unwrap();
+        assert_eq!(prompts.len(), 2);
+        assert_eq!(prompts[0].name, "osk-a");
+        assert_eq!(prompts[1].name, "osk-b");
+    }
+}
