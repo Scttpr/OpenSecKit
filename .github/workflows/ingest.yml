@@ -43,7 +43,7 @@ jobs:
           ./osk ingest -p . -o ${{ env.CTX_FILENAME }}
 
       - name: Upload Ingest Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ env.CTX_FILENAME }}
           path: ${{ env.CTX_FILENAME }}
