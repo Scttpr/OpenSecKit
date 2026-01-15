@@ -1,0 +1,181 @@
+# {{ framework_name }} Compliance Assessment Report
+
+**Assessment Date**: {{ assessment_date }}
+**Framework**: {{ framework_id | upper }} ({{ framework_version }})
+**Overall Status**: {{ overall_status | upper }}
+**Compliance Score**: {{ overall_score }}%
+
+---
+
+## Executive Summary
+
+This report presents the compliance assessment of the system against **{{ framework_name }}** requirements. The assessment was conducted using OpenSecKit's guided compliance workflow, analyzing the full system context including codebase, integrations, operational tooling, and infrastructure.
+
+| Metric | Value |
+|--------|-------|
+| Total Controls | {{ total_controls }} |
+| Assessed | {{ assessed_controls }} |
+| Compliant | {{ compliant_controls }} |
+| Partial | {{ partial_controls }} |
+| Gaps | {{ gap_controls }} |
+| Not Applicable | {{ not_applicable_controls }} |
+
+{% if gap_controls > 0 %}
+### Critical Findings
+
+{% for mapping in mappings %}
+{% if mapping.gap_severity == "critical" %}
+- **{{ mapping.framework_ref }}** - {{ mapping.requirement }}: {{ mapping.gap_detail }}
+{% endif %}
+{% endfor %}
+{% endif %}
+
+---
+
+## Assessment Scope
+
+{{ scope_description }}
+
+### System Components Assessed
+
+**Data Categories** ({{ data_categories | length }}):
+{% for category in data_categories %}
+- {{ category.name }} ({{ category.sensitivity }})
+{% endfor %}
+
+**Sub-Processors** ({{ sub_processors | length }}):
+
+| Service | Source | Location | EU-Based |
+|---------|--------|----------|----------|
+{% for processor in sub_processors %}
+| {{ processor.name }} | {{ processor.source }} | {{ processor.location }} | {{ processor.is_eu }} |
+{% endfor %}
+
+{% if components_excluded | length > 0 %}
+### Exclusions
+
+The following components were excluded from this assessment:
+
+{% for exclusion in components_excluded %}
+- **{{ exclusion.id }}**: {{ exclusion.justification }}
+{% endfor %}
+{% endif %}
+
+---
+
+## Control Assessment by Category
+
+{% for category_name, controls in controls_by_category %}
+### {{ category_name }}
+
+| Control | Requirement | Status | Score |
+|---------|-------------|--------|-------|
+{% for mapping in controls %}
+| {{ mapping.framework_ref }} | {{ mapping.requirement }} | {{ mapping.status }} | {{ mapping.score }}% |
+{% endfor %}
+
+{% endfor %}
+
+---
+
+## Gaps and Remediation
+
+{% if gap_controls == 0 and partial_controls == 0 %}
+No compliance gaps identified. All assessed controls meet requirements.
+{% else %}
+
+### Gap Summary by Category
+
+| Category | Critical | High | Medium | Low |
+|----------|----------|------|--------|-----|
+| Codebase | {{ gaps_by_category.codebase.critical | default(value=0) }} | {{ gaps_by_category.codebase.high | default(value=0) }} | {{ gaps_by_category.codebase.medium | default(value=0) }} | {{ gaps_by_category.codebase.low | default(value=0) }} |
+| Tooling | {{ gaps_by_category.tooling.critical | default(value=0) }} | {{ gaps_by_category.tooling.high | default(value=0) }} | {{ gaps_by_category.tooling.medium | default(value=0) }} | {{ gaps_by_category.tooling.low | default(value=0) }} |
+| Infrastructure | {{ gaps_by_category.infrastructure.critical | default(value=0) }} | {{ gaps_by_category.infrastructure.high | default(value=0) }} | {{ gaps_by_category.infrastructure.medium | default(value=0) }} | {{ gaps_by_category.infrastructure.low | default(value=0) }} |
+| Process | {{ gaps_by_category.process.critical | default(value=0) }} | {{ gaps_by_category.process.high | default(value=0) }} | {{ gaps_by_category.process.medium | default(value=0) }} | {{ gaps_by_category.process.low | default(value=0) }} |
+
+### Detailed Gaps
+
+{% for mapping in mappings %}
+{% if mapping.status == "gap" or mapping.status == "partial" %}
+#### {{ mapping.framework_ref }} - {{ mapping.requirement }}
+
+- **Status**: {{ mapping.status | upper }}
+- **Severity**: {{ mapping.gap_severity | upper }}
+- **Category**: {{ mapping.gap_category }}
+
+**Gap Description**: {{ mapping.gap_detail }}
+
+**Remediation**: {{ mapping.remediation.recommendation }}
+
+**Estimated Effort**: {{ mapping.remediation.effort }}
+
+---
+
+{% endif %}
+{% endfor %}
+{% endif %}
+
+---
+
+## Action Items
+
+{% if action_items | length == 0 %}
+No action items generated. All controls are compliant.
+{% else %}
+
+| Priority | Action | Category | Controls Addressed | Status |
+|----------|--------|----------|-------------------|--------|
+{% for action in action_items %}
+| {{ action.priority }} | {{ action.title }} | {{ action.category }} | {{ action.addresses_controls | join(sep=", ") }} | {{ action.status }} |
+{% endfor %}
+
+### Detailed Action Items
+
+{% for action in action_items %}
+#### {{ action.id }}: {{ action.title }}
+
+- **Priority**: {{ action.priority }}
+- **Category**: {{ action.category }}
+- **Status**: {{ action.status }}
+{% if action.owner %}- **Owner**: {{ action.owner }}{% endif %}
+{% if action.due_date %}- **Due Date**: {{ action.due_date }}{% endif %}
+
+{{ action.description }}
+
+**Addresses Controls**: {{ action.addresses_controls | join(sep=", ") }}
+
+---
+
+{% endfor %}
+{% endif %}
+
+---
+
+## Evidence Summary
+
+{% for mapping in mappings %}
+{% if mapping.evidence | length > 0 %}
+### {{ mapping.framework_ref }} - {{ mapping.requirement }}
+
+| Evidence | Type | Source | Confidence |
+|----------|------|--------|------------|
+{% for evidence in mapping.evidence %}
+| {{ evidence.description }} | {{ evidence.type }} | {{ evidence.path }} | {{ evidence.confidence | default(value="-") }} |
+{% endfor %}
+
+{% endif %}
+{% endfor %}
+
+---
+
+## Audit Trail
+
+| Date | Action | Details |
+|------|--------|---------|
+{% for entry in audit_trail %}
+| {{ entry.date }} | {{ entry.action }} | {{ entry.details }} |
+{% endfor %}
+
+---
+
+*Report generated by OpenSecKit v4 - {{ assessment_date }}*

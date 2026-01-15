@@ -1,0 +1,217 @@
+# Homologation Checklist - RGS {{ rgs_level }}
+
+**Last Updated**: {{ assessment_date }}
+**System**: {{ system_name | default(value="[System Name]") }}
+**Target Level**: {{ rgs_level }}
+**Homologation Status**: {{ homologation_status }}
+
+---
+
+## Purpose
+
+This checklist tracks progress toward RGS homologation following ANSSI guidelines. Complete all required items before submitting for commission d'homologation.
+
+---
+
+## Pre-Requisites
+
+| Requirement | Status | Notes |
+|-------------|--------|-------|
+| System model complete | {{ prereqs.system_model }} | `.osk/system-model/` |
+| Security level defined | {{ prereqs.security_level }} | {{ rgs_level }} |
+| DICP assessment complete | {{ prereqs.dicp }} | See assessment-rgs.md |
+| EBIOS RM analysis | {{ prereqs.ebios }} | {{ prereqs.ebios_notes }} |
+
+---
+
+## Phase 1: Étude (Study)
+
+### Risk Analysis
+
+- {{ phase1.risk_analysis.status_icon }} **Risk Analysis (EBIOS RM recommended)**
+  - Status: {{ phase1.risk_analysis.status }}
+  - Document: {{ phase1.risk_analysis.document | default(value="Not provided") }}
+  {% if phase1.risk_analysis.action %}
+  - Action Required: {{ phase1.risk_analysis.action }}
+  {% endif %}
+
+### Security Requirements
+
+- {{ phase1.security_requirements.status_icon }} **Security Requirements Definition**
+  - Status: {{ phase1.security_requirements.status }}
+  - DICP Levels: D{{ dicp_required.d }} I{{ dicp_required.i }} C{{ dicp_required.c }} P{{ dicp_required.p }}
+
+### System Perimeter
+
+- {{ phase1.perimeter.status_icon }} **System Perimeter Definition**
+  - Status: {{ phase1.perimeter.status }}
+  - Document: system-perimeter.md
+  - Components: {{ components.total }} identified
+
+---
+
+## Phase 2: Dossier (Documentation)
+
+### Required Documents
+
+| Document | Status | Location | Notes |
+|----------|--------|----------|-------|
+| PSSI (Politique de Sécurité) | {{ docs.pssi.status }} | {{ docs.pssi.location | default(value="-") }} | {{ docs.pssi.notes | default(value="") }} |
+| Plan de traitement des risques | {{ docs.ptr.status }} | {{ docs.ptr.location | default(value="-") }} | {{ docs.ptr.notes | default(value="") }} |
+| Procedures d'exploitation | {{ docs.procedures.status }} | {{ docs.procedures.location | default(value="-") }} | {{ docs.procedures.notes | default(value="") }} |
+| Plan de continuité | {{ docs.pca.status }} | {{ docs.pca.location | default(value="-") }} | {{ docs.pca.notes | default(value="") }} |
+| Schéma d'architecture | {{ docs.architecture.status }} | {{ docs.architecture.location | default(value="-") }} | {{ docs.architecture.notes | default(value="") }} |
+
+### Security Controls Documentation
+
+| Domain | Annexe | Documentation Status | Controls Documented |
+|--------|--------|---------------------|---------------------|
+| Authentification | B2 | {{ domains.authentification.doc_status }} | {{ domains.authentification.documented }}/{{ domains.authentification.total }} |
+| Intégrité | B3 | {{ domains.integrite.doc_status }} | {{ domains.integrite.documented }}/{{ domains.integrite.total }} |
+| Confidentialité | B4 | {{ domains.confidentialite.doc_status }} | {{ domains.confidentialite.documented }}/{{ domains.confidentialite.total }} |
+| Traçabilité | B5 | {{ domains.tracabilite.doc_status }} | {{ domains.tracabilite.documented }}/{{ domains.tracabilite.total }} |
+| Horodatage | B6 | {{ domains.horodatage.doc_status }} | {{ domains.horodatage.documented }}/{{ domains.horodatage.total }} |
+| Signature | B7 | {{ domains.signature.doc_status }} | {{ domains.signature.documented }}/{{ domains.signature.total }} |
+
+---
+
+## Phase 3: Décision (Approval)
+
+### Pre-Audit Checklist
+
+- {{ audit.controls.status_icon }} All {{ rgs_level }} controls assessed
+- {{ audit.gaps.status_icon }} No critical gaps remaining
+- {{ audit.crypto.status_icon }} Cryptography validated against ANSSI recommendations
+- {{ audit.certs.status_icon }} All service certifications verified
+- {{ audit.logs.status_icon }} Logging meets retention requirements
+
+### Audit Preparation
+
+| Item | Status | Notes |
+|------|--------|-------|
+| Conformité audit scheduled | {{ audit.scheduled }} | {{ audit.date | default(value="Not scheduled") }} |
+| Auditor selected | {{ audit.auditor }} | {{ audit.auditor_name | default(value="Not selected") }} |
+| Documentation package ready | {{ audit.package }} | |
+| Technical tests completed | {{ audit.tests }} | {{ audit.test_notes | default(value="") }} |
+
+### Commission d'Homologation
+
+- {{ commission.authority.status_icon }} Autorité d'homologation identified: {{ commission.authority_name | default(value="Not identified") }}
+- {{ commission.members.status_icon }} Commission members defined
+- {{ commission.date.status_icon }} Commission date: {{ commission.date_value | default(value="Not scheduled") }}
+
+---
+
+## Phase 4: MCS (Maintien en Conditions de Sécurité)
+
+### Ongoing Requirements
+
+| Requirement | Frequency | Status | Last Completed |
+|-------------|-----------|--------|----------------|
+| Security review | Quarterly | {{ mcs.review.status }} | {{ mcs.review.last | default(value="N/A") }} |
+| Penetration test | Annual | {{ mcs.pentest.status }} | {{ mcs.pentest.last | default(value="N/A") }} |
+| Vulnerability scan | Monthly | {{ mcs.vuln_scan.status }} | {{ mcs.vuln_scan.last | default(value="N/A") }} |
+| Incident review | Quarterly | {{ mcs.incident.status }} | {{ mcs.incident.last | default(value="N/A") }} |
+| Documentation update | As needed | {{ mcs.docs.status }} | {{ mcs.docs.last | default(value="N/A") }} |
+
+### Homologation Validity
+
+- **Maximum Duration**: 3 years
+- **Renewal Required By**: {{ homologation_expiry | default(value="N/A") }}
+- **Conditions for Renewal**: Re-assessment required, audit recommended
+
+---
+
+## Blockers Summary
+
+{% if blockers | length > 0 %}
+The following items must be resolved before homologation:
+
+| # | Type | Description | Owner | Due Date |
+|---|------|-------------|-------|----------|
+{% for blocker in blockers %}
+| {{ loop.index }} | {{ blocker.type }} | {{ blocker.description }} | {{ blocker.owner | default(value="TBD") }} | {{ blocker.due | default(value="ASAP") }} |
+{% endfor %}
+{% else %}
+No blockers identified. System is ready for homologation.
+{% endif %}
+
+---
+
+## Tooling Certification Status
+
+{% if rgs_level == "rgs-star-star" or rgs_level == "rgs-star-star-star" %}
+For {{ rgs_level }}, services handling sensitive data must have appropriate certifications:
+
+| Service | Required Certification | Current Status | Blocker? |
+|---------|----------------------|----------------|----------|
+{% for tool in tool_certs %}
+| {{ tool.name }} | {{ tool.required }} | {{ tool.current }} | {{ tool.blocker }} |
+{% endfor %}
+
+**Key Certifications:**
+- **SecNumCloud**: Required for cloud services at RGS** and above
+- **HDS**: Required for health data hosting
+- **ISO 27001**: Recommended baseline for all services
+- **SOC 2 Type II**: Acceptable for non-sensitive operations
+{% else %}
+Standard certification requirements apply for RGS*.
+{% endif %}
+
+---
+
+## Action Items
+
+{% if action_items | length > 0 %}
+### Immediate (P0)
+
+{% for action in action_items %}
+{% if action.priority == "P0" %}
+- [ ] **{{ action.id }}**: {{ action.title }}
+  - Domain: {{ action.domain }}
+  - Owner: {{ action.owner | default(value="TBD") }}
+{% endif %}
+{% endfor %}
+
+### Short-term (P1 - 30 days)
+
+{% for action in action_items %}
+{% if action.priority == "P1" %}
+- [ ] **{{ action.id }}**: {{ action.title }}
+  - Domain: {{ action.domain }}
+{% endif %}
+{% endfor %}
+
+### Medium-term (P2 - 90 days)
+
+{% for action in action_items %}
+{% if action.priority == "P2" %}
+- [ ] **{{ action.id }}**: {{ action.title }}
+  - Domain: {{ action.domain }}
+{% endif %}
+{% endfor %}
+{% else %}
+No action items pending.
+{% endif %}
+
+---
+
+## Next Steps
+
+{% if homologation_status == "ready" %}
+1. Submit dossier d'homologation to autorité d'homologation
+2. Schedule commission d'homologation meeting
+3. Prepare for audit de conformité
+4. Plan MCS activities post-homologation
+{% else %}
+1. Resolve all blockers listed above
+2. Complete missing documentation
+3. Validate tool certifications
+4. Re-run assessment: `/osk-comply rgs --update`
+5. Generate updated checklist
+{% endif %}
+
+---
+
+*Checklist generated by OpenSecKit v4 - {{ assessment_date }}*
+*Reference: ANSSI RGS v2.0 Homologation Guidelines*

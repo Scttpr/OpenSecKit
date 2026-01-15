@@ -1,0 +1,156 @@
+# RGPD Compliance Assessment Summary
+
+**Assessment Date**: {{ assessment_date }}
+**Framework**: RGPD (EU 2016/679)
+**Overall Status**: {{ overall_status | upper }}
+**Compliance Score**: {{ overall_score }}%
+
+---
+
+## Executive Summary
+
+This assessment evaluates compliance with the **General Data Protection Regulation (GDPR)** based on the full system context including codebase, integrations, operational tooling, and infrastructure.
+
+### Key Findings
+
+| Category | Status | Score |
+|----------|--------|-------|
+| Principles (Art. 5-11) | {{ categories.principles.status }} | {{ categories.principles.score }}% |
+| Data Subject Rights (Art. 12-23) | {{ categories.rights.status }} | {{ categories.rights.score }}% |
+| Controller/Processor (Art. 24-43) | {{ categories.controller_processor.status }} | {{ categories.controller_processor.score }}% |
+| International Transfers (Art. 44-50) | {{ categories.transfers.status }} | {{ categories.transfers.score }}% |
+
+### Compliance Metrics
+
+| Metric | Count |
+|--------|-------|
+| Total Controls Assessed | {{ total_controls }} |
+| Compliant | {{ compliant_controls }} |
+| Partial Compliance | {{ partial_controls }} |
+| Gaps Identified | {{ gap_controls }} |
+| Not Applicable | {{ not_applicable_controls }} |
+
+---
+
+## Data Landscape Overview
+
+### Personal Data Categories
+
+| Category | Sensitivity | Legal Basis | Status |
+|----------|-------------|-------------|--------|
+{% for data in data_categories %}
+| {{ data.name }} | {{ data.sensitivity }} | {{ data.legal_basis }} | {{ data.status }} |
+{% endfor %}
+
+### Data Subjects
+
+| Type | Approximate Count | Special Category Data |
+|------|-------------------|----------------------|
+{% for subject in data_subjects %}
+| {{ subject.type }} | {{ subject.count_estimate }} | {{ subject.has_special_category }} |
+{% endfor %}
+
+---
+
+## Sub-Processor Overview (Art. 28)
+
+### Direct Integrations
+
+| Service | Location | DPA Status | Compliance Status |
+|---------|----------|------------|-------------------|
+{% for processor in sub_processors.integrations %}
+| {{ processor.name }} | {{ processor.location }} | {{ processor.dpa_status }} | {{ processor.compliance_status }} |
+{% endfor %}
+
+### Operational Tooling
+
+| Tool | Category | Location | DPA Status | Compliance Status |
+|------|----------|----------|------------|-------------------|
+{% for tool in sub_processors.tooling %}
+| {{ tool.name }} | {{ tool.category }} | {{ tool.location }} | {{ tool.dpa_status }} | {{ tool.compliance_status }} |
+{% endfor %}
+
+### Infrastructure Providers
+
+| Provider | Services Used | Location | DPA Status |
+|----------|---------------|----------|------------|
+{% for infra in sub_processors.infrastructure %}
+| {{ infra.name }} | {{ infra.services }} | {{ infra.location }} | {{ infra.dpa_status }} |
+{% endfor %}
+
+---
+
+## International Transfers (Art. 44-49)
+
+{% if has_international_transfers %}
+### Non-EU Data Transfers Identified
+
+| Service | Location | Transfer Mechanism | Status |
+|---------|----------|-------------------|--------|
+{% for transfer in international_transfers %}
+| {{ transfer.service }} | {{ transfer.location }} | {{ transfer.mechanism }} | {{ transfer.status }} |
+{% endfor %}
+
+**Required Actions**:
+{% for action in transfer_actions %}
+- {{ action }}
+{% endfor %}
+{% else %}
+No international data transfers identified. All services are EU-based.
+{% endif %}
+
+---
+
+## DPIA Requirement Assessment (Art. 35)
+
+{% if dpia_required %}
+**DPIA Required**: Yes
+
+**Triggering Factors**:
+{% for factor in dpia_factors %}
+- {{ factor }}
+{% endfor %}
+
+**Recommendation**: Conduct a Data Protection Impact Assessment before proceeding with processing activities.
+{% else %}
+**DPIA Required**: No (based on current processing activities)
+
+Processing activities do not meet the threshold for mandatory DPIA as defined in Art. 35 and CNIL guidelines.
+{% endif %}
+
+---
+
+## Priority Action Items
+
+{% if action_items | length > 0 %}
+| Priority | Action | Category | Due |
+|----------|--------|----------|-----|
+{% for action in action_items | slice(end=10) %}
+| {{ action.priority }} | {{ action.title }} | {{ action.category }} | {{ action.due_date | default(value="-") }} |
+{% endfor %}
+
+{% if action_items | length > 10 %}
+*... and {{ action_items | length - 10 }} additional action items. See gap-report-rgpd.md for full list.*
+{% endif %}
+{% else %}
+No action items identified. Full compliance achieved.
+{% endif %}
+
+---
+
+## Next Steps
+
+{% if overall_status == "compliant" %}
+1. Generate audit-ready documentation: `/osk-comply rgpd --export md`
+2. Schedule periodic re-assessment (recommended: quarterly)
+3. Monitor for regulatory updates
+{% else %}
+1. Address critical gaps immediately (see gap-report-rgpd.md)
+2. Update sub-processor register with missing DPAs
+3. Implement required transfer mechanisms for non-EU services
+4. Re-run assessment after remediation: `/osk-comply rgpd --update`
+{% endif %}
+
+---
+
+*Assessment generated by OpenSecKit v4 - {{ assessment_date }}*

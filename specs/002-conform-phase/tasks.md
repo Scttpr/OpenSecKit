@@ -19,9 +19,9 @@
 
 **Purpose**: Create directories and copy schemas
 
-- [ ] T001 Create directory structure: `domaines/rgs/templates/`, `domaines/_schema/`, `templates/data/comply/`, `templates/outputs/comply/`
-- [ ] T002 [P] Copy framework schema from `specs/002-conform-phase/contracts/framework-schema.yaml` to `domaines/_schema/framework-schema.yaml`
-- [ ] T003 [P] Copy assessment scope contract from `specs/002-conform-phase/contracts/assessment-scope.yaml` to `templates/schemas/assessment-scope.yaml`
+- [X] T001 Create directory structure: `domaines/rgs/templates/`, `domaines/_schema/`, `templates/data/comply/`, `templates/outputs/comply/`
+- [X] T002 [P] Copy framework schema from `specs/002-conform-phase/contracts/framework-schema.yaml` to `domaines/_schema/framework-schema.yaml`
+- [X] T003 [P] Copy assessment scope contract from `specs/002-conform-phase/contracts/assessment-scope.yaml` to `templates/schemas/assessment-scope.yaml`
 
 ---
 
@@ -33,22 +33,22 @@
 
 ### Shared Output Templates
 
-- [ ] T004 [P] Create assessment YAML template in `templates/data/comply/assessment.yaml.tera`
-- [ ] T005 [P] Create assessment report template in `templates/outputs/comply/assessment-report.md.tera`
-- [ ] T006 [P] Create gap analysis template in `templates/outputs/comply/gap-analysis.md.tera`
-- [ ] T007 [P] Create terminal summary template in `templates/reports/compliance-summary.tera`
+- [X] T004 [P] Create assessment YAML template in `templates/data/comply/assessment.yaml.tera`
+- [X] T005 [P] Create assessment report template in `templates/outputs/comply/assessment-report.md.tera`
+- [X] T006 [P] Create gap analysis template in `templates/outputs/comply/gap-analysis.md.tera`
+- [X] T007 [P] Create terminal summary template in `templates/reports/compliance-summary.tera`
 
 ### RGS Framework Definition
 
-- [ ] T008 Create RGS framework.yaml with metadata and security levels in `domaines/rgs/framework.yaml`
-- [ ] T009 Add RGS categories (B2-B7: Auth, Integrity, Confidentiality, Traceability, Timestamping, Signature) to `domaines/rgs/framework.yaml`
-- [ ] T010 Add RGS controls for Authentication domain (RGS-B2.1 to RGS-B2.5) to `domaines/rgs/framework.yaml`
-- [ ] T011 Add RGS controls for Integrity domain (RGS-B3.1 to RGS-B3.4) to `domaines/rgs/framework.yaml`
-- [ ] T012 Add RGS controls for Confidentiality domain (RGS-B4.1 to RGS-B4.4) to `domaines/rgs/framework.yaml`
-- [ ] T013 Add RGS controls for Traceability domain (RGS-B5.1 to RGS-B5.5) to `domaines/rgs/framework.yaml`
-- [ ] T014 Add RGS controls for Timestamping domain (RGS-B6.1 to RGS-B6.2) to `domaines/rgs/framework.yaml`
-- [ ] T015 Add RGS controls for Signature domain (RGS-B7.1 to RGS-B7.2) to `domaines/rgs/framework.yaml`
-- [ ] T016 Add scoring thresholds and cross_framework_mapping to `domaines/rgs/framework.yaml`
+- [X] T008 Create RGS framework.yaml with metadata and security levels in `domaines/rgs/framework.yaml`
+- [X] T009 Add RGS categories (B2-B7: Auth, Integrity, Confidentiality, Traceability, Timestamping, Signature) to `domaines/rgs/framework.yaml`
+- [X] T010 Add RGS controls for Authentication domain (RGS-B2.1 to RGS-B2.5) to `domaines/rgs/framework.yaml`
+- [X] T011 Add RGS controls for Integrity domain (RGS-B3.1 to RGS-B3.4) to `domaines/rgs/framework.yaml`
+- [X] T012 Add RGS controls for Confidentiality domain (RGS-B4.1 to RGS-B4.4) to `domaines/rgs/framework.yaml`
+- [X] T013 Add RGS controls for Traceability domain (RGS-B5.1 to RGS-B5.5) to `domaines/rgs/framework.yaml`
+- [X] T014 Add RGS controls for Timestamping domain (RGS-B6.1 to RGS-B6.2) to `domaines/rgs/framework.yaml`
+- [X] T015 Add RGS controls for Signature domain (RGS-B7.1 to RGS-B7.2) to `domaines/rgs/framework.yaml`
+- [X] T016 Add scoring thresholds and cross_framework_mapping to `domaines/rgs/framework.yaml`
 
 **Checkpoint**: Foundation ready - RGS framework complete, shared templates in place
 
@@ -62,20 +62,20 @@
 
 ### GDPR Output Templates
 
-- [ ] T017 [P] [US1] Create GDPR assessment summary template in `domaines/rgpd/templates/assessment-summary.md.tera`
-- [ ] T018 [P] [US1] Create sub-processor register template in `domaines/rgpd/templates/sub-processor-register.md.tera`
-- [ ] T019 [P] [US1] Create GDPR gap report template in `domaines/rgpd/templates/gap-report.md.tera`
+- [X] T017 [P] [US1] Create GDPR assessment summary template in `domaines/rgpd/templates/assessment-summary.md.tera`
+- [X] T018 [P] [US1] Create sub-processor register template in `domaines/rgpd/templates/sub-processor-register.md.tera`
+- [X] T019 [P] [US1] Create GDPR gap report template in `domaines/rgpd/templates/gap-report.md.tera`
 
 ### GDPR Agent Prompt
 
-- [ ] T020 [US1] Update prerequisites check section in `prompts/osk-comply-rgpd.md` (check for system model, warn on missing sections)
-- [ ] T021 [US1] Update scope definition section in `prompts/osk-comply-rgpd.md` (present data.yaml + integrations.yaml + tooling.yaml + architecture.yaml)
-- [ ] T022 [US1] Add evidence auto-detection logic in `prompts/osk-comply-rgpd.md` (map evidence_types to system model paths)
-- [ ] T023 [US1] Update control assessment workflow in `prompts/osk-comply-rgpd.md` (chapter-grouped, display article text, allow confirm/reject/skip)
-- [ ] T024 [US1] Add international transfer detection in `prompts/osk-comply-rgpd.md` (flag non-EU in integrations, tooling, architecture)
-- [ ] T025 [US1] Add sub-processor assessment in `prompts/osk-comply-rgpd.md` (Art. 28 - list from integrations AND tooling)
-- [ ] T026 [US1] Update gap analysis and report generation in `prompts/osk-comply-rgpd.md` (score, gaps grouped by codebase/tooling/infra, action items)
-- [ ] T027 [US1] Add output file generation in `prompts/osk-comply-rgpd.md` (assessment-rgpd.yaml, assessment-rgpd.md, gap-report-rgpd.md, sub-processor-register.md)
+- [X] T020 [US1] Update prerequisites check section in `prompts/osk-comply-rgpd.md` (check for system model, warn on missing sections)
+- [X] T021 [US1] Update scope definition section in `prompts/osk-comply-rgpd.md` (present data.yaml + integrations.yaml + tooling.yaml + architecture.yaml)
+- [X] T022 [US1] Add evidence auto-detection logic in `prompts/osk-comply-rgpd.md` (map evidence_types to system model paths)
+- [X] T023 [US1] Update control assessment workflow in `prompts/osk-comply-rgpd.md` (chapter-grouped, display article text, allow confirm/reject/skip)
+- [X] T024 [US1] Add international transfer detection in `prompts/osk-comply-rgpd.md` (flag non-EU in integrations, tooling, architecture)
+- [X] T025 [US1] Add sub-processor assessment in `prompts/osk-comply-rgpd.md` (Art. 28 - list from integrations AND tooling)
+- [X] T026 [US1] Update gap analysis and report generation in `prompts/osk-comply-rgpd.md` (score, gaps grouped by codebase/tooling/infra, action items)
+- [X] T027 [US1] Add output file generation in `prompts/osk-comply-rgpd.md` (assessment-rgpd.yaml, assessment-rgpd.md, gap-report-rgpd.md, sub-processor-register.md)
 
 **Checkpoint**: `/osk-comply rgpd` fully functional - can assess GDPR compliance against full system context
 
@@ -89,22 +89,22 @@
 
 ### RGS Output Templates
 
-- [ ] T028 [P] [US2] Create RGS assessment summary template in `domaines/rgs/templates/assessment-summary.md.tera`
-- [ ] T029 [P] [US2] Create homologation checklist template in `domaines/rgs/templates/homologation-checklist.md.tera`
-- [ ] T030 [P] [US2] Create system perimeter template in `domaines/rgs/templates/system-perimeter.md.tera`
+- [X] T028 [P] [US2] Create RGS assessment summary template in `domaines/rgs/templates/assessment-summary.md.tera`
+- [X] T029 [P] [US2] Create homologation checklist template in `domaines/rgs/templates/homologation-checklist.md.tera`
+- [X] T030 [P] [US2] Create system perimeter template in `domaines/rgs/templates/system-perimeter.md.tera`
 
 ### RGS Agent Prompt
 
-- [ ] T031 [US2] Update prerequisites check section in `prompts/osk-comply-rgs.md` (check for system model, warn on missing sections)
-- [ ] T032 [US2] Add RGS level selection in `prompts/osk-comply-rgs.md` (ask for *, **, *** if not defined)
-- [ ] T033 [US2] Update scope definition section in `prompts/osk-comply-rgs.md` (present full system perimeter including tooling)
-- [ ] T034 [US2] Add tool certification check in `prompts/osk-comply-rgs.md` (SecNumCloud, HDS, ISO 27001 for each service)
-- [ ] T035 [US2] Add evidence auto-detection logic in `prompts/osk-comply-rgs.md` (map evidence_types to system model paths)
-- [ ] T036 [US2] Update domain-by-domain assessment in `prompts/osk-comply-rgs.md` (B2-B7, display annexe text, ANSSI recommendations)
-- [ ] T037 [US2] Add cryptographic validation in `prompts/osk-comply-rgs.md` (check algorithms against ANSSI approved list)
-- [ ] T038 [US2] Add traceability assessment in `prompts/osk-comply-rgs.md` (app logs + infra logs + third-party audit logs)
-- [ ] T039 [US2] Update homologation readiness in `prompts/osk-comply-rgs.md` (blockers vs recommendations, documentation checklist)
-- [ ] T040 [US2] Add output file generation in `prompts/osk-comply-rgs.md` (assessment-rgs.yaml, assessment-rgs.md, homologation-checklist.md, system-perimeter.md)
+- [X] T031 [US2] Update prerequisites check section in `prompts/osk-comply-rgs.md` (check for system model, warn on missing sections)
+- [X] T032 [US2] Add RGS level selection in `prompts/osk-comply-rgs.md` (ask for *, **, *** if not defined)
+- [X] T033 [US2] Update scope definition section in `prompts/osk-comply-rgs.md` (present full system perimeter including tooling)
+- [X] T034 [US2] Add tool certification check in `prompts/osk-comply-rgs.md` (SecNumCloud, HDS, ISO 27001 for each service)
+- [X] T035 [US2] Add evidence auto-detection logic in `prompts/osk-comply-rgs.md` (map evidence_types to system model paths)
+- [X] T036 [US2] Update domain-by-domain assessment in `prompts/osk-comply-rgs.md` (B2-B7, display annexe text, ANSSI recommendations)
+- [X] T037 [US2] Add cryptographic validation in `prompts/osk-comply-rgs.md` (check algorithms against ANSSI approved list)
+- [X] T038 [US2] Add traceability assessment in `prompts/osk-comply-rgs.md` (app logs + infra logs + third-party audit logs)
+- [X] T039 [US2] Update homologation readiness in `prompts/osk-comply-rgs.md` (blockers vs recommendations, documentation checklist)
+- [X] T040 [US2] Add output file generation in `prompts/osk-comply-rgs.md` (assessment-rgs.yaml, assessment-rgs.md, homologation-checklist.md, system-perimeter.md)
 
 **Checkpoint**: `/osk-comply rgs` fully functional - can assess RGS compliance with homologation guidance
 
