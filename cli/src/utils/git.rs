@@ -11,40 +11,6 @@ pub fn is_git_repo() -> bool {
         .unwrap_or(false)
 }
 
-pub fn create_branch(name: &str) -> Result<()> {
-    let check = Command::new("git")
-        .args([
-            "show-ref",
-            "--verify",
-            "--quiet",
-            &format!("refs/heads/{}", name),
-        ])
-        .status()
-        .context("Failed to check branch")?;
-
-    if check.success() {
-        let status = Command::new("git")
-            .args(["checkout", name])
-            .status()
-            .context("Failed to checkout branch")?;
-
-        if !status.success() {
-            bail!("Cannot checkout branch {}", name);
-        }
-    } else {
-        let status = Command::new("git")
-            .args(["checkout", "-b", name])
-            .status()
-            .context("Failed to create branch")?;
-
-        if !status.success() {
-            bail!("Cannot create branch {}", name);
-        }
-    }
-
-    Ok(())
-}
-
 fn add(paths: &[&str]) -> Result<()> {
     let mut cmd = Command::new("git");
     cmd.arg("add");

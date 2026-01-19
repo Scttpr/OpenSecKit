@@ -1,0 +1,287 @@
+# OpenSecKit V4 - Compliance Assessment Output
+# Generated: {{ assessment_date }}
+# Framework: {{ framework_id | upper }}
+
+schema_version: "4.0.0"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# ASSESSMENT METADATA
+# ═══════════════════════════════════════════════════════════════════════════
+
+metadata:
+  framework: "{{ framework_id }}"
+  framework_name: "{{ framework_name }}"
+  assessment_date: "{{ assessment_date }}"
+  assessor: "/osk-comply {{ framework_id }}"
+  system_model_hash: "{{ system_model_hash }}"
+  assessment_version: "{{ assessment_version | default(value="1") }}"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# OVERALL STATUS
+# ═══════════════════════════════════════════════════════════════════════════
+
+status:
+  overall: "{{ overall_status }}"  # compliant | partial | non_compliant | not_assessed
+  score: {{ overall_score }}
+  total_controls: {{ total_controls }}
+  assessed_controls: {{ assessed_controls }}
+  compliant_controls: {{ compliant_controls }}
+  partial_controls: {{ partial_controls }}
+  gap_controls: {{ gap_controls }}
+  not_applicable_controls: {{ not_applicable_controls }}
+
+# ═══════════════════════════════════════════════════════════════════════════
+# ASSESSMENT SCOPE
+# ═══════════════════════════════════════════════════════════════════════════
+
+scope:
+  description: "{{ scope_description }}"
+  scope_confirmed: {{ scope_confirmed }}
+  scope_confirmed_date: "{{ scope_confirmed_date }}"
+
+  components_included:
+{% for component in components_included %}
+    - "{{ component }}"
+{% endfor %}
+
+  components_excluded:
+{% for exclusion in components_excluded %}
+    - id: "{{ exclusion.id }}"
+      justification: "{{ exclusion.justification }}"
+{% endfor %}
+
+  data_categories:
+{% for category in data_categories %}
+    - id: "{{ category.id }}"
+      name: "{{ category.name }}"
+      sensitivity: "{{ category.sensitivity }}"
+      in_scope: {{ category.in_scope }}
+{% endfor %}
+
+  sub_processors:
+{% for processor in sub_processors %}
+    - id: "{{ processor.id }}"
+      name: "{{ processor.name }}"
+      source: "{{ processor.source }}"
+      location: "{{ processor.location }}"
+      is_eu: {{ processor.is_eu }}
+      in_scope: {{ processor.in_scope }}
+{% endfor %}
+
+{% if rgs_level %}
+  rgs_level: "{{ rgs_level }}"
+{% endif %}
+
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTROL MAPPINGS
+# ═══════════════════════════════════════════════════════════════════════════
+
+mappings:
+{% for mapping in mappings %}
+  - id: "{{ mapping.id }}"
+    framework_ref: "{{ mapping.framework_ref }}"
+    requirement: "{{ mapping.requirement }}"
+    category: "{{ mapping.category }}"
+    status: "{{ mapping.status }}"  # compliant | partial | gap | not_applicable | not_assessed
+    score: {{ mapping.score }}
+    assessed_date: "{{ mapping.assessed_date }}"
+    assessed_by: "{{ mapping.assessed_by }}"  # auto | manual
+
+{% if mapping.evidence %}
+    evidence:
+{% for evidence in mapping.evidence %}
+      - id: "{{ evidence.id }}"
+        type: "{{ evidence.type }}"  # auto-detected | config | document | manual
+        description: "{{ evidence.description }}"
+        path: "{{ evidence.path }}"
+        collected_date: "{{ evidence.collected_date }}"
+{% if evidence.confidence %}
+        confidence: "{{ evidence.confidence }}"  # high | medium | low
+{% endif %}
+{% endfor %}
+{% endif %}
+
+{% if mapping.status == "gap" or mapping.status == "partial" %}
+    gap_detail: "{{ mapping.gap_detail }}"
+    gap_severity: "{{ mapping.gap_severity }}"  # critical | high | medium | low
+    gap_category: "{{ mapping.gap_category }}"  # codebase | tooling | infrastructure | process
+    remediation:
+      recommendation: "{{ mapping.remediation.recommendation }}"
+      effort: "{{ mapping.remediation.effort }}"  # low | medium | high
+{% endif %}
+
+{% endfor %}
+
+# ═══════════════════════════════════════════════════════════════════════════
+# ACTION ITEMS
+# ═══════════════════════════════════════════════════════════════════════════
+
+action_items:
+{% for action in action_items %}
+  - id: "{{ action.id }}"
+    title: "{{ action.title }}"
+    description: "{{ action.description }}"
+    priority: "{{ action.priority }}"  # P0 | P1 | P2 | P3
+    category: "{{ action.category }}"  # codebase | tooling | infrastructure | process | documentation
+    addresses_controls:
+{% for control in action.addresses_controls %}
+      - "{{ control }}"
+{% endfor %}
+    status: "{{ action.status }}"  # open | in_progress | blocked | completed | deferred
+{% if action.owner %}
+    owner: "{{ action.owner }}"
+{% endif %}
+{% if action.due_date %}
+    due_date: "{{ action.due_date }}"
+{% endif %}
+{% endfor %}
+
+# ═══════════════════════════════════════════════════════════════════════════
+# CROSS-FRAMEWORK MAPPING
+# ═══════════════════════════════════════════════════════════════════════════
+
+{% if cross_framework_mappings %}
+cross_framework:
+  mappings:
+{% for mapping in cross_framework_mappings %}
+    - control_id: "{{ mapping.control_id }}"
+      maps_to:
+{% for target in mapping.maps_to %}
+        - framework: "{{ target.framework }}"
+          controls: [{% for c in target.controls %}"{{ c }}"{% if not loop.last %}, {% endif %}{% endfor %}]
+{% endfor %}
+{% endfor %}
+
+{% if synergies %}
+  synergies:
+{% for synergy in synergies %}
+    - "{{ synergy }}"
+{% endfor %}
+{% endif %}
+{% endif %}
+
+# ═══════════════════════════════════════════════════════════════════════════
+# AUDIT TRAIL
+# ═══════════════════════════════════════════════════════════════════════════
+
+audit_trail:
+{% for entry in audit_trail %}
+  - date: "{{ entry.date }}"
+    action: "{{ entry.action }}"
+    details: "{{ entry.details }}"
+{% if entry.previous_score %}
+    previous_score: {{ entry.previous_score }}
+    new_score: {{ entry.new_score }}
+{% endif %}
+{% endfor %}
+
+{% if framework_id == "rgs" %}
+# ═══════════════════════════════════════════════════════════════════════════
+# RGS-SPECIFIC ASSESSMENT DATA
+# ═══════════════════════════════════════════════════════════════════════════
+
+rgs:
+  system_name: "{{ rgs_system_name }}"
+  system_perimeter: "{{ rgs_system_perimeter }}"
+  system_classification: "{{ rgs_system_classification | default(value='NP') }}"
+
+  homologation:
+    level: "{{ rgs_level }}"
+    status: "{{ rgs_homologation_status | default(value='none') }}"
+{% if rgs_homologation_decision_date %}
+    decision_date: "{{ rgs_homologation_decision_date }}"
+{% endif %}
+{% if rgs_homologation_expiry_date %}
+    expiry_date: "{{ rgs_homologation_expiry_date }}"
+{% endif %}
+{% if rgs_homologation_authority %}
+    authority: "{{ rgs_homologation_authority }}"
+{% endif %}
+{% if rgs_homologation_decision_reference %}
+    decision_reference: "{{ rgs_homologation_decision_reference }}"
+{% endif %}
+
+  dicp:
+    disponibilite:
+      level: {{ dicp_d_level | default(value=0) }}
+      justification: "{{ dicp_d_justification | default(value='Not assessed') }}"
+    integrite:
+      level: {{ dicp_i_level | default(value=0) }}
+      justification: "{{ dicp_i_justification | default(value='Not assessed') }}"
+    confidentialite:
+      level: {{ dicp_c_level | default(value=0) }}
+      justification: "{{ dicp_c_justification | default(value='Not assessed') }}"
+    preuve:
+      level: {{ dicp_p_level | default(value=0) }}
+      justification: "{{ dicp_p_justification | default(value='Not assessed') }}"
+
+  ebios_rm:
+    completed: {{ ebios_completed | default(value=false) }}
+{% if ebios_date %}
+    date: "{{ ebios_date }}"
+{% endif %}
+{% if ebios_document_path %}
+    document_path: "{{ ebios_document_path }}"
+{% endif %}
+    workshops_completed:
+      - workshop: 1
+        name: "Cadrage et socle de sécurité"
+        status: "{{ ebios_workshop_1 | default(value='not_started') }}"
+      - workshop: 2
+        name: "Sources de risque"
+        status: "{{ ebios_workshop_2 | default(value='not_started') }}"
+      - workshop: 3
+        name: "Scénarios stratégiques"
+        status: "{{ ebios_workshop_3 | default(value='not_started') }}"
+      - workshop: 4
+        name: "Scénarios opérationnels"
+        status: "{{ ebios_workshop_4 | default(value='not_started') }}"
+      - workshop: 5
+        name: "Traitement du risque"
+        status: "{{ ebios_workshop_5 | default(value='not_started') }}"
+
+{% if qualified_products %}
+  qualified_products:
+{% for product in qualified_products %}
+    - product: "{{ product.name }}"
+      qualification: "{{ product.qualification }}"
+{% if product.certificate_ref %}
+      certificate_ref: "{{ product.certificate_ref }}"
+{% endif %}
+{% if product.expiry %}
+      expiry: "{{ product.expiry }}"
+{% endif %}
+{% endfor %}
+{% endif %}
+
+  mcs:
+    plan_exists: {{ mcs_plan_exists | default(value=false) }}
+{% if mcs_plan_path %}
+    plan_path: "{{ mcs_plan_path }}"
+{% endif %}
+    vulnerability_watch: {{ mcs_vulnerability_watch | default(value=false) }}
+    patch_sla_defined: {{ mcs_patch_sla_defined | default(value=false) }}
+    annual_pentest: {{ mcs_annual_pentest | default(value=false) }}
+{% if mcs_last_pentest_date %}
+    last_pentest_date: "{{ mcs_last_pentest_date }}"
+{% endif %}
+
+  crypto:
+    anssi_approved_algorithms: {{ crypto_anssi_approved | default(value=false) }}
+    key_management_policy: {{ crypto_key_management_policy | default(value=false) }}
+    hsm_used: {{ crypto_hsm_used | default(value=false) }}
+    certificate_management: {{ crypto_certificate_management | default(value=false) }}
+
+{% if eidas_applicable %}
+  eidas:
+    applicable: {{ eidas_applicable }}
+    level: "{{ eidas_level | default(value='none') }}"
+{% if eidas_services %}
+    services:
+{% for service in eidas_services %}
+      - "{{ service }}"
+{% endfor %}
+{% endif %}
+{% endif %}
+
+{% endif %}

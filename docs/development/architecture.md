@@ -33,9 +33,9 @@ OpenSecKit/
 │   ├── outputs/           # Templates fichiers
 │   └── reports/           # Rapports terminal
 │
-├── domaines/              # Domaines réglementaires
+├── frameworks/              # Domaines réglementaires
 │   ├── rgpd/
-│   ├── gouvernement-rgs/
+│   ├── rgs/
 │   └── nis2/
 │
 ├── docs/                  # Documentation (MkDocs)

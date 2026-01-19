@@ -1,0 +1,163 @@
+# RGPD/GDPR Knowledge Base Manifest
+# Tracks versions and update status of knowledge documents
+
+metadata:
+  framework: "rgpd"
+  last_audit: null  # Set when you verify all docs are current
+  maintainer: null
+
+documents:
+  # ============================================================================
+  # OFFICIAL REGULATION
+  # ============================================================================
+  - id: "rgpd-regulation"
+    file: "rgpd-reglement-ue-2016-679.pdf"
+    markdown: null  # To be converted
+    title: "Règlement (UE) 2016/679 - RGPD"
+    source: "https://eur-lex.europa.eu/legal-content/FR/TXT/PDF/?uri=CELEX:32016R0679"
+    version: "2016/679"
+    language: "fr"
+    last_checked: "2025-01"
+    stability: "frozen"
+    notes: "Full GDPR regulation - 99 articles, 173 recitals"
+
+  # ============================================================================
+  # CNIL GUIDES
+  # ============================================================================
+  - id: "cnil-securite-2024"
+    file: "cnil-guide-securite-donnees-2024.pdf"
+    markdown: null
+    title: "Guide de la sécurité des données personnelles (2024)"
+    source: "https://www.cnil.fr/sites/cnil/files/2024-03/cnil_guide_securite_personnelle_2024.pdf"
+    version: "2024"
+    language: "fr"
+    last_checked: "2025-01"
+    stability: "stable"
+    notes: "25 security measures (fiches) - Article 32 implementation reference"
+
+  - id: "cnil-dpo"
+    file: "cnil-guide-dpo.pdf"
+    markdown: null
+    title: "Guide pratique RGPD - Délégués à la protection des données"
+    source: "https://www.cnil.fr/sites/default/files/atoms/files/guide_pratique_rgpd_-_delegues_a_la_protection_des_donnees.pdf"
+    version: null
+    language: "fr"
+    last_checked: "2025-01"
+    stability: "stable"
+    notes: "DPO designation, missions, independence - Articles 37-39"
+
+  - id: "cnil-sous-traitant"
+    file: "cnil-guide-sous-traitant.pdf"
+    markdown: "cnil-guide-sous-traitant.md"
+    title: "Guide du sous-traitant"
+    source: "https://www.cnil.fr/sites/cnil/files/atoms/files/rgpd-guide_sous-traitant-cnil.pdf"
+    version: "2017-09"
+    language: "fr"
+    last_checked: "2025-01"
+    stability: "stable"
+    notes: "Processor obligations, contract clauses - Article 28"
+
+  # ============================================================================
+  # AIPD / DPIA
+  # ============================================================================
+  - id: "cnil-aipd-modeles"
+    file: "cnil-aipd-modeles.pdf"
+    markdown: "cnil-aipd-modeles.md"
+    title: "AIPD - Modèles et méthode"
+    source: "https://www.cnil.fr/sites/default/files/atoms/files/cnil-pia-2-fr-modeles.pdf"
+    version: null
+    language: "fr"
+    last_checked: "2025-01"
+    stability: "stable"
+    notes: "DPIA methodology, templates, risk assessment - Article 35"
+
+  - id: "cnil-aipd-liste"
+    file: "cnil-aipd-liste-traitements-requise.pdf"
+    markdown: "cnil-aipd-liste-traitements-requise.md"
+    title: "Liste des traitements nécessitant une AIPD"
+    source: "https://www.cnil.fr/sites/default/files/atoms/files/liste-traitements-aipd-requise.pdf"
+    version: "2018-10"
+    language: "fr"
+    last_checked: "2025-01"
+    stability: "stable"
+    notes: "French national list per Article 35(4)"
+
+  - id: "g29-aipd"
+    file: "cnil-aipd-g29-lignes-directrices.pdf"
+    markdown: null
+    title: "Lignes directrices AIPD (G29/EDPB)"
+    source: "https://www.cnil.fr/sites/cnil/files/atoms/files/wp248_rev.01_fr.pdf"
+    version: "WP248 rev.01"
+    language: "fr"
+    last_checked: "2025-01"
+    stability: "frozen"
+    notes: "EDPB guidelines on DPIA methodology"
+
+  # ============================================================================
+  # COOKIES & TRACKERS
+  # ============================================================================
+  - id: "cnil-cookies-recommandation"
+    file: "cnil-cookies-recommandation-2020.pdf"
+    markdown: "cnil-cookies-recommandation-2020.md"
+    title: "Recommandation cookies et traceurs"
+    source: "https://www.cnil.fr/sites/cnil/files/atoms/files/recommandation-cookies-et-autres-traceurs.pdf"
+    version: "2020-092"
+    language: "fr"
+    last_checked: "2025-01"
+    stability: "stable"
+    notes: "Délibération n° 2020-092 - practical compliance methods"
+
+  - id: "cnil-cookies-lignes-directrices"
+    file: "cnil-cookies-lignes-directrices-2020.pdf"
+    markdown: "cnil-cookies-lignes-directrices-2020.md"
+    title: "Lignes directrices cookies et traceurs"
+    source: "https://www.cnil.fr/sites/cnil/files/atoms/files/lignes_directrices_de_la_cnil_sur_les_cookies_et_autres_traceurs.pdf"
+    version: "2020-091"
+    language: "fr"
+    last_checked: "2025-01"
+    stability: "stable"
+    notes: "Délibération n° 2020-091 - Article 82 LIL"
+
+  # ============================================================================
+  # EXISTING DOCUMENTS (to review/update)
+  # ============================================================================
+  - id: "regulation-partial"
+    file: "regulation-ch2-5.md"
+    title: "GDPR Regulation - Chapters II-V (partial)"
+    source: "https://eur-lex.europa.eu/eli/reg/2016/679/oj"
+    version: "2016/679"
+    language: "en"
+    stability: "frozen"
+    notes: "Partial - to be replaced by full French version"
+
+  - id: "cnil-guidelines-old"
+    file: "cnil-guidelines.md"
+    title: "CNIL Practical Guidelines (summary)"
+    source: "https://www.cnil.fr/fr/rgpd-de-quoi-parle-t-on"
+    language: "fr"
+    stability: "occasional"
+    notes: "Summary only - detailed guides now available as PDFs"
+
+  - id: "sccs"
+    file: "sccs-2021.md"
+    title: "Standard Contractual Clauses (2021)"
+    source: "https://ec.europa.eu/info/law/law-topic/data-protection/international-dimension-data-protection/standard-contractual-clauses-scc_en"
+    version: "2021/914"
+    language: "en"
+    stability: "stable"
+    notes: "Controller-to-Controller and Controller-to-Processor modules"
+
+  - id: "adequacy-list"
+    file: "adequacy-list.yaml"
+    title: "Adequacy Decisions List"
+    source: "https://ec.europa.eu/info/law/law-topic/data-protection/international-dimension-data-protection/adequacy-decisions_en"
+    language: "en"
+    stability: "dynamic"
+    notes: "Countries with EU adequacy decisions"
+    cron_check: true
+
+# Update procedure:
+# 1. Download PDF from source URL
+# 2. Convert PDF to markdown (preserve structure)
+# 3. Update 'markdown' field with .md filename
+# 4. Set last_checked and last_updated dates

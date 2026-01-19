@@ -5,15 +5,13 @@ on:
         branches: [main]
         paths:
             - "docs/**"
-            - "mkdocs.yml"
-            - "**.md"
+            - "website/mkdocs.yml"
         tags:
             - "v*"
     pull_request:
         paths:
             - "docs/**"
-            - "mkdocs.yml"
-            - "**.md"
+            - "website/mkdocs.yml"
     workflow_dispatch:
 
 permissions:
@@ -32,17 +30,6 @@ jobs:
         if: github.event_name == 'pull_request' || (github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/'))
         steps:
             - uses: actions/checkout@v4
-
-            - name: Setup Node.js
-              uses: actions/setup-node@v6
-              with:
-                  node-version: "20"
-
-            - name: Install dependencies
-              run: npm ci
-
-            - name: Check Dead Links
-              run: ./scripts/check-links.sh
 
             - name: Setup Python
               uses: actions/setup-python@v6
@@ -71,7 +58,7 @@ jobs:
               run: pip install mkdocs-material
 
             - name: Build
-              run: mkdocs build
+              run: mkdocs build -f website/mkdocs.yml
 
             - name: Upload artifact
               uses: actions/upload-pages-artifact@v4

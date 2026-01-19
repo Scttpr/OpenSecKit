@@ -1,0 +1,348 @@
+# Framework Template for OpenSecKit
+# Copy this file to domaines/<your-framework>/framework.yaml and customize
+#
+# Documentation: docs/extending-frameworks.md
+# Schema: domaines/_schema/framework-schema.yaml
+
+# =============================================================================
+# FRAMEWORK METADATA
+# =============================================================================
+
+framework:
+  # Unique identifier (lowercase, hyphens allowed)
+  # This becomes the command: /osk-comply <id>
+  id: "your-framework"
+
+  # Human-readable name
+  name: "Your Framework Name"
+
+  # Version of the framework specification
+  version: "1.0"
+
+  # Issuing authority or organization
+  source: "Your Organization"
+
+  # Brief description
+  description: |
+    A brief description of what this framework covers and who should use it.
+
+  # Official documentation URL
+  official_url: "https://example.com/framework"
+
+  # Where this framework applies (optional but recommended)
+  applicability:
+    # Geographic regions (ISO 3166-1 alpha-2 or custom)
+    regions:
+      - "EU"
+      - "US"
+
+    # Industry sectors
+    sectors:
+      - "technology"
+      - "finance"
+      - "healthcare"
+
+    # Types of data this framework addresses
+    data_types:
+      - "personal_data"
+      - "financial_data"
+
+# =============================================================================
+# SECURITY LEVELS (Optional)
+# =============================================================================
+
+# Define if your framework has multiple compliance levels
+# Omit this section entirely if framework has only one level
+
+security_levels:
+  - id: "basic"
+    name: "Basic"
+    description: "Minimum compliance requirements for all organizations"
+    minimum_score: 70
+
+  - id: "enhanced"
+    name: "Enhanced"
+    description: "Strengthened requirements for sensitive operations"
+    minimum_score: 85
+
+  - id: "advanced"
+    name: "Advanced"
+    description: "Maximum security requirements for critical systems"
+    minimum_score: 95
+
+# =============================================================================
+# CATEGORIES / DOMAINS
+# =============================================================================
+
+# Group controls into logical categories
+categories:
+  - id: "access-control"
+    name: "Access Control"
+    description: "Controls related to authentication and authorization"
+    reference: "Section 1"  # Reference in official document
+
+  - id: "data-protection"
+    name: "Data Protection"
+    description: "Controls for protecting data at rest and in transit"
+    reference: "Section 2"
+
+  - id: "monitoring"
+    name: "Monitoring & Logging"
+    description: "Controls for audit trails and security monitoring"
+    reference: "Section 3"
+
+# =============================================================================
+# CONTROLS
+# =============================================================================
+
+controls:
+  # -------------------------------------------------------------------------
+  # ACCESS CONTROL
+  # -------------------------------------------------------------------------
+
+  - id: "AC-001"
+    category: "access-control"
+    name: "User Authentication"
+    description: |
+      Implement strong authentication mechanisms for all user access.
+
+    # Which security levels require this control
+    # Omit if no security_levels defined
+    levels:
+      - "basic"
+      - "enhanced"
+      - "advanced"
+
+    # Where to look for evidence
+    evidence_types:
+      - type: "code"
+        paths:
+          - "src/**/auth/**"
+          - "src/**/login/**"
+        description: "Authentication implementation code"
+
+      - type: "config"
+        paths:
+          - ".env*"
+          - "config/auth*"
+        description: "Authentication configuration"
+
+    # How to verify compliance
+    verification:
+      automated:
+        - "Check for password hashing (bcrypt, argon2, scrypt)"
+        - "Verify MFA implementation exists"
+      manual:
+        - "Review authentication flow documentation"
+        - "Verify password policy meets requirements"
+
+    # Remediation guidance
+    remediation:
+      guidance: |
+        Implement authentication using industry-standard libraries.
+        Use bcrypt or argon2 for password hashing.
+        Consider implementing MFA for sensitive operations.
+      references:
+        - "https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html"
+
+    # Map to other frameworks (optional)
+    mappings:
+      iso27001:
+        - "A.9.4.2"
+        - "A.9.4.3"
+      nist:
+        - "IA-2"
+        - "IA-5"
+      gdpr:
+        - "Art. 32"
+
+  - id: "AC-002"
+    category: "access-control"
+    name: "Access Authorization"
+    description: |
+      Implement role-based or attribute-based access control.
+    levels:
+      - "basic"
+      - "enhanced"
+      - "advanced"
+    evidence_types:
+      - type: "code"
+        paths:
+          - "src/**/permissions/**"
+          - "src/**/rbac/**"
+          - "src/**/authorization/**"
+        description: "Authorization implementation"
+    verification:
+      automated:
+        - "Check for RBAC/ABAC implementation"
+        - "Verify authorization checks on sensitive endpoints"
+      manual:
+        - "Review access control matrix"
+    remediation:
+      guidance: "Implement least-privilege access using RBAC or ABAC patterns."
+    mappings:
+      iso27001: ["A.9.1.2", "A.9.2.3"]
+      nist: ["AC-2", "AC-3"]
+
+  # -------------------------------------------------------------------------
+  # DATA PROTECTION
+  # -------------------------------------------------------------------------
+
+  - id: "DP-001"
+    category: "data-protection"
+    name: "Encryption at Rest"
+    description: |
+      Encrypt sensitive data when stored in databases or filesystems.
+    levels:
+      - "enhanced"
+      - "advanced"
+    evidence_types:
+      - type: "infrastructure"
+        paths:
+          - ".osk/system-model/architecture.yaml"
+        description: "Database encryption configuration"
+      - type: "config"
+        paths:
+          - "terraform/**"
+          - "docker-compose*.yml"
+        description: "Infrastructure configuration"
+    verification:
+      automated:
+        - "Check database encryption settings"
+        - "Verify disk encryption enabled"
+      manual:
+        - "Review encryption key management procedures"
+    remediation:
+      guidance: "Enable encryption at rest for all databases and storage systems."
+    mappings:
+      iso27001: ["A.10.1.1"]
+      nist: ["SC-28"]
+      gdpr: ["Art. 32(1)(a)"]
+
+  - id: "DP-002"
+    category: "data-protection"
+    name: "Encryption in Transit"
+    description: |
+      Use TLS/HTTPS for all data transmission.
+    levels:
+      - "basic"
+      - "enhanced"
+      - "advanced"
+    evidence_types:
+      - type: "config"
+        paths:
+          - "nginx*.conf"
+          - "config/ssl*"
+        description: "TLS configuration"
+      - type: "code"
+        paths:
+          - "src/**/*client*"
+          - "src/**/*api*"
+        description: "API client configuration"
+    verification:
+      automated:
+        - "Check TLS version >= 1.2"
+        - "Verify HTTPS enforcement"
+      manual:
+        - "Review certificate management process"
+    remediation:
+      guidance: "Configure TLS 1.2+ for all connections. Disable older protocols."
+    mappings:
+      iso27001: ["A.13.2.1"]
+      nist: ["SC-8"]
+
+  # -------------------------------------------------------------------------
+  # MONITORING
+  # -------------------------------------------------------------------------
+
+  - id: "MON-001"
+    category: "monitoring"
+    name: "Security Event Logging"
+    description: |
+      Log all security-relevant events including authentication attempts,
+      authorization decisions, and data access.
+    levels:
+      - "basic"
+      - "enhanced"
+      - "advanced"
+    evidence_types:
+      - type: "code"
+        paths:
+          - "src/**/logging/**"
+          - "src/**/audit/**"
+        description: "Logging implementation"
+      - type: "tooling"
+        paths:
+          - ".osk/system-model/tooling.yaml"
+        filter: "category == 'monitoring'"
+        description: "Monitoring tools"
+    verification:
+      automated:
+        - "Check for audit logging calls"
+        - "Verify log retention configuration"
+      manual:
+        - "Review log analysis procedures"
+        - "Verify alerting is configured"
+    remediation:
+      guidance: |
+        Implement structured logging for all security events.
+        Configure log aggregation and retention per requirements.
+    mappings:
+      iso27001: ["A.12.4.1", "A.12.4.3"]
+      nist: ["AU-2", "AU-6"]
+
+# =============================================================================
+# SCORING CONFIGURATION
+# =============================================================================
+
+scoring:
+  # Scoring method: "weighted", "simple", or "custom"
+  method: "weighted"
+
+  # Weight for each status
+  weights:
+    compliant: 1.0
+    partial: 0.5
+    gap: 0.0
+    not_applicable: null  # Excluded from calculation
+
+  # Score thresholds for overall status
+  thresholds:
+    compliant: 85    # >= 85% = Compliant
+    partial: 60      # >= 60% = Partial Compliance
+    # Below 60% = Non-Compliant
+
+# =============================================================================
+# CROSS-FRAMEWORK MAPPING (Optional)
+# =============================================================================
+
+cross_framework_mapping:
+  iso27001:
+    description: "ISO/IEC 27001:2022 Information Security Management"
+    url: "https://www.iso.org/standard/27001"
+
+  nist:
+    description: "NIST Cybersecurity Framework"
+    url: "https://www.nist.gov/cyberframework"
+
+  gdpr:
+    description: "General Data Protection Regulation"
+    url: "https://gdpr.eu/"
+
+# =============================================================================
+# NOTES
+# =============================================================================
+
+# After creating your framework.yaml:
+#
+# 1. Validate: osk validate framework domaines/your-framework/framework.yaml
+#
+# 2. Test: /osk-comply your-framework --dry-run
+#
+# 3. Optionally create custom templates in:
+#    domaines/your-framework/templates/
+#      - assessment-summary.md.tera
+#      - gap-report.md.tera
+#      - export-report.md.tera
+#
+# 4. See docs/extending-frameworks.md for detailed documentation

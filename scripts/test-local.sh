@@ -175,7 +175,7 @@ echo -e "${GREEN}   ✓ osk init terminé${NC}"
 echo -e "   📂 Copie des ressources locales..."
 cp -r "$OSK_ROOT/prompts/"*.md .osk/prompts/ 2>/dev/null || true
 cp -r "$OSK_ROOT/templates/"* .osk/templates/ 2>/dev/null || true
-cp -r "$OSK_ROOT/domaines/"* .osk/domaines/ 2>/dev/null || true
+cp -r "$OSK_ROOT/frameworks/"* .osk/frameworks/ 2>/dev/null || true
 
 # Synchronise les slash commands depuis les prompts locaux
 cp .osk/prompts/*.md .claude/commands/ 2>/dev/null || true
@@ -233,9 +233,9 @@ fi
 # Domaines
 DOMAINE_COUNT=$(find .osk/domaines -name "*.md" 2>/dev/null | wc -l)
 if [[ $DOMAINE_COUNT -ge 10 ]]; then
-    echo -e "   ${GREEN}✓${NC} .osk/domaines/ ($DOMAINE_COUNT fichiers)"
+    echo -e "   ${GREEN}✓${NC} .osk/frameworks/ ($DOMAINE_COUNT fichiers)"
 else
-    echo -e "   ${YELLOW}⚠${NC} .osk/domaines/ ($DOMAINE_COUNT fichiers)"
+    echo -e "   ${YELLOW}⚠${NC} .osk/frameworks/ ($DOMAINE_COUNT fichiers)"
 fi
 
 # Stack détectée

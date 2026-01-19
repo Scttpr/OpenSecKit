@@ -1,3 +1,2 @@
-{# Template Claude Code - Copie directe du prompt source #}
-{# Les prompts OpenSecKit sont déjà au format Claude Code #}
+{# Claude Code template - uses raw_content fetched from GitHub #}
 {{ raw_content }}

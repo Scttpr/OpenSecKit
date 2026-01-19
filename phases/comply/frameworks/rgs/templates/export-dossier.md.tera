@@ -1,0 +1,407 @@
+{% if has_blockers %}
+> **PROJET - Bloqueurs Non Résolus**
+>
+> Ce document est marqué comme PROJET car {{ blocker_count }} bloqueur(s) d'homologation reste(nt) non résolu(s).
+> Résolvez tous les bloqueurs avant de soumettre ce dossier à la commission d'homologation.
+
+---
+
+{% endif %}
+# Dossier d'Homologation RGS
+
+**Organisme**: {{ organization_name | default(value="[Nom de l'organisme]") }}
+**Système d'Information**: {{ system_name | default(value="[Nom du SI]") }}
+**Niveau RGS Visé**: {{ rgs_level }}
+**Date du Dossier**: {{ export_date }}
+**Version**: {{ dossier_version | default(value="1.0") }}
+
+---
+
+## Table des Matières
+
+1. [Présentation du Système](#1-présentation-du-système)
+2. [Périmètre d'Homologation](#2-périmètre-dhomologation)
+3. [Besoins de Sécurité (DICP)](#3-besoins-de-sécurité-dicp)
+4. [Conformité RGS](#4-conformité-rgs)
+5. [Cartographie des Prestataires](#5-cartographie-des-prestataires)
+6. [Validation Cryptographique](#6-validation-cryptographique)
+7. [Analyse des Écarts](#7-analyse-des-écarts)
+8. [Plan de Traitement](#8-plan-de-traitement)
+9. [Avis pour l'Autorité d'Homologation](#9-avis-pour-lautorité-dhomologation)
+
+---
+
+## 1. Présentation du Système
+
+### 1.1 Identification
+
+| Attribut | Valeur |
+|----------|--------|
+| Nom du SI | {{ system_name }} |
+| Responsable | {{ system_owner | default(value="[À compléter]") }} |
+| RSSI | {{ rssi | default(value="[À compléter]") }} |
+| Date de mise en service | {{ service_date | default(value="[À compléter]") }} |
+
+### 1.2 Description Fonctionnelle
+
+{{ system_description | default(value="[Description du système et de ses fonctions principales]") }}
+
+### 1.3 Contexte Réglementaire
+
+| Référentiel | Applicable | Niveau |
+|-------------|------------|--------|
+| RGS | Oui | {{ rgs_level }} |
+| RGPD | {{ rgpd_applicable | default(value="À évaluer") }} | - |
+| LPM / NIS2 | {{ nis2_applicable | default(value="À évaluer") }} | - |
+| HDS | {{ hds_applicable | default(value="Non") }} | - |
+
+---
+
+## 2. Périmètre d'Homologation
+
+### 2.1 Synthèse du Périmètre
+
+| Catégorie | Nombre | Dans le Périmètre | Hors Périmètre |
+|-----------|--------|-------------------|----------------|
+| Composants Applicatifs | {{ perimeter.application.total }} | {{ perimeter.application.in_scope }} | {{ perimeter.application.out_scope }} |
+| Intégrations Externes | {{ perimeter.integrations.total }} | {{ perimeter.integrations.in_scope }} | {{ perimeter.integrations.out_scope }} |
+| Outillage Opérationnel | {{ perimeter.tooling.total }} | {{ perimeter.tooling.in_scope }} | {{ perimeter.tooling.out_scope }} |
+| Infrastructure | {{ perimeter.infrastructure.total }} | {{ perimeter.infrastructure.in_scope }} | {{ perimeter.infrastructure.out_scope }} |
+
+### 2.2 Composants Applicatifs
+
+{% for component in application_components %}
+#### {{ component.name }}
+
+- **ID**: {{ component.id }}
+- **Type**: {{ component.type }}
+- **Description**: {{ component.description }}
+- **Données traitées**: {{ component.data_handled | join(sep=", ") }}
+- **Classification**: {{ component.classification }}
+
+{% endfor %}
+
+### 2.3 Intégrations et Services Externes
+
+| Service | Catégorie | Localisation | Certification | Dans le Périmètre |
+|---------|-----------|--------------|---------------|-------------------|
+{% for integration in integrations %}
+| {{ integration.name }} | {{ integration.category }} | {{ integration.location }} | {{ integration.certifications | join(sep=", ") | default(value="Aucune") }} | {{ integration.in_scope }} |
+{% endfor %}
+
+### 2.4 Outillage Opérationnel
+
+**Important pour {{ rgs_level }}**: Les outils opérationnels manipulant des données du SI sont dans le périmètre.
+
+| Outil | Catégorie | Fonction | Localisation | Certification |
+|-------|-----------|----------|--------------|---------------|
+{% for tool in tooling %}
+| {{ tool.name }} | {{ tool.category }} | {{ tool.purpose }} | {{ tool.location }} | {{ tool.certifications | join(sep=", ") | default(value="Aucune") }} |
+{% endfor %}
+
+### 2.5 Infrastructure
+
+| Fournisseur | Services | Région | Certification | SecNumCloud |
+|-------------|----------|--------|---------------|-------------|
+{% for infra in infrastructure %}
+| {{ infra.name }} | {{ infra.services | join(sep=", ") }} | {{ infra.region }} | {{ infra.certifications | join(sep=", ") | default(value="Aucune") }} | {{ infra.secnumcloud | default(value="Non") }} |
+{% endfor %}
+
+### 2.6 Exclusions Justifiées
+
+{% if exclusions | length > 0 %}
+| Composant | Catégorie | Justification |
+|-----------|-----------|---------------|
+{% for exclusion in exclusions %}
+| {{ exclusion.name }} | {{ exclusion.category }} | {{ exclusion.justification }} |
+{% endfor %}
+{% else %}
+Aucune exclusion. Tous les composants identifiés sont dans le périmètre.
+{% endif %}
+
+---
+
+## 3. Besoins de Sécurité (DICP)
+
+### 3.1 Expression des Besoins
+
+| Critère | Description | Niveau Requis |
+|---------|-------------|---------------|
+| **D**isponibilité | Continuité de service | {{ dicp_required.d }} |
+| **I**ntégrité | Exactitude des données | {{ dicp_required.i }} |
+| **C**onfidentialité | Protection contre divulgation | {{ dicp_required.c }} |
+| **P**reuve | Traçabilité et non-répudiation | {{ dicp_required.p }} |
+
+### 3.2 Évaluation de Conformité DICP
+
+| Critère | Niveau Requis | Niveau Atteint | Écart | Conformité |
+|---------|---------------|----------------|-------|------------|
+| Disponibilité | {{ dicp_required.d }} | {{ dicp_achieved.d }} | {{ dicp_gap.d | default(value="0") }} | {{ dicp_status.d }} |
+| Intégrité | {{ dicp_required.i }} | {{ dicp_achieved.i }} | {{ dicp_gap.i | default(value="0") }} | {{ dicp_status.i }} |
+| Confidentialité | {{ dicp_required.c }} | {{ dicp_achieved.c }} | {{ dicp_gap.c | default(value="0") }} | {{ dicp_status.c }} |
+| Preuve | {{ dicp_required.p }} | {{ dicp_achieved.p }} | {{ dicp_gap.p | default(value="0") }} | {{ dicp_status.p }} |
+
+---
+
+## 4. Conformité RGS
+
+### 4.1 Synthèse par Domaine
+
+| Domaine | ID | Score | Statut | Contrôles |
+|---------|-----|-------|--------|-----------|
+| Authentification | AUTH | {{ domains.authentification.score }}% | {{ domains.authentification.status }} | {{ domains.authentification.compliant }}/{{ domains.authentification.total }} |
+| Intégrité | INT | {{ domains.integrite.score }}% | {{ domains.integrite.status }} | {{ domains.integrite.compliant }}/{{ domains.integrite.total }} |
+| Confidentialité | CONF | {{ domains.confidentialite.score }}% | {{ domains.confidentialite.status }} | {{ domains.confidentialite.compliant }}/{{ domains.confidentialite.total }} |
+| Traçabilité | TRAC | {{ domains.tracabilite.score }}% | {{ domains.tracabilite.status }} | {{ domains.tracabilite.compliant }}/{{ domains.tracabilite.total }} |
+| Horodatage | HORO | {{ domains.horodatage.score }}% | {{ domains.horodatage.status }} | {{ domains.horodatage.compliant }}/{{ domains.horodatage.total }} |
+| Signature | SIG | {{ domains.signature.score }}% | {{ domains.signature.status }} | {{ domains.signature.compliant }}/{{ domains.signature.total }} |
+
+**Score Global**: {{ overall_score }}%
+**Statut**: {{ overall_status | upper }}
+**Seuil {{ rgs_level }}**: {{ minimum_score }}%
+
+### 4.2 Détail par Domaine
+
+{% for domain in domain_details %}
+#### Domaine {{ domain.id }}: {{ domain.name }}
+
+| ID | Contrôle | Applicable | Statut | Preuves |
+|----|----------|------------|--------|---------|
+{% for control in domain.controls %}
+| {{ control.id }} | {{ control.name }} | {{ control.applicable }} | {{ control.status }} | {{ control.evidence_count }} |
+{% endfor %}
+
+{% endfor %}
+
+---
+
+## 5. Cartographie des Prestataires
+
+### 5.1 Synthèse des Certifications
+
+{% if rgs_level == "rgs-star-star" or rgs_level == "rgs-star-star-star" %}
+**Exigence {{ rgs_level }}**: Les prestataires traitant des données sensibles doivent disposer de certifications appropriées.
+
+| Certification | Requis pour | Nombre Certifiés | Nombre Non-Certifiés |
+|---------------|-------------|------------------|----------------------|
+| SecNumCloud | {{ rgs_level }} (cloud) | {{ cert_stats.secnumcloud.certified }} | {{ cert_stats.secnumcloud.not_certified }} |
+| ISO 27001 | Tous niveaux | {{ cert_stats.iso27001.certified }} | {{ cert_stats.iso27001.not_certified }} |
+| HDS | Données de santé | {{ cert_stats.hds.certified }} | {{ cert_stats.hds.not_certified }} |
+| SOC 2 Type II | `RGS*` | {{ cert_stats.soc2.certified }} | {{ cert_stats.soc2.not_certified }} |
+{% endif %}
+
+### 5.2 Détail des Prestataires
+
+| Prestataire | Source | Services | Certification | Conformité {{ rgs_level }} |
+|-------------|--------|----------|---------------|---------------------------|
+{% for provider in providers %}
+| {{ provider.name }} | {{ provider.source }} | {{ provider.services | join(sep=", ") }} | {{ provider.certifications | join(sep=", ") | default(value="Aucune") }} | {{ provider.rgs_compliant }} |
+{% endfor %}
+
+{% if certification_blockers | length > 0 %}
+### 5.3 Bloqueurs de Certification
+
+Les prestataires suivants ne disposent pas des certifications requises pour {{ rgs_level }}:
+
+{% for blocker in certification_blockers %}
+- **{{ blocker.name }}** ({{ blocker.source }}): Certification manquante {{ blocker.required_certification }}
+  - Alternative recommandée: {{ blocker.alternative | default(value="Documenter les mesures compensatoires") }}
+{% endfor %}
+{% endif %}
+
+---
+
+## 6. Validation Cryptographique
+
+### 6.1 Algorithmes Utilisés
+
+Validation selon les recommandations ANSSI {{ anssi_year | default(value="2024") }}:
+
+| Usage | Algorithme | Taille de Clé | Statut ANSSI | Conformité |
+|-------|------------|---------------|--------------|------------|
+{% for crypto in crypto_validation %}
+| {{ crypto.usage }} | {{ crypto.algorithm }} | {{ crypto.key_size }} | {{ crypto.anssi_status }} | {{ crypto.status }} |
+{% endfor %}
+
+{% if crypto_issues | length > 0 %}
+### 6.2 Points d'Attention Cryptographiques
+
+{% for issue in crypto_issues %}
+- **{{ issue.component }}**: {{ issue.description }}
+  - Recommandation: {{ issue.recommendation }}
+{% endfor %}
+{% endif %}
+
+### 6.3 Gestion des Clés
+
+| Aspect | Implémentation | Conformité {{ rgs_level }} |
+|--------|----------------|---------------------------|
+| Stockage des clés | {{ key_management.storage }} | {{ key_management.storage_compliant }} |
+| Rotation des clés | {{ key_management.rotation }} | {{ key_management.rotation_compliant }} |
+| HSM | {{ key_management.hsm }} | {{ key_management.hsm_compliant }} |
+
+---
+
+## 7. Analyse des Écarts
+
+### 7.1 Synthèse des Écarts
+
+| Source | Critique | Élevé | Moyen | Faible | Total |
+|--------|----------|-------|-------|--------|-------|
+| Code | {{ gaps_by_source.codebase.critical }} | {{ gaps_by_source.codebase.high }} | {{ gaps_by_source.codebase.medium }} | {{ gaps_by_source.codebase.low }} | {{ gaps_by_source.codebase.total }} |
+| Outillage | {{ gaps_by_source.tooling.critical }} | {{ gaps_by_source.tooling.high }} | {{ gaps_by_source.tooling.medium }} | {{ gaps_by_source.tooling.low }} | {{ gaps_by_source.tooling.total }} |
+| Infrastructure | {{ gaps_by_source.infrastructure.critical }} | {{ gaps_by_source.infrastructure.high }} | {{ gaps_by_source.infrastructure.medium }} | {{ gaps_by_source.infrastructure.low }} | {{ gaps_by_source.infrastructure.total }} |
+| Processus | {{ gaps_by_source.process.critical }} | {{ gaps_by_source.process.high }} | {{ gaps_by_source.process.medium }} | {{ gaps_by_source.process.low }} | {{ gaps_by_source.process.total }} |
+| **Total** | **{{ gaps_total.critical }}** | **{{ gaps_total.high }}** | **{{ gaps_total.medium }}** | **{{ gaps_total.low }}** | **{{ gaps_total.total }}** |
+
+### 7.2 Bloqueurs d'Homologation
+
+{% if blockers | length > 0 %}
+Les écarts suivants doivent être résolus avant l'homologation:
+
+| # | Contrôle | Description | Impact |
+|---|----------|-------------|--------|
+{% for blocker in blockers %}
+| {{ loop.index }} | {{ blocker.control }} | {{ blocker.description }} | {{ blocker.impact }} |
+{% endfor %}
+{% else %}
+Aucun bloqueur identifié. Le système est prêt pour l'homologation.
+{% endif %}
+
+### 7.3 Détail des Écarts
+
+{% for gap in gaps %}
+#### {{ gap.id }}: {{ gap.control }}
+
+| Attribut | Valeur |
+|----------|--------|
+| Domaine | {{ gap.domain }} |
+| Sévérité | {{ gap.severity | upper }} |
+| Source | {{ gap.source }} |
+| Description | {{ gap.description }} |
+| Mesure corrective | {{ gap.remediation }} |
+| Responsable | {{ gap.owner | default(value="À définir") }} |
+| Échéance | {{ gap.target_date | default(value="À définir") }} |
+
+{% endfor %}
+
+---
+
+## 8. Plan de Traitement
+
+### 8.1 Actions Prioritaires
+
+#### P0 - Immédiat (Bloqueurs)
+
+{% for action in action_items %}
+{% if action.priority == "P0" %}
+- [ ] **{{ action.id }}**: {{ action.title }}
+  - Contrôle: {{ action.control }}
+  - Responsable: {{ action.owner | default(value="À définir") }}
+  - Échéance: {{ action.due_date | default(value="Immédiat") }}
+{% endif %}
+{% endfor %}
+
+#### P1 - Court terme (30 jours)
+
+{% for action in action_items %}
+{% if action.priority == "P1" %}
+- [ ] **{{ action.id }}**: {{ action.title }}
+  - Contrôle: {{ action.control }}
+{% endif %}
+{% endfor %}
+
+#### P2 - Moyen terme (90 jours)
+
+{% for action in action_items %}
+{% if action.priority == "P2" %}
+- [ ] **{{ action.id }}**: {{ action.title }}
+  - Contrôle: {{ action.control }}
+{% endif %}
+{% endfor %}
+
+### 8.2 Checklist Documentation
+
+| Document | Statut | Emplacement |
+|----------|--------|-------------|
+| PSSI (Politique de Sécurité) | {{ docs.pssi.status }} | {{ docs.pssi.location | default(value="-") }} |
+| Plan de traitement des risques | {{ docs.ptr.status }} | {{ docs.ptr.location | default(value="-") }} |
+| Procédures d'exploitation | {{ docs.procedures.status }} | {{ docs.procedures.location | default(value="-") }} |
+| Plan de continuité (PCA/PRA) | {{ docs.pca.status }} | {{ docs.pca.location | default(value="-") }} |
+| Schéma d'architecture | {{ docs.architecture.status }} | {{ docs.architecture.location | default(value="-") }} |
+| Cartographie des flux | {{ docs.dataflows.status }} | {{ docs.dataflows.location | default(value="-") }} |
+
+---
+
+## 9. Avis pour l'Autorité d'Homologation
+
+### 9.1 Synthèse
+
+| Critère | Évaluation |
+|---------|------------|
+| Score global | {{ overall_score }}% |
+| Seuil {{ rgs_level }} | {{ minimum_score }}% |
+| Écart au seuil | {{ score_gap }}% |
+| Bloqueurs | {{ blocker_count }} |
+| Statut | {{ homologation_status | upper }} |
+
+### 9.2 Recommandation
+
+{% if homologation_ready %}
+**AVIS FAVORABLE**
+
+Le système répond aux exigences {{ rgs_level }}. Il est recommandé de procéder à l'homologation.
+
+**Points de vigilance:**
+{% for warning in warnings %}
+- {{ warning }}
+{% endfor %}
+{% else %}
+**AVIS DÉFAVORABLE**
+
+Le système ne répond pas encore aux exigences {{ rgs_level }}. Les points suivants doivent être traités:
+
+{% for blocker in blockers %}
+1. {{ blocker.description }}
+{% endfor %}
+
+**Prochaines étapes:**
+1. Résoudre les {{ blocker_count }} bloqueur(s) identifié(s)
+2. Mettre à jour l'évaluation: `/osk-comply rgs --update`
+3. Régénérer le dossier: `/osk-comply rgs --export md`
+4. Soumettre à nouveau à la commission d'homologation
+{% endif %}
+
+### 9.3 Validité de l'Homologation
+
+| Attribut | Valeur |
+|----------|--------|
+| Durée maximale | 3 ans |
+| Date de renouvellement | {{ expiry_date | default(value="À définir après homologation") }} |
+| Conditions de maintien | Revue annuelle, MCS, audit en cas de changement majeur |
+
+---
+
+## Annexe A: Métadonnées de l'Évaluation
+
+| Champ | Valeur |
+|-------|--------|
+| Outil | OpenSecKit v4 |
+| Référentiel | RGS v{{ rgs_version | default(value="2.0") }} |
+| Date d'évaluation | {{ assessment_date }} |
+| Date d'export | {{ export_date }} |
+| Hash du modèle système | {{ system_model_hash }} |
+| Évaluateur | {{ assessor | default(value="Automatisé") }} |
+
+---
+
+## Annexe B: Références Réglementaires
+
+- [RGS v2.0 - ANSSI](https://www.ssi.gouv.fr/entreprise/reglementation/confiance-numerique/le-referentiel-general-de-securite-rgs/)
+- [Recommandations cryptographiques ANSSI](https://www.ssi.gouv.fr/guide/mecanismes-cryptographiques/)
+- [Qualification SecNumCloud](https://www.ssi.gouv.fr/entreprise/qualifications/prestataires-de-services-de-confiance-qualifies/prestataires-de-service-dinformatique-en-nuage-secnumcloud/)
+
+---
+
+*Dossier généré par OpenSecKit v4 - {{ export_date }}*
+*Ce document doit être validé par l'autorité d'homologation compétente.*

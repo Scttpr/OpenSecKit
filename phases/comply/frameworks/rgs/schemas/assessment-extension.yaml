@@ -1,0 +1,95 @@
+# OpenSecKit V4 - RGS Assessment Extension
+# Version: 4.0.0
+# Usage: RGS-specific fields for compliance assessment
+# Extends: phases/comply/frameworks/_schema/assessment.yaml
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# RGS-SPECIFIC ASSESSMENT FIELDS
+# Added to the base assessment.yaml when framework is RGS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+rgs:
+  # System identification for homologation
+  system_name: "[System name for homologation]"
+  system_perimeter: "[Description of system perimeter]"
+  system_classification: "[DR|NP|CD|SD]"  # Diffusion Restreinte, etc.
+
+  # Homologation status (mandatory for public sector)
+  homologation:
+    level: "[rgs-star|rgs-star-star|rgs-star-star-star]"
+    status: "[none|in_progress|valid|expired|suspended]"
+    decision_date: "[DATE ISO]"
+    expiry_date: "[DATE ISO]"           # Max 3 years
+    authority: "[Homologation authority name]"
+    decision_reference: "[Decision document reference]"
+
+  # DICP assessment (Disponibilité, Intégrité, Confidentialité, Preuve)
+  dicp:
+    disponibilite:
+      level: 0                          # 0-4 scale
+      justification: "[Why this level]"
+    integrite:
+      level: 0
+      justification: "[Why this level]"
+    confidentialite:
+      level: 0
+      justification: "[Why this level]"
+    preuve:
+      level: 0
+      justification: "[Why this level]"
+
+  # EBIOS Risk Manager (recommended methodology)
+  ebios_rm:
+    completed: true|false
+    date: "[DATE ISO]"
+    document_path: "[Path to EBIOS RM analysis]"
+    workshops_completed:
+      - workshop: 1
+        name: "Cadrage et socle de sécurité"
+        status: "[completed|partial|not_started]"
+      - workshop: 2
+        name: "Sources de risque"
+        status: "[completed|partial|not_started]"
+      - workshop: 3
+        name: "Scénarios stratégiques"
+        status: "[completed|partial|not_started]"
+      - workshop: 4
+        name: "Scénarios opérationnels"
+        status: "[completed|partial|not_started]"
+      - workshop: 5
+        name: "Traitement du risque"
+        status: "[completed|partial|not_started]"
+
+  # ANSSI contact (if applicable)
+  anssi_contact:
+    has_contact: true|false
+    contact_email: "[ANSSI referent email if applicable]"
+
+  # Qualified products (ANSSI certifications)
+  qualified_products:
+    - product: "[Product name]"
+      qualification: "[CSPN|CC EAL X|SecNumCloud]"
+      certificate_ref: "[Certificate reference]"
+      expiry: "[DATE ISO]"
+
+  # MCS - Maintien en Conditions de Sécurité
+  mcs:
+    plan_exists: true|false
+    plan_path: "[Path to MCS plan]"
+    vulnerability_watch: true|false
+    patch_sla_defined: true|false
+    annual_pentest: true|false
+    last_pentest_date: "[DATE ISO]"
+
+  # Cryptographic compliance
+  crypto:
+    anssi_approved_algorithms: true|false
+    key_management_policy: true|false
+    hsm_used: true|false
+    certificate_management: true|false
+
+  # eIDAS mapping (for trust services)
+  eidas:
+    applicable: true|false
+    level: "[low|substantial|high]"
+    services: []                        # Applicable trust services

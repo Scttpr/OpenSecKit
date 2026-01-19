@@ -5,7 +5,7 @@ mod args;
 mod commands;
 mod config;
 mod github;
-mod prompts;
+mod registry;
 mod stack;
 mod utils;
 

@@ -1,80 +1,9 @@
-//! Auto-increment counters for features and incidents
+//! Feature directory helpers
 
 use anyhow::Result;
 use regex::Regex;
 use std::fs;
 use std::path::Path;
-
-pub fn next_feature_number() -> Result<u32> {
-    next_feature_number_in(Path::new("."))
-}
-
-fn next_feature_number_in(base: &Path) -> Result<u32> {
-    let specs_dir = base.join(".osk/specs");
-
-    if !specs_dir.exists() {
-        return Ok(1);
-    }
-
-    let re = Regex::new(r"^(\d{3})-")?;
-    let mut max_num: u32 = 0;
-
-    for entry in fs::read_dir(specs_dir)? {
-        let entry = entry?;
-        if entry.file_type()?.is_dir() {
-            let name = entry.file_name();
-            let name_str = name.to_string_lossy();
-
-            if let Some(caps) = re.captures(&name_str) {
-                if let Some(num_str) = caps.get(1) {
-                    if let Ok(num) = num_str.as_str().parse::<u32>() {
-                        if num > max_num {
-                            max_num = num;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    Ok(max_num + 1)
-}
-
-pub fn next_incident_number(date: &str) -> Result<u32> {
-    next_incident_number_in(Path::new("."), date)
-}
-
-fn next_incident_number_in(base: &Path, date: &str) -> Result<u32> {
-    let incidents_dir = base.join("docs/security/incidents");
-
-    if !incidents_dir.exists() {
-        return Ok(1);
-    }
-
-    let pattern = format!(r"^INC-{}-(\d{{3}})\.md$", regex::escape(date));
-    let re = Regex::new(&pattern)?;
-    let mut max_num: u32 = 0;
-
-    for entry in fs::read_dir(incidents_dir)? {
-        let entry = entry?;
-        if entry.file_type()?.is_file() {
-            let name = entry.file_name();
-            let name_str = name.to_string_lossy();
-
-            if let Some(caps) = re.captures(&name_str) {
-                if let Some(num_str) = caps.get(1) {
-                    if let Ok(num) = num_str.as_str().parse::<u32>() {
-                        if num > max_num {
-                            max_num = num;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    Ok(max_num + 1)
-}
 
 pub fn find_feature_dir(name: &str) -> Result<Option<String>> {
     let specs_dir = Path::new(".osk/specs");
@@ -127,7 +56,6 @@ pub fn slugify(name: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use tempfile::tempdir;
 
     #[test]
     fn test_slugify() {
@@ -141,74 +69,5 @@ mod tests {
         assert_eq!(slugify("Test@#$%Feature"), "test-feature");
         assert_eq!(slugify("___underscores___"), "underscores");
         assert_eq!(slugify(""), "");
-    }
-
-    #[test]
-    fn test_next_feature_number_empty() {
-        let dir = tempdir().unwrap();
-        let num = next_feature_number_in(dir.path()).unwrap();
-        assert_eq!(num, 1);
-    }
-
-    #[test]
-    fn test_next_feature_number_with_existing() {
-        let dir = tempdir().unwrap();
-        let base = dir.path();
-
-        fs::create_dir_all(base.join(".osk/specs/001-auth")).unwrap();
-        fs::create_dir_all(base.join(".osk/specs/002-payment")).unwrap();
-        fs::create_dir_all(base.join(".osk/specs/005-logging")).unwrap();
-
-        let num = next_feature_number_in(base).unwrap();
-        assert_eq!(num, 6);
-    }
-
-    #[test]
-    fn test_next_incident_number_empty() {
-        let dir = tempdir().unwrap();
-        let num = next_incident_number_in(dir.path(), "2025-01-01").unwrap();
-        assert_eq!(num, 1);
-    }
-
-    #[test]
-    fn test_next_incident_number_with_existing() {
-        let dir = tempdir().unwrap();
-        let base = dir.path();
-
-        fs::create_dir_all(base.join("docs/security/incidents")).unwrap();
-        fs::write(
-            base.join("docs/security/incidents/INC-2025-01-01-001.md"),
-            "",
-        )
-        .unwrap();
-        fs::write(
-            base.join("docs/security/incidents/INC-2025-01-01-002.md"),
-            "",
-        )
-        .unwrap();
-        fs::write(
-            base.join("docs/security/incidents/INC-2025-01-02-001.md"),
-            "",
-        )
-        .unwrap();
-
-        let num = next_incident_number_in(base, "2025-01-01").unwrap();
-        assert_eq!(num, 3);
-    }
-
-    #[test]
-    fn test_next_incident_number_different_date() {
-        let dir = tempdir().unwrap();
-        let base = dir.path();
-
-        fs::create_dir_all(base.join("docs/security/incidents")).unwrap();
-        fs::write(
-            base.join("docs/security/incidents/INC-2025-01-01-005.md"),
-            "",
-        )
-        .unwrap();
-
-        let num = next_incident_number_in(base, "2025-01-02").unwrap();
-        assert_eq!(num, 1);
     }
 }

@@ -1,13 +1,14 @@
 //! Multi-agent configuration and file generation
 
 use anyhow::{Context, Result};
+use reqwest::blocking::Client;
 use serde::Deserialize;
 use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
 use tera::{Context as TeraContext, Tera};
 
-use crate::prompts::PromptInfo;
+use crate::registry::{CommandInfo, DomainsInfo};
 
 #[derive(Debug, Deserialize)]
 pub struct AgentsConfig {
@@ -47,13 +48,6 @@ pub struct UniversalConfig {
     pub template: String,
 }
 
-#[derive(Debug, Clone, Default, serde::Serialize)]
-pub struct DomainsInfo {
-    pub rgpd: bool,
-    pub rgs: bool,
-    pub nis2: bool,
-}
-
 pub fn load_agents_config(osk_dir: &Path) -> Result<AgentsConfig> {
     let config_path = osk_dir.join("agents.toml");
 
@@ -82,13 +76,16 @@ pub fn is_agent_available(agent: &AgentConfig) -> bool {
     false
 }
 
+#[allow(clippy::too_many_arguments)]
 pub fn generate_agent_files(
+    client: &Client,
     agent_id: &str,
     agent: &AgentConfig,
-    prompts: &[PromptInfo],
+    commands: &[CommandInfo],
     templates_dir: &Path,
     version: &str,
     domains: &DomainsInfo,
+    local_repo: Option<&Path>,
 ) -> Result<usize> {
     if !agent.enabled {
         return Ok(0);
@@ -102,9 +99,9 @@ pub fn generate_agent_files(
     tera.add_raw_template(&agent.template, &template_content)?;
 
     match agent.format.as_str() {
-        "slash-command" => generate_slash_commands(agent, prompts, &tera, version),
-        "single-file" => generate_single_file(agent, prompts, &tera, version, domains),
-        "rules-dir" => generate_rules_dir(agent, prompts, &tera, version, domains),
+        "slash-command" => generate_slash_commands(client, agent, commands, &tera, version, local_repo),
+        "single-file" => generate_single_file(agent, commands, &tera, version, domains),
+        "rules-dir" => generate_rules_dir(agent, commands, &tera, version, domains),
         _ => {
             eprintln!("   ⚠️  Format inconnu pour {}: {}", agent_id, agent.format);
             Ok(0)
@@ -113,10 +110,12 @@ pub fn generate_agent_files(
 }
 
 fn generate_slash_commands(
+    client: &Client,
     agent: &AgentConfig,
-    prompts: &[PromptInfo],
+    commands: &[CommandInfo],
     tera: &Tera,
     _version: &str,
+    local_repo: Option<&Path>,
 ) -> Result<usize> {
     let output_dir = agent
         .output_dir
@@ -130,13 +129,52 @@ fn generate_slash_commands(
     fs::create_dir_all(output_dir)?;
 
     let mut count = 0;
-    for prompt in prompts {
+    for cmd in commands {
+        // Get prompt content: from local file if available, otherwise fetch from URL
+        let raw_content = if let Some(repo_root) = local_repo {
+            // Local mode: derive path from URL
+            // URL format: https://raw.githubusercontent.com/.../main/{path}
+            // Extract the path after "main/" to get the local file path
+            let local_path = if let Some(pos) = cmd.url.find("/main/") {
+                let relative_path = &cmd.url[pos + 6..]; // Skip "/main/"
+                repo_root.join(relative_path)
+            } else {
+                // Fallback to legacy path for backwards compatibility
+                repo_root.join("prompts").join(format!("{}.md", cmd.name))
+            };
+            match fs::read_to_string(&local_path) {
+                Ok(content) => content,
+                Err(e) => {
+                    eprintln!("   ⚠️  Cannot read {}: {}", local_path.display(), e);
+                    format!("# {}\n\nFailed to read local prompt: {}", cmd.name, e)
+                }
+            }
+        } else {
+            // Remote mode: fetch from GitHub URL
+            match client.get(&cmd.url).send() {
+                Ok(response) => {
+                    if response.status().is_success() {
+                        response.text().unwrap_or_else(|_| {
+                            format!("# {}\n\nFailed to read prompt content from {}", cmd.name, cmd.url)
+                        })
+                    } else {
+                        eprintln!("   ⚠️  HTTP {} fetching {}", response.status(), cmd.url);
+                        format!("# {}\n\nFailed to fetch prompt (HTTP {})\nURL: {}", cmd.name, response.status(), cmd.url)
+                    }
+                }
+                Err(e) => {
+                    eprintln!("   ⚠️  Error fetching {}: {}", cmd.url, e);
+                    format!("# {}\n\nFailed to fetch prompt: {}\nURL: {}", cmd.name, e, cmd.url)
+                }
+            }
+        };
+
         let mut context = TeraContext::new();
-        context.insert("raw_content", &prompt.raw_content);
-        context.insert("prompt", prompt);
+        context.insert("command", cmd);
+        context.insert("raw_content", &raw_content);
 
         let content = tera.render(&agent.template, &context)?;
-        let filename = pattern.replace("{command}", &prompt.name);
+        let filename = pattern.replace("{command}", &cmd.name);
         let path = Path::new(output_dir).join(&filename);
 
         fs::write(&path, content)?;
@@ -148,7 +186,7 @@ fn generate_slash_commands(
 
 fn generate_single_file(
     agent: &AgentConfig,
-    prompts: &[PromptInfo],
+    commands: &[CommandInfo],
     tera: &Tera,
     version: &str,
     domains: &DomainsInfo,
@@ -163,7 +201,7 @@ fn generate_single_file(
     }
 
     let mut context = TeraContext::new();
-    context.insert("prompts", prompts);
+    context.insert("commands", commands);
     context.insert("version", version);
     context.insert("domains", domains);
 
@@ -175,7 +213,7 @@ fn generate_single_file(
 
 fn generate_rules_dir(
     agent: &AgentConfig,
-    prompts: &[PromptInfo],
+    commands: &[CommandInfo],
     tera: &Tera,
     version: &str,
     domains: &DomainsInfo,
@@ -192,14 +230,14 @@ fn generate_rules_dir(
     fs::create_dir_all(output_dir)?;
 
     let mut count = 0;
-    for prompt in prompts {
+    for cmd in commands {
         let mut context = TeraContext::new();
-        context.insert("prompt", prompt);
+        context.insert("command", cmd);
         context.insert("version", version);
         context.insert("domains", domains);
 
         let content = tera.render(&agent.template, &context)?;
-        let filename = pattern.replace("{command}", &prompt.name);
+        let filename = pattern.replace("{command}", &cmd.name);
         let path = Path::new(output_dir).join(&filename);
 
         fs::write(&path, content)?;
@@ -211,7 +249,7 @@ fn generate_rules_dir(
 
 pub fn generate_agents_md(
     config: &UniversalConfig,
-    prompts: &[PromptInfo],
+    commands: &[CommandInfo],
     templates_dir: &Path,
     version: &str,
     domains: &DomainsInfo,
@@ -228,7 +266,7 @@ pub fn generate_agents_md(
     tera.add_raw_template(&config.template, &template_content)?;
 
     let mut context = TeraContext::new();
-    context.insert("prompts", prompts);
+    context.insert("commands", commands);
     context.insert("version", version);
     context.insert("domains", domains);
 

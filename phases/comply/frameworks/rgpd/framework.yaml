@@ -1,0 +1,501 @@
+# OpenSecKit V4 - RGPD/GDPR Framework
+# Version: 4.0.0
+# Reference: Regulation (EU) 2016/679
+
+metadata:
+  framework_id: "rgpd"
+  name: "Règlement Général sur la Protection des Données"
+  name_en: "General Data Protection Regulation"
+  version: "2016/679"
+  authority: "European Union"
+  effective_date: "2018-05-25"
+  scope: "Personal data processing"
+
+categories:
+  - id: "principles"
+    name: "Data Processing Principles"
+    articles: ["5", "6", "7", "8", "9", "10", "11"]
+
+  - id: "rights"
+    name: "Data Subject Rights"
+    articles: ["12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"]
+
+  - id: "controller_processor"
+    name: "Controller and Processor Obligations"
+    articles: ["24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43"]
+
+  - id: "transfers"
+    name: "International Transfers"
+    articles: ["44", "45", "46", "47", "48", "49", "50"]
+
+controls:
+  # Chapter II - Principles
+  - id: "RGPD-5.1.a"
+    article: "5.1.a"
+    name: "Lawfulness, fairness and transparency"
+    description: "Personal data shall be processed lawfully, fairly and in a transparent manner"
+    category: "principles"
+    criticality: "must"
+    evidence_types: ["privacy_policy", "processing_records", "legal_basis_documentation"]
+
+  - id: "RGPD-5.1.b"
+    article: "5.1.b"
+    name: "Purpose limitation"
+    description: "Collected for specified, explicit and legitimate purposes"
+    category: "principles"
+    criticality: "must"
+    evidence_types: ["processing_records", "purpose_documentation"]
+
+  - id: "RGPD-5.1.c"
+    article: "5.1.c"
+    name: "Data minimization"
+    description: "Adequate, relevant and limited to what is necessary"
+    category: "principles"
+    criticality: "must"
+    evidence_types: ["data_inventory", "necessity_assessment"]
+
+  - id: "RGPD-5.1.d"
+    article: "5.1.d"
+    name: "Accuracy"
+    description: "Accurate and kept up to date"
+    category: "principles"
+    criticality: "must"
+    evidence_types: ["data_quality_procedures", "update_mechanisms"]
+
+  - id: "RGPD-5.1.e"
+    article: "5.1.e"
+    name: "Storage limitation"
+    description: "Kept no longer than necessary"
+    category: "principles"
+    criticality: "must"
+    evidence_types: ["retention_policy", "deletion_procedures"]
+
+  - id: "RGPD-5.1.f"
+    article: "5.1.f"
+    name: "Integrity and confidentiality"
+    description: "Processed with appropriate security"
+    category: "principles"
+    criticality: "must"
+    evidence_types: ["security_measures", "access_controls", "encryption_evidence"]
+
+  - id: "RGPD-5.2"
+    article: "5.2"
+    name: "Accountability"
+    description: "Controller shall be able to demonstrate compliance"
+    category: "principles"
+    criticality: "must"
+    evidence_types: ["compliance_documentation", "audit_trails"]
+
+  - id: "RGPD-6"
+    article: "6"
+    name: "Lawful basis"
+    description: "At least one legal basis for processing"
+    category: "principles"
+    criticality: "must"
+    evidence_types: ["legal_basis_register"]
+
+  - id: "RGPD-7"
+    article: "7"
+    name: "Consent conditions"
+    description: "Consent must be freely given, specific, informed, unambiguous"
+    category: "principles"
+    criticality: "must"
+    applies_when: "consent_based"
+    evidence_types: ["consent_mechanisms", "consent_records"]
+
+  - id: "RGPD-8"
+    article: "8"
+    name: "Conditions for child's consent"
+    description: "Processing of child's data requires parental consent for children under 16 (or lower age set by Member State, minimum 13)"
+    category: "principles"
+    criticality: "must"
+    applies_when: "children_data"
+    evidence_types: ["age_verification", "parental_consent_mechanisms"]
+
+  - id: "RGPD-9"
+    article: "9"
+    name: "Special categories"
+    description: "Processing of sensitive data prohibited unless exception applies"
+    category: "principles"
+    criticality: "must"
+    applies_when: "sensitive_data"
+    evidence_types: ["sensitive_data_safeguards", "legal_basis_special"]
+
+  - id: "RGPD-10"
+    article: "10"
+    name: "Criminal convictions data"
+    description: "Processing of personal data relating to criminal convictions only under control of official authority"
+    category: "principles"
+    criticality: "must"
+    applies_when: "criminal_data"
+    evidence_types: ["legal_basis_special", "official_authority_documentation"]
+
+  - id: "RGPD-11"
+    article: "11"
+    name: "Processing not requiring identification"
+    description: "Controller not obliged to maintain additional information solely to identify data subject"
+    category: "principles"
+    criticality: "should"
+    evidence_types: ["identification_policy"]
+
+  # Chapter III - Rights
+  - id: "RGPD-12"
+    article: "12"
+    name: "Transparent communication"
+    description: "Provide information in concise, transparent, intelligible and easily accessible form, using clear and plain language"
+    category: "rights"
+    criticality: "must"
+    evidence_types: ["privacy_notices", "communication_procedures"]
+
+  - id: "RGPD-13"
+    article: "13"
+    name: "Information at collection"
+    description: "Provide information when collecting directly"
+    category: "rights"
+    criticality: "must"
+    evidence_types: ["privacy_notices", "collection_forms"]
+
+  - id: "RGPD-14"
+    article: "14"
+    name: "Information indirect collection"
+    description: "Provide information when not collected from subject"
+    category: "rights"
+    criticality: "must"
+    applies_when: "indirect_collection"
+    evidence_types: ["notification_procedures"]
+
+  - id: "RGPD-15"
+    article: "15"
+    name: "Right of access"
+    description: "Data subject can obtain copy of their data"
+    category: "rights"
+    criticality: "must"
+    evidence_types: ["access_procedures", "response_records"]
+
+  - id: "RGPD-16"
+    article: "16"
+    name: "Right to rectification"
+    description: "Data subject can correct inaccurate data"
+    category: "rights"
+    criticality: "must"
+    evidence_types: ["rectification_procedures"]
+
+  - id: "RGPD-17"
+    article: "17"
+    name: "Right to erasure"
+    description: "Right to be forgotten"
+    category: "rights"
+    criticality: "must"
+    evidence_types: ["deletion_procedures", "erasure_records"]
+
+  - id: "RGPD-18"
+    article: "18"
+    name: "Right to restriction of processing"
+    description: "Data subject can request restriction of processing in certain circumstances"
+    category: "rights"
+    criticality: "must"
+    evidence_types: ["restriction_procedures", "processing_flags"]
+
+  - id: "RGPD-19"
+    article: "19"
+    name: "Notification obligation"
+    description: "Notify recipients of rectification, erasure or restriction unless impossible or disproportionate"
+    category: "rights"
+    criticality: "must"
+    evidence_types: ["notification_procedures", "recipient_register"]
+
+  - id: "RGPD-20"
+    article: "20"
+    name: "Right to data portability"
+    description: "Receive data in portable format"
+    category: "rights"
+    criticality: "must"
+    applies_when: "consent_or_contract"
+    evidence_types: ["export_capabilities"]
+
+  - id: "RGPD-21"
+    article: "21"
+    name: "Right to object"
+    description: "Data subject can object to processing based on legitimate interests or direct marketing"
+    category: "rights"
+    criticality: "must"
+    evidence_types: ["objection_procedures", "marketing_opt_out"]
+
+  - id: "RGPD-22"
+    article: "22"
+    name: "Automated decision-making"
+    description: "Right not to be subject to decisions based solely on automated processing with legal or significant effects"
+    category: "rights"
+    criticality: "must"
+    applies_when: "automated_decisions"
+    evidence_types: ["automated_decision_safeguards", "human_intervention_procedures"]
+
+  - id: "RGPD-23"
+    article: "23"
+    name: "Restrictions"
+    description: "Union or Member State law may restrict scope of rights when necessary and proportionate"
+    category: "rights"
+    criticality: "should"
+    applies_when: "legal_restrictions"
+    evidence_types: ["legal_basis_documentation"]
+
+  # Chapter IV - Controller/Processor
+  - id: "RGPD-24"
+    article: "24"
+    name: "Responsibility of the controller"
+    description: "Implement appropriate technical and organisational measures to ensure and demonstrate compliance"
+    category: "controller_processor"
+    criticality: "must"
+    evidence_types: ["compliance_documentation", "policies_procedures"]
+
+  - id: "RGPD-25.1"
+    article: "25.1"
+    name: "Privacy by Design"
+    description: "Implement data protection by design"
+    category: "controller_processor"
+    criticality: "must"
+    evidence_types: ["design_documentation", "privacy_considerations"]
+
+  - id: "RGPD-25.2"
+    article: "25.2"
+    name: "Privacy by Default"
+    description: "Default settings ensure minimum necessary processing"
+    category: "controller_processor"
+    criticality: "must"
+    evidence_types: ["default_settings", "configuration_evidence"]
+
+  - id: "RGPD-26"
+    article: "26"
+    name: "Joint controllers"
+    description: "Joint controllers shall determine their respective responsibilities by arrangement"
+    category: "controller_processor"
+    criticality: "must"
+    applies_when: "joint_processing"
+    evidence_types: ["joint_controller_agreement", "responsibility_allocation"]
+
+  - id: "RGPD-27"
+    article: "27"
+    name: "Representatives"
+    description: "Controllers not established in Union shall designate a representative in the Union"
+    category: "controller_processor"
+    criticality: "must"
+    applies_when: "non_eu_controller"
+    evidence_types: ["representative_designation"]
+
+  - id: "RGPD-28"
+    article: "28"
+    name: "Processor agreements"
+    description: "Written contract with processors covering required elements"
+    category: "controller_processor"
+    criticality: "must"
+    evidence_types: ["dpa_contracts", "processor_register"]
+
+  - id: "RGPD-29"
+    article: "29"
+    name: "Processing under authority"
+    description: "Processor and persons acting under controller authority shall only process on documented instructions"
+    category: "controller_processor"
+    criticality: "must"
+    evidence_types: ["processing_instructions", "authorization_records"]
+
+  - id: "RGPD-30"
+    article: "30"
+    name: "Records of processing"
+    description: "Maintain records of processing activities"
+    category: "controller_processor"
+    criticality: "must"
+    evidence_types: ["processing_register"]
+
+  - id: "RGPD-31"
+    article: "31"
+    name: "Cooperation with supervisory authority"
+    description: "Controller and processor shall cooperate with supervisory authority on request"
+    category: "controller_processor"
+    criticality: "must"
+    evidence_types: ["cooperation_procedures", "authority_communication_records"]
+
+  - id: "RGPD-32"
+    article: "32"
+    name: "Security of processing"
+    description: "Implement appropriate technical and organizational measures"
+    category: "controller_processor"
+    criticality: "must"
+    evidence_types: ["security_measures", "risk_assessment"]
+
+  - id: "RGPD-33"
+    article: "33"
+    name: "Breach notification to authority"
+    description: "Notify supervisory authority within 72 hours"
+    category: "controller_processor"
+    criticality: "must"
+    evidence_types: ["breach_procedures", "notification_records"]
+
+  - id: "RGPD-34"
+    article: "34"
+    name: "Breach notification to data subjects"
+    description: "Communicate breach to affected individuals"
+    category: "controller_processor"
+    criticality: "must"
+    applies_when: "high_risk_breach"
+    evidence_types: ["communication_procedures"]
+
+  - id: "RGPD-35"
+    article: "35"
+    name: "Data Protection Impact Assessment"
+    description: "Conduct DPIA for high-risk processing"
+    category: "controller_processor"
+    criticality: "must"
+    applies_when: "high_risk_processing"
+    evidence_types: ["dpia_documentation"]
+
+  - id: "RGPD-36"
+    article: "36"
+    name: "Prior consultation"
+    description: "Consult supervisory authority before processing if DPIA indicates high risk that cannot be mitigated"
+    category: "controller_processor"
+    criticality: "must"
+    applies_when: "high_residual_risk"
+    evidence_types: ["authority_consultation_records"]
+
+  - id: "RGPD-37"
+    article: "37"
+    name: "Designation of DPO"
+    description: "Designate a Data Protection Officer where required"
+    category: "controller_processor"
+    criticality: "must"
+    applies_when: "dpo_required"
+    evidence_types: ["dpo_designation", "dpo_contact_details"]
+
+  - id: "RGPD-38"
+    article: "38"
+    name: "Position of the DPO"
+    description: "Ensure DPO independence, resources, and direct reporting to highest management"
+    category: "controller_processor"
+    criticality: "must"
+    applies_when: "dpo_designated"
+    evidence_types: ["dpo_position_documentation", "reporting_structure"]
+
+  - id: "RGPD-39"
+    article: "39"
+    name: "Tasks of the DPO"
+    description: "DPO shall inform, advise, monitor compliance, cooperate with authority, and act as contact point"
+    category: "controller_processor"
+    criticality: "must"
+    applies_when: "dpo_designated"
+    evidence_types: ["dpo_task_documentation", "dpo_activity_records"]
+
+  - id: "RGPD-40"
+    article: "40"
+    name: "Codes of conduct"
+    description: "Associations may prepare codes of conduct to contribute to proper application of GDPR"
+    category: "controller_processor"
+    criticality: "may"
+    evidence_types: ["code_of_conduct_adherence"]
+
+  - id: "RGPD-41"
+    article: "41"
+    name: "Monitoring of codes"
+    description: "Monitoring of compliance with codes of conduct by accredited bodies"
+    category: "controller_processor"
+    criticality: "may"
+    applies_when: "code_adherence"
+    evidence_types: ["monitoring_body_accreditation"]
+
+  - id: "RGPD-42"
+    article: "42"
+    name: "Certification"
+    description: "Data protection certification mechanisms may be established to demonstrate compliance"
+    category: "controller_processor"
+    criticality: "may"
+    evidence_types: ["certification_documentation", "certification_marks"]
+
+  - id: "RGPD-43"
+    article: "43"
+    name: "Certification bodies"
+    description: "Certification issued by accredited certification bodies"
+    category: "controller_processor"
+    criticality: "may"
+    applies_when: "certification_sought"
+    evidence_types: ["certification_body_accreditation"]
+
+  # Chapter V - Transfers
+  - id: "RGPD-44"
+    article: "44"
+    name: "Transfer restrictions"
+    description: "Transfers only with adequate safeguards"
+    category: "transfers"
+    criticality: "must"
+    applies_when: "international_transfer"
+    evidence_types: ["transfer_mechanisms", "safeguard_documentation"]
+
+  - id: "RGPD-45"
+    article: "45"
+    name: "Adequacy decision"
+    description: "Transfer permitted to countries with adequate level of protection as determined by Commission"
+    category: "transfers"
+    criticality: "must"
+    applies_when: "adequacy_transfer"
+    evidence_types: ["adequacy_decision_reference"]
+
+  - id: "RGPD-46"
+    article: "46"
+    name: "Appropriate safeguards"
+    description: "Standard contractual clauses or other mechanisms"
+    category: "transfers"
+    criticality: "must"
+    applies_when: "international_transfer_non_adequate"
+    evidence_types: ["sccs", "bcrs", "transfer_agreements"]
+
+  - id: "RGPD-47"
+    article: "47"
+    name: "Binding corporate rules"
+    description: "Group of undertakings may use binding corporate rules for intra-group transfers"
+    category: "transfers"
+    criticality: "must"
+    applies_when: "bcr_transfer"
+    evidence_types: ["bcrs", "bcr_approval"]
+
+  - id: "RGPD-48"
+    article: "48"
+    name: "Non-authorized transfers"
+    description: "Judgments of third country courts not recognized unless based on international agreement"
+    category: "transfers"
+    criticality: "must"
+    evidence_types: ["transfer_refusal_documentation"]
+
+  - id: "RGPD-49"
+    article: "49"
+    name: "Derogations"
+    description: "Specific derogations for transfers in absence of adequacy decision or safeguards"
+    category: "transfers"
+    criticality: "should"
+    applies_when: "derogation_transfer"
+    evidence_types: ["derogation_justification", "data_subject_consent"]
+
+  - id: "RGPD-50"
+    article: "50"
+    name: "International cooperation"
+    description: "Commission and supervisory authorities shall take steps for international cooperation"
+    category: "transfers"
+    criticality: "should"
+    evidence_types: ["international_cooperation_records"]
+
+scoring:
+  method: "weighted"
+  weights:
+    must: 3
+    should: 2
+    may: 1
+  thresholds:
+    compliant: 90
+    partial: 70
+    non_compliant: 0
+
+cross_framework_mapping:
+  iso27001:
+    "RGPD-5.1.f": ["A.8.2", "A.8.3", "A.8.10"]
+    "RGPD-32": ["A.8.2", "A.8.24"]
+    "RGPD-33": ["A.5.24", "A.6.8"]
+  nis2:
+    "RGPD-32": ["21.2.a", "21.2.h"]
+    "RGPD-33": ["23"]

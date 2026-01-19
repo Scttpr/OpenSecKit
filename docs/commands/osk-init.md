@@ -101,7 +101,7 @@ L'installation affiche un résumé condensé par module :
 ├── constitution.md      # Constitution sécurité
 ├── prompts/             # Prompts sources
 ├── templates/           # Templates
-├── domaines/            # Domaines réglementaires
+├── frameworks/            # Domaines réglementaires
 ├── memory/              # Mémoire contextuelle
 └── specs/               # Spécifications par feature
 ```

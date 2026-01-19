@@ -1,0 +1,442 @@
+# OpenSecKit V4 - RGS Framework Definition
+# Référentiel Général de Sécurité v2.0
+# Authority: ANSSI (Agence Nationale de la Sécurité des Systèmes d'Information)
+
+# ═══════════════════════════════════════════════════════════════════════════
+# METADATA
+# ═══════════════════════════════════════════════════════════════════════════
+
+metadata:
+  framework_id: "rgs"
+  name: "Référentiel Général de Sécurité"
+  name_en: "French General Security Framework"
+  version: "2.0"
+  authority: "ANSSI"
+  effective_date: "2014-06-01"
+  scope: "Systèmes d'information des administrations françaises et opérateurs d'importance vitale"
+  language: "fr"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# SECURITY LEVELS
+# ═══════════════════════════════════════════════════════════════════════════
+
+security_levels:
+  - id: "rgs-star"
+    name: "RGS* (Standard)"
+    description: "Niveau de base pour les services non sensibles"
+    minimum_controls_percent: 70
+  - id: "rgs-star-star"
+    name: "RGS** (Renforcé)"
+    description: "Niveau intermédiaire pour les données sensibles et services critiques"
+    minimum_controls_percent: 85
+  - id: "rgs-star-star-star"
+    name: "RGS*** (Élevé)"
+    description: "Niveau maximal pour les OIV et données classifiées"
+    minimum_controls_percent: 95
+
+# ═══════════════════════════════════════════════════════════════════════════
+# DICP MODEL (French adaptation of CIA)
+# ═══════════════════════════════════════════════════════════════════════════
+
+dicp_model:
+  - id: "disponibilite"
+    name: "Disponibilité"
+    scale: "0-4"
+    description: "Garantie d'accès au service dans les délais requis"
+  - id: "integrite"
+    name: "Intégrité"
+    scale: "0-4"
+    description: "Garantie de non-altération des données et traitements"
+  - id: "confidentialite"
+    name: "Confidentialité"
+    scale: "0-4"
+    description: "Protection contre la divulgation non autorisée"
+  - id: "preuve"
+    name: "Preuve"
+    scale: "0-4"
+    description: "Capacité à démontrer les actions effectuées (traçabilité, non-répudiation)"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# CATEGORIES (Control Domains)
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# These are functional domain identifiers for grouping RGS controls.
+# They map to RGS security functions, not to RGS annexe numbers.
+#
+# RGS Annexes (for reference):
+#   - A1-A5: Certificate policies
+#   - B1: Cryptographic mechanisms
+#   - B2: Key management
+#   - B3: Authentication mechanisms
+#   - C: Audit requirements
+# ═══════════════════════════════════════════════════════════════════════════
+
+categories:
+  - id: "authentification"
+    name: "Authentification et Identification"
+    domain: "AUTH"
+
+  - id: "integrite"
+    name: "Intégrité des Données"
+    domain: "INT"
+
+  - id: "confidentialite"
+    name: "Confidentialité"
+    domain: "CONF"
+
+  - id: "tracabilite"
+    name: "Traçabilité"
+    domain: "TRAC"
+
+  - id: "horodatage"
+    name: "Horodatage"
+    domain: "HORO"
+
+  - id: "signature"
+    name: "Signature Électronique"
+    domain: "SIG"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTROLS - AUTHENTIFICATION (AUTH)
+# ═══════════════════════════════════════════════════════════════════════════
+
+controls:
+  # AUTH - Authentication Controls
+  - id: "RGS-AUTH.1"
+    domain: "AUTH"
+    name: "Authentification des utilisateurs"
+    description: "Mise en place d'un mécanisme d'authentification des utilisateurs adapté au niveau de sécurité requis. Les mécanismes doivent être conformes aux recommandations ANSSI."
+    category: "authentification"
+    criticality: "must"
+    evidence_types:
+      - auth_procedures
+      - mfa_implementation
+      - password_policy
+    rgs_levels: ["rgs-star", "rgs-star-star", "rgs-star-star-star"]
+
+  - id: "RGS-AUTH.2"
+    domain: "AUTH"
+    name: "Authentification forte (MFA)"
+    description: "Mise en œuvre d'une authentification à plusieurs facteurs pour les accès sensibles. Au moins deux facteurs parmi: connaissance, possession, inhérence."
+    category: "authentification"
+    criticality: "must"
+    evidence_types:
+      - mfa_implementation
+      - auth_procedures
+    applies_when: "privileged_access"
+    rgs_levels: ["rgs-star-star", "rgs-star-star-star"]
+
+  - id: "RGS-AUTH.3"
+    domain: "AUTH"
+    name: "Gestion des sessions"
+    description: "Contrôle des sessions utilisateur: délai d'inactivité, verrouillage automatique, limitation des sessions simultanées."
+    category: "authentification"
+    criticality: "should"
+    evidence_types:
+      - session_management
+      - configuration_evidence
+    rgs_levels: ["rgs-star", "rgs-star-star", "rgs-star-star-star"]
+
+  - id: "RGS-AUTH.4"
+    domain: "AUTH"
+    name: "Certificats d'authentification"
+    description: "Utilisation de certificats électroniques qualifiés pour l'authentification des utilisateurs et des serveurs."
+    category: "authentification"
+    criticality: "must"
+    evidence_types:
+      - auth_procedures
+      - encryption_evidence
+    rgs_levels: ["rgs-star-star", "rgs-star-star-star"]
+    eidas_level: "substantiel"
+
+  - id: "RGS-AUTH.5"
+    domain: "AUTH"
+    name: "Protection des authentifiants"
+    description: "Stockage sécurisé des authentifiants (mots de passe hashés avec sel, clés protégées par HSM pour RGS**/RGS***)."
+    category: "authentification"
+    criticality: "must"
+    evidence_types:
+      - security_measures
+      - key_policy
+      - encryption_evidence
+    rgs_levels: ["rgs-star", "rgs-star-star", "rgs-star-star-star"]
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # CONTROLS - INTEGRITE (INT)
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  - id: "RGS-INT.1"
+    domain: "INT"
+    name: "Intégrité des données stockées"
+    description: "Mise en place de mécanismes de contrôle d'intégrité des données au repos (checksums, signatures, chiffrement authentifié)."
+    category: "integrite"
+    criticality: "must"
+    evidence_types:
+      - encryption_evidence
+      - security_measures
+    rgs_levels: ["rgs-star", "rgs-star-star", "rgs-star-star-star"]
+
+  - id: "RGS-INT.2"
+    domain: "INT"
+    name: "Signature électronique qualifiée"
+    description: "Utilisation de signatures électroniques qualifiées pour garantir l'intégrité et l'authenticité des documents critiques."
+    category: "integrite"
+    criticality: "must"
+    evidence_types:
+      - encryption_evidence
+      - compliance_documentation
+    applies_when: "critical_documents"
+    rgs_levels: ["rgs-star-star", "rgs-star-star-star"]
+    eidas_level: "high"
+
+  - id: "RGS-INT.3"
+    domain: "INT"
+    name: "Intégrité des échanges"
+    description: "Protection de l'intégrité des données en transit via TLS 1.2+ avec suites cryptographiques conformes ANSSI."
+    category: "integrite"
+    criticality: "must"
+    evidence_types:
+      - tls_config
+      - encryption_evidence
+    rgs_levels: ["rgs-star", "rgs-star-star", "rgs-star-star-star"]
+
+  - id: "RGS-INT.4"
+    domain: "INT"
+    name: "Contrôle des modifications"
+    description: "Traçabilité et validation des modifications apportées aux données et configurations sensibles."
+    category: "integrite"
+    criticality: "should"
+    evidence_types:
+      - audit_trails
+      - access_controls
+    rgs_levels: ["rgs-star", "rgs-star-star", "rgs-star-star-star"]
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # CONTROLS - CONFIDENTIALITE (CONF)
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  - id: "RGS-CONF.1"
+    domain: "CONF"
+    name: "Classification des données"
+    description: "Mise en place d'une politique de classification des données avec niveaux de sensibilité définis."
+    category: "confidentialite"
+    criticality: "must"
+    evidence_types:
+      - data_inventory
+      - compliance_documentation
+    rgs_levels: ["rgs-star", "rgs-star-star", "rgs-star-star-star"]
+
+  - id: "RGS-CONF.2"
+    domain: "CONF"
+    name: "Chiffrement en transit"
+    description: "Chiffrement obligatoire des communications via TLS 1.2+ avec algorithmes conformes aux recommandations ANSSI."
+    category: "confidentialite"
+    criticality: "must"
+    evidence_types:
+      - tls_config
+      - encryption_evidence
+    rgs_levels: ["rgs-star", "rgs-star-star", "rgs-star-star-star"]
+
+  - id: "RGS-CONF.3"
+    domain: "CONF"
+    name: "Chiffrement au repos"
+    description: "Chiffrement des données sensibles au repos avec AES-256 ou algorithme équivalent approuvé ANSSI."
+    category: "confidentialite"
+    criticality: "must"
+    evidence_types:
+      - encryption_evidence
+      - key_policy
+    rgs_levels: ["rgs-star-star", "rgs-star-star-star"]
+
+  - id: "RGS-CONF.4"
+    domain: "CONF"
+    name: "Contrôle d'accès"
+    description: "Mise en œuvre du principe du moindre privilège avec gestion fine des droits d'accès aux ressources."
+    category: "confidentialite"
+    criticality: "must"
+    evidence_types:
+      - access_controls
+      - security_measures
+    rgs_levels: ["rgs-star", "rgs-star-star", "rgs-star-star-star"]
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # CONTROLS - TRACABILITE (TRAC)
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  - id: "RGS-TRAC.1"
+    domain: "TRAC"
+    name: "Journalisation des événements"
+    description: "Enregistrement des événements de sécurité: authentifications, accès aux données sensibles, modifications de configuration, erreurs."
+    category: "tracabilite"
+    criticality: "must"
+    evidence_types:
+      - log_samples
+      - logging_policy
+    rgs_levels: ["rgs-star", "rgs-star-star", "rgs-star-star-star"]
+
+  - id: "RGS-TRAC.2"
+    domain: "TRAC"
+    name: "Protection des journaux"
+    description: "Protection de l'intégrité des journaux contre la modification et la suppression. Stockage séparé pour RGS**/RGS***."
+    category: "tracabilite"
+    criticality: "must"
+    evidence_types:
+      - log_samples
+      - security_measures
+      - access_controls
+    rgs_levels: ["rgs-star", "rgs-star-star", "rgs-star-star-star"]
+
+  - id: "RGS-TRAC.3"
+    domain: "TRAC"
+    name: "Centralisation des logs"
+    description: "Centralisation des journaux dans un SIEM ou solution équivalente pour corrélation et analyse."
+    category: "tracabilite"
+    criticality: "must"
+    evidence_types:
+      - log_samples
+      - logging_policy
+    rgs_levels: ["rgs-star-star", "rgs-star-star-star"]
+
+  - id: "RGS-TRAC.4"
+    domain: "TRAC"
+    name: "Conservation des journaux"
+    description: "Conservation des journaux pendant la durée légale requise (minimum 1 an, 5 ans pour RGS***)."
+    category: "tracabilite"
+    criticality: "must"
+    evidence_types:
+      - retention_policy
+      - logging_policy
+    rgs_levels: ["rgs-star", "rgs-star-star", "rgs-star-star-star"]
+
+  - id: "RGS-TRAC.5"
+    domain: "TRAC"
+    name: "Non-répudiation"
+    description: "Mécanismes de non-répudiation pour les transactions critiques (signature des logs, horodatage qualifié)."
+    category: "tracabilite"
+    criticality: "must"
+    evidence_types:
+      - audit_trails
+      - encryption_evidence
+    applies_when: "critical_transactions"
+    rgs_levels: ["rgs-star-star-star"]
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # CONTROLS - HORODATAGE (HORO)
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  - id: "RGS-HORO.1"
+    domain: "HORO"
+    name: "Synchronisation temporelle"
+    description: "Synchronisation de tous les systèmes sur une source de temps fiable (NTP sécurisé, serveur de temps interne)."
+    category: "horodatage"
+    criticality: "must"
+    evidence_types:
+      - configuration_evidence
+      - security_measures
+    rgs_levels: ["rgs-star", "rgs-star-star", "rgs-star-star-star"]
+
+  - id: "RGS-HORO.2"
+    domain: "HORO"
+    name: "Horodatage qualifié"
+    description: "Utilisation d'une autorité d'horodatage qualifiée pour les documents à valeur probante."
+    category: "horodatage"
+    criticality: "must"
+    evidence_types:
+      - compliance_documentation
+      - encryption_evidence
+    applies_when: "legal_documents"
+    rgs_levels: ["rgs-star-star", "rgs-star-star-star"]
+    eidas_level: "high"
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # CONTROLS - SIGNATURE (SIG)
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  - id: "RGS-SIG.1"
+    domain: "SIG"
+    name: "Signature électronique"
+    description: "Mise en œuvre de la signature électronique avec niveau de confiance adapté aux exigences métier."
+    category: "signature"
+    criticality: "should"
+    evidence_types:
+      - encryption_evidence
+      - compliance_documentation
+    rgs_levels: ["rgs-star", "rgs-star-star", "rgs-star-star-star"]
+    eidas_level: "low"
+
+  - id: "RGS-SIG.2"
+    domain: "SIG"
+    name: "Signature qualifiée"
+    description: "Utilisation de certificats de signature qualifiés délivrés par un prestataire de confiance qualifié."
+    category: "signature"
+    criticality: "must"
+    evidence_types:
+      - encryption_evidence
+      - compliance_documentation
+    applies_when: "qualified_signature_required"
+    rgs_levels: ["rgs-star-star", "rgs-star-star-star"]
+    eidas_level: "high"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# SCORING
+# ═══════════════════════════════════════════════════════════════════════════
+
+scoring:
+  method: "weighted"
+  weights:
+    must: 3
+    should: 2
+    may: 1
+  thresholds:
+    compliant: 90
+    partial: 50
+    non_compliant: 0
+
+# ═══════════════════════════════════════════════════════════════════════════
+# CROSS-FRAMEWORK MAPPING
+# ═══════════════════════════════════════════════════════════════════════════
+
+cross_framework_mapping:
+  iso27001:
+    "RGS-AUTH.1": ["A.9.2.1", "A.9.4.2"]
+    "RGS-AUTH.2": ["A.9.4.2"]
+    "RGS-CONF.2": ["A.13.1.1", "A.14.1.2"]
+    "RGS-CONF.3": ["A.10.1.1"]
+    "RGS-TRAC.1": ["A.12.4.1"]
+  rgpd:
+    "RGS-CONF.1": ["RGPD-5.1.f"]
+    "RGS-CONF.3": ["RGPD-32.1.a"]
+    "RGS-TRAC.1": ["RGPD-5.2"]
+
+# ═══════════════════════════════════════════════════════════════════════════
+# HOMOLOGATION PROCESS
+# ═══════════════════════════════════════════════════════════════════════════
+
+homologation_process:
+  phases:
+    - phase: 1
+      name: "Étude"
+      activities:
+        - "Analyse de risques (EBIOS RM recommandé)"
+        - "Identification des besoins de sécurité"
+        - "Définition du périmètre système"
+    - phase: 2
+      name: "Dossier"
+      activities:
+        - "Rédaction du dossier de sécurité"
+        - "Politique de sécurité du système (PSSI)"
+        - "Plan de traitement des risques"
+        - "Procédures d'exploitation sécurisée"
+    - phase: 3
+      name: "Décision"
+      activities:
+        - "Audit de conformité"
+        - "Commission d'homologation"
+        - "Décision d'homologation signée"
+    - phase: 4
+      name: "MCS (Maintien en Conditions de Sécurité)"
+      activities:
+        - "Revue trimestrielle"
+        - "Test d'intrusion annuel"
+        - "Veille vulnérabilités"
+        - "Renouvellement (3 ans max)"

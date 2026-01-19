@@ -28,7 +28,7 @@ projet/
 │   │   ├── outputs/
 │   │   └── reports/
 │   ├── prompts/                    # Prompts sources
-│   └── domaines/                   # Domaines réglementaires
+│   └── frameworks/                   # Domaines réglementaires
 │
 ├── AGENTS.md                       # Format universel (tous agents)
 │

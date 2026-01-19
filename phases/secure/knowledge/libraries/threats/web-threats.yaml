@@ -1,0 +1,343 @@
+# OpenSecKit V4 - Web Application Threat Library
+# Version: 4.0.0
+# Use: Reference for threat modeling web applications
+
+metadata:
+  library_id: "web-threats"
+  name: "Web Application Security Threats"
+  version: "4.0.0"
+  based_on: ["OWASP Web Top 10 2021", "STRIDE", "CWE Top 25"]
+
+threats:
+  # Cross-Site Scripting (XSS)
+  - id: "WEB-XSS-001"
+    name: "Reflected XSS"
+    category: "injection"
+    stride: "tampering"
+    owasp_web: "A03:2021"
+    cwe: "CWE-79"
+    capec: "CAPEC-86"
+    description: "Script injection via URL parameters or form inputs"
+    attack_vector: "Craft malicious link with script payload"
+    impact: "Session theft, credential harvesting, defacement"
+    likelihood: "high"
+    indicators:
+      - "User input in HTML response"
+      - "No output encoding"
+      - "Lack of Content-Security-Policy"
+    mitigations:
+      - "Context-aware output encoding"
+      - "Content-Security-Policy header"
+      - "HTTPOnly cookies for sessions"
+      - "Input validation"
+
+  - id: "WEB-XSS-002"
+    name: "Stored XSS"
+    category: "injection"
+    stride: "tampering"
+    owasp_web: "A03:2021"
+    cwe: "CWE-79"
+    capec: "CAPEC-86"
+    description: "Persistent script injection stored in database"
+    attack_vector: "Submit malicious content (comments, profiles, posts)"
+    impact: "Mass user compromise, persistent attack"
+    likelihood: "medium"
+    indicators:
+      - "User-generated content displayed"
+      - "Rich text editors"
+      - "No sanitization before storage"
+    mitigations:
+      - "Sanitize HTML on input"
+      - "Encode on output"
+      - "CSP with strict nonce/hash"
+      - "Regular content scanning"
+
+  - id: "WEB-XSS-003"
+    name: "DOM-based XSS"
+    category: "injection"
+    stride: "tampering"
+    owasp_web: "A03:2021"
+    cwe: "CWE-79"
+    description: "Script injection via client-side JavaScript"
+    attack_vector: "Exploit JavaScript that processes URL fragments or DOM"
+    impact: "Session theft without server interaction"
+    likelihood: "medium"
+    indicators:
+      - "JavaScript reading URL/hash"
+      - "innerHTML assignments"
+      - "eval() with user data"
+    mitigations:
+      - "Use textContent instead of innerHTML"
+      - "Avoid eval() and document.write()"
+      - "CSP with strict directives"
+
+  # Cross-Site Request Forgery (CSRF)
+  - id: "WEB-CSRF-001"
+    name: "State-Changing CSRF"
+    category: "session"
+    stride: "tampering"
+    owasp_web: "A01:2021"
+    cwe: "CWE-352"
+    capec: "CAPEC-62"
+    description: "Unauthorized actions via forged requests"
+    attack_vector: "Malicious page submits form to target site"
+    impact: "Unauthorized state changes (password, email, purchases)"
+    likelihood: "medium"
+    indicators:
+      - "No CSRF tokens"
+      - "Cookies without SameSite"
+      - "State changes via GET"
+    mitigations:
+      - "CSRF tokens for state changes"
+      - "SameSite=Strict cookies"
+      - "Verify Origin/Referer headers"
+      - "Re-authentication for critical actions"
+
+  - id: "WEB-CSRF-002"
+    name: "Login CSRF"
+    category: "session"
+    stride: "spoofing"
+    cwe: "CWE-352"
+    description: "Force login to attacker-controlled account"
+    attack_vector: "Submit login form with attacker credentials"
+    impact: "Victim actions attributed to attacker account"
+    likelihood: "low"
+    indicators:
+      - "No CSRF on login form"
+      - "No pre-session token"
+    mitigations:
+      - "CSRF token on login"
+      - "Monitor suspicious login patterns"
+
+  # Clickjacking
+  - id: "WEB-CLICK-001"
+    name: "UI Redressing (Clickjacking)"
+    category: "tampering"
+    stride: "tampering"
+    owasp_web: "A04:2021"
+    cwe: "CWE-1021"
+    capec: "CAPEC-103"
+    description: "Tricking users to click hidden elements"
+    attack_vector: "Overlay transparent iframe over malicious page"
+    impact: "Unauthorized actions, data theft"
+    likelihood: "medium"
+    indicators:
+      - "No X-Frame-Options header"
+      - "Missing CSP frame-ancestors"
+      - "Sensitive actions on single click"
+    mitigations:
+      - "X-Frame-Options: DENY"
+      - "CSP: frame-ancestors 'none'"
+      - "Framebusting JavaScript (fallback)"
+      - "Confirmation for sensitive actions"
+
+  # Session Attacks
+  - id: "WEB-SESS-001"
+    name: "Session Cookie Theft"
+    category: "session"
+    stride: "spoofing"
+    cwe: "CWE-384"
+    description: "Stealing session cookies via network or XSS"
+    attack_vector: "Network sniffing, XSS, malware"
+    impact: "Account takeover"
+    likelihood: "medium"
+    indicators:
+      - "Cookies without Secure flag"
+      - "Cookies without HttpOnly"
+      - "Missing SameSite attribute"
+    mitigations:
+      - "Secure; HttpOnly; SameSite=Strict"
+      - "TLS for all pages"
+      - "Short session expiry"
+      - "Session binding to fingerprint"
+
+  - id: "WEB-SESS-002"
+    name: "Insufficient Session Expiration"
+    category: "session"
+    stride: "spoofing"
+    cwe: "CWE-613"
+    description: "Sessions remain valid too long"
+    attack_vector: "Use old session token"
+    impact: "Extended attack window"
+    likelihood: "medium"
+    indicators:
+      - "No absolute timeout"
+      - "No idle timeout"
+      - "Remember me without proper controls"
+    mitigations:
+      - "Absolute session timeout (24h max)"
+      - "Idle timeout (15-30 min)"
+      - "Secure remember-me implementation"
+
+  # Open Redirect
+  - id: "WEB-REDIR-001"
+    name: "Open Redirect"
+    category: "tampering"
+    stride: "spoofing"
+    owasp_web: "A01:2021"
+    cwe: "CWE-601"
+    capec: "CAPEC-194"
+    description: "Redirect to attacker-controlled site"
+    attack_vector: "Manipulate redirect URL parameter"
+    impact: "Phishing, credential theft, malware distribution"
+    likelihood: "medium"
+    indicators:
+      - "URL parameter in redirect"
+      - "No redirect URL validation"
+      - "No whitelist of allowed destinations"
+    mitigations:
+      - "Whitelist allowed redirect destinations"
+      - "Indirect reference maps"
+      - "Warn users before external redirects"
+
+  # File Upload Threats
+  - id: "WEB-FILE-001"
+    name: "Malicious File Upload"
+    category: "injection"
+    stride: "tampering"
+    owasp_web: "A04:2021"
+    cwe: "CWE-434"
+    capec: "CAPEC-17"
+    description: "Upload of executable or malicious files"
+    attack_vector: "Upload web shell, malware, or polyglot files"
+    impact: "Remote code execution, malware distribution"
+    likelihood: "medium"
+    indicators:
+      - "No file type validation"
+      - "Uploads in web root"
+      - "Original filename preserved"
+    mitigations:
+      - "Whitelist allowed file types"
+      - "Validate magic bytes, not just extension"
+      - "Store uploads outside web root"
+      - "Rename uploaded files"
+      - "Scan for malware"
+
+  - id: "WEB-FILE-002"
+    name: "Path Traversal via Upload"
+    category: "injection"
+    stride: "tampering"
+    cwe: "CWE-22"
+    description: "File saved to unintended location"
+    attack_vector: "Include ../ in filename"
+    impact: "Overwrite critical files, code execution"
+    likelihood: "low"
+    indicators:
+      - "User-controlled filename"
+      - "No path sanitization"
+    mitigations:
+      - "Strip path from filename"
+      - "Generate random filenames"
+      - "Validate final path is within upload dir"
+
+  # Security Headers
+  - id: "WEB-HDR-001"
+    name: "Missing Security Headers"
+    category: "configuration"
+    stride: "information_disclosure"
+    owasp_web: "A05:2021"
+    cwe: "CWE-693"
+    description: "Browser security features not enabled"
+    attack_vector: "Exploit missing protections"
+    impact: "XSS, clickjacking, MIME sniffing attacks"
+    likelihood: "high"
+    indicators:
+      - "No CSP header"
+      - "No X-Content-Type-Options"
+      - "No Strict-Transport-Security"
+    mitigations:
+      - "Content-Security-Policy"
+      - "X-Content-Type-Options: nosniff"
+      - "Strict-Transport-Security"
+      - "X-Frame-Options"
+      - "Referrer-Policy"
+
+  # Client-Side Storage
+  - id: "WEB-STOR-001"
+    name: "Sensitive Data in Local Storage"
+    category: "information_disclosure"
+    stride: "information_disclosure"
+    cwe: "CWE-922"
+    description: "Sensitive data stored in browser localStorage"
+    attack_vector: "XSS reads localStorage, malicious browser extensions"
+    impact: "Token theft, PII exposure"
+    likelihood: "medium"
+    indicators:
+      - "Tokens in localStorage"
+      - "PII in client-side storage"
+      - "No encryption"
+    mitigations:
+      - "Use HttpOnly cookies for tokens"
+      - "Encrypt sensitive client data"
+      - "Minimize client-side storage"
+
+  # Third-Party Dependencies
+  - id: "WEB-DEP-001"
+    name: "Vulnerable JavaScript Dependencies"
+    category: "configuration"
+    stride: "tampering"
+    owasp_web: "A06:2021"
+    cwe: "CWE-1035"
+    description: "Third-party JavaScript with known vulnerabilities"
+    attack_vector: "Exploit vulnerable library code"
+    impact: "XSS, RCE depending on vulnerability"
+    likelihood: "medium"
+    indicators:
+      - "Outdated npm packages"
+      - "No dependency scanning"
+      - "Direct CDN includes without SRI"
+    mitigations:
+      - "Regular dependency updates"
+      - "SCA scanning in CI/CD"
+      - "Subresource Integrity for CDN"
+
+  - id: "WEB-DEP-002"
+    name: "Supply Chain Attack via CDN"
+    category: "tampering"
+    stride: "tampering"
+    cwe: "CWE-829"
+    description: "Compromised third-party CDN serves malicious code"
+    attack_vector: "CDN compromise or DNS hijacking"
+    impact: "Mass compromise of users"
+    likelihood: "low"
+    indicators:
+      - "External CDN dependencies"
+      - "No Subresource Integrity"
+      - "No fallback"
+    mitigations:
+      - "Subresource Integrity (SRI)"
+      - "Self-host critical dependencies"
+      - "CSP with strict sources"
+
+  # Form Security
+  - id: "WEB-FORM-001"
+    name: "Autocomplete on Sensitive Fields"
+    category: "information_disclosure"
+    stride: "information_disclosure"
+    cwe: "CWE-524"
+    description: "Browser stores sensitive form data"
+    attack_vector: "Access browser autocomplete data"
+    impact: "Credential exposure on shared devices"
+    likelihood: "low"
+    indicators:
+      - "Password fields without autocomplete=off"
+      - "Credit card fields without autocomplete=cc-*"
+    mitigations:
+      - "autocomplete=new-password for new passwords"
+      - "autocomplete=off for sensitive fields"
+
+  - id: "WEB-FORM-002"
+    name: "Form Action Hijacking"
+    category: "tampering"
+    stride: "tampering"
+    cwe: "CWE-352"
+    description: "Form submits to attacker-controlled endpoint"
+    attack_vector: "DOM manipulation to change form action"
+    impact: "Credential theft"
+    likelihood: "low"
+    indicators:
+      - "Dynamic form action"
+      - "User-controlled form attributes"
+    mitigations:
+      - "CSP to prevent injection"
+      - "Verify form submission on server"

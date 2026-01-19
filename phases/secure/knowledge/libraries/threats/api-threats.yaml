@@ -1,0 +1,346 @@
+# OpenSecKit V4 - API Threat Library
+# Version: 4.0.0
+# Use: Reference for threat modeling API endpoints
+
+metadata:
+  library_id: "api-threats"
+  name: "API Security Threats"
+  version: "4.0.0"
+  based_on: ["OWASP API Security Top 10 2023", "STRIDE"]
+
+threats:
+  # OWASP API1 - Broken Object Level Authorization
+  - id: "API-BOLA-001"
+    name: "Direct Object Reference Manipulation"
+    category: "authorization"
+    stride: "elevation_of_privilege"
+    owasp_api: "API1:2023"
+    description: "Attacker manipulates object IDs to access other users' data"
+    attack_vector: "Modify resource ID in API request (e.g., /api/users/123 → /api/users/456)"
+    impact: "Unauthorized access to other users' data"
+    likelihood: "high"
+    indicators:
+      - "Sequential or predictable IDs in URLs"
+      - "No ownership validation in handlers"
+      - "Missing authorization middleware"
+    mitigations:
+      - "Implement authorization checks for every object access"
+      - "Use UUIDs instead of sequential IDs"
+      - "Validate user ownership of resources"
+
+  - id: "API-BOLA-002"
+    name: "Mass Assignment to Privileged Fields"
+    category: "authorization"
+    stride: "tampering"
+    owasp_api: "API1:2023"
+    description: "Attacker includes privileged fields in request body"
+    attack_vector: "Add isAdmin=true or role=admin to request payload"
+    impact: "Privilege escalation"
+    likelihood: "medium"
+    indicators:
+      - "Direct binding of request body to model"
+      - "No field whitelist in update operations"
+    mitigations:
+      - "Use DTOs with explicit field mapping"
+      - "Whitelist allowed fields per operation"
+      - "Separate endpoints for privileged operations"
+
+  # OWASP API2 - Broken Authentication
+  - id: "API-AUTH-001"
+    name: "Credential Stuffing"
+    category: "authentication"
+    stride: "spoofing"
+    owasp_api: "API2:2023"
+    description: "Automated login attempts using breached credentials"
+    attack_vector: "Automated requests with username/password lists"
+    impact: "Account takeover"
+    likelihood: "high"
+    indicators:
+      - "No rate limiting on login endpoint"
+      - "No account lockout mechanism"
+      - "Missing CAPTCHA for failed attempts"
+    mitigations:
+      - "Rate limiting per IP and per account"
+      - "Account lockout after N failures"
+      - "CAPTCHA after failed attempts"
+      - "Monitor for credential stuffing patterns"
+
+  - id: "API-AUTH-002"
+    name: "JWT Token Manipulation"
+    category: "authentication"
+    stride: "spoofing"
+    owasp_api: "API2:2023"
+    description: "Attacker modifies JWT claims or exploits weak signing"
+    attack_vector: "Change algorithm to 'none', modify claims, use weak secret"
+    impact: "Identity spoofing, privilege escalation"
+    likelihood: "medium"
+    indicators:
+      - "Algorithm confusion vulnerability"
+      - "Weak signing secret"
+      - "No token expiry validation"
+    mitigations:
+      - "Explicit algorithm validation"
+      - "Strong signing keys (256+ bits)"
+      - "Short token expiry"
+      - "Token blacklisting for logout"
+
+  - id: "API-AUTH-003"
+    name: "Session Fixation"
+    category: "authentication"
+    stride: "spoofing"
+    owasp_api: "API2:2023"
+    description: "Attacker sets victim's session ID before authentication"
+    attack_vector: "Pre-set session token, trick user to authenticate"
+    impact: "Session hijacking"
+    likelihood: "low"
+    indicators:
+      - "Session ID accepted from client before auth"
+      - "Session not regenerated on login"
+    mitigations:
+      - "Generate new session on authentication"
+      - "Never accept session ID from client"
+      - "Bind session to user fingerprint"
+
+  # OWASP API3 - Broken Object Property Level Authorization
+  - id: "API-PROP-001"
+    name: "Excessive Data Exposure"
+    category: "information_disclosure"
+    stride: "information_disclosure"
+    owasp_api: "API3:2023"
+    description: "API returns more data than needed by the client"
+    attack_vector: "Inspect API responses for sensitive fields"
+    impact: "PII exposure, internal data leakage"
+    likelihood: "high"
+    indicators:
+      - "Full object returned instead of DTO"
+      - "Internal fields in response (passwords, tokens)"
+      - "Verbose error messages"
+    mitigations:
+      - "Use response DTOs with explicit fields"
+      - "Filter sensitive fields server-side"
+      - "Review API responses for data minimization"
+
+  # OWASP API4 - Unrestricted Resource Consumption
+  - id: "API-RATE-001"
+    name: "API Rate Limit Bypass"
+    category: "availability"
+    stride: "denial_of_service"
+    owasp_api: "API4:2023"
+    description: "Attacker bypasses rate limiting mechanisms"
+    attack_vector: "Rotate IPs, modify headers, use multiple accounts"
+    impact: "Service degradation, increased costs"
+    likelihood: "medium"
+    indicators:
+      - "Rate limit only by IP"
+      - "No request size limits"
+      - "No pagination limits"
+    mitigations:
+      - "Multi-factor rate limiting (IP + user + fingerprint)"
+      - "Request size limits"
+      - "Pagination limits"
+      - "Cost-based throttling"
+
+  - id: "API-RATE-002"
+    name: "Resource Exhaustion via Complex Queries"
+    category: "availability"
+    stride: "denial_of_service"
+    owasp_api: "API4:2023"
+    description: "Expensive operations consume excessive resources"
+    attack_vector: "Deep pagination, complex filters, large batch operations"
+    impact: "Service degradation, database overload"
+    likelihood: "medium"
+    indicators:
+      - "No query complexity limits"
+      - "Unbounded database queries"
+      - "No timeout on operations"
+    mitigations:
+      - "Query complexity analysis"
+      - "Timeout on all operations"
+      - "Background processing for heavy operations"
+
+  # OWASP API5 - Broken Function Level Authorization
+  - id: "API-FUNC-001"
+    name: "Admin Function Access"
+    category: "authorization"
+    stride: "elevation_of_privilege"
+    owasp_api: "API5:2023"
+    description: "Regular users access administrative endpoints"
+    attack_vector: "Call /admin/* endpoints without proper role"
+    impact: "Unauthorized administrative actions"
+    likelihood: "medium"
+    indicators:
+      - "Admin endpoints without role checks"
+      - "Relying on UI to hide admin functions"
+      - "Inconsistent authorization across endpoints"
+    mitigations:
+      - "Centralized authorization middleware"
+      - "Role-based endpoint protection"
+      - "Audit logging of administrative actions"
+
+  # OWASP API6 - Unrestricted Access to Sensitive Business Flows
+  - id: "API-FLOW-001"
+    name: "Business Logic Abuse"
+    category: "tampering"
+    stride: "tampering"
+    owasp_api: "API6:2023"
+    description: "Abuse of business workflows for unintended purposes"
+    attack_vector: "Automated purchasing, coupon abuse, referral fraud"
+    impact: "Financial loss, unfair advantage"
+    likelihood: "medium"
+    indicators:
+      - "No business flow rate limiting"
+      - "Automatable sensitive operations"
+      - "No fraud detection"
+    mitigations:
+      - "Business flow rate limiting"
+      - "CAPTCHA for sensitive operations"
+      - "Anomaly detection"
+      - "Device fingerprinting"
+
+  # OWASP API7 - Server Side Request Forgery
+  - id: "API-SSRF-001"
+    name: "Server-Side Request Forgery"
+    category: "tampering"
+    stride: "tampering"
+    owasp_api: "API7:2023"
+    description: "Server makes requests to attacker-controlled URLs"
+    attack_vector: "Provide malicious URL in webhook, import, or image URL field"
+    impact: "Internal network access, cloud metadata exposure"
+    likelihood: "medium"
+    indicators:
+      - "URL inputs without validation"
+      - "Server fetches external resources"
+      - "Internal service accessible from app"
+    mitigations:
+      - "URL allowlist validation"
+      - "Block internal IP ranges"
+      - "Disable unnecessary URL protocols"
+      - "Use dedicated egress proxy"
+
+  # OWASP API8 - Security Misconfiguration
+  - id: "API-CONFIG-001"
+    name: "Debug Mode in Production"
+    category: "information_disclosure"
+    stride: "information_disclosure"
+    owasp_api: "API8:2023"
+    description: "Debug features enabled in production environment"
+    attack_vector: "Access debug endpoints, verbose error messages"
+    impact: "Internal information disclosure"
+    likelihood: "medium"
+    indicators:
+      - "Stack traces in responses"
+      - "Debug endpoints accessible"
+      - "Verbose logging"
+    mitigations:
+      - "Environment-specific configuration"
+      - "Disable debug in production"
+      - "Generic error responses"
+
+  - id: "API-CONFIG-002"
+    name: "Missing Security Headers"
+    category: "information_disclosure"
+    stride: "information_disclosure"
+    owasp_api: "API8:2023"
+    description: "API lacks security headers"
+    attack_vector: "Exploit missing CORS, CSP, or other headers"
+    impact: "Cross-site attacks, data theft"
+    likelihood: "high"
+    indicators:
+      - "Missing CORS configuration"
+      - "Missing Content-Security-Policy"
+      - "Missing X-Content-Type-Options"
+    mitigations:
+      - "Strict CORS policy"
+      - "Security headers middleware"
+      - "Regular header audit"
+
+  # OWASP API9 - Improper Inventory Management
+  - id: "API-INV-001"
+    name: "Shadow API Discovery"
+    category: "information_disclosure"
+    stride: "information_disclosure"
+    owasp_api: "API9:2023"
+    description: "Undocumented or deprecated APIs still accessible"
+    attack_vector: "Enumerate API versions, discover old endpoints"
+    impact: "Access to unpatched vulnerabilities"
+    likelihood: "medium"
+    indicators:
+      - "Multiple API versions running"
+      - "Undocumented endpoints"
+      - "No API inventory"
+    mitigations:
+      - "Complete API inventory"
+      - "Deprecation and retirement process"
+      - "API gateway enforcement"
+
+  # OWASP API10 - Unsafe Consumption of APIs
+  - id: "API-CONSUME-001"
+    name: "Third-Party API Trust"
+    category: "tampering"
+    stride: "tampering"
+    owasp_api: "API10:2023"
+    description: "Blindly trusting data from third-party APIs"
+    attack_vector: "Compromise third-party, inject malicious data"
+    impact: "Injection attacks, data corruption"
+    likelihood: "low"
+    indicators:
+      - "No validation of third-party responses"
+      - "Direct use of external data"
+      - "No schema validation"
+    mitigations:
+      - "Validate all external data"
+      - "Schema validation"
+      - "Sanitize before use"
+      - "Monitor third-party health"
+
+  # Injection Threats
+  - id: "API-INJ-001"
+    name: "SQL Injection"
+    category: "injection"
+    stride: "tampering"
+    description: "SQL code injection via API parameters"
+    attack_vector: "Malicious SQL in query parameters or body"
+    impact: "Data breach, data manipulation"
+    likelihood: "medium"
+    indicators:
+      - "String concatenation in queries"
+      - "No parameterized queries"
+      - "Dynamic query construction"
+    mitigations:
+      - "Parameterized queries"
+      - "ORM usage"
+      - "Input validation"
+      - "Least privilege database accounts"
+
+  - id: "API-INJ-002"
+    name: "NoSQL Injection"
+    category: "injection"
+    stride: "tampering"
+    description: "NoSQL operator injection"
+    attack_vector: "Inject MongoDB operators ($gt, $ne) in JSON"
+    impact: "Authentication bypass, data access"
+    likelihood: "medium"
+    indicators:
+      - "Direct use of request body in queries"
+      - "No type validation"
+    mitigations:
+      - "Type validation"
+      - "Sanitize query operators"
+      - "Use ODM with validation"
+
+  - id: "API-INJ-003"
+    name: "Command Injection"
+    category: "injection"
+    stride: "tampering"
+    description: "OS command injection via API parameters"
+    attack_vector: "Shell metacharacters in input"
+    impact: "Remote code execution"
+    likelihood: "low"
+    indicators:
+      - "System calls with user input"
+      - "Shell execution"
+    mitigations:
+      - "Avoid system calls"
+      - "Input validation"
+      - "Use libraries instead of shell"
+      - "Sandboxing"

@@ -1,60 +1,64 @@
-# {{ prompt.name }}
+# {{ command.name }}
 
-> {{ prompt.description }}
+> {{ command.description }}
+
+## Full Instructions
+
+**Fetch from:** {{ command.url }}
 
 ## Context
 
-This project uses **OpenSecKit** for security-as-code.
-- Configuration: `.osk/config.toml`
-- Specifications: `.osk/specs/`
-- Risk Registry: `docs/security/risks/risk-register.yaml`
+This project uses **OpenSecKit V4** with hub-and-spokes architecture.
 
-{% if prompt.argument -%}
+### System Model (Hub) - Always Read First
+- **Index**: `.osk/system-model/index.yaml` (~200 lines, quick orientation)
+- **Full sections**: `.osk/system-model/*.yaml` (load as needed)
+
+### Outputs (Spokes)
+- **Compliance**: `.osk/compliance/`
+- **Specifications**: `.osk/specs/`
+
+{% if command.argument -%}
 ## Usage
 
 ```
-{{ prompt.name }} {{ prompt.argument }}
+{{ command.name }} {{ command.argument }}
 ```
 {% endif %}
 
-{% if prompt.principles | length > 0 -%}
-## Security Principles
+{% if command.part -%}
+## Part
 
-This command implements:
-{% for principle in prompt.principles -%}
-- Principle {{ principle }}
-{% endfor %}
+This command is part of the **{{ command.part | upper }}** workflow.
+{% if command.part == "discover" -%}
+- Discover commands build the system model (hub)
+- Output goes to `.osk/system-model/`
+{% elif command.part == "comply" -%}
+- Comply commands assess compliance (spoke)
+- Consumes system model, outputs to `.osk/compliance/`
+{% elif command.part == "secure" -%}
+- Secure commands implement shift-left security (spoke)
+- Consumes system model, outputs to `.osk/specs/`
+{% endif %}
 {% endif %}
 
-{% if prompt.requires | length > 0 -%}
+{% if command.requires | length > 0 -%}
 ## Prerequisites
 
 Requires these files to exist:
-{% for req in prompt.requires -%}
+{% for req in command.requires -%}
 - `{{ req }}`
 {% endfor %}
 {% endif %}
 
-## Instructions
-
-{{ prompt.instructions }}
-
-{% if prompt.outputs | length > 0 -%}
+{% if command.outputs | length > 0 -%}
 ## Expected Outputs
 
 Generate these files:
-{% for output in prompt.outputs -%}
+{% for output in command.outputs -%}
 - `{{ output }}`
 {% endfor %}
 {% endif %}
 
-{% if prompt.steps | length > 0 -%}
-## Steps
-
-{% for step in prompt.steps -%}
-{{ loop.index }}. {{ step }}
-{% endfor %}
-{% endif %}
-
 ---
-*OpenSecKit v{{ version }} - {{ prompt.phase }} phase*
+*OpenSecKit v{{ version }} - {{ command.part | default(value="core") }} phase*

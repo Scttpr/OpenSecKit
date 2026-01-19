@@ -1,0 +1,70 @@
+# eIDAS Trust Levels
+# Regulation (EU) No 910/2014
+# Used by: RGS (qualified signatures), RGPD (identity verification)
+
+metadata:
+  source: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=uriserv:OJ.L_.2014.257.01.0073.01.ENG"
+  version: "910/2014"
+  last_checked: null
+  stability: "stable"  # eIDAS 2.0 in progress but backwards compatible
+
+# Assurance Levels (Article 8)
+assurance_levels:
+  low:
+    description: "Limited confidence in claimed identity"
+    authentication: "Single factor"
+    identity_proofing: "Self-declaration accepted"
+    use_cases:
+      - "Low-risk online services"
+      - "Newsletter subscriptions"
+    rgs_mapping: null  # Below RGS minimum
+
+  substantial:
+    description: "Substantial confidence in claimed identity"
+    authentication: "Two-factor required"
+    identity_proofing: "Verified against authoritative source"
+    use_cases:
+      - "Government online services"
+      - "Banking light operations"
+    rgs_mapping: "rgs-star"
+
+  high:
+    description: "High confidence in claimed identity"
+    authentication: "Two-factor with hardware token"
+    identity_proofing: "In-person or equivalent remote verification"
+    use_cases:
+      - "Critical government services"
+      - "Legal documents"
+      - "Healthcare"
+    rgs_mapping: "rgs-star-star"
+
+# Trust Services (Chapter III)
+trust_services:
+  electronic_signature:
+    levels:
+      - simple: "No specific requirements"
+      - advanced: "Uniquely linked to signatory, capable of identifying signatory"
+      - qualified: "Created by qualified device, based on qualified certificate"
+    rgs_mapping:
+      "rgs-star": "advanced"
+      "rgs-star-star": "qualified"
+      "rgs-star-star-star": "qualified"
+
+  electronic_seal:
+    levels:
+      - simple: "No specific requirements"
+      - advanced: "Uniquely linked to creator"
+      - qualified: "Created by qualified device"
+
+  electronic_timestamp:
+    levels:
+      - simple: "Links data to time"
+      - qualified: "Issued by qualified trust service provider"
+    rgs_mapping:
+      "rgs-star": null
+      "rgs-star-star": "qualified"
+      "rgs-star-star-star": "qualified"
+
+# Qualified Trust Service Providers (France)
+# Source: https://eidas.ec.europa.eu/efda/tl-browser/
+french_qtsp_list_url: "https://eidas.ec.europa.eu/efda/tl-browser/#/screen/tl/FR"

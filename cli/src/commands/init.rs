@@ -1,32 +1,45 @@
 //! Init command - project initialization
+//!
+//! V4 Architecture: Minimal downloads, registry-based metadata
+//! - Downloads only: config/registry.toml, config/agents.toml, templates/agents/
+//! - Prompts are fetched on-demand by agents from GitHub URLs
+//! - All generated output stays in .osk/
 
-use crate::agents::{self, AgentConfig, AgentsConfig, DomainsInfo};
+use crate::agents::{self, AgentConfig, AgentsConfig};
 use crate::args::Agent;
 use crate::config::{
     DomainsConfig, MemoryConfig, Nis2Config, OskConfig, PrinciplesConfig, ProjectConfig,
     RgpdConfig, RgsConfig, SpecsConfig, StackConfig,
 };
-use crate::prompts;
+use crate::registry::{self, CommandInfo, DomainsInfo};
 use crate::stack;
-use anyhow::Result;
+use anyhow::{bail, Result};
 use dialoguer::{theme::ColorfulTheme, Input, Select};
 use reqwest::blocking::Client;
 use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
+use walkdir::WalkDir;
 
-const VERSION: &str = "3.2.0";
+const VERSION: &str = "4.0.0";
+
+/// Source for resources (registry, agents config, templates)
+#[derive(Debug, Clone)]
+pub enum ResourceSource {
+    /// Use local files from the repository
+    Local(PathBuf),
+    /// Fetch from a specific version tag
+    Version(String),
+    /// Fetch from the latest release
+    Latest,
+}
 
 #[derive(Default)]
 struct InstallStats {
-    prompts: usize,
-    schemas: usize,
-    outputs: usize,
-    reports: usize,
-    rgpd: usize,
-    rgs: usize,
-    nis2: usize,
+    registry: bool,
+    agents_config: bool,
     agents_templates: usize,
+    commands: usize,
     errors: Vec<String>,
 }
 
@@ -37,36 +50,79 @@ struct AgentInstallResult {
     output_path: String,
 }
 
+#[allow(clippy::too_many_arguments)]
 pub fn run(
     client: &Client,
     force: bool,
     default: bool,
     agent: Option<Agent>,
     all_agents: bool,
+    local: bool,
+    local_path: Option<String>,
+    version: Option<String>,
 ) -> Result<()> {
-    println!("🚀 Initialisation de OpenSecKit v{}\n", VERSION);
+    // Determine resource source
+    let source = if let Some(path) = local_path {
+        // Explicit path provided
+        let repo_root = PathBuf::from(&path);
+        validate_repo_root(&repo_root)?;
+        ResourceSource::Local(repo_root.canonicalize().unwrap_or(repo_root))
+    } else if local {
+        // Auto-detect repo root
+        let repo_root = find_repo_root()?;
+        ResourceSource::Local(repo_root)
+    } else if let Some(v) = version {
+        ResourceSource::Version(v)
+    } else {
+        ResourceSource::Latest
+    };
+
+    let source_label = match &source {
+        ResourceSource::Local(path) => format!("local ({})", path.display()),
+        ResourceSource::Version(v) => format!("version {}", v),
+        ResourceSource::Latest => "latest".to_string(),
+    };
+
+    println!("🚀 Initialisation de OpenSecKit v{} [{}]\n", VERSION, source_label);
 
     let config = load_or_create_config(force, default)?;
     scaffold_project(&config, force)?;
-    let stats = install_resources(client, force)?;
+    let mut stats = install_resources(client, force, &source)?;
 
     let osk_dir = PathBuf::from(".osk");
     let agents_config = load_agents_config_or_fallback(&osk_dir)?;
     let selected_agents = select_agents(&agents_config, default, agent, all_agents)?;
-    let prompts_dir = osk_dir.join("prompts");
-    let prompts_info = prompts::parse_prompts_dir(&prompts_dir)?;
-    let domains = detect_domains(&stats);
-    let templates_dir = osk_dir.join("templates");
+
+    // Load registry and get commands + domains
+    let registry_path = osk_dir.join("registry.toml");
+    let (commands, domains) = if registry_path.exists() {
+        let reg = registry::load_registry(&registry_path)?;
+        let cmds = registry::get_commands(&reg);
+        let doms = registry::detect_domains(&reg);
+        stats.commands = cmds.len();
+        (cmds, doms)
+    } else {
+        eprintln!("   ⚠️  registry.toml non trouvé, utilisation des valeurs par défaut");
+        (Vec::new(), DomainsInfo::default())
+    };
+
+    // In local mode, use templates directly from repo; in remote mode, use downloaded ones
+    let (templates_dir, local_repo) = match &source {
+        ResourceSource::Local(path) => (path.join("templates"), Some(path.as_path())),
+        _ => (osk_dir.join("templates"), None),
+    };
     let mut agent_results = Vec::new();
 
     for agent_id in &selected_agents {
         if let Some(agent_config) = agents_config.agents.get(agent_id) {
             match install_agent(
+                client,
                 agent_id,
                 agent_config,
-                &prompts_info,
+                &commands,
                 &templates_dir,
                 &domains,
+                local_repo,
             ) {
                 Ok(result) => agent_results.push(result),
                 Err(e) => eprintln!("   ⚠️  Erreur {}: {}", agent_id, e),
@@ -78,7 +134,7 @@ pub fn run(
         if universal.enabled {
             if let Err(e) = agents::generate_agents_md(
                 universal,
-                &prompts_info,
+                &commands,
                 &templates_dir,
                 VERSION,
                 &domains,
@@ -266,19 +322,23 @@ fn prompt_agent_selection(config: &AgentsConfig) -> Result<String> {
 }
 
 fn install_agent(
+    client: &Client,
     agent_id: &str,
     agent_config: &AgentConfig,
-    prompts_info: &[prompts::PromptInfo],
+    commands: &[CommandInfo],
     templates_dir: &Path,
     domains: &DomainsInfo,
+    local_repo: Option<&Path>,
 ) -> Result<AgentInstallResult> {
     let files_count = agents::generate_agent_files(
+        client,
         agent_id,
         agent_config,
-        prompts_info,
+        commands,
         templates_dir,
         VERSION,
         domains,
+        local_repo,
     )?;
 
     let output_path = agent_config
@@ -295,33 +355,17 @@ fn install_agent(
     })
 }
 
-fn detect_domains(stats: &InstallStats) -> DomainsInfo {
-    DomainsInfo {
-        rgpd: stats.rgpd > 0,
-        rgs: stats.rgs > 0,
-        nis2: stats.nis2 > 0,
-    }
-}
-
 fn print_summary(
     stats: &InstallStats,
     agent_results: &[AgentInstallResult],
     universal: Option<&agents::UniversalConfig>,
 ) {
-    println!("\n   📦 Modules chargés:");
-    println!(
-        "      ✓ Core          {} prompts, {} schemas, {} outputs",
-        stats.prompts, stats.schemas, stats.outputs
-    );
-
-    if stats.rgpd > 0 {
-        println!("      ✓ RGPD          {} fichiers", stats.rgpd);
+    println!("\n   📦 Resources:");
+    if stats.registry {
+        println!("      ✓ Registry      {} commands", stats.commands);
     }
-    if stats.rgs > 0 {
-        println!("      ✓ RGS           {} fichiers", stats.rgs);
-    }
-    if stats.nis2 > 0 {
-        println!("      ✓ NIS2          {} fichiers", stats.nis2);
+    if stats.agents_config {
+        println!("      ✓ Agents config loaded");
     }
     if stats.agents_templates > 0 {
         println!("      ✓ Templates     {} agents", stats.agents_templates);
@@ -343,36 +387,44 @@ fn print_summary(
 
     if !stats.errors.is_empty() {
         println!(
-            "\n   ⚠️  {} erreur(s) lors du téléchargement",
+            "\n   ⚠️  {} erreur(s) lors de l'installation",
             stats.errors.len()
         );
+        for err in &stats.errors {
+            println!("      - {}", err);
+        }
     }
 
     println!("\n✅ OpenSecKit prêt !");
+    println!("   📁 System model: .osk/system-model/");
+    println!("   📄 Prompts: fetched on-demand from GitHub");
 
     if let Some(first) = agent_results.first() {
         match first.agent_id.as_str() {
             "claude-code" => {
                 println!("\n💡 Prochaines étapes:");
                 println!("   1. Lancez Claude Code: claude");
-                println!("   2. Exécutez /osk-configure pour analyser votre code");
+                println!("   2. Exécutez /osk-discover-init pour analyser votre code");
             }
             "copilot" => {
                 println!("\n💡 Prochaines étapes:");
                 println!("   1. Ouvrez VS Code avec GitHub Copilot");
-                println!("   2. Demandez à Copilot d'analyser la sécurité du projet");
+                println!("   2. Exécutez /osk-discover-init pour analyser votre code");
             }
             "cursor" => {
                 println!("\n💡 Prochaines étapes:");
                 println!("   1. Ouvrez Cursor dans ce projet");
-                println!("   2. Les règles OSK sont automatiquement chargées");
+                println!("   2. Exécutez /osk-discover-init pour analyser votre code");
             }
             "gemini" => {
                 println!("\n💡 Prochaines étapes:");
                 println!("   1. Utilisez Gemini avec le contexte du projet");
+                println!("   2. Exécutez /osk-discover-init pour analyser votre code");
             }
             _ => {}
         }
+    } else {
+        println!("\n💡 Prochaine étape: Exécutez /osk-discover-init pour analyser votre code");
     }
 }
 
@@ -478,12 +530,16 @@ fn scaffold_project(config: &OskConfig, force: bool) -> Result<()> {
     fs::create_dir_all(".osk/templates")?;
     fs::create_dir_all(".osk/memory")?;
     fs::create_dir_all(".osk/specs")?;
+    fs::create_dir_all(".osk/system-model")?;
 
     let config_path = Path::new(".osk/config.toml");
     if !config_path.exists() || force {
         let toml_string = toml::to_string_pretty(config)?;
         fs::write(config_path, toml_string)?;
     }
+
+    // Scaffold all system-model files
+    scaffold_system_model(force)?;
 
     if Path::new(".gitignore").exists() {
         let content = fs::read_to_string(".gitignore")?;
@@ -498,34 +554,360 @@ fn scaffold_project(config: &OskConfig, force: bool) -> Result<()> {
     Ok(())
 }
 
-fn install_resources(client: &Client, force: bool) -> Result<InstallStats> {
+/// Scaffold all system-model YAML files with placeholder content
+fn scaffold_system_model(force: bool) -> Result<()> {
+    let system_model_dir = Path::new(".osk/system-model");
+
+    // Define all skeleton files
+    let skeletons: Vec<(&str, &str)> = vec![
+        ("index.yaml", r#"# OpenSecKit System Model Index
+# Run /osk-discover init to populate this file
+metadata:
+  schema_version: "4.0.0"
+  created_at: null
+  last_scan: null
+  confidence: 0.0
+
+stats:
+  components: 0
+  data_categories: 0
+  actors: 0
+  trust_zones: 0
+  integrations: 0
+  tools: 0
+  discovery_gaps: 0
+
+summaries: {}
+
+sections:
+  business: "business.yaml"
+  architecture: "architecture.yaml"
+  data: "data.yaml"
+  actors: "actors.yaml"
+  trust: "trust.yaml"
+  integrations: "integrations.yaml"
+  security: "security.yaml"
+  tooling: "tooling.yaml"
+  team: "team.yaml"
+  gaps: "gaps.yaml"
+
+component_data_map: {}
+sensitive_flows: []
+pii_integrations: []
+compliance_hints: {}
+"#),
+        ("business.yaml", r#"# OpenSecKit System Model - Business Context
+# Run /osk-discover init to populate this file
+metadata:
+  section: "business"
+  parent: "index.yaml"
+
+business_context:
+  domain: null
+  description: null
+  stakeholders: []
+
+business_processes: []
+
+business_rules: []
+"#),
+        ("architecture.yaml", r#"# OpenSecKit System Model - Architecture
+# Run /osk-discover init to populate this file
+metadata:
+  section: "architecture"
+  parent: "index.yaml"
+
+architecture:
+  style: null
+  description: null
+
+components: []
+
+data_flows: []
+
+infrastructure:
+  hosting: null
+  regions: []
+  environments: []
+"#),
+        ("data.yaml", r#"# OpenSecKit System Model - Data Categories
+# Run /osk-discover init to populate this file
+metadata:
+  section: "data"
+  parent: "index.yaml"
+
+data_categories: []
+
+storage_locations: []
+
+retention_policies: []
+"#),
+        ("actors.yaml", r#"# OpenSecKit System Model - Actors
+# Run /osk-discover init to populate this file
+metadata:
+  section: "actors"
+  parent: "index.yaml"
+
+users: []
+
+roles: []
+
+privileged_accounts: []
+"#),
+        ("trust.yaml", r#"# OpenSecKit System Model - Trust Zones
+# Run /osk-discover init to populate this file
+metadata:
+  section: "trust"
+  parent: "index.yaml"
+
+trust_zones: []
+
+boundaries: []
+"#),
+        ("integrations.yaml", r#"# OpenSecKit System Model - Integrations
+# Run /osk-discover init to populate this file
+metadata:
+  section: "integrations"
+  parent: "index.yaml"
+
+external_services: []
+
+internal_dependencies: []
+"#),
+        ("security.yaml", r#"# OpenSecKit System Model - Security Controls
+# Run /osk-discover init to populate this file
+metadata:
+  section: "security"
+  parent: "index.yaml"
+
+controls:
+  authentication: []
+  authorization: []
+  encryption: []
+  input_validation: []
+  logging: []
+  secrets: []
+
+vulnerabilities: []
+"#),
+        ("tooling.yaml", r#"# OpenSecKit System Model - Tooling & DevOps
+# Run /osk-discover init to populate this file
+metadata:
+  section: "tooling"
+  parent: "index.yaml"
+
+source_control:
+  provider: null
+  branch_protection: null
+  code_review_required: null
+
+ci_cd:
+  platform: null
+  pipelines: []
+
+security_tools:
+  sast: []
+  dast: []
+  sca: []
+  secrets_scanning: []
+
+observability:
+  logging: null
+  monitoring: null
+  alerting: null
+
+secrets_management:
+  provider: null
+  rotation_policy: null
+"#),
+        ("team.yaml", r#"# OpenSecKit System Model - Team & Processes
+# Run /osk-discover init to populate this file
+metadata:
+  section: "team"
+  parent: "index.yaml"
+
+team:
+  name: null
+  size: null
+  security_champion: null
+  incident_responder: null
+
+processes:
+  onboarding_documented: false
+  offboarding_documented: false
+  code_review_required: false
+  security_training_required: false
+
+incident_response:
+  plan_documented: false
+  runbooks: []
+  last_drill: null
+
+security_practices:
+  threat_modeling_conducted: false
+  last_pen_test: null
+  bug_bounty: false
+"#),
+        ("gaps.yaml", r#"# OpenSecKit System Model - Discovery Gaps
+# Run /osk-discover init to populate this file
+metadata:
+  section: "gaps"
+  parent: "index.yaml"
+
+gaps: []
+
+# Gap severities: critical, high, medium, low
+# Gap categories: business, architecture, data, actors, trust, integrations, security, tooling, team
+"#),
+    ];
+
+    for (filename, content) in skeletons {
+        let file_path = system_model_dir.join(filename);
+        if !file_path.exists() || force {
+            fs::write(&file_path, content)?;
+        }
+    }
+
+    Ok(())
+}
+
+fn install_resources(client: &Client, force: bool, source: &ResourceSource) -> Result<InstallStats> {
+    match source {
+        ResourceSource::Local(repo_root) => install_resources_local(repo_root, force),
+        ResourceSource::Version(tag) => install_resources_remote(client, force, tag),
+        ResourceSource::Latest => {
+            use crate::github;
+            let tag = github::fetch_latest_tag(client)?;
+            install_resources_remote(client, force, &tag)
+        }
+    }
+}
+
+/// Validate that a path contains OpenSecKit resources
+fn validate_repo_root(path: &Path) -> Result<()> {
+    let registry = path.join("config/registry.toml");
+    let templates_dir = path.join("templates/agents");
+
+    if !registry.exists() || !templates_dir.exists() {
+        bail!(
+            "Invalid OpenSecKit repository path: {}\n\
+            Missing config/registry.toml or templates/agents/ directory.",
+            path.display()
+        );
+    }
+    Ok(())
+}
+
+/// Find the OpenSecKit repository root
+fn find_repo_root() -> Result<PathBuf> {
+    let current_exe = std::env::current_exe().ok();
+
+    let candidates: Vec<PathBuf> = vec![
+        PathBuf::from("."),
+        PathBuf::from(".."),
+        PathBuf::from("../.."),
+        current_exe
+            .as_ref()
+            .and_then(|p| p.parent())
+            .and_then(|p| p.parent())
+            .and_then(|p| p.parent())
+            .map(|p| p.to_path_buf())
+            .unwrap_or_default(),
+    ];
+
+    for candidate in candidates {
+        let registry = candidate.join("config/registry.toml");
+        let templates_dir = candidate.join("templates/agents");
+
+        if registry.exists() && templates_dir.exists() {
+            return Ok(candidate.canonicalize().unwrap_or(candidate));
+        }
+    }
+
+    bail!(
+        "Cannot find OpenSecKit repository root. \
+        Make sure you run 'osk init --local' from within the OpenSecKit repository \
+        or use remote mode (default)."
+    )
+}
+
+/// Install resources from local repository
+/// V4: Only copies registry.toml and agents.toml (templates used directly from repo)
+fn install_resources_local(repo_root: &Path, force: bool) -> Result<InstallStats> {
+    let mut stats = InstallStats::default();
+
+    // Copy config/registry.toml
+    let registry_src = repo_root.join("config/registry.toml");
+    let registry_dest = PathBuf::from(".osk/registry.toml");
+
+    if registry_src.exists() && (!registry_dest.exists() || force) {
+        match fs::copy(&registry_src, &registry_dest) {
+            Ok(_) => stats.registry = true,
+            Err(e) => stats.errors.push(format!("registry.toml: {}", e)),
+        }
+    } else if registry_dest.exists() {
+        stats.registry = true;
+    }
+
+    // Copy config/agents.toml
+    let agents_src = repo_root.join("config/agents.toml");
+    let agents_dest = PathBuf::from(".osk/agents.toml");
+    if agents_src.exists() && (!agents_dest.exists() || force) {
+        match fs::copy(&agents_src, &agents_dest) {
+            Ok(_) => stats.agents_config = true,
+            Err(e) => stats.errors.push(format!("agents.toml: {}", e)),
+        }
+    } else if agents_dest.exists() {
+        stats.agents_config = true;
+    }
+
+    // In local mode, templates are used directly from repo (not copied)
+    // Just count them for stats
+    let agents_templates_src = repo_root.join("templates/agents");
+    if agents_templates_src.exists() {
+        for entry in WalkDir::new(&agents_templates_src).into_iter().filter_map(|e| e.ok()) {
+            if entry.file_type().is_file() {
+                stats.agents_templates += 1;
+            }
+        }
+    }
+
+    Ok(stats)
+}
+
+/// Install resources from remote GitHub repository
+/// V4: Only downloads registry.toml, agents.toml, and templates/agents/
+fn install_resources_remote(client: &Client, force: bool, tag: &str) -> Result<InstallStats> {
     use crate::github;
 
     let mut stats = InstallStats::default();
 
-    let tag = match github::fetch_latest_tag(client) {
-        Ok(t) => t,
-        Err(e) => {
-            stats.errors.push(format!("Fetch tag: {}", e));
-            return Ok(stats);
-        }
-    };
-
+    // Download config/registry.toml
     let registry_dest = PathBuf::from(".osk/registry.toml");
     if !registry_dest.exists() || force {
-        if let Err(e) = github::download_file(client, &tag, "registry.toml", &registry_dest) {
-            stats.errors.push(format!("registry.toml: {}", e));
+        if let Err(e) = github::download_file(client, tag, "config/registry.toml", &registry_dest) {
+            stats.errors.push(format!("config/registry.toml: {}", e));
+        } else {
+            stats.registry = true;
         }
+    } else {
+        stats.registry = true;
     }
 
+    // Download config/agents.toml
     let agents_dest = PathBuf::from(".osk/agents.toml");
     if !agents_dest.exists() || force {
-        if let Err(e) = github::download_file(client, &tag, "agents.toml", &agents_dest) {
-            stats.errors.push(format!("agents.toml: {}", e));
+        if let Err(e) = github::download_file(client, tag, "config/agents.toml", &agents_dest) {
+            stats.errors.push(format!("config/agents.toml: {}", e));
+        } else {
+            stats.agents_config = true;
         }
+    } else {
+        stats.agents_config = true;
     }
 
-    let tree_items = match github::fetch_repo_tree(client, &tag) {
+    // Download only templates/agents/ (for agent file rendering)
+    let tree_items = match github::fetch_repo_tree(client, tag) {
         Ok(items) => items,
         Err(e) => {
             stats.errors.push(format!("Fetch tree: {}", e));
@@ -538,46 +920,29 @@ fn install_resources(client: &Client, force: bool) -> Result<InstallStats> {
             continue;
         }
 
-        let dest = PathBuf::from(".osk").join(&item.path);
-        if dest.exists() && !force {
-            count_resource(&item.path, &mut stats);
+        // Only download templates/agents/ files
+        if !item.path.starts_with("templates/agents/") {
             continue;
         }
 
-        if item.path.starts_with("prompts/")
-            || item.path.starts_with("templates/")
-            || item.path.starts_with("domaines/")
-            || item.path == "constitution.md"
-        {
-            if let Err(e) = github::download_file(client, &tag, &item.path, &dest) {
-                stats.errors.push(format!("{}: {}", item.path, e));
-            } else {
-                count_resource(&item.path, &mut stats);
-            }
+        let dest = PathBuf::from(".osk").join(&item.path);
+        if dest.exists() && !force {
+            stats.agents_templates += 1;
+            continue;
+        }
+
+        if let Some(parent) = dest.parent() {
+            fs::create_dir_all(parent).ok();
+        }
+
+        if let Err(e) = github::download_file(client, tag, &item.path, &dest) {
+            stats.errors.push(format!("{}: {}", item.path, e));
+        } else {
+            stats.agents_templates += 1;
         }
     }
 
     Ok(stats)
-}
-
-fn count_resource(path: &str, stats: &mut InstallStats) {
-    if path.starts_with("prompts/") && path.ends_with(".md") {
-        stats.prompts += 1;
-    } else if path.starts_with("templates/schemas/") {
-        stats.schemas += 1;
-    } else if path.starts_with("templates/outputs/") {
-        stats.outputs += 1;
-    } else if path.starts_with("templates/reports/") {
-        stats.reports += 1;
-    } else if path.starts_with("templates/agents/") {
-        stats.agents_templates += 1;
-    } else if path.starts_with("domaines/rgpd/") {
-        stats.rgpd += 1;
-    } else if path.starts_with("domaines/gouvernement-rgs/") {
-        stats.rgs += 1;
-    } else if path.starts_with("domaines/nis2/") {
-        stats.nis2 += 1;
-    }
 }
 
 #[cfg(test)]
@@ -618,47 +983,13 @@ mod tests {
     }
 
     #[test]
-    fn test_count_resource_prompts() {
-        let mut stats = InstallStats::default();
-        count_resource("prompts/osk-analyze.md", &mut stats);
-        count_resource("prompts/osk-configure.md", &mut stats);
-        assert_eq!(stats.prompts, 2);
-    }
-
-    #[test]
-    fn test_count_resource_templates() {
-        let mut stats = InstallStats::default();
-        count_resource("templates/schemas/context.yaml", &mut stats);
-        count_resource("templates/outputs/report.md", &mut stats);
-        count_resource("templates/agents/cursor.tera", &mut stats);
-        assert_eq!(stats.schemas, 1);
-        assert_eq!(stats.outputs, 1);
-        assert_eq!(stats.agents_templates, 1);
-    }
-
-    #[test]
-    fn test_count_resource_domains() {
-        let mut stats = InstallStats::default();
-        count_resource("domaines/rgpd/checklist.md", &mut stats);
-        count_resource("domaines/gouvernement-rgs/guide.md", &mut stats);
-        count_resource("domaines/nis2/requirements.md", &mut stats);
-        assert_eq!(stats.rgpd, 1);
-        assert_eq!(stats.rgs, 1);
-        assert_eq!(stats.nis2, 1);
-    }
-
-    #[test]
-    fn test_detect_domains() {
-        let stats = InstallStats {
-            rgpd: 3,
-            rgs: 0,
-            nis2: 1,
-            ..Default::default()
-        };
-        let domains = detect_domains(&stats);
-        assert!(domains.rgpd);
-        assert!(!domains.rgs);
-        assert!(domains.nis2);
+    fn test_install_stats_default() {
+        let stats = InstallStats::default();
+        assert!(!stats.registry);
+        assert!(!stats.agents_config);
+        assert_eq!(stats.agents_templates, 0);
+        assert_eq!(stats.commands, 0);
+        assert!(stats.errors.is_empty());
     }
 
     #[test]

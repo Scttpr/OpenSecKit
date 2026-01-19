@@ -1,0 +1,34 @@
+
+## RGS Assessment Complete
+
+**Status**: {{ overall_status | upper }}
+**Score**: {{ overall_score }}% ({{ rgs_level }} requires {% if rgs_level == "rgs-star" %}70%{% elif rgs_level == "rgs-star-star" %}85%{% else %}95%{% endif %})
+
+| Metric | Value |
+|--------|-------|
+| Controls Assessed | {{ assessed_controls }}/{{ total_controls }} |
+| Compliant | {{ compliant_controls }} |
+| Gaps | {{ gap_controls }} |
+{% if homologation_blockers | length > 0 %}| Blockers | {{ homologation_blockers | length }} |{% endif %}
+
+{% if homologation_ready %}
+Homologation: **READY**
+{% else %}
+Homologation: **{{ homologation_blockers | length }} blocker(s) to resolve**
+{% endif %}
+
+### Output Files
+
+```
+.osk/compliance/
+├── assessment-rgs.yaml          # Machine-readable assessment
+├── assessment-rgs.md            # Full assessment report
+├── homologation-checklist.md    # Pre-homologation checklist
+└── system-perimeter.md          # System scope documentation
+```
+
+{% if overall_status == "compliant" %}
+Next: `osk comply rgs --export md` to generate homologation dossier
+{% else %}
+Next: Review `.osk/compliance/assessment-rgs.md` for detailed gaps and remediation steps
+{% endif %}

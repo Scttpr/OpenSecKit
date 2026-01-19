@@ -2,11 +2,9 @@
 //!
 //! Ce module regroupe les helpers pour :
 //! - Parsing/écriture YAML
-//! - Gestion des compteurs (features, incidents)
+//! - Gestion des compteurs (features)
 //! - Opérations Git
-//! - Substitution de templates
 
 pub mod counter;
 pub mod git;
-pub mod template;
 pub mod yaml;

@@ -68,7 +68,7 @@ mon-projet/
 │   ├── registry.toml        # Registre des commandes
 │   ├── prompts/             # Prompts sources
 │   ├── templates/           # Templates
-│   ├── domaines/            # Domaines réglementaires
+│   ├── frameworks/            # Domaines réglementaires
 │   ├── memory/              # Mémoire contextuelle
 │   └── specs/               # Spécifications par feature
 │

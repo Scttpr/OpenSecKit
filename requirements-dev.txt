@@ -1,4 +1,0 @@
-# Development dependencies for OpenSecKit
-# Install with: python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements-dev.txt
-
-python-frontmatter==1.1.0

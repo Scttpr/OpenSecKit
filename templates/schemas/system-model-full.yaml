@@ -1,0 +1,756 @@
+# OpenSecKit V4 - System Model Schema
+# Version: 4.0.0
+# Purpose: Central "reality model" for Part 1 (Discover)
+# Usage: .osk/system-model.yaml
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# METADATA
+# ═══════════════════════════════════════════════════════════════════════════════
+
+metadata:
+  schema_version: "4.0.0"
+  created_at: "[DATE ISO]"
+  created_by: "[/osk-discover init]"
+  last_scan: "[DATE ISO]"
+  last_updated_by: "[command or user]"
+  confidence: 0.0  # 0-1: How much was auto-detected vs inferred/manual
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 1: BUSINESS CONTEXT
+# Describes WHAT the system does from a business perspective
+# ═══════════════════════════════════════════════════════════════════════════════
+
+business:
+  # Business domain classification
+  domain: "[e-commerce|healthcare|finance|government|saas|...]"
+  description: "[High-level description of what the system does]"
+
+  # Business processes the system supports
+  processes:
+    - id: "BP-XXX"              # Unique identifier
+      name: "[Process name]"
+      description: "[What this process accomplishes]"
+      trigger: "[What initiates this process]"
+      actors: ["[actor-id]"]    # References to actors section
+      data_created: ["DATA-XXX"] # Data created by this process
+      data_read: ["DATA-XXX"]   # Data read by this process
+      data_modified: ["DATA-XXX"] # Data modified by this process
+      criticality: "[low|medium|high|critical]"
+      # Criticality guide:
+      #   critical: Business stops if unavailable
+      #   high: Significant business impact
+      #   medium: Workaround exists
+      #   low: Minimal impact
+
+  # End-to-end user journeys
+  user_journeys:
+    - id: "UJ-XXX"
+      name: "[Journey name]"
+      description: "[What the user accomplishes]"
+      steps: ["BP-XXX", "BP-YYY"]  # Ordered list of processes
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 2: ARCHITECTURE
+# Describes HOW the system is built technically
+# ═══════════════════════════════════════════════════════════════════════════════
+
+architecture:
+  style: "[monolith|microservices|serverless|hybrid|modular-monolith]"
+
+  # System components (services, databases, queues, etc.)
+  components:
+    - id: "COMP-XXX"            # Unique identifier
+      name: "[Human-readable name]"
+      type: "[service|datastore|queue|cache|gateway|cdn|scheduler]"
+      technology: "[Node.js|Python|PostgreSQL|Redis|RabbitMQ|...]"
+      framework: "[Express|FastAPI|Spring|...]"  # Optional
+      source_paths:             # Where the code lives
+        - "src/..."
+      ports: [3000]             # Exposed ports (if applicable)
+      trust_zone: "ZONE-XXX"    # Reference to trust zone
+      stores: ["DATA-XXX"]      # Data stored here (for datastores)
+      stateless: true|false     # For services
+      replicas: 1               # Number of instances (if known)
+
+  # Data flows between components
+  data_flows:
+    - id: "DF-XXX"
+      name: "[Flow description]"
+      from: "COMP-XXX"          # Source component
+      to: "COMP-YYY"            # Destination component
+      protocol: "[HTTP|HTTPS|gRPC|WebSocket|TCP|...]"
+      encryption: "[TLS 1.2|TLS 1.3|mTLS|none]"
+      data: ["DATA-XXX"]        # Data categories transferred
+      authentication: "[jwt|api-key|oauth|none]"
+      crosses_trust_boundary: true|false
+      trust_boundary_crossed: "TB-XXX"  # If crosses_trust_boundary
+
+  # Infrastructure (if detectable from IaC)
+  infrastructure:
+    provider: "[aws|gcp|azure|on-premise|hybrid]"
+    regions: ["eu-west-1", "..."]
+    environments:
+      - name: "[production|staging|development]"
+        url: "[base URL if known]"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 3: DATA INVENTORY
+# Describes WHAT data the system handles and WHERE
+# ═══════════════════════════════════════════════════════════════════════════════
+
+data:
+  # Data categories/types
+  inventory:
+    - id: "DATA-XXX"            # Unique identifier
+      name: "[Human-readable name]"
+      description: "[What this data represents]"
+
+      # Classification
+      classification: "[public|internal|personal|sensitive|confidential]"
+      # Classification guide:
+      #   public: Can be shared publicly
+      #   internal: Internal use only, not PII
+      #   personal: PII under RGPD (email, name, address, etc.)
+      #   sensitive: Special category data (health, religion, etc.)
+      #   confidential: Business secrets, credentials
+
+      # Field-level detail
+      fields:
+        - name: "[field_name]"
+          type: "[string|number|boolean|date|object|array]"
+          pii: true|false       # Is this Personally Identifiable Information?
+          sensitivity: "[public|personal|sensitive|confidential]"
+          encrypted: true|false # Is this field encrypted at rest?
+          hashed: true|false    # Is this field hashed (e.g., passwords)?
+          indexed: true|false   # Is this field indexed/searchable?
+
+      # Storage and lifecycle
+      storage: ["COMP-XXX"]     # Where this data is stored
+      source_files:             # Model/schema definitions
+        - "src/models/..."
+      retention: "[duration|policy name]"
+      deletion_mechanism: "[soft-delete|hard-delete|anonymization]"
+
+      # Compliance metadata
+      legal_basis: "[contract|consent|legal_obligation|vital_interest|public_task|legitimate_interest]"
+      consent_required: true|false
+      data_subject_type: "[customer|employee|prospect|partner]"
+      cross_border_transfer: true|false
+      pci_scope: true|false     # Is this in PCI-DSS scope?
+
+  # Data flow paths (end-to-end)
+  flows:
+    - id: "DFLOW-XXX"
+      data: "DATA-XXX"
+      description: "[What happens to this data]"
+      path: ["COMP-XXX", "COMP-YYY", "..."]  # Ordered path
+      encrypted_in_transit: true|false
+      encrypted_at_rest: true|false
+      logged: true|false        # Is access to this data logged?
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 4: ACTORS
+# Describes WHO interacts with the system
+# ═══════════════════════════════════════════════════════════════════════════════
+
+actors:
+  # Actor definitions
+  users:
+    - id: "[actor-id]"          # e.g., "end-user", "admin", "api-client"
+      name: "[Human-readable name]"
+      type: "[external|internal|system|third-party]"
+      # Type guide:
+      #   external: End users, customers
+      #   internal: Employees, administrators
+      #   system: Automated processes, cron jobs
+      #   third-party: Partner systems, webhooks
+      description: "[Who this actor represents]"
+
+      # Authentication
+      authentication:
+        method: "[password|sso|oauth|api-key|certificate|none]"
+        provider: "[internal|auth0|okta|cognito|...]"
+        mfa_required: true|false
+        mfa_methods: ["totp", "sms", "webauthn"]
+        session_duration: "[duration]"
+
+      # Authorization
+      authorization:
+        model: "[rbac|abac|acl|owner-based]"
+        roles: ["ROLE-XXX"]     # Assigned roles
+        permissions: ["read:resource", "write:resource"]
+
+      # Data access
+      can_access:
+        - data: "DATA-XXX"
+          scope: "[own|team|all]"  # own=only their data, all=all data
+          operations: ["read", "write", "delete"]
+
+      # Risk indicators
+      privileged: true|false    # Has elevated privileges?
+      external_network: true|false  # Connects from external network?
+      volume: "[low|medium|high]"  # Expected request volume
+
+  # Role definitions
+  roles:
+    - id: "ROLE-XXX"
+      name: "[Role name]"
+      description: "[What this role can do]"
+      permissions:
+        - resource: "[resource name]"
+          actions: ["read", "write", "delete", "admin"]
+      inherits: ["ROLE-YYY"]    # Role inheritance
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 5: TRUST BOUNDARIES
+# Describes security zones and their boundaries
+# ═══════════════════════════════════════════════════════════════════════════════
+
+trust_boundaries:
+  # Security zones
+  zones:
+    - id: "ZONE-XXX"
+      name: "[Zone name]"
+      description: "[What this zone contains]"
+      trust_level: 0            # 0=untrusted, 1=dmz, 2=internal, 3=data tier
+      # Trust level guide:
+      #   0: External/untrusted (internet, public)
+      #   1: DMZ/semi-trusted (edge services, API gateways)
+      #   2: Internal/trusted (backend services, internal APIs)
+      #   3: Data tier/highly trusted (databases, secrets)
+      components: ["COMP-XXX"]
+      network_segment: "[CIDR or description]"
+
+  # Boundaries between zones
+  boundaries:
+    - id: "TB-XXX"
+      name: "[Boundary name]"
+      from_zone: "ZONE-XXX"     # Less trusted zone
+      to_zone: "ZONE-YYY"       # More trusted zone
+      controls:                 # Security controls at this boundary
+        - type: "[firewall|waf|auth|encryption|rate-limit|...]"
+          name: "[Control name]"
+          config: "[Configuration details]"
+      data_flows: ["DF-XXX"]    # Data flows crossing this boundary
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 6: EXTERNAL INTEGRATIONS
+# Describes third-party services and dependencies
+# ═══════════════════════════════════════════════════════════════════════════════
+
+integrations:
+  - id: "INT-XXX"
+    name: "[Service name]"
+    vendor: "[Vendor name]"
+    type: "[payment|email|auth|analytics|storage|cdn|monitoring|...]"
+    description: "[What we use this for]"
+
+    # Data sharing
+    data_shared: ["DATA-XXX"]   # What data is sent to this service
+    data_received: ["DATA-XXX"] # What data is received from this service
+
+    # Location and compliance
+    location: "[Country or region]"
+    locations_processing: ["USA", "EU", "..."]  # Where data is processed
+    transfer_mechanism: "[adequacy|sccs|bcr|dpf|consent|derogation]"
+    # Transfer mechanism guide (RGPD):
+    #   adequacy: Country has adequacy decision
+    #   sccs: Standard Contractual Clauses
+    #   bcr: Binding Corporate Rules
+    #   dpf: Data Privacy Framework (US)
+    #   consent: Explicit consent for transfer
+    #   derogation: Art. 49 derogation
+
+    # Agreements and certifications
+    dpa_signed: true|false      # Data Processing Agreement
+    dpa_date: "[DATE]"
+    security_certifications: ["SOC2", "ISO27001", "PCI-DSS", "..."]
+    subprocessors_list: "[URL or 'not published']"
+
+    # Technical details
+    api_type: "[REST|GraphQL|SOAP|webhook|SDK]"
+    authentication: "[api-key|oauth|jwt|basic|...]"
+    endpoint: "[Base URL]"
+
+    # Criticality
+    criticality: "[low|medium|high|critical]"
+    fallback_available: true|false
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 7: SECURITY CONTROLS (Detected)
+# Security measures implemented IN the codebase (authentication, authorization, encryption)
+# Note: For security tools AROUND the code (SAST, DAST, CI/CD), see Section 10: Tooling
+# ═══════════════════════════════════════════════════════════════════════════════
+
+security_controls:
+  encryption:
+    at_rest:
+      enabled: true|false
+      algorithm: "[AES-256|...]"
+      key_management: "[aws-kms|vault|azure-keyvault|...]"
+      scope: ["COMP-XXX"]       # Which components have encryption at rest
+    in_transit:
+      enabled: true|false
+      protocol: "[TLS 1.2|TLS 1.3|mTLS]"
+      certificate_management: "[letsencrypt|acm|manual]"
+
+  authentication:
+    password_policy:
+      min_length: 8
+      require_uppercase: true|false
+      require_numbers: true|false
+      require_special: true|false
+      bcrypt_rounds: 10
+    session:
+      storage: "[cookie|jwt|redis]"
+      duration: "[duration]"
+      refresh_enabled: true|false
+    mfa:
+      available: true|false
+      required_for: ["admin", "..."]
+      methods: ["totp", "sms", "webauthn"]
+
+  logging:
+    enabled: true|false
+    events_logged: ["auth", "data_access", "admin_actions", "errors"]
+    pii_scrubbing: true|false
+    retention: "[duration]"
+    destination: "[cloudwatch|elasticsearch|splunk|...]"
+    immutable: true|false
+
+  secrets_management:
+    # Note: Detailed secrets tooling is in Section 10 (tooling.secrets_management)
+    method: "[env-vars|vault|aws-secrets|azure-keyvault|...]"
+    rotation_enabled: true|false
+    rotation_period: "[duration]"
+    pre_commit_scanning: true|false
+    scanner: "[gitleaks|trufflehog|...]"
+
+  dependency_management:
+    # Note: Detailed SCA tooling is in Section 10 (tooling.security_tooling.sca)
+    lock_file: true|false
+    automated_updates: true|false
+    tool: "[dependabot|renovate|snyk|...]"
+    vulnerability_scanning: true|false
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 8: DISCOVERY GAPS
+# Issues and ambiguities found during discovery
+# ═══════════════════════════════════════════════════════════════════════════════
+
+discovery_gaps:
+  - id: "GAP-XXX"
+    type: "[missing_info|security_concern|ambiguity|inconsistency]"
+    # Type guide:
+    #   missing_info: Information could not be determined
+    #   security_concern: Potential security issue detected
+    #   ambiguity: Multiple interpretations possible
+    #   inconsistency: Conflicting information found
+    category: "[business|architecture|data|actors|trust|integration|security|tooling|team]"
+    field: "[path.to.field]"    # Which field this relates to
+    location: "[file:line]"     # Source code location (if applicable)
+    message: "[Description of the gap]"
+    severity: "[info|low|medium|high|critical]"
+    action: "[USER_INPUT_REQUIRED|REVIEW_RECOMMENDED|AUTO_FIXABLE|INVESTIGATE]"
+    suggested_value: "[Suggested resolution if applicable]"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 9: DIAGRAMS (Auto-generated)
+# Mermaid diagrams for visualization
+# ═══════════════════════════════════════════════════════════════════════════════
+
+diagrams:
+  architecture: |
+    # Mermaid diagram of components and data flows
+    # Auto-generated by /osk-discover
+
+  trust_boundaries: |
+    # Mermaid diagram of trust zones and boundaries
+    # Auto-generated by /osk-discover
+
+  data_flows: |
+    # Mermaid diagram of data flow paths
+    # Auto-generated by /osk-discover
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 10: TOOLING ECOSYSTEM
+# Describes the broader information system supporting development and operations
+# ═══════════════════════════════════════════════════════════════════════════════
+
+tooling:
+  # Source control and repository management
+  source_control:
+    platform: "[github|gitlab|bitbucket|azure-devops]"
+    organization: "[Organization/namespace name]"
+    repository: "[Repository name]"
+    visibility: "[public|private|internal]"
+    branch_strategy:
+      default_branch: "[main|master|develop]"
+      strategy: "[gitflow|trunk-based|github-flow]"
+      protected_branches: ["main", "..."]
+      require_reviews: true|false
+      require_ci_pass: true|false
+    access_control:
+      sso_enabled: true|false
+      mfa_required: true|false
+      external_collaborators: true|false
+    certifications: ["SOC2", "ISO27001", "..."]
+
+  # CI/CD pipelines
+  ci_cd:
+    platform: "[github-actions|gitlab-ci|jenkins|azure-pipelines|circleci]"
+    config_files: [".github/workflows/*.yml", "..."]
+    pipelines:
+      - id: "PIPE-XXX"
+        name: "[Pipeline name]"
+        trigger: "[push|pull_request|schedule|manual]"
+        environment: "[development|staging|production]"
+        stages: ["build", "test", "deploy"]
+        secrets_source: "[env-vars|vault|cloud-secrets]"
+        artifact_destination: "[registry|s3|...]"
+        security_gates:
+          sast_required: true|false
+          tests_required: true|false
+          approval_required: true|false
+    runners:
+      type: "[hosted|self-hosted|hybrid]"
+      os: ["linux", "windows", "macos"]
+      network_access: "[internet|private|restricted]"
+    certifications: ["SOC2", "..."]
+
+  # Artifact management
+  artifacts:
+    package_registries:
+      - type: "[npm|pypi|maven|cargo|nuget|docker]"
+        registry: "[public|private|self-hosted]"
+        url: "[Registry URL]"
+        publish_access: "[ci-only|team|restricted]"
+        vulnerability_scanning: true|false
+    container_registry:
+      provider: "[ecr|gcr|acr|dockerhub|ghcr]"
+      url: "[Registry URL]"
+      scanning_enabled: true|false
+      signing_enabled: true|false
+    binary_storage:
+      provider: "[s3|gcs|azure-blob|artifactory]"
+      retention_policy: "[Duration or policy]"
+
+  # Security tooling
+  security_tooling:
+    sast:
+      - tool: "[semgrep|snyk-code|sonarqube|checkmarx|...]"
+        vendor: "[Vendor name]"
+        integration: "[ci|ide|pre-commit|standalone]"
+        languages: ["typescript", "python", "..."]
+        blocking: true|false  # Blocks merge/deploy on findings
+    dast:
+      - tool: "[zap|burp|nuclei|...]"
+        vendor: "[Vendor name]"
+        integration: "[ci|scheduled|manual]"
+        target_environments: ["staging", "..."]
+    sca:
+      - tool: "[snyk|dependabot|renovate|trivy|...]"
+        vendor: "[Vendor name]"
+        integration: "[ci|scheduled|pr-check]"
+        auto_remediation: true|false
+        license_scanning: true|false
+    secrets_scanning:
+      - tool: "[gitleaks|trufflehog|github-secret-scanning|...]"
+        integration: "[pre-commit|ci|repo-scanning]"
+        blocking: true|false
+    container_scanning:
+      - tool: "[trivy|snyk|grype|...]"
+        vendor: "[Vendor name]"
+        integration: "[ci|registry|runtime]"
+    iac_scanning:
+      - tool: "[checkov|tfsec|terrascan|...]"
+        vendor: "[Vendor name]"
+        targets: ["terraform", "kubernetes", "cloudformation"]
+
+  # Monitoring and observability
+  observability:
+    apm:
+      provider: "[datadog|newrelic|dynatrace|elastic]"
+      environments: ["production", "staging", "..."]
+    logging:
+      provider: "[datadog|splunk|elasticsearch|cloudwatch]"
+      retention: "[Duration]"
+      pii_filtering: true|false
+    alerting:
+      provider: "[pagerduty|opsgenie|slack|custom]"
+      escalation_policy: "[Policy name or description]"
+    error_tracking:
+      provider: "[sentry|bugsnag|rollbar]"
+      source_maps: true|false
+    uptime_monitoring:
+      provider: "[pingdom|uptimerobot|datadog]"
+      endpoints_monitored: 0
+
+  # Infrastructure management
+  infrastructure:
+    iac_tools:
+      - tool: "[terraform|pulumi|cloudformation|cdk|ansible]"
+        version: "[Version]"
+        state_backend: "[s3|gcs|terraform-cloud|local]"
+        state_encryption: true|false
+    container_orchestration:
+      platform: "[kubernetes|ecs|docker-swarm|nomad]"
+      managed: true|false  # true for EKS/GKE/AKS
+      provider: "[eks|gke|aks|self-hosted]"
+    cloud_consoles:
+      - provider: "[aws|gcp|azure|cloudflare]"
+        sso_enabled: true|false
+        mfa_required: true|false
+        audit_logging: true|false
+    dns_management:
+      provider: "[route53|cloudflare|gcp-dns]"
+      dnssec_enabled: true|false
+    cdn:
+      provider: "[cloudflare|cloudfront|fastly|akamai]"
+      waf_enabled: true|false
+
+  # Development tools
+  development:
+    ide_configs:
+      shared_configs: [".vscode", ".editorconfig", "..."]
+      recommended_extensions: ["[extension-id]", "..."]
+    code_quality:
+      - tool: "[eslint|prettier|black|rustfmt|clippy]"
+        type: "[linter|formatter|type-checker]"
+        enforced_in_ci: true|false
+    pre_commit_hooks:
+      enabled: true|false
+      framework: "[husky|pre-commit|lefthook]"
+      hooks: ["lint", "format", "test", "..."]
+    local_environment:
+      containerized: true|false
+      setup_documentation: "[Path to setup docs]"
+
+  # Collaboration tools
+  collaboration:
+    documentation:
+      - platform: "[confluence|notion|gitbook|docusaurus|readme]"
+        purpose: "[architecture|api|runbooks|onboarding]"
+        access: "[public|team|restricted]"
+        sso_enabled: true|false
+    communication:
+      - platform: "[slack|teams|discord]"
+        purpose: "[team|alerts|support]"
+        integrations: ["github", "pagerduty", "..."]
+    project_management:
+      platform: "[jira|linear|github-projects|asana]"
+      sso_enabled: true|false
+      external_access: true|false
+    design:
+      - platform: "[figma|miro|lucidchart|drawio]"
+        purpose: "[ui-design|architecture|whiteboarding]"
+
+  # Secrets and credentials management
+  secrets_management:
+    production:
+      provider: "[vault|aws-secrets|azure-keyvault|gcp-secrets]"
+      rotation_enabled: true|false
+      access_logging: true|false
+    development:
+      provider: "[env-files|1password|vault]"
+      shared_secrets: true|false
+    api_keys:
+      - service: "[Service name]"
+        rotation_period: "[Duration]"
+        storage: "[Where stored]"
+
+  # Vendor certifications summary
+  certifications_summary:
+    soc2_type2: ["[Tools with SOC2 Type II]"]
+    iso27001: ["[Tools with ISO 27001]"]
+    gdpr_compliant: ["[GDPR compliant tools]"]
+    hipaa_eligible: ["[HIPAA eligible tools]"]
+
+  # Tool governance (who manages tools and how)
+  governance:
+    tool_ownership:
+      - category: "[ci_cd|security|observability|infrastructure]"
+        owner_role: "[Role responsible]"
+        owner_contact: "[Contact info]"
+        backup_contact: "[Backup contact]"
+    access_management:
+      request_process: "[ticket|self-service|manual]"
+      approval_required: true|false
+      review_frequency: "[quarterly|annually|never]"
+      last_review: "[DATE]"
+      documented: true|false
+    alert_triage:
+      sast_findings:
+        owner: "[Role/team]"
+        sla: "[Duration]"
+        escalation: "[Escalation path]"
+      dependency_vulnerabilities:
+        owner: "[Role/team]"
+        sla: "[Duration]"
+        escalation: "[Escalation path]"
+      secrets_detected:
+        owner: "[Role/team]"
+        sla: "[Duration]"
+        escalation: "[Escalation path]"
+    change_management:
+      ci_cd_changes:
+        approval_required: true|false
+        approvers: ["[Role]"]
+      infrastructure_changes:
+        approval_required: true|false
+        approvers: ["[Role]"]
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION 11: TEAM & PROCESSES
+# Describes team structure, roles, and organizational security processes
+# ═══════════════════════════════════════════════════════════════════════════════
+
+team:
+  # Team structure
+  name: "[Team name]"
+  organization: "[Organization/department]"
+  size: 0
+  location: "[Location or 'distributed']"
+  timezone: "[Primary timezone]"
+
+  roles:
+    - role: "[tech_lead|product_owner|developer|devops|...]"
+      responsibilities: "[Key responsibilities]"
+      contact: "[Contact info]"
+      backup: "[Backup contact]"
+
+  security_roles:
+    security_champion:
+      name: "[Name or 'not assigned']"
+      responsibilities: "[What they do]"
+    incident_responder:
+      name: "[Name or role]"
+      escalation_path: "[How to escalate]"
+    compliance_contact:
+      name: "[Name or role]"
+      scope: "[What compliance areas]"
+
+  # Access and identity management
+  access_management:
+    identity_provider: "[okta|azure-ad|google|internal]"
+    sso_enabled: true|false
+    mfa_policy: "[required|optional|none]"
+
+    onboarding:
+      process_documented: true|false
+      documentation_location: "[URL or path]"
+      checklist_exists: true|false
+      security_training_required: true|false
+      average_time_to_access: "[Duration]"
+      default_access_granted: ["[System or tool]"]
+
+    offboarding:
+      process_documented: true|false
+      checklist_exists: true|false
+      average_time_to_revoke: "[Duration]"
+      automated: true|false
+
+    access_reviews:
+      frequency: "[quarterly|annually|never]"
+      last_review: "[DATE]"
+      scope: ["[What is reviewed]"]
+      documented: true|false
+
+  # Training and awareness
+  training:
+    security_awareness:
+      required: true|false
+      frequency: "[annually|quarterly|onboarding-only]"
+      last_conducted: "[DATE]"
+      topics: ["phishing", "password-hygiene", "data-handling", "..."]
+      completion_tracked: true|false
+    secure_coding:
+      required: true|false
+      frequency: "[Duration]"
+      provider: "[internal|external-vendor|online-platform]"
+      topics: ["owasp-top-10", "secure-design", "..."]
+    phishing_simulations:
+      conducted: true|false
+      frequency: "[Duration]"
+      last_conducted: "[DATE]"
+
+  # Incident response
+  incident_response:
+    plan_documented: true|false
+    plan_location: "[URL or path]"
+    last_updated: "[DATE]"
+    last_tested: "[DATE]"
+    communication:
+      internal_channel: "[Slack channel, etc.]"
+      external_contact: "[Email, phone]"
+      stakeholder_notification: "[Process description]"
+    escalation_matrix:
+      - severity: "[critical|high|medium|low]"
+        response_time: "[Duration]"
+        notify: ["[Role or person]"]
+        escalate_to: "[Next level]"
+    post_incident:
+      retrospective_required: true|false
+      documentation_required: true|false
+      learning_shared: true|false
+
+  # Development processes
+  development_processes:
+    code_review:
+      required: true|false
+      min_reviewers: 1
+      security_review_triggers: ["auth-changes", "crypto", "input-handling", "..."]
+      guidelines_documented: true|false
+    release_process:
+      documented: true|false
+      documentation_location: "[URL or path]"
+      environments: ["development", "staging", "production"]
+      rollback_procedure: true|false
+      feature_flags_used: true|false
+    security_in_sdlc:
+      threat_modeling:
+        conducted: true|false
+        frequency: "[per-feature|quarterly|annually|never]"
+        methodology: "[STRIDE|PASTA|attack-trees|custom]"
+      security_requirements:
+        defined_per_feature: true|false
+        template_exists: true|false
+      penetration_testing:
+        conducted: true|false
+        frequency: "[annually|bi-annually|per-release]"
+        provider: "[internal|external-vendor]"
+        last_test: "[DATE]"
+
+  # Knowledge management
+  knowledge_management:
+    documentation:
+      platform: "[confluence|notion|gitbook|internal]"
+      architecture_docs: true|false
+      runbooks_exist: true|false
+      security_guidelines: true|false
+      onboarding_guide: true|false
+    decision_records:
+      adr_used: true|false
+      location: "[Path or URL]"
+      security_decisions_tracked: true|false
+    lessons_learned:
+      captured: true|false
+      shared: true|false
+      location: "[Path or URL]"
+
+  # Compliance and audit
+  compliance:
+    frameworks: ["[RGPD|ISO27001|SOC2|PCI-DSS|HIPAA|...]"]
+    audits:
+      - type: "[internal|external|certification]"
+        frequency: "[Duration]"
+        last_audit: "[DATE]"
+        findings_tracked: true|false
+    policies:
+      - name: "[Policy name]"
+        location: "[URL or path]"
+        last_reviewed: "[DATE]"
+        owner: "[Role or person]"
+    evidence_collection:
+      automated: true|false
+      tools: ["[Tool names]"]

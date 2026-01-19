@@ -1,0 +1,339 @@
+{% if has_critical_gaps %}
+> **DRAFT - Critical Gaps Unresolved**
+>
+> This document is marked as DRAFT because {{ critical_gap_count }} critical gap(s) remain unresolved.
+> Address all critical gaps before using this document for regulatory purposes.
+
+---
+
+{% endif %}
+# GDPR Compliance Report
+
+**Organization**: {{ organization_name | default(value="[Organization Name]") }}
+**System**: {{ system_name | default(value="[System Name]") }}
+**Report Date**: {{ export_date }}
+**Assessment Date**: {{ assessment_date }}
+**Report Version**: {{ report_version | default(value="1.0") }}
+
+---
+
+## Executive Summary
+
+### Compliance Status
+
+| Metric | Value |
+|--------|-------|
+| Overall Score | {{ overall_score }}% |
+| Compliance Status | {{ overall_status | upper }} |
+| Total Controls | {{ total_controls }} |
+| Compliant | {{ compliant_controls }} |
+| Partial | {{ partial_controls }} |
+| Gaps | {{ gap_controls }} |
+| Not Applicable | {{ not_applicable_controls }} |
+
+### Key Findings
+
+{% if critical_gaps | length > 0 %}
+**Critical Issues Requiring Immediate Attention:**
+
+{% for gap in critical_gaps %}
+- **{{ gap.article }}**: {{ gap.description }}
+{% endfor %}
+{% else %}
+No critical issues identified.
+{% endif %}
+
+### Assessment Scope
+
+This assessment covers:
+- {{ components.application }} application components
+- {{ components.integrations }} external integrations (sub-processors)
+- {{ components.tooling }} operational tools
+- {{ components.infrastructure }} infrastructure providers
+
+---
+
+## 1. Record of Processing Activities (Article 30)
+
+*Required under Article 30 GDPR for controllers and processors.*
+
+### 1.1 Controller Information
+
+| Field | Value |
+|-------|-------|
+| Controller Name | {{ controller.name | default(value="[Controller Name]") }} |
+| Contact Details | {{ controller.contact | default(value="[Contact]") }} |
+| DPO Contact | {{ controller.dpo | default(value="[DPO Contact]") }} |
+| Representative (if non-EU) | {{ controller.representative | default(value="N/A") }} |
+
+### 1.2 Processing Activities
+
+{% for activity in processing_activities %}
+#### {{ activity.name }}
+
+| Attribute | Details |
+|-----------|---------|
+| Purpose | {{ activity.purpose }} |
+| Legal Basis | {{ activity.legal_basis }} |
+| Categories of Data Subjects | {{ activity.data_subjects | join(sep=", ") }} |
+| Categories of Personal Data | {{ activity.data_categories | join(sep=", ") }} |
+| Recipients | {{ activity.recipients | join(sep=", ") }} |
+| International Transfers | {{ activity.transfers | default(value="None") }} |
+| Retention Period | {{ activity.retention }} |
+| Security Measures | {{ activity.security_measures | join(sep=", ") }} |
+
+{% endfor %}
+
+---
+
+## 2. Sub-Processor Register (Article 28)
+
+*Required documentation of all processors and sub-processors.*
+
+### 2.1 Sub-Processor Summary
+
+| Category | Count | With DPA | Without DPA |
+|----------|-------|----------|-------------|
+| Direct Integrations | {{ subprocessors.integrations.total }} | {{ subprocessors.integrations.with_dpa }} | {{ subprocessors.integrations.without_dpa }} |
+| Operational Tooling | {{ subprocessors.tooling.total }} | {{ subprocessors.tooling.with_dpa }} | {{ subprocessors.tooling.without_dpa }} |
+| Infrastructure | {{ subprocessors.infrastructure.total }} | {{ subprocessors.infrastructure.with_dpa }} | {{ subprocessors.infrastructure.without_dpa }} |
+
+### 2.2 Sub-Processor Details
+
+| Service | Category | Location | DPA Status | SCCs | Purpose |
+|---------|----------|----------|------------|------|---------|
+{% for sp in subprocessor_list %}
+| {{ sp.name }} | {{ sp.category }} | {{ sp.location }} | {{ sp.dpa_status }} | {{ sp.sccs | default(value="-") }} | {{ sp.purpose }} |
+{% endfor %}
+
+{% if subprocessors_without_dpa | length > 0 %}
+### 2.3 Action Required: Missing DPAs
+
+The following sub-processors require Data Processing Agreements:
+
+{% for sp in subprocessors_without_dpa %}
+1. **{{ sp.name }}** ({{ sp.category }})
+   - Contact: {{ sp.contact | default(value="Refer to service documentation") }}
+   - Priority: {{ sp.priority }}
+   - Notes: {{ sp.notes | default(value="-") }}
+{% endfor %}
+{% endif %}
+
+---
+
+## 3. International Transfers (Articles 44-49)
+
+*Assessment of data transfers to third countries.*
+
+### 3.1 Transfer Summary
+
+| Destination | Count | With Safeguards | Requiring Action |
+|-------------|-------|-----------------|------------------|
+| EU/EEA | {{ transfers.eu }} | {{ transfers.eu }} | 0 |
+| Adequacy Decision Countries | {{ transfers.adequacy }} | {{ transfers.adequacy }} | 0 |
+| Third Countries (with SCCs) | {{ transfers.with_sccs }} | {{ transfers.with_sccs }} | 0 |
+| Third Countries (no safeguards) | {{ transfers.no_safeguards }} | 0 | {{ transfers.no_safeguards }} |
+
+### 3.2 Transfer Details
+
+{% for transfer in transfer_list %}
+#### {{ transfer.service }} → {{ transfer.country }}
+
+| Attribute | Value |
+|-----------|-------|
+| Service | {{ transfer.service }} |
+| Destination Country | {{ transfer.country }} |
+| Transfer Mechanism | {{ transfer.mechanism }} |
+| Data Categories | {{ transfer.data_categories | join(sep=", ") }} |
+| TIA Completed | {{ transfer.tia_completed | default(value="No") }} |
+| Supplementary Measures | {{ transfer.supplementary_measures | default(value="None documented") }} |
+
+{% endfor %}
+
+{% if transfers_requiring_action | length > 0 %}
+### 3.3 Action Required: Transfer Safeguards
+
+{% for transfer in transfers_requiring_action %}
+1. **{{ transfer.service }}** ({{ transfer.country }})
+   - Required: {{ transfer.required_action }}
+   - Priority: {{ transfer.priority }}
+{% endfor %}
+{% endif %}
+
+---
+
+## 4. Security Measures (Article 32)
+
+*Technical and organizational measures to ensure appropriate security.*
+
+### 4.1 Technical Measures
+
+| Category | Implementation | Status |
+|----------|----------------|--------|
+| Encryption at Rest | {{ security.encryption_rest }} | {{ security.encryption_rest_status }} |
+| Encryption in Transit | {{ security.encryption_transit }} | {{ security.encryption_transit_status }} |
+| Access Control | {{ security.access_control }} | {{ security.access_control_status }} |
+| Authentication | {{ security.authentication }} | {{ security.authentication_status }} |
+| Logging & Monitoring | {{ security.logging }} | {{ security.logging_status }} |
+| Backup & Recovery | {{ security.backup }} | {{ security.backup_status }} |
+
+### 4.2 Organizational Measures
+
+| Measure | Status | Documentation |
+|---------|--------|---------------|
+| Security Policy | {{ measures.security_policy }} | {{ measures.security_policy_doc | default(value="-") }} |
+| Staff Training | {{ measures.training }} | {{ measures.training_doc | default(value="-") }} |
+| Incident Response | {{ measures.incident_response }} | {{ measures.incident_doc | default(value="-") }} |
+| Access Reviews | {{ measures.access_reviews }} | {{ measures.access_reviews_doc | default(value="-") }} |
+
+---
+
+## 5. Data Subject Rights (Articles 15-22)
+
+*Mechanisms for fulfilling data subject rights.*
+
+### 5.1 Rights Implementation Status
+
+| Right | Article | Implementation | Status |
+|-------|---------|----------------|--------|
+| Access | Art. 15 | {{ rights.access.implementation | default(value="Manual") }} | {{ rights.access.status }} |
+| Rectification | Art. 16 | {{ rights.rectification.implementation | default(value="Manual") }} | {{ rights.rectification.status }} |
+| Erasure | Art. 17 | {{ rights.erasure.implementation | default(value="Manual") }} | {{ rights.erasure.status }} |
+| Restriction | Art. 18 | {{ rights.restriction.implementation | default(value="Manual") }} | {{ rights.restriction.status }} |
+| Portability | Art. 20 | {{ rights.portability.implementation | default(value="Manual") }} | {{ rights.portability.status }} |
+| Objection | Art. 21 | {{ rights.objection.implementation | default(value="Manual") }} | {{ rights.objection.status }} |
+
+### 5.2 Request Handling Process
+
+- Request submission: {{ rights_process.submission | default(value="Not documented") }}
+- Verification method: {{ rights_process.verification | default(value="Not documented") }}
+- Response timeline: {{ rights_process.timeline | default(value="30 days") }}
+- Escalation process: {{ rights_process.escalation | default(value="Not documented") }}
+
+---
+
+## 6. Gap Analysis
+
+### 6.1 Gaps by Severity
+
+| Severity | Count | Articles Affected |
+|----------|-------|-------------------|
+| Critical | {{ gaps_by_severity.critical }} | {{ gaps_critical_articles | join(sep=", ") }} |
+| High | {{ gaps_by_severity.high }} | {{ gaps_high_articles | join(sep=", ") }} |
+| Medium | {{ gaps_by_severity.medium }} | {{ gaps_medium_articles | join(sep=", ") }} |
+| Low | {{ gaps_by_severity.low }} | {{ gaps_low_articles | join(sep=", ") }} |
+
+### 6.2 Gaps by Source
+
+| Source | Critical | High | Medium | Low | Total |
+|--------|----------|------|--------|-----|-------|
+| Codebase | {{ gaps_by_source.codebase.critical }} | {{ gaps_by_source.codebase.high }} | {{ gaps_by_source.codebase.medium }} | {{ gaps_by_source.codebase.low }} | {{ gaps_by_source.codebase.total }} |
+| Tooling | {{ gaps_by_source.tooling.critical }} | {{ gaps_by_source.tooling.high }} | {{ gaps_by_source.tooling.medium }} | {{ gaps_by_source.tooling.low }} | {{ gaps_by_source.tooling.total }} |
+| Infrastructure | {{ gaps_by_source.infrastructure.critical }} | {{ gaps_by_source.infrastructure.high }} | {{ gaps_by_source.infrastructure.medium }} | {{ gaps_by_source.infrastructure.low }} | {{ gaps_by_source.infrastructure.total }} |
+| Process | {{ gaps_by_source.process.critical }} | {{ gaps_by_source.process.high }} | {{ gaps_by_source.process.medium }} | {{ gaps_by_source.process.low }} | {{ gaps_by_source.process.total }} |
+
+### 6.3 Gap Details
+
+{% for gap in gaps %}
+#### {{ gap.id }}: {{ gap.article }} - {{ gap.title }}
+
+| Attribute | Value |
+|-----------|-------|
+| Severity | {{ gap.severity | upper }} |
+| Source | {{ gap.source }} |
+| Description | {{ gap.description }} |
+| Remediation | {{ gap.remediation }} |
+| Owner | {{ gap.owner | default(value="TBD") }} |
+| Target Date | {{ gap.target_date | default(value="TBD") }} |
+
+{% endfor %}
+
+---
+
+## 7. Remediation Plan
+
+### 7.1 Priority Actions
+
+#### P0 - Immediate (Critical)
+
+{% for action in action_items %}
+{% if action.priority == "P0" %}
+- [ ] **{{ action.id }}**: {{ action.title }}
+  - Article: {{ action.article }}
+  - Owner: {{ action.owner | default(value="TBD") }}
+{% endif %}
+{% endfor %}
+
+#### P1 - Short-term (30 days)
+
+{% for action in action_items %}
+{% if action.priority == "P1" %}
+- [ ] **{{ action.id }}**: {{ action.title }}
+  - Article: {{ action.article }}
+{% endif %}
+{% endfor %}
+
+#### P2 - Medium-term (90 days)
+
+{% for action in action_items %}
+{% if action.priority == "P2" %}
+- [ ] **{{ action.id }}**: {{ action.title }}
+  - Article: {{ action.article }}
+{% endif %}
+{% endfor %}
+
+---
+
+## 8. DPIA Requirement
+
+{% if dpia_required %}
+### Data Protection Impact Assessment Required
+
+Based on the assessment, a DPIA is required under Article 35(3) due to:
+
+{% for reason in dpia_reasons %}
+- {{ reason }}
+{% endfor %}
+
+**DPIA Status**: {{ dpia_status | default(value="Not started") }}
+{% else %}
+### DPIA Not Required
+
+Based on the current processing activities, a DPIA is not mandatory. However, consider conducting one if:
+- Processing scope changes
+- New high-risk processing activities are introduced
+- Significant system changes occur
+{% endif %}
+
+---
+
+## Appendix A: Control-by-Control Assessment
+
+{% for chapter in chapters %}
+### {{ chapter.name }}
+
+| Article | Control | Status | Evidence |
+|---------|---------|--------|----------|
+{% for control in chapter.controls %}
+| {{ control.article }} | {{ control.name }} | {{ control.status }} | {{ control.evidence_summary | default(value="-") }} |
+{% endfor %}
+
+{% endfor %}
+
+---
+
+## Appendix B: Assessment Metadata
+
+| Field | Value |
+|-------|-------|
+| Assessment Tool | OpenSecKit v4 |
+| Framework | GDPR (RGPD) |
+| Assessment Date | {{ assessment_date }} |
+| Export Date | {{ export_date }} |
+| System Model Hash | {{ system_model_hash }} |
+| Assessor | {{ assessor | default(value="Automated") }} |
+
+---
+
+*Report generated by OpenSecKit v4 - {{ export_date }}*
+*This document should be reviewed by a qualified data protection professional before submission to regulatory authorities.*

@@ -1,0 +1,332 @@
+# OpenSecKit V4 - Authentication Threat Library
+# Version: 4.0.0
+# Use: Reference for threat modeling authentication systems
+
+metadata:
+  library_id: "auth-threats"
+  name: "Authentication Security Threats"
+  version: "4.0.0"
+  based_on: ["OWASP Authentication Cheat Sheet", "STRIDE", "NIST 800-63B"]
+
+threats:
+  # Credential Attacks
+  - id: "AUTH-CRED-001"
+    name: "Brute Force Attack"
+    category: "authentication"
+    stride: "spoofing"
+    description: "Systematic password guessing"
+    attack_vector: "Automated login attempts with common passwords"
+    impact: "Account compromise"
+    likelihood: "high"
+    indicators:
+      - "No rate limiting"
+      - "No account lockout"
+      - "No failed attempt monitoring"
+    mitigations:
+      - "Rate limiting (5 attempts per minute)"
+      - "Account lockout after 10 failures"
+      - "Progressive delays"
+      - "CAPTCHA after 3 failures"
+
+  - id: "AUTH-CRED-002"
+    name: "Credential Stuffing"
+    category: "authentication"
+    stride: "spoofing"
+    description: "Using breached credentials from other sites"
+    attack_vector: "Automated login with credential dumps"
+    impact: "Mass account compromise"
+    likelihood: "high"
+    indicators:
+      - "No breach detection"
+      - "No anomaly detection"
+      - "Password reuse common"
+    mitigations:
+      - "Check passwords against breach databases"
+      - "Detect login patterns (time, location, device)"
+      - "Enforce unique passwords"
+      - "MFA requirement"
+
+  - id: "AUTH-CRED-003"
+    name: "Password Spraying"
+    category: "authentication"
+    stride: "spoofing"
+    description: "Trying common passwords across many accounts"
+    attack_vector: "Few passwords against many usernames"
+    impact: "Account compromise while avoiding lockout"
+    likelihood: "medium"
+    indicators:
+      - "Lockout only per account"
+      - "No global rate limiting"
+    mitigations:
+      - "Global rate limiting"
+      - "IP-based throttling"
+      - "Password complexity requirements"
+
+  - id: "AUTH-CRED-004"
+    name: "Dictionary Attack"
+    category: "authentication"
+    stride: "spoofing"
+    description: "Using dictionary words and common patterns"
+    attack_vector: "Wordlist-based password guessing"
+    impact: "Account compromise"
+    likelihood: "medium"
+    indicators:
+      - "No password complexity"
+      - "No common password check"
+    mitigations:
+      - "Ban common passwords"
+      - "Require password entropy"
+      - "Use passphrase recommendation"
+
+  # Session Attacks
+  - id: "AUTH-SESS-001"
+    name: "Session Hijacking"
+    category: "session"
+    stride: "spoofing"
+    description: "Stealing or predicting session tokens"
+    attack_vector: "XSS, network sniffing, malware"
+    impact: "Account takeover"
+    likelihood: "medium"
+    indicators:
+      - "Predictable session IDs"
+      - "Cookies without secure flags"
+      - "Long session expiry"
+    mitigations:
+      - "Cryptographically random session IDs"
+      - "HttpOnly, Secure, SameSite cookies"
+      - "Short session expiry"
+      - "Session binding to fingerprint"
+
+  - id: "AUTH-SESS-002"
+    name: "Session Fixation"
+    category: "session"
+    stride: "spoofing"
+    description: "Setting victim's session before authentication"
+    attack_vector: "Pre-set session ID via URL or cookie"
+    impact: "Session hijacking"
+    likelihood: "low"
+    indicators:
+      - "Session accepted from URL"
+      - "No session regeneration on login"
+    mitigations:
+      - "Regenerate session on authentication"
+      - "Never accept session from URL"
+      - "Validate session origin"
+
+  - id: "AUTH-SESS-003"
+    name: "Session Replay"
+    category: "session"
+    stride: "repudiation"
+    description: "Reusing captured session tokens"
+    attack_vector: "Capture and replay authentication tokens"
+    impact: "Unauthorized access"
+    likelihood: "medium"
+    indicators:
+      - "No token freshness validation"
+      - "Long-lived tokens"
+      - "No device binding"
+    mitigations:
+      - "Short-lived tokens"
+      - "Token rotation"
+      - "Device binding"
+      - "Timestamp validation"
+
+  # Token Attacks
+  - id: "AUTH-TOKEN-001"
+    name: "JWT Algorithm Confusion"
+    category: "authentication"
+    stride: "tampering"
+    description: "Exploiting algorithm handling in JWT"
+    attack_vector: "Change alg to 'none' or RSA→HMAC confusion"
+    impact: "Token forgery"
+    likelihood: "medium"
+    indicators:
+      - "No explicit algorithm validation"
+      - "Using library defaults"
+    mitigations:
+      - "Explicit algorithm whitelist"
+      - "Reject 'none' algorithm"
+      - "Separate keys per algorithm type"
+
+  - id: "AUTH-TOKEN-002"
+    name: "JWT Secret Brute Force"
+    category: "cryptography"
+    stride: "information_disclosure"
+    description: "Cracking weak JWT signing secrets"
+    attack_vector: "Offline brute force of HMAC secret"
+    impact: "Token forgery capability"
+    likelihood: "medium"
+    indicators:
+      - "Short or common secrets"
+      - "Dictionary-word secrets"
+    mitigations:
+      - "256+ bit secrets"
+      - "Use RS256 for public validation"
+      - "Regular key rotation"
+
+  - id: "AUTH-TOKEN-003"
+    name: "Refresh Token Theft"
+    category: "session"
+    stride: "spoofing"
+    description: "Stealing long-lived refresh tokens"
+    attack_vector: "XSS, malware, insecure storage"
+    impact: "Long-term account access"
+    likelihood: "medium"
+    indicators:
+      - "Refresh tokens in localStorage"
+      - "No refresh token rotation"
+      - "No refresh token revocation"
+    mitigations:
+      - "HttpOnly cookie storage"
+      - "Refresh token rotation"
+      - "Family-based revocation"
+      - "Short refresh token lifetime"
+
+  # Password Reset Attacks
+  - id: "AUTH-RESET-001"
+    name: "Password Reset Token Prediction"
+    category: "authentication"
+    stride: "spoofing"
+    description: "Predicting or brute-forcing reset tokens"
+    attack_vector: "Enumerate or guess reset tokens"
+    impact: "Account takeover"
+    likelihood: "low"
+    indicators:
+      - "Sequential reset tokens"
+      - "Short tokens"
+      - "Long expiry"
+    mitigations:
+      - "Cryptographically random tokens (128+ bits)"
+      - "Short expiry (15-60 minutes)"
+      - "Single-use tokens"
+
+  - id: "AUTH-RESET-002"
+    name: "Password Reset Link Leakage"
+    category: "information_disclosure"
+    stride: "information_disclosure"
+    description: "Reset link exposed via referrer or logs"
+    attack_vector: "Access logs, browser history, referrer header"
+    impact: "Account takeover"
+    likelihood: "medium"
+    indicators:
+      - "Reset page has external links"
+      - "Token in URL parameters"
+      - "No referrer policy"
+    mitigations:
+      - "No external resources on reset page"
+      - "Referrer-Policy: no-referrer"
+      - "POST token instead of URL"
+
+  - id: "AUTH-RESET-003"
+    name: "Account Enumeration via Reset"
+    category: "information_disclosure"
+    stride: "information_disclosure"
+    description: "Determine valid accounts via reset response"
+    attack_vector: "Different responses for valid/invalid emails"
+    impact: "User enumeration for targeting"
+    likelihood: "high"
+    indicators:
+      - "Different error messages"
+      - "Response time differences"
+    mitigations:
+      - "Generic success message"
+      - "Constant-time responses"
+      - "Rate limiting"
+
+  # MFA Attacks
+  - id: "AUTH-MFA-001"
+    name: "MFA Bypass via Race Condition"
+    category: "authentication"
+    stride: "tampering"
+    description: "Bypassing MFA using race conditions"
+    attack_vector: "Multiple simultaneous authentication requests"
+    impact: "MFA bypass"
+    likelihood: "low"
+    indicators:
+      - "Stateless MFA validation"
+      - "No request serialization"
+    mitigations:
+      - "Atomic MFA state transitions"
+      - "Request serialization"
+      - "Idempotency checks"
+
+  - id: "AUTH-MFA-002"
+    name: "TOTP Brute Force"
+    category: "authentication"
+    stride: "spoofing"
+    description: "Brute forcing 6-digit TOTP codes"
+    attack_vector: "Try all 1M combinations within time window"
+    impact: "MFA bypass"
+    likelihood: "low"
+    indicators:
+      - "No rate limiting on MFA"
+      - "Extended time windows"
+    mitigations:
+      - "Rate limiting (3 attempts)"
+      - "Strict time window (30s)"
+      - "Account lockout"
+
+  - id: "AUTH-MFA-003"
+    name: "SMS Interception"
+    category: "authentication"
+    stride: "spoofing"
+    description: "Intercepting SMS-based OTPs"
+    attack_vector: "SIM swapping, SS7 attacks, malware"
+    impact: "MFA bypass"
+    likelihood: "medium"
+    indicators:
+      - "SMS-only MFA"
+      - "No alternative methods"
+    mitigations:
+      - "Prefer TOTP/FIDO2 over SMS"
+      - "SIM swap detection"
+      - "Multiple MFA options"
+
+  # OAuth/OIDC Attacks
+  - id: "AUTH-OAUTH-001"
+    name: "OAuth CSRF"
+    category: "session"
+    stride: "tampering"
+    description: "Cross-site request forgery on OAuth flow"
+    attack_vector: "Malicious authorization link"
+    impact: "Account linking to attacker"
+    likelihood: "medium"
+    indicators:
+      - "No state parameter"
+      - "Predictable state"
+    mitigations:
+      - "Cryptographically random state"
+      - "Validate state on callback"
+      - "Bind state to session"
+
+  - id: "AUTH-OAUTH-002"
+    name: "OAuth Open Redirect"
+    category: "configuration"
+    stride: "tampering"
+    description: "Redirect to malicious site via OAuth callback"
+    attack_vector: "Manipulate redirect_uri parameter"
+    impact: "Token theft, phishing"
+    likelihood: "medium"
+    indicators:
+      - "Wildcard redirect URIs"
+      - "No exact matching"
+    mitigations:
+      - "Exact redirect URI matching"
+      - "Pre-registered URIs only"
+      - "No wildcards"
+
+  - id: "AUTH-OAUTH-003"
+    name: "Authorization Code Injection"
+    category: "authentication"
+    stride: "spoofing"
+    description: "Inject stolen authorization code"
+    attack_vector: "Capture code and use on attacker's session"
+    impact: "Account takeover"
+    likelihood: "medium"
+    indicators:
+      - "No PKCE"
+      - "Public clients without binding"
+    mitigations:
+      - "PKCE for all clients"
+      - "Bind code to client session"
+      - "Short code expiry"
