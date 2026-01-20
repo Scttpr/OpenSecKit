@@ -1,0 +1,259 @@
+{# Template: Procédure d'exercice des droits des personnes (Articles 12-22 RGPD) #}
+{# Source: knowledge/reference/edpb-droit-acces.md #}
+{# Input: system-model/data.yaml, actors.yaml, organization.yaml #}
+
+# Procédure d'Exercice des Droits des Personnes
+
+> **Articles 12 à 22 du RGPD** - Droits des personnes concernées
+> Document généré le {{ now() | date(format="%d/%m/%Y") }}
+> Organisation: **{{ organization.legal_entity.name }}**
+
+---
+
+## 1. Vue d'ensemble des droits
+
+| Droit | Article | Délai | Conditions |
+|-------|---------|-------|------------|
+| **Information** | 13-14 | Au moment de la collecte | Toujours applicable |
+| **Accès** | 15 | 1 mois | Toujours applicable |
+| **Rectification** | 16 | 1 mois | Données inexactes/incomplètes |
+| **Effacement** | 17 | 1 mois | Sous conditions |
+| **Limitation** | 18 | 1 mois | Sous conditions |
+| **Portabilité** | 20 | 1 mois | Base légale: consentement ou contrat |
+| **Opposition** | 21 | 1 mois | Intérêt légitime ou prospection | # @TODO, why this conditions?
+| **Décision automatisée** | 22 | 1 mois | Profilage avec effet juridique |
+
+---
+
+## 2. Contacts pour l'exercice des droits
+
+| Canal | Information |
+|-------|-------------|
+| **Email dédié** | {{ organization.privacy_contact.email | default(value="privacy@[domaine]") }} |
+| **Adresse postale** | {{ organization.legal_entity.address | default(value="À compléter") }} |
+| **DPO** | {{ team.security_roles.dpo.email | default(value="dpo@[domaine]") }} |
+| **Formulaire en ligne** | {{ organization.privacy_contact.form_url | default(value="À mettre en place") }} |
+
+---
+
+## 3. Procédure de traitement des demandes
+
+### 3.1 Réception et enregistrement
+
+1. **Enregistrer** la demande dans le registre des demandes
+2. **Accuser réception** dans les 48h
+3. **Vérifier l'identité** du demandeur
+4. **Qualifier** le type de droit exercé
+
+### 3.2 Vérification d'identité
+
+| Situation | Vérification requise |
+|-----------|---------------------|
+| Demande via espace client authentifié | Authentification suffisante |
+| Demande par email connu | Confirmation par retour d'email |
+| Demande par courrier | Copie pièce d'identité si doute raisonnable |
+| Demande par tiers (mandataire) | Mandat + pièces d'identité |
+
+> **Important**: Ne pas demander plus d'informations que nécessaire. En cas de doute raisonnable, des informations complémentaires peuvent être demandées.
+
+### 3.3 Délais de réponse
+
+| Complexité | Délai | Condition |
+|------------|-------|-----------|
+| Standard | **1 mois** | À compter de la réception |
+| Complexe | **3 mois max** | Justification et information dans le 1er mois |
+| Manifestement infondée | Refus ou frais | Justification requise |
+
+---
+
+## 4. Traitement par type de droit
+
+### 4.1 Droit d'accès (Article 15)
+
+**Ce que la personne peut demander:**
+- Confirmation que ses données sont traitées
+- Copie des données personnelles
+- Informations sur: finalités, catégories, destinataires, durée, droits, source
+
+**Réponse à fournir:**
+```markdown
+## Données personnelles vous concernant
+
+### Informations générales
+- Finalités du traitement: [...]
+- Catégories de données: [...]
+- Destinataires: [...]
+- Durée de conservation: [...]
+- Source des données: [...]
+
+### Vos données
+[Export des données au format lisible]
+
+### Vos droits
+Vous disposez des droits de rectification, effacement, limitation...
+```
+
+**Format**: Électronique si demande électronique, format couramment utilisé.
+
+### 4.2 Droit de rectification (Article 16)
+
+**Conditions**: Données inexactes ou incomplètes
+
+**Actions**:
+1. Vérifier l'inexactitude/incomplétude
+2. Rectifier les données
+3. Informer les destinataires (si possible)
+4. Confirmer la rectification
+
+### 4.3 Droit à l'effacement (Article 17)
+
+**Conditions d'application** (au moins une):
+- [ ] Données plus nécessaires au regard des finalités
+- [ ] Retrait du consentement (si base légale)
+- [ ] Opposition au traitement (intérêt légitime)
+- [ ] Traitement illicite
+- [ ] Obligation légale d'effacement
+- [ ] Données collectées auprès de mineurs (services numériques)
+
+**Exceptions** (refus possible si):
+- [ ] Liberté d'expression et d'information
+- [ ] Obligation légale de conservation
+- [ ] Intérêt public (santé, archives, recherche)
+- [ ] Constatation/exercice/défense de droits en justice
+
+**Actions**:
+1. Vérifier les conditions d'application
+2. Vérifier les exceptions
+3. Si applicable: effacer les données
+4. Informer les destinataires
+5. Si refus: motiver la décision
+
+### 4.4 Droit à la limitation (Article 18)
+
+**Conditions** (au moins une):
+- [ ] Contestation de l'exactitude (pendant vérification)
+- [ ] Traitement illicite mais opposition à l'effacement
+- [ ] Données nécessaires pour droits en justice
+- [ ] Opposition en cours de vérification
+
+**Actions**:
+1. Marquer les données comme "limitées"
+2. Conserver sans traiter (sauf consentement, justice, intérêt public)
+3. Informer avant levée de la limitation
+
+### 4.5 Droit à la portabilité (Article 20)
+
+**Conditions cumulatives**:
+- [ ] Base légale = consentement ou contrat
+- [ ] Traitement automatisé
+- [ ] Données fournies par la personne
+
+**Format de réponse**:
+- Format structuré
+- Couramment utilisé
+- Lisible par machine
+- Exemples: JSON, CSV, XML
+
+**Actions**:
+1. Vérifier les conditions
+2. Extraire les données concernées
+3. Fournir dans un format adapté
+4. Ou transmettre à un autre responsable (si techniquement possible)
+
+### 4.6 Droit d'opposition (Article 21)
+
+**Cas général** (intérêt légitime):
+- Doit justifier de raisons tenant à sa situation particulière
+- Peut être refusé si motifs légitimes et impérieux
+
+**Prospection directe**:
+- Opposition sans justification
+- **Doit toujours être acceptée**
+
+**Actions**:
+1. Identifier le fondement (intérêt légitime ou prospection)
+2. Si prospection: cesser immédiatement
+3. Si intérêt légitime: évaluer les motifs
+4. Informer de la décision
+
+### 4.7 Décision individuelle automatisée (Article 22)
+
+**Droit de ne pas faire l'objet d'une décision** fondée exclusivement sur un traitement automatisé produisant des effets juridiques ou significatifs.
+
+**Exceptions** (décision automatisée permise si):
+- [ ] Nécessaire au contrat
+- [ ] Autorisée par le droit
+- [ ] Consentement explicite
+
+**Dans ces cas, garantir**:
+- Information sur la logique sous-jacente
+- Droit d'obtenir une intervention humaine
+- Droit de contester la décision
+
+---
+
+## 5. Modèle de registre des demandes
+
+| Réf | Date réception | Demandeur | Type droit | Statut | Date réponse | Décision |
+|-----|----------------|-----------|------------|--------|--------------|----------|
+| DEM-001 | | | | ☐ Reçu ☐ En cours ☐ Clos | | |
+
+---
+
+## 6. Modèles de réponse
+
+### Accusé de réception
+
+```
+Objet: Accusé de réception de votre demande d'exercice de droits
+
+Madame, Monsieur,
+
+Nous accusons réception de votre demande du [DATE] relative à l'exercice
+de votre droit [TYPE].
+
+Conformément au RGPD, nous vous répondrons dans un délai d'un mois.
+
+Pour toute question: [CONTACT]
+
+Cordialement,
+[SIGNATURE]
+```
+
+### Réponse favorable
+
+```
+Objet: Réponse à votre demande d'exercice de droits
+
+Madame, Monsieur,
+
+Suite à votre demande du [DATE], nous vous informons que votre droit
+[TYPE] a été exercé.
+
+[DÉTAILS DE L'ACTION RÉALISÉE]
+
+Cordialement,
+[SIGNATURE]
+```
+
+### Refus motivé
+
+```
+Objet: Réponse à votre demande d'exercice de droits
+
+Madame, Monsieur,
+
+Suite à votre demande du [DATE], nous vous informons que nous ne pouvons
+pas donner suite à votre demande pour le motif suivant:
+
+[MOTIF DÉTAILLÉ]
+
+Vous pouvez contester cette décision auprès de la CNIL (www.cnil.fr).
+
+Cordialement,
+[SIGNATURE]
+```
+
+---
+
+*Procédure conforme aux Articles 12-22 du RGPD et aux Lignes directrices EDPB 01/2022*

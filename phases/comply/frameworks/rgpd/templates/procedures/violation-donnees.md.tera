@@ -1,0 +1,213 @@
+{# Template: Procédure de notification des violations de données (Articles 33-34 RGPD) #}
+{# Source: knowledge/core/violations-donnees.md, knowledge/core/breach-notification.md #}
+{# Input: system-model/team.yaml, organization.yaml #}
+
+# Procédure de Gestion des Violations de Données
+
+> **Articles 33 et 34 du RGPD** - Notification et communication des violations
+> Document généré le {{ now() | date(format="%d/%m/%Y") }}
+> Organisation: **{{ organization.legal_entity.name }}**
+
+---
+
+## 1. Définition
+
+Une **violation de données à caractère personnel** est une violation de la sécurité entraînant, de manière accidentelle ou illicite:
+- La **destruction** de données personnelles
+- La **perte** de données personnelles
+- L'**altération** de données personnelles
+- La **divulgation non autorisée** de données personnelles
+- L'**accès non autorisé** à des données personnelles
+
+### Types de violations (classification CNIL)
+
+| Type | Description | Exemple |
+|------|-------------|---------|
+| **Confidentialité** | Divulgation ou accès non autorisé | Envoi d'email au mauvais destinataire |
+| **Intégrité** | Altération non autorisée | Modification malveillante de données |
+| **Disponibilité** | Perte d'accès ou destruction | Ransomware, suppression accidentelle |
+
+---
+
+## 2. Contacts et responsabilités
+
+### Équipe de réponse aux incidents
+
+| Rôle | Contact | Téléphone | Email |
+|------|---------|-----------|-------|
+| **DPO** | {{ team.security_roles.dpo.name | default(value="À désigner") }} | {{ team.security_roles.dpo.phone | default(value="-") }} | {{ team.security_roles.dpo.email | default(value="-") }} |
+| **RSSI** | {{ team.security_roles.security_champion.name | default(value="À désigner") }} | {{ team.security_roles.security_champion.phone | default(value="-") }} | {{ team.security_roles.security_champion.email | default(value="-") }} |
+| **Responsable incident** | {{ team.incident_response.owner | default(value="À désigner") }} | - | - |
+| **Direction** | {{ organization.representant_legal.name | default(value="À désigner") }} | - | - |
+
+### Canaux d'escalade
+
+{{ team.incident_response.communication_channels | default(value="À définir (email dédié, téléphone d'urgence, etc.)") }}
+
+---
+
+## 3. Procédure de détection et qualification
+
+### 3.1 Détection
+
+Sources de détection possibles:
+- Alertes systèmes de sécurité (SIEM, IDS/IPS)
+- Signalement d'un employé
+- Signalement d'un sous-traitant
+- Plainte d'une personne concernée
+- Notification externe (CERT, autorité)
+
+### 3.2 Qualification initiale (dans les 4 heures)
+
+| Critère | Question | Réponse |
+|---------|----------|---------|
+| **Nature** | S'agit-il d'une violation de données personnelles? | ☐ Oui ☐ Non |
+| **Type** | Confidentialité / Intégrité / Disponibilité? | ☐ C ☐ I ☐ D |
+| **Périmètre** | Quelles données sont concernées? | _______________ |
+| **Volume** | Combien de personnes affectées (estimation)? | _______________ |
+| **Sensibilité** | Les données sont-elles sensibles (Art. 9)? | ☐ Oui ☐ Non |
+
+---
+
+## 4. Évaluation du risque
+
+### 4.1 Critères d'évaluation
+
+| Facteur | Faible (1) | Modéré (2) | Élevé (3) | Critique (4) |
+|---------|------------|------------|-----------|--------------|
+| **Type de données** | Données basiques | Données identifiantes | Données financières | Données sensibles Art.9 |
+| **Volume** | < 100 personnes | 100-1000 | 1000-10000 | > 10000 |
+| **Facilité d'identification** | Anonymes | Pseudonymes | Indirectement identifiables | Directement identifiables |
+| **Conséquences** | Désagrément mineur | Préjudice limité | Préjudice significatif | Préjudice grave |
+| **Personnes vulnérables** | Non | Minorité | Majorité | Uniquement vulnérables |
+
+### 4.2 Matrice de décision
+
+| Niveau de risque | Score | Notification CNIL | Communication personnes |
+|------------------|-------|-------------------|------------------------|
+| **Négligeable** | 1-4 | Non (documentation interne) | Non |
+| **Limité** | 5-8 | **Oui (72h)** | Non |
+| **Important** | 9-12 | **Oui (72h)** | **Oui** |
+| **Maximal** | 13-16 | **Oui (72h)** | **Oui (sans délai)** |
+
+---
+
+## 5. Obligations de notification
+
+### 5.1 Documentation interne (obligatoire dans tous les cas)
+
+Tenir un **registre des violations** contenant:
+- Nature de la violation
+- Catégories et nombre approximatif de personnes concernées
+- Catégories et nombre approximatif d'enregistrements concernés
+- Conséquences probables
+- Mesures prises pour remédier à la violation
+
+### 5.2 Notification à la CNIL (si risque pour les droits)
+
+**Délai**: 72 heures maximum après prise de connaissance
+
+**Téléservice**: https://www.cnil.fr/fr/notifier-une-violation-de-donnees-personnelles
+
+**Contenu de la notification**:
+- [ ] Nature de la violation
+- [ ] Catégories de données affectées
+- [ ] Nombre approximatif de personnes concernées
+- [ ] Nombre approximatif d'enregistrements concernés
+- [ ] Nom et coordonnées du DPO ou point de contact
+- [ ] Conséquences probables de la violation
+- [ ] Mesures prises ou envisagées
+
+> **Si le délai de 72h ne peut être respecté**: Notification initiale puis complémentaire avec justification du retard.
+
+### 5.3 Communication aux personnes concernées (si risque élevé)
+
+**Délai**: Dans les meilleurs délais
+
+**Contenu** (en termes clairs et simples):
+- [ ] Nature de la violation
+- [ ] Nom et coordonnées du DPO ou point de contact
+- [ ] Conséquences probables
+- [ ] Mesures prises et recommandations
+
+**Exceptions** (pas de communication si):
+- Données protégées par chiffrement (état de l'art)
+- Mesures correctives prises éliminant le risque élevé
+- Communication exigerait des efforts disproportionnés → communication publique
+
+---
+
+## 6. Fiche d'incident
+
+### Identification
+
+| Champ | Valeur |
+|-------|--------|
+| **Référence incident** | INC-{{ now() | date(format="%Y%m%d") }}-XXX |
+| **Date/heure découverte** | |
+| **Date/heure incident (estimée)** | |
+| **Déclarant** | |
+| **Qualificateur** | |
+
+### Description de l'incident
+
+| Champ | Valeur |
+|-------|--------|
+| **Description** | |
+| **Type de violation** | ☐ Confidentialité ☐ Intégrité ☐ Disponibilité |
+| **Origine** | ☐ Interne ☐ Externe ☐ Sous-traitant |
+| **Cause** | ☐ Malveillance ☐ Erreur humaine ☐ Technique ☐ Autre |
+
+### Données concernées
+
+| Champ | Valeur |
+|-------|--------|
+| **Catégories de données** | |
+| **Données sensibles (Art. 9)** | ☐ Oui ☐ Non |
+| **Nombre de personnes (estimation)** | |
+| **Nombre d'enregistrements** | |
+| **Systèmes affectés** | |
+
+### Évaluation du risque
+
+| Critère | Score (1-4) |
+|---------|-------------|
+| Type de données | |
+| Volume | |
+| Facilité d'identification | |
+| Conséquences | |
+| Personnes vulnérables | |
+| **TOTAL** | |
+
+**Niveau de risque**: ☐ Négligeable ☐ Limité ☐ Important ☐ Maximal
+
+### Décisions
+
+| Action | Décision | Date | Responsable |
+|--------|----------|------|-------------|
+| Notification CNIL | ☐ Oui ☐ Non | | |
+| Communication personnes | ☐ Oui ☐ Non | | |
+
+### Mesures correctives
+
+| Mesure | Statut | Responsable | Échéance |
+|--------|--------|-------------|----------|
+| | ☐ Fait ☐ En cours ☐ Planifié | | |
+
+### Chronologie
+
+| Date/Heure | Événement | Acteur |
+|------------|-----------|--------|
+| | | |
+
+---
+
+## 7. Contacts CNIL
+
+- **Téléservice notification**: https://notifications.cnil.fr/notifications/index
+- **Questions**: dpo@cnil.fr
+- **Téléphone**: 01 53 73 22 22
+
+---
+
+*Procédure conforme aux Articles 33-34 du RGPD et aux recommandations CNIL/EDPB*

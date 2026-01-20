@@ -1,0 +1,104 @@
+# EU Adequacy Decisions - Countries with Adequate Data Protection
+# Source: https://ec.europa.eu/info/law/law-topic/data-protection/international-dimension-data-protection/adequacy-decisions_en
+# Last checked: 2026-01-20
+# Stability: Dynamic (new decisions ~yearly)
+
+metadata:
+  source: "European Commission"
+  last_updated: "2026-01-20"
+  notes: "Transfers to these countries do not require SCCs or other safeguards"
+
+# Full adequacy decisions
+adequate_countries:
+  - country: "Andorra"
+    decision_date: "2010-10-19"
+    decision_ref: "2010/625/EU"
+    scope: "full"
+
+  - country: "Argentina"
+    decision_date: "2003-06-30"
+    decision_ref: "2003/490/EC"
+    scope: "full"
+
+  - country: "Canada"
+    decision_date: "2001-12-20"
+    decision_ref: "2002/2/EC"
+    scope: "commercial_only"  # PIPEDA - commercial organizations only
+    notes: "Only commercial organizations subject to PIPEDA"
+
+  - country: "Faroe Islands"
+    decision_date: "2010-03-05"
+    decision_ref: "2010/146/EU"
+    scope: "full"
+
+  - country: "Guernsey"
+    decision_date: "2003-11-21"
+    decision_ref: "2003/821/EC"
+    scope: "full"
+
+  - country: "Israel"
+    decision_date: "2011-01-31"
+    decision_ref: "2011/61/EU"
+    scope: "full"
+
+  - country: "Isle of Man"
+    decision_date: "2004-04-28"
+    decision_ref: "2004/411/EC"
+    scope: "full"
+
+  - country: "Japan"
+    decision_date: "2019-01-23"
+    decision_ref: "2019/419"
+    scope: "full"
+    notes: "Mutual adequacy with EU"
+
+  - country: "Jersey"
+    decision_date: "2008-05-08"
+    decision_ref: "2008/393/EC"
+    scope: "full"
+
+  - country: "New Zealand"
+    decision_date: "2012-12-19"
+    decision_ref: "2013/65/EU"
+    scope: "full"
+
+  - country: "Republic of Korea"
+    decision_date: "2021-12-17"
+    decision_ref: "2022/254"
+    scope: "full"
+
+  - country: "Switzerland"
+    decision_date: "2000-07-26"
+    decision_ref: "2000/518/EC"
+    scope: "full"
+
+  - country: "United Kingdom"
+    decision_date: "2021-06-28"
+    decision_ref: "2021/1772"
+    scope: "full"
+    expiry: "2025-06-27"  # Subject to review
+    notes: "Post-Brexit adequacy, time-limited"
+
+  - country: "Uruguay"
+    decision_date: "2012-08-21"
+    decision_ref: "2012/484/EU"
+    scope: "full"
+
+  - country: "United States"
+    decision_date: "2023-07-10"
+    decision_ref: "2023/4745"
+    scope: "data_privacy_framework"
+    notes: "EU-US Data Privacy Framework - only for certified organizations"
+    certification_list: "https://www.dataprivacyframework.gov/s/participant-search"
+
+# Partial or sector-specific adequacy
+# TODO: Add any sector-specific decisions
+
+# Pending decisions
+# TODO: Track countries under evaluation
+
+# Revoked/suspended decisions
+revoked:
+  - country: "United States (Privacy Shield)"
+    revoked_date: "2020-07-16"
+    reason: "Schrems II judgment (C-311/18)"

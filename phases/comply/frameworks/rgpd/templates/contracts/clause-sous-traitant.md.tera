@@ -1,0 +1,215 @@
+{# Template: Clauses contractuelles de sous-traitance (Article 28 RGPD) #}
+{# Source: knowledge/core/guide-sous-traitant.md (lignes 289-383) #}
+{# Input: system-model/integrations.yaml, organization.yaml #}
+
+# Clauses de Sous-Traitance RGPD
+
+> **Article 28 du RGPD** - Sous-traitant
+> Document généré le {{ now() | date(format="%d/%m/%Y") }}
+> Sous-traitant: **{{ integration.name }}** ({{ integration.vendor }})
+
+---
+
+## I. Objet
+
+Les présentes clauses définissent les conditions dans lesquelles **{{ integration.name }}** (ci-après « le Sous-traitant ») s'engage à effectuer pour le compte de **{{ organization.legal_entity.name }}** (ci-après « le Responsable de traitement ») les opérations de traitement de données à caractère personnel définies ci-après.
+
+Les parties s'engagent à respecter le règlement (UE) 2016/679 du 27 avril 2016 relatif à la protection des personnes physiques à l'égard du traitement des données à caractère personnel (ci-après « RGPD »).
+
+---
+
+## II. Description du traitement faisant l'objet de la sous-traitance
+
+| Élément | Description |
+|---------|-------------|
+| **Service(s) fourni(s)** | {{ integration.type | default(value="À préciser") }} |
+| **Nature des opérations** | {% for exchange in integration.data_exchanged %}{{ exchange.purpose }}{% if not loop.last %}, {% endif %}{% endfor %} |
+| **Finalité(s) du traitement** | {{ integration.processing_purposes | join(sep=", ") | default(value="À préciser") }} |
+| **Durée du contrat** | {{ integration.contract.duration | default(value="À définir") }} |
+
+### Données à caractère personnel traitées
+
+{% for exchange in integration.data_exchanged %}
+- **{{ exchange.data_id }}**: {{ exchange.direction }} - {{ exchange.purpose }}
+{% endfor %}
+
+### Catégories de personnes concernées
+
+{{ integration.data_subjects | join(sep=", ") | default(value="À préciser (clients, employés, utilisateurs, etc.)") }}
+
+---
+
+## III. Durée du contrat
+
+Le présent contrat entre en vigueur le {{ integration.contract.start_date | default(value="[DATE]") }}.
+
+Durée: {{ integration.contract.duration | default(value="[DURÉE À PRÉCISER]") }}
+
+---
+
+## IV. Obligations du Sous-traitant vis-à-vis du Responsable de traitement
+
+Le Sous-traitant s'engage à:
+
+### 1. Traiter les données uniquement pour les finalités de la sous-traitance
+
+Le Sous-traitant ne traite les données à caractère personnel que sur instruction documentée du Responsable de traitement, y compris en ce qui concerne les transferts de données vers un pays tiers ou à une organisation internationale.
+
+### 2. Traiter conformément aux instructions documentées
+
+Le Sous-traitant traite les données uniquement conformément aux instructions documentées du Responsable de traitement.
+
+> **Si le Sous-traitant considère qu'une instruction constitue une violation du RGPD ou d'autres dispositions du droit de l'Union ou du droit des États membres relatives à la protection des données, il en informe immédiatement le Responsable de traitement.**
+
+### 3. Garantir la confidentialité
+
+Le Sous-traitant s'assure que les personnes autorisées à traiter les données à caractère personnel:
+- S'engagent à respecter la confidentialité ou sont soumises à une obligation légale appropriée de confidentialité
+- Reçoivent la formation nécessaire en matière de protection des données à caractère personnel
+
+### 4. Protection des données dès la conception et par défaut
+
+Le Sous-traitant met en œuvre les mesures techniques et organisationnelles appropriées pour garantir que, par défaut, seules les données à caractère personnel nécessaires au regard de chaque finalité spécifique du traitement sont traitées (minimisation).
+
+### 5. Sous-traitance ultérieure
+
+{% if integration.subprocessors_authorized | default(value=false) %}
+**Option A - Autorisation générale:**
+
+Le Sous-traitant peut faire appel à un autre sous-traitant (sous-traitant ultérieur) pour mener des activités de traitement spécifiques. Dans ce cas, il informe préalablement et par écrit le Responsable de traitement de tout changement prévu concernant l'ajout ou le remplacement d'autres sous-traitants.
+
+Le Responsable de traitement dispose d'un délai de **{{ integration.subprocessors_objection_delay | default(value="15 jours") }}** à compter de la date de réception de cette information pour présenter ses objections.
+
+**Liste des sous-traitants ultérieurs autorisés:**
+{% for subprocessor in integration.subprocessors | default(value=[]) %}
+- {{ subprocessor.name }} - {{ subprocessor.service }} ({{ subprocessor.location }})
+{% endfor %}
+{% else %}
+**Option B - Autorisation spécifique:**
+
+Le Sous-traitant ne peut faire appel à un autre sous-traitant qu'après autorisation écrite, préalable et spécifique du Responsable de traitement.
+{% endif %}
+
+Le sous-traitant ultérieur est tenu de respecter les mêmes obligations de protection des données que celles fixées dans le présent contrat. **Le Sous-traitant demeure pleinement responsable** devant le Responsable de traitement de l'exécution par le sous-traitant ultérieur de ses obligations.
+
+### 6. Droit d'information des personnes concernées
+
+{% if integration.handles_information | default(value=false) %}
+Le Sous-traitant fournit l'information aux personnes concernées au moment de la collecte des données, dans les termes convenus avec le Responsable de traitement.
+{% else %}
+Le Responsable de traitement fournit lui-même l'information aux personnes concernées.
+{% endif %}
+
+### 7. Exercice des droits des personnes
+
+{% if integration.handles_rights | default(value=false) %}
+Le Sous-traitant répond, au nom et pour le compte du Responsable de traitement et dans les délais prévus par le RGPD, aux demandes des personnes concernées en cas d'exercice de leurs droits (accès, rectification, effacement, limitation, portabilité, opposition).
+{% else %}
+Le Sous-traitant transmet au Responsable de traitement, dans un délai de **{{ integration.rights_transfer_delay | default(value="48 heures") }}**, toute demande reçue de la part d'une personne concernée souhaitant exercer ses droits.
+{% endif %}
+
+### 8. Notification des violations de données
+
+Le Sous-traitant notifie au Responsable de traitement toute violation de données à caractère personnel dans un délai maximum de **{{ integration.breach_notification_delay | default(value="24 heures") }}** après en avoir pris connaissance.
+
+Cette notification est accompagnée de toute documentation utile afin de permettre au Responsable de traitement, si nécessaire, de notifier cette violation à l'autorité de contrôle compétente.
+
+### 9. Aide au respect des obligations de sécurité et d'AIPD
+
+Le Sous-traitant aide le Responsable de traitement à garantir le respect des obligations suivantes:
+- Sécurité du traitement (Article 32)
+- Notification de violation à l'autorité de contrôle (Article 33)
+- Communication de violation aux personnes concernées (Article 34)
+- Analyse d'impact relative à la protection des données (Article 35)
+- Consultation préalable (Article 36)
+
+### 10. Mesures de sécurité
+
+Le Sous-traitant met en œuvre les mesures de sécurité suivantes (Article 32):
+
+| Catégorie | Mesures |
+|-----------|---------|
+| **Pseudonymisation et chiffrement** | {{ integration.security.encryption_in_transit | default(value="À préciser") }} |
+| **Confidentialité, intégrité, disponibilité** | {{ integration.security.controls | default(value="À préciser") }} |
+| **Capacité de rétablissement** | {{ integration.security.recovery | default(value="À préciser") }} |
+| **Tests et évaluation** | {{ integration.security.testing | default(value="À préciser") }} |
+
+Certifications du Sous-traitant: {{ integration.compliance.certifications | join(sep=", ") | default(value="Aucune certifiée") }}
+
+### 11. Sort des données en fin de contrat
+
+Au terme de la prestation de services, le Sous-traitant s'engage à:
+
+{% if integration.end_of_contract.action | default(value="delete") == "return" %}
+- [ ] **Renvoyer** toutes les données à caractère personnel au Responsable de traitement
+{% else %}
+- [ ] **Détruire** toutes les données à caractère personnel
+{% endif %}
+- [ ] **Détruire** les copies existantes, sauf obligation légale de conservation
+- [ ] **Fournir** une attestation écrite de destruction des données
+
+Délai: {{ integration.end_of_contract.delay | default(value="30 jours") }} après la fin du contrat.
+
+### 12. Délégué à la Protection des Données
+
+{% if integration.dpo is defined %}
+Le Sous-traitant communique au Responsable de traitement le nom et les coordonnées de son DPO:
+
+- **Nom**: {{ integration.dpo.name }}
+- **Email**: {{ integration.dpo.email }}
+{% else %}
+Le Sous-traitant indique ne pas avoir désigné de DPO. *À vérifier si l'obligation s'applique.*
+{% endif %}
+
+### 13. Registre des catégories d'activités de traitement
+
+Le Sous-traitant déclare tenir un registre de toutes les catégories d'activités de traitement effectuées pour le compte du Responsable de traitement, conformément à l'article 30.2 du RGPD.
+
+### 14. Documentation et audits
+
+Le Sous-traitant met à la disposition du Responsable de traitement toutes les informations nécessaires pour démontrer le respect des obligations prévues au présent contrat et pour permettre la réalisation d'audits.
+
+---
+
+## V. Obligations du Responsable de traitement
+
+Le Responsable de traitement s'engage à:
+
+1. Fournir au Sous-traitant les données nécessaires à l'exécution de la prestation
+2. Documenter par écrit toute instruction concernant le traitement des données
+3. Veiller, au préalable et pendant toute la durée du traitement, au respect des obligations du RGPD par le Sous-traitant
+4. Superviser le traitement, y compris par la réalisation d'audits et d'inspections
+
+---
+
+## VI. Localisation des données
+
+| Élément | Valeur |
+|---------|--------|
+| **Localisation principale** | {{ integration.compliance.data_location | default(value="À préciser") }} |
+| **Transfert hors UE** | {% if integration.compliance.data_location not in ["FR", "EU"] %}Oui{% else %}Non{% endif %} |
+{% if integration.compliance.data_location not in ["FR", "EU"] %}
+| **Mécanisme de transfert** | {{ integration.compliance.transfer_mechanism | default(value="À préciser (CCT, décision d'adéquation, etc.)") }} |
+{% endif %}
+
+---
+
+## VII. Signatures
+
+**Pour le Responsable de traitement:**
+
+Nom: {{ organization.representant_legal.name | default(value="_________________________") }}
+Fonction: {{ organization.representant_legal.function | default(value="_________________________") }}
+Date: _________________________
+Signature: _________________________
+
+**Pour le Sous-traitant:**
+
+Nom: _________________________
+Fonction: _________________________
+Date: _________________________
+Signature: _________________________
+
+---
+
+*Clauses conformes aux exigences de l'Article 28 du RGPD et au Guide du sous-traitant de la CNIL (2017)*

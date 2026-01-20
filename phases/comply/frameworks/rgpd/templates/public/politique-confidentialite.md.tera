@@ -1,0 +1,178 @@
+{# Template: Politique de Confidentialité (Articles 13-14 RGPD) #}
+{# Source: RGPD Articles 13-14 (information des personnes) #}
+{# Input: system-model/data.yaml, integrations.yaml, business.yaml, organization.yaml #}
+
+# Politique de Confidentialité
+
+> Dernière mise à jour: {{ now() | date(format="%d/%m/%Y") }}
+
+---
+
+## 1. Identité du responsable de traitement
+
+**{{ organization.legal_entity.name }}**
+{{ organization.legal_entity.address | default(value="[Adresse]") }}
+SIRET: {{ organization.legal_entity.siret | default(value="[SIRET]") }}
+
+{% if team.security_roles.dpo is defined %}
+**Délégué à la Protection des Données (DPO):**
+{{ team.security_roles.dpo.name }}
+Email: {{ team.security_roles.dpo.email }}
+{% endif %}
+
+---
+
+## 2. Données collectées et finalités
+
+Nous collectons et traitons les données personnelles suivantes dans le cadre de nos activités:
+
+{% for category in data.data_categories %}
+### {{ category.name }}
+
+**Finalités:**
+{% for purpose in category.processing_purposes %}
+- {{ purpose }}
+{% endfor %}
+
+**Données collectées:**
+{% for field in category.fields %}
+- {{ field.name }}{% if field.pii %} (donnée personnelle){% endif %}{% if field.sensitive %} ⚠️ donnée sensible{% endif %}
+
+{% endfor %}
+
+**Base légale:** {{ category.legal_basis | default(value="À préciser") }}
+{% if category.legal_basis == "consentement" %}
+*Vous pouvez retirer votre consentement à tout moment.*
+{% elif category.legal_basis == "contrat" %}
+*Ce traitement est nécessaire à l'exécution du contrat qui nous lie.*
+{% elif category.legal_basis == "interet_legitime" %}
+*Ce traitement est fondé sur notre intérêt légitime à {{ category.legitimate_interest_description | default(value="[préciser]") }}.*
+{% endif %}
+
+**Durée de conservation:** {{ category.retention.period | default(value="À définir") }}
+
+---
+
+{% endfor %}
+
+## 3. Destinataires des données
+
+Vos données peuvent être communiquées aux destinataires suivants:
+
+### Services internes
+- Services concernés par l'exécution des prestations
+- Service informatique (hébergement et maintenance)
+
+### Sous-traitants
+{% for integration in integrations.integrations %}
+{% if integration.data_exchanged is defined %}
+| **{{ integration.name }}** | {{ integration.vendor }} |
+|---|---|
+| Service | {{ integration.type }} |
+| Finalité | {% for exchange in integration.data_exchanged %}{{ exchange.purpose }}{% if not loop.last %}, {% endif %}{% endfor %} |
+| Localisation | {{ integration.compliance.data_location | default(value="À vérifier") }} |
+
+{% endif %}
+{% endfor %}
+
+### Autres destinataires
+- Autorités légales sur réquisition
+
+---
+
+## 4. Transferts hors Union Européenne
+
+{% set transfers = data.data_categories | selectattr("cross_border", "equalto", true) | list %}
+{% if transfers | length > 0 %}
+Certaines de vos données peuvent être transférées vers des pays situés en dehors de l'Union Européenne:
+
+| Données | Pays | Garanties |
+|---------|------|-----------|
+{% for category in transfers %}
+| {{ category.name }} | {{ category.transfer_destinations | join(sep=", ") }} | {{ category.transfer_mechanism | default(value="À préciser") }} |
+{% endfor %}
+
+Ces transferts sont encadrés par des garanties appropriées (décision d'adéquation, clauses contractuelles types, etc.) conformément au Chapitre V du RGPD.
+{% else %}
+Vos données sont hébergées au sein de l'Union Européenne et ne font pas l'objet de transferts vers des pays tiers.
+{% endif %}
+
+---
+
+## 5. Vos droits
+
+Conformément au RGPD, vous disposez des droits suivants sur vos données personnelles:
+
+| Droit | Description |
+|-------|-------------|
+| **Accès** | Obtenir la confirmation que vos données sont traitées et en recevoir une copie |
+| **Rectification** | Faire corriger des données inexactes ou compléter des données incomplètes |
+| **Effacement** | Demander la suppression de vos données dans certains cas |
+| **Limitation** | Demander la suspension du traitement dans certains cas |
+| **Portabilité** | Recevoir vos données dans un format structuré et lisible par machine |
+| **Opposition** | Vous opposer au traitement fondé sur l'intérêt légitime |
+
+### Comment exercer vos droits?
+
+Vous pouvez exercer vos droits:
+- Par email: {{ organization.privacy_contact.email | default(value="[email]") }}
+- Par courrier: {{ organization.legal_entity.address | default(value="[adresse]") }}
+{% if organization.privacy_contact.form_url is defined %}
+- Via notre formulaire en ligne: {{ organization.privacy_contact.form_url }}
+{% endif %}
+
+**Délai de réponse:** 1 mois à compter de votre demande (prolongeable de 2 mois en cas de complexité).
+
+### Réclamation auprès de la CNIL
+
+Si vous estimez que le traitement de vos données constitue une violation du RGPD, vous avez le droit d'introduire une réclamation auprès de la CNIL:
+
+**Commission Nationale de l'Informatique et des Libertés**
+3 Place de Fontenoy - TSA 80715
+75334 PARIS CEDEX 07
+www.cnil.fr
+
+---
+
+## 6. Sécurité des données
+
+Nous mettons en œuvre des mesures techniques et organisationnelles appropriées pour protéger vos données personnelles:
+
+{% for control in controls.existing_controls | default(value=[]) %}
+- {{ control }}
+{% endfor %}
+{% if controls.existing_controls is not defined %}
+- Chiffrement des données en transit (HTTPS/TLS)
+- Contrôle d'accès et authentification
+- Sauvegardes régulières
+- Journalisation des accès
+{% endif %}
+
+---
+
+## 7. Cookies et traceurs
+
+{% if business.uses_cookies | default(value=true) %}
+Notre site utilise des cookies et traceurs. Pour plus d'informations, consultez notre [Politique Cookies].
+
+**Types de cookies utilisés:**
+- Cookies strictement nécessaires (exemptés de consentement)
+- Cookies de mesure d'audience
+- Cookies de personnalisation
+
+Vous pouvez gérer vos préférences via notre bandeau cookies ou les paramètres de votre navigateur.
+{% else %}
+Notre site n'utilise pas de cookies de suivi ou de publicité.
+{% endif %}
+
+---
+
+## 8. Modifications de la politique
+
+Cette politique peut être mise à jour. En cas de modification substantielle, nous vous en informerons par les moyens appropriés.
+
+Date de la dernière mise à jour: {{ now() | date(format="%d/%m/%Y") }}
+
+---
+
+*{{ organization.legal_entity.name }} - Tous droits réservés*
