@@ -2,7 +2,7 @@
 
 <div align="center">
 <h2>Security as Code, Multi-Agent Ready</h2>
-<p><strong>Version 3.1.0</strong></p>
+<p><strong>Version 4.0.0</strong></p>
 </div>
 
 ---
