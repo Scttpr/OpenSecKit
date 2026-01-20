@@ -3,8 +3,10 @@
 
 metadata:
   framework: "rgs"
-  last_audit: null # Set when you verify all docs are current
-  maintainer: null
+  last_audit: "2026-01-20"
+  maintainer: "OpenSecKit"
+  version: "4.1.0"
+  notes: "Standardized manifest structure to match RGPD framework"
 
 documents:
   # RGS v2.0 Official Documents
