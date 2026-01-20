@@ -34,11 +34,11 @@ pub fn get_files_content(files: &[String]) -> String {
         content.push_str(&format!("\n## Fichier : {file_path}\n```\n"));
 
         if is_binary(path) {
-            content.push_str("[Fichier binaire ou trop volumineux - Contenu masqué]");
+            content.push_str("[Binary or large file - content hidden]");
         } else {
             match fs::read_to_string(file_path) {
                 Ok(c) => content.push_str(&c),
-                Err(_) => content.push_str("[Erreur de lecture]"),
+                Err(_) => content.push_str("[Read error]"),
             }
         }
 
@@ -48,7 +48,7 @@ pub fn get_files_content(files: &[String]) -> String {
 }
 
 pub fn run(output_path: &str, _stats: bool, base_path: &str) -> Result<()> {
-    println!("📦 Génération du contexte statique...");
+    println!("  Generating static context...");
 
     let tree = get_file_tree(base_path);
 
@@ -74,12 +74,12 @@ pub fn run(output_path: &str, _stats: bool, base_path: &str) -> Result<()> {
 
     let content = get_files_content(&all_files);
 
-    let file = File::create(output_path).context("Impossible de créer le fichier de sortie")?;
+    let file = File::create(output_path).context("Failed to create output file")?;
     let mut writer = BufWriter::new(file);
 
-    writeln!(writer, "# ARBORESCENCE\n\n{tree}\n\n# CONTENU\n\n{content}")?;
+    writeln!(writer, "# FILE TREE\n\n{tree}\n\n# CONTENT\n\n{content}")?;
 
-    println!("✅ Contexte exporté avec succès vers {output_path}");
+    println!("  ✓ Context exported to {output_path}");
     Ok(())
 }
 
@@ -202,6 +202,6 @@ mod tests {
 
         let content = get_files_content(&[binary_file.to_string_lossy().to_string()]);
 
-        assert!(content.contains("[Fichier binaire ou trop volumineux"));
+        assert!(content.contains("[Binary or large file"));
     }
 }

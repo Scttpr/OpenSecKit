@@ -138,6 +138,10 @@ impl From<(&str, &CommandConfig)> for CommandInfo {
     }
 }
 
+/// Load and parse the registry.toml file
+///
+/// The registry defines all available commands, their dependencies,
+/// and metadata used for agent file generation.
 pub fn load_registry(path: &Path) -> Result<Registry> {
     let content = fs::read_to_string(path)
         .with_context(|| format!("Cannot read registry: {}", path.display()))?;
@@ -148,6 +152,9 @@ pub fn load_registry(path: &Path) -> Result<Registry> {
     Ok(registry)
 }
 
+/// Extract all commands from the registry as CommandInfo structs
+///
+/// Returns a sorted list of commands ready for template rendering.
 pub fn get_commands(registry: &Registry) -> Vec<CommandInfo> {
     let mut commands: Vec<CommandInfo> = registry
         .commands
@@ -179,6 +186,7 @@ pub fn detect_domains(registry: &Registry) -> DomainsInfo {
     domains
 }
 
+/// Available compliance domains detected from registry commands
 #[derive(Debug, Clone, Default, Serialize)]
 pub struct DomainsInfo {
     pub rgpd: bool,

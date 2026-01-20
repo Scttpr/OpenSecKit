@@ -12,6 +12,7 @@ use crate::registry::{CommandInfo, DomainsInfo};
 
 #[derive(Debug, Deserialize)]
 pub struct AgentsConfig {
+    #[allow(dead_code)]
     pub meta: MetaConfig,
     pub agents: HashMap<String, AgentConfig>,
     pub universal: Option<UniversalConfig>,
@@ -22,6 +23,7 @@ pub struct MetaConfig {
     #[serde(default)]
     #[allow(dead_code)]
     pub version: String,
+    #[allow(dead_code)]
     pub default_agent: String,
 }
 
@@ -52,16 +54,17 @@ pub fn load_agents_config(osk_dir: &Path) -> Result<AgentsConfig> {
     let config_path = osk_dir.join("agents.toml");
 
     if !config_path.exists() {
-        anyhow::bail!("agents.toml non trouvé dans {}", osk_dir.display());
+        anyhow::bail!("agents.toml not found in {}", osk_dir.display());
     }
 
-    let content = fs::read_to_string(&config_path).context("Impossible de lire agents.toml")?;
+    let content = fs::read_to_string(&config_path).context("Failed to read agents.toml")?;
 
-    let config: AgentsConfig = toml::from_str(&content).context("Erreur de parsing agents.toml")?;
+    let config: AgentsConfig = toml::from_str(&content).context("Failed to parse agents.toml")?;
 
     Ok(config)
 }
 
+#[allow(dead_code)]
 pub fn is_agent_available(agent: &AgentConfig) -> bool {
     if let Some(cmd) = &agent.detect_cmd {
         if which::which(cmd).is_ok() {
@@ -93,7 +96,7 @@ pub fn generate_agent_files(
 
     let template_path = templates_dir.join("agents").join(&agent.template);
     let template_content = fs::read_to_string(&template_path)
-        .with_context(|| format!("Template non trouvé: {}", template_path.display()))?;
+        .with_context(|| format!("Template not found: {}", template_path.display()))?;
 
     let mut tera = Tera::default();
     tera.add_raw_template(&agent.template, &template_content)?;
@@ -103,7 +106,7 @@ pub fn generate_agent_files(
         "single-file" => generate_single_file(agent, commands, &tera, version, domains),
         "rules-dir" => generate_rules_dir(agent, commands, &tera, version, domains),
         _ => {
-            eprintln!("   ⚠️  Format inconnu pour {}: {}", agent_id, agent.format);
+            eprintln!("  ⚠ Unknown format for {}: {}", agent_id, agent.format);
             Ok(0)
         }
     }
@@ -120,11 +123,11 @@ fn generate_slash_commands(
     let output_dir = agent
         .output_dir
         .as_ref()
-        .ok_or_else(|| anyhow::anyhow!("output_dir requis pour format slash-command"))?;
+        .ok_or_else(|| anyhow::anyhow!("output_dir required for slash-command format"))?;
     let pattern = agent
         .file_pattern
         .as_ref()
-        .ok_or_else(|| anyhow::anyhow!("file_pattern requis pour format slash-command"))?;
+        .ok_or_else(|| anyhow::anyhow!("file_pattern required for slash-command format"))?;
 
     fs::create_dir_all(output_dir)?;
 
@@ -145,7 +148,7 @@ fn generate_slash_commands(
             match fs::read_to_string(&local_path) {
                 Ok(content) => content,
                 Err(e) => {
-                    eprintln!("   ⚠️  Cannot read {}: {}", local_path.display(), e);
+                    eprintln!("   ⚠  Cannot read {}: {}", local_path.display(), e);
                     format!("# {}\n\nFailed to read local prompt: {}", cmd.name, e)
                 }
             }
@@ -158,12 +161,12 @@ fn generate_slash_commands(
                             format!("# {}\n\nFailed to read prompt content from {}", cmd.name, cmd.url)
                         })
                     } else {
-                        eprintln!("   ⚠️  HTTP {} fetching {}", response.status(), cmd.url);
+                        eprintln!("   ⚠  HTTP {} fetching {}", response.status(), cmd.url);
                         format!("# {}\n\nFailed to fetch prompt (HTTP {})\nURL: {}", cmd.name, response.status(), cmd.url)
                     }
                 }
                 Err(e) => {
-                    eprintln!("   ⚠️  Error fetching {}: {}", cmd.url, e);
+                    eprintln!("   ⚠  Error fetching {}: {}", cmd.url, e);
                     format!("# {}\n\nFailed to fetch prompt: {}\nURL: {}", cmd.name, e, cmd.url)
                 }
             }
@@ -194,7 +197,7 @@ fn generate_single_file(
     let output_file = agent
         .output_file
         .as_ref()
-        .ok_or_else(|| anyhow::anyhow!("output_file requis pour format single-file"))?;
+        .ok_or_else(|| anyhow::anyhow!("output_file required for single-file format"))?;
 
     if let Some(parent) = Path::new(output_file).parent() {
         fs::create_dir_all(parent)?;
@@ -221,11 +224,11 @@ fn generate_rules_dir(
     let output_dir = agent
         .output_dir
         .as_ref()
-        .ok_or_else(|| anyhow::anyhow!("output_dir requis pour format rules-dir"))?;
+        .ok_or_else(|| anyhow::anyhow!("output_dir required for rules-dir format"))?;
     let pattern = agent
         .file_pattern
         .as_ref()
-        .ok_or_else(|| anyhow::anyhow!("file_pattern requis pour format rules-dir"))?;
+        .ok_or_else(|| anyhow::anyhow!("file_pattern required for rules-dir format"))?;
 
     fs::create_dir_all(output_dir)?;
 
@@ -260,7 +263,7 @@ pub fn generate_agents_md(
 
     let template_path = templates_dir.join("agents").join(&config.template);
     let template_content = fs::read_to_string(&template_path)
-        .with_context(|| format!("Template AGENTS.md non trouvé: {}", template_path.display()))?;
+        .with_context(|| format!("AGENTS.md template not found: {}", template_path.display()))?;
 
     let mut tera = Tera::default();
     tera.add_raw_template(&config.template, &template_content)?;

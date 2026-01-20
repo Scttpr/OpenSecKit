@@ -57,7 +57,7 @@ pub fn run(since: Option<&str>, json: bool) -> Result<()> {
         println!("No changes detected since {}", &since_commit[..7.min(since_commit.len())]);
     } else {
         println!(
-            "📝 {} changes since {}",
+            "» {} changes since {}",
             result.summary.total,
             &since_commit[..7.min(since_commit.len())]
         );

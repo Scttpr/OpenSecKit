@@ -60,16 +60,16 @@ impl CheckResult {
 
     fn print(&self) {
         for path in &self.found {
-            println!("✅ {}", path);
+            println!("✓ {}", path);
         }
         for path in &self.missing {
-            println!("❌ {} (missing)", path);
+            println!("✗ {} (missing)", path);
         }
 
         if self.ready {
-            println!("\n🚀 Ready for /{}", self.command);
+            println!("\n» Ready for /{}", self.command);
         } else if let Some(ref suggestion) = self.suggestion {
-            println!("\n💡 {}", suggestion);
+            println!("\n→ {}", suggestion);
         }
     }
 

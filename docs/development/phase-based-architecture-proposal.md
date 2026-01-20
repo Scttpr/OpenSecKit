@@ -8,7 +8,7 @@ Restructure OpenSecKit from **artifact-type organization** to **phase-based orga
 
 ```
 OpenSecKit/
-├── phases/
+├── kit/
 │   ├── discover/           # Part 1: System Discovery
 │   │   ├── prompts/
 │   │   │   ├── init.md
@@ -149,24 +149,24 @@ OpenSecKit/
 
 | Current Location | Proposed Location |
 |-----------------|-------------------|
-| `prompts/osk-discover-*.md` | `phases/discover/prompts/*.md` |
-| `prompts/osk-comply-*.md` | `phases/comply/prompts/*.md` |
-| `prompts/osk-secure-*.md` | `phases/secure/prompts/*.md` |
-| `frameworks/rgpd/` | `phases/comply/frameworks/rgpd/` |
-| `frameworks/rgs/` | `phases/comply/frameworks/rgs/` |
-| `templates/data/discover/` | `phases/discover/templates/data/` |
-| `templates/data/comply/` | `phases/comply/templates/data/` |
-| `templates/outputs/discover/` | `phases/discover/templates/outputs/` |
-| `templates/outputs/comply/` | `phases/comply/templates/outputs/` |
-| `templates/secure/` | `phases/secure/templates/outputs/` |
-| `templates/reports/discovery-*.tera` | `phases/discover/templates/reports/` |
-| `templates/reports/compliance-*.tera` | `phases/comply/templates/reports/` |
+| `prompts/osk-discover-*.md` | `kit/discover/prompts/*.md` |
+| `prompts/osk-comply-*.md` | `kit/comply/prompts/*.md` |
+| `prompts/osk-secure-*.md` | `kit/secure/prompts/*.md` |
+| `frameworks/rgpd/` | `kit/comply/frameworks/rgpd/` |
+| `frameworks/rgs/` | `kit/comply/frameworks/rgs/` |
+| `templates/data/discover/` | `kit/discover/templates/data/` |
+| `templates/data/comply/` | `kit/comply/templates/data/` |
+| `templates/outputs/discover/` | `kit/discover/templates/outputs/` |
+| `templates/outputs/comply/` | `kit/comply/templates/outputs/` |
+| `templates/secure/` | `kit/secure/templates/outputs/` |
+| `templates/reports/discovery-*.tera` | `kit/discover/templates/reports/` |
+| `templates/reports/compliance-*.tera` | `kit/comply/templates/reports/` |
 | `templates/schemas/` | `shared/schemas/` |
 | `templates/agents/` | `shared/agents/` |
-| `knowledge/methodologies/` | `phases/secure/knowledge/methodologies/` |
-| `knowledge/libraries/` | `phases/secure/knowledge/libraries/` |
-| `knowledge/examples/` | `phases/secure/knowledge/examples/` |
-| `knowledge/frameworks/rgs/` | `phases/comply/frameworks/rgs/knowledge/` |
+| `knowledge/methodologies/` | `kit/secure/knowledge/methodologies/` |
+| `knowledge/libraries/` | `kit/secure/knowledge/libraries/` |
+| `knowledge/examples/` | `kit/secure/knowledge/examples/` |
+| `knowledge/frameworks/rgs/` | `kit/comply/frameworks/rgs/knowledge/` |
 | `templates/outputs/*.tmpl` | `shared/legacy/` |
 
 ## Benefits
@@ -175,14 +175,14 @@ OpenSecKit/
 Everything needed for a phase is in one folder:
 ```bash
 # To understand the comply phase:
-ls phases/comply/
+ls kit/comply/
 # → prompts/ frameworks/ templates/ README.md
 ```
 
 ### 2. Frameworks Live Where They Belong
 Frameworks are compliance-specific, so they're under `comply/`:
 ```
-phases/comply/frameworks/
+kit/comply/frameworks/
 ├── rgpd/
 │   ├── framework.yaml
 │   ├── templates/
@@ -194,8 +194,8 @@ phases/comply/frameworks/
 ```
 
 ### 3. Knowledge is Contextualized
-- Security methodologies → `phases/secure/knowledge/`
-- Framework-specific knowledge → `phases/comply/frameworks/{name}/knowledge/`
+- Security methodologies → `kit/secure/knowledge/`
+- Framework-specific knowledge → `kit/comply/frameworks/{name}/knowledge/`
 - No more top-level `knowledge/` that's really only for secure phase
 
 ### 4. Cleaner Prompt Names
@@ -205,26 +205,26 @@ prompts/osk-discover-init.md
 prompts/osk-comply-rgpd.md
 
 # Proposed (context from folder)
-phases/discover/prompts/init.md
-phases/comply/prompts/rgpd.md
+kit/discover/prompts/init.md
+kit/comply/prompts/rgpd.md
 ```
 
 ### 5. Extensibility
 Adding a new phase (e.g., "operate" for runtime security):
 ```bash
-mkdir -p phases/operate/{prompts,templates,knowledge}
+mkdir -p kit/operate/{prompts,templates,knowledge}
 ```
 
 ### 6. Clear Shared vs Phase-Specific
 - `shared/` = truly cross-cutting (schemas, agent configs)
-- `phases/*/` = phase-specific everything
+- `kit/*/` = phase-specific everything
 
 ## Trade-offs
 
 ### Cons to Consider
 
 1. **CLI Path Updates**: Registry and CLI code need to reference new paths
-2. **Deeper Nesting**: `phases/comply/frameworks/rgpd/templates/` vs `frameworks/rgpd/templates/`
+2. **Deeper Nesting**: `kit/comply/frameworks/rgpd/templates/` vs `frameworks/rgpd/templates/`
 3. **Migration Effort**: One-time restructure + testing
 4. **Tooling Updates**: Any scripts referencing old paths need updates
 
@@ -244,18 +244,18 @@ phases = "phases"
 shared = "shared"
 
 [phases.discover]
-prompts = "phases/discover/prompts"
-templates = "phases/discover/templates"
+prompts = "kit/discover/prompts"
+templates = "kit/discover/templates"
 
 [phases.comply]
-prompts = "phases/comply/prompts"
-frameworks = "phases/comply/frameworks"
-templates = "phases/comply/templates"
+prompts = "kit/comply/prompts"
+frameworks = "kit/comply/frameworks"
+templates = "kit/comply/templates"
 
 [phases.secure]
-prompts = "phases/secure/prompts"
-templates = "phases/secure/templates"
-knowledge = "phases/secure/knowledge"
+prompts = "kit/secure/prompts"
+templates = "kit/secure/templates"
+knowledge = "kit/secure/knowledge"
 
 [shared]
 schemas = "shared/schemas"
@@ -268,7 +268,7 @@ agents = "shared/agents"
 1. The 3-phase model is the core product concept
 2. Current structure is already hybrid (phase prefixes everywhere)
 3. Frameworks at top-level alongside knowledge is awkward
-4. Makes onboarding clearer ("want to understand comply? look at phases/comply/")
+4. Makes onboarding clearer ("want to understand comply? look at kit/comply/")
 
 **Next Steps**:
 1. [ ] Review and approve this proposal

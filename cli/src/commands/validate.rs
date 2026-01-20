@@ -118,17 +118,17 @@ fn validate_yaml(json: bool) -> Result<()> {
     } else {
         for file in &checked_files {
             if file.status == "valid" {
-                println!("✅ {}", file.path);
+                println!("✓ {}", file.path);
             } else {
                 println!(
-                    "❌ {}: {}",
+                    "✗ {}: {}",
                     file.path,
                     file.error.as_deref().unwrap_or("unknown error")
                 );
             }
         }
         println!(
-            "\n📊 {} files validated, {} errors",
+            "\n» {} files validated, {} errors",
             valid_count, error_count
         );
     }
@@ -199,14 +199,14 @@ fn validate_deps(feature: &str, json: bool) -> Result<()> {
         println!("   {} tasks found", tasks_file.tasks.len());
 
         for warning in &warnings {
-            println!("   ⚠️  {}", warning);
+            println!("   ⚠  {}", warning);
         }
 
         if has_cycle {
-            println!("\n❌ Circular dependency detected:");
+            println!("\n✗ Circular dependency detected:");
             println!("   {}", cycle_path.join(" → "));
         } else {
-            println!("\n✅ No circular dependencies found");
+            println!("\n✓ No circular dependencies found");
         }
     }
 
@@ -364,16 +364,16 @@ fn validate_workflow(feature: &str, json: bool) -> Result<()> {
         for file in &checked_files {
             let filename = file.path.split('/').next_back().unwrap_or(&file.path);
             match file.status.as_str() {
-                "valid" => println!("✅ {}", filename),
-                "incomplete" => println!("⚠️  {} (empty or TODO)", filename),
-                _ => println!("❌ {} (missing)", filename),
+                "valid" => println!("✓ {}", filename),
+                "incomplete" => println!("⚠  {} (empty or TODO)", filename),
+                _ => println!("✗ {} (missing)", filename),
             }
         }
-        println!("\n📊 Workflow: {}/7 complete", complete_count);
+        println!("\n» Workflow: {}/7 complete", complete_count);
         if complete_count == 7 {
-            println!("✅ Workflow complete for '{}'", feature);
+            println!("✓ Workflow complete for '{}'", feature);
         } else if let Some(ref cmd) = next_command {
-            println!("💡 Next: Run {}", cmd);
+            println!("→ Next: Run {}", cmd);
         }
     }
 
@@ -525,28 +525,28 @@ fn validate_system_model(model_path: &str, json: bool) -> Result<()> {
         for file in &checked_files {
             let filename = file.path.split('/').next_back().unwrap_or(&file.path);
             match file.status.as_str() {
-                "valid" => println!("   ✅ {}", filename),
-                "missing" => println!("   ❌ {} (missing)", filename),
-                _ => println!("   ❌ {} ({})", filename, file.error.as_deref().unwrap_or("invalid")),
+                "valid" => println!("   ✓ {}", filename),
+                "missing" => println!("   ✗ {} (missing)", filename),
+                _ => println!("   ✗ {} ({})", filename, file.error.as_deref().unwrap_or("invalid")),
             }
         }
 
         if !errors.is_empty() {
             println!("\n📋 Issues found:");
             for err in &errors {
-                let icon = if err.severity == "error" { "❌" } else { "⚠️" };
+                let icon = if err.severity == "error" { "✗" } else { "⚠" };
                 println!("   {} [{}] {}", icon, err.file, err.message);
                 if let Some(ref suggestion) = err.suggestion {
-                    println!("      💡 {}", suggestion);
+                    println!("      → {}", suggestion);
                 }
             }
         }
 
-        println!("\n📊 Result: {} errors, {} warnings", error_count, warning_count);
+        println!("\n» Result: {} errors, {} warnings", error_count, warning_count);
         if valid {
-            println!("✅ System model is valid");
+            println!("✓ System model is valid");
         } else {
-            println!("❌ System model has validation errors");
+            println!("✗ System model has validation errors");
         }
     }
 

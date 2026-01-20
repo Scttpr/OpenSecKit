@@ -17,21 +17,21 @@ phases = "phases"
 shared = "shared"
 
 [paths.discover]
-root = "phases/discover"
-prompts = "phases/discover/prompts"
-templates = "phases/discover/templates"
+root = "kit/discover"
+prompts = "kit/discover/prompts"
+templates = "kit/discover/templates"
 
 [paths.comply]
-root = "phases/comply"
-prompts = "phases/comply/prompts"
-frameworks = "phases/comply/frameworks"
-templates = "phases/comply/templates"
+root = "kit/comply"
+prompts = "kit/comply/prompts"
+frameworks = "kit/comply/frameworks"
+templates = "kit/comply/templates"
 
 [paths.secure]
-root = "phases/secure"
-prompts = "phases/secure/prompts"
-templates = "phases/secure/templates"
-knowledge = "phases/secure/knowledge"
+root = "kit/secure"
+prompts = "kit/secure/prompts"
+templates = "kit/secure/templates"
+knowledge = "kit/secure/knowledge"
 
 [paths.shared]
 schemas = "shared/schemas"
@@ -104,7 +104,7 @@ principles = ["IV", "V", "VI", "VII"]
 # ════════════════════════════════════════════════════════════════════════════════
 
 [commands.discover]
-url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/phases/discover/prompts/discover.md"
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/prompts/discover.md"
 version = "4.0.0"
 part = "discover"
 phase = "discovery"
@@ -128,7 +128,7 @@ agents = ["claude-code", "copilot", "cursor", "gemini"]
 roles = ["discovery-analyst"]
 
 [commands.discover-validate]
-url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/phases/discover/prompts/validate.md"
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/prompts/validate.md"
 version = "4.0.0"
 part = "discover"
 phase = "discovery"
@@ -141,7 +141,7 @@ agents = ["claude-code", "copilot", "cursor", "gemini"]
 roles = ["discovery-analyst"]
 
 [commands.discover-docs]
-url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/phases/discover/prompts/docs.md"
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/prompts/docs.md"
 version = "4.0.0"
 part = "discover"
 phase = "discovery"
@@ -158,7 +158,7 @@ roles = ["discovery-analyst"]
 # ════════════════════════════════════════════════════════════════════════════════
 
 [commands.comply-rgpd]
-url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/phases/comply/frameworks/rgpd/prompt.md"
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/frameworks/rgpd/prompt.md"
 version = "4.0.0"
 part = "comply"
 phase = "compliance"
@@ -178,7 +178,7 @@ agents = ["claude-code", "copilot", "cursor", "gemini"]
 roles = ["compliance-analyst"]
 
 [commands.comply-rgs]
-url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/phases/comply/frameworks/rgs/prompt.md"
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/frameworks/rgs/prompt.md"
 version = "4.0.0"
 part = "comply"
 phase = "compliance"
@@ -198,7 +198,7 @@ agents = ["claude-code", "copilot", "cursor", "gemini"]
 roles = ["compliance-analyst"]
 
 [commands.comply-list]
-url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/phases/comply/prompts/list.md"
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/prompts/list.md"
 version = "4.0.0"
 part = "comply"
 phase = "compliance"
@@ -210,7 +210,7 @@ agents = ["claude-code", "copilot", "cursor", "gemini"]
 roles = ["compliance-analyst"]
 
 [commands.comply-status]
-url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/phases/comply/prompts/status.md"
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/prompts/status.md"
 version = "4.0.0"
 part = "comply"
 phase = "compliance"
@@ -226,7 +226,7 @@ roles = ["compliance-analyst"]
 # ════════════════════════════════════════════════════════════════════════════════
 
 [commands.secure-specify]
-url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/phases/secure/prompts/osk-secure-specify.md"
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/secure/prompts/osk-secure-specify.md"
 version = "4.0.0"
 part = "secure"
 phase = "specify"
@@ -243,7 +243,7 @@ agents = ["claude-code", "copilot", "cursor", "gemini"]
 roles = ["security-architect"]
 
 [commands.secure-clarify]
-url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/phases/secure/prompts/osk-secure-clarify.md"
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/secure/prompts/osk-secure-clarify.md"
 version = "4.0.0"
 part = "secure"
 phase = "clarify"
@@ -256,7 +256,7 @@ agents = ["claude-code", "copilot", "cursor", "gemini"]
 roles = ["security-architect"]
 
 [commands.secure-plan]
-url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/phases/secure/prompts/osk-secure-plan.md"
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/secure/prompts/osk-secure-plan.md"
 version = "4.0.0"
 part = "secure"
 phase = "plan"
@@ -270,7 +270,7 @@ agents = ["claude-code", "copilot", "cursor", "gemini"]
 roles = ["security-engineer"]
 
 [commands.secure-tasks]
-url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/phases/secure/prompts/osk-secure-tasks.md"
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/secure/prompts/osk-secure-tasks.md"
 version = "4.0.0"
 part = "secure"
 phase = "tasks"
@@ -286,7 +286,7 @@ agents = ["claude-code", "copilot", "cursor", "gemini"]
 roles = ["security-engineer"]
 
 [commands.secure-implement]
-url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/phases/secure/prompts/osk-secure-implement.md"
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/secure/prompts/osk-secure-implement.md"
 version = "4.0.0"
 part = "secure"
 phase = "implement"
@@ -329,8 +329,8 @@ rgs = "comply-rgs"                # /osk-rgs → /osk-comply-rgs
 name = "RGPD / GDPR"
 version = "2016/679"
 description = "Règlement Général sur la Protection des Données"
-templates_path = "phases/comply/frameworks/rgpd/"
-framework_path = "phases/comply/frameworks/rgpd/framework.yaml"
+templates_path = "kit/comply/frameworks/rgpd/"
+framework_path = "kit/comply/frameworks/rgpd/framework.yaml"
 detection_patterns = [
     "user", "email", "password", "address", "phone",
     "date_of_birth", "ip_address", "health", "religion",
@@ -342,8 +342,8 @@ articles = ["Art. 5", "Art. 6", "Art. 25", "Art. 30", "Art. 32", "Art. 33", "Art
 name = "RGS"
 version = "2.0"
 description = "Référentiel Général de Sécurité (France)"
-templates_path = "phases/comply/frameworks/rgs/"
-framework_path = "phases/comply/frameworks/rgs/framework.yaml"
+templates_path = "kit/comply/frameworks/rgs/"
+framework_path = "kit/comply/frameworks/rgs/framework.yaml"
 detection_patterns = [
     "gouv.fr", "service-public", "franceconnect",
     "siret", "siren", "administration", "RGS", "ANSSI"
@@ -360,49 +360,49 @@ levels = ["standard", "renforce", "*"]
 name = "Threat Modeling"
 name_fr = "Modélisation des menaces"
 description = "Proactive analysis of attack vectors"
-knowledge_path = "phases/secure/knowledge/principles/I-threat-modeling/"
+knowledge_path = "kit/secure/knowledge/principles/I-threat-modeling/"
 methods = ["STRIDE", "DFD", "Attack Trees"]
 
 [principles.II]
 name = "Risk Analysis"
 name_fr = "Analyse de risques"
 description = "Risk scoring and prioritization"
-knowledge_path = "phases/secure/knowledge/principles/II-risk-analysis/"
+knowledge_path = "kit/secure/knowledge/principles/II-risk-analysis/"
 methods = ["Risk Scoring", "Risk Register"]
 
 [principles.III]
 name = "Security by Design"
 name_fr = "Sécurité dès la conception"
 description = "Security controls from the start"
-knowledge_path = "phases/secure/knowledge/principles/III-security-design/"
+knowledge_path = "kit/secure/knowledge/principles/III-security-design/"
 methods = ["OWASP ASVS", "Security Requirements"]
 
 [principles.IV]
 name = "Security Testing"
 name_fr = "Tests de sécurité"
 description = "Automated SAST/DAST/SCA"
-knowledge_path = "phases/secure/knowledge/principles/IV-security-testing/"
+knowledge_path = "kit/secure/knowledge/principles/IV-security-testing/"
 methods = ["SAST", "DAST", "SCA"]
 
 [principles.V]
 name = "Secrets Management"
 name_fr = "Gestion des secrets"
 description = "No secrets in code"
-knowledge_path = "phases/secure/knowledge/principles/V-secrets-management/"
+knowledge_path = "kit/secure/knowledge/principles/V-secrets-management/"
 methods = ["Vault", "Secret Detection", "Rotation"]
 
 [principles.VI]
 name = "Audit Logging"
 name_fr = "Traçabilité et audit"
 description = "Immutable, centralized logs"
-knowledge_path = "phases/secure/knowledge/principles/VI-audit-logging/"
+knowledge_path = "kit/secure/knowledge/principles/VI-audit-logging/"
 methods = ["Structured Logging", "SIEM", "Alerting"]
 
 [principles.VII]
 name = "Patch Management"
 name_fr = "Patch management"
 description = "Strict update SLAs"
-knowledge_path = "phases/secure/knowledge/principles/VII-patch-management/"
+knowledge_path = "kit/secure/knowledge/principles/VII-patch-management/"
 methods = ["SCA", "Dependabot", "SLA"]
 
 # ════════════════════════════════════════════════════════════════════════════════

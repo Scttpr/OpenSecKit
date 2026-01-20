@@ -32,14 +32,14 @@ pub fn run(path: Option<&str>, json: bool) -> Result<()> {
         let output = serde_json::to_string_pretty(&result)?;
         println!("{}", output);
     } else {
-        println!("📂 Scanned {} files", result.file_count);
+        println!("  Scanned {} files", result.file_count);
         println!();
         for file in &result.files {
             println!("  {}", file);
         }
         if !result.gitignore_hints.is_empty() {
             println!();
-            println!("📋 Gitignore hints:");
+            println!("  Gitignore hints:");
             for hint in &result.gitignore_hints {
                 println!("  {} → {}", hint.pattern, hint.implies);
             }
@@ -195,6 +195,14 @@ mod tests {
     #[test]
     fn test_scan_respects_gitignore() {
         let temp = TempDir::new().unwrap();
+
+        // Initialize a git repo for .gitignore to be respected
+        std::process::Command::new("git")
+            .args(["init"])
+            .current_dir(temp.path())
+            .output()
+            .expect("Failed to init git repo");
+
         fs::write(temp.path().join(".gitignore"), "ignored.txt\n").unwrap();
         fs::write(temp.path().join("included.rs"), "").unwrap();
         fs::write(temp.path().join("ignored.txt"), "").unwrap();

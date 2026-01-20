@@ -1,0 +1,71 @@
+# OpenSecKit V4 - RGPD Assessment Extension
+# Version: 4.0.0
+# Usage: RGPD-specific fields for compliance assessment
+# Extends: kit/comply/frameworks/_schema/assessment.yaml
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# RGPD-SPECIFIC ASSESSMENT FIELDS
+# Added to the base assessment.yaml when framework is RGPD
+# ═══════════════════════════════════════════════════════════════════════════════
+
+rgpd:
+  # Controller information (Art. 4)
+  data_controller:
+    name: "[Organization name]"
+    address: "[Address]"
+    contact: "[Contact email]"
+
+  # Data Protection Officer (Art. 37-39)
+  dpo:
+    required: true|false           # Based on Art. 37 criteria
+    name: "[DPO name]"
+    email: "[DPO email]"
+    external: true|false           # Internal vs external DPO
+
+  # Supervisory authority (Art. 51-59)
+  supervisory_authority: "[CNIL, ICO, BfDI, etc.]"
+  lead_authority: "[For cross-border processing]"
+
+  # Processing activities (Art. 30)
+  processing_activities_count: 0
+  processing_register_path: "[Path to register file]"
+
+  # Data Protection Impact Assessment (Art. 35)
+  dpia:
+    required: true|false           # Based on Art. 35 criteria
+    completed: true|false
+    date: "[DATE ISO]"
+    path: "[Path to DPIA document]"
+    high_risk_processing: []       # List of high-risk activities
+
+  # International transfers (Chapter V)
+  international_transfers:
+    present: true|false
+    destinations: []               # Countries outside EEA
+    transfer_mechanisms_used:
+      - mechanism: "[SCCs|DPF|BCRs|adequacy|derogation]"
+        countries: []
+        documentation_path: "[Path to transfer agreements]"
+
+  # Data subject rights (Chapter III)
+  rights_implementation:
+    access_request_workflow: true|false      # Art. 15
+    rectification_workflow: true|false       # Art. 16
+    erasure_workflow: true|false             # Art. 17
+    portability_workflow: true|false         # Art. 20
+    objection_workflow: true|false           # Art. 21
+    automated_decision_review: true|false    # Art. 22
+
+  # Breach notification (Art. 33-34)
+  breach_procedures:
+    internal_reporting: true|false
+    authority_notification: true|false
+    subject_notification: true|false
+    72h_capability: true|false
+
+  # Consent management (Art. 7)
+  consent:
+    consent_mechanism_implemented: true|false
+    granular_consent: true|false
+    withdrawal_mechanism: true|false
+    consent_records_maintained: true|false

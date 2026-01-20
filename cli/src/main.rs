@@ -6,7 +6,6 @@ mod commands;
 mod config;
 mod github;
 mod registry;
-mod stack;
 mod utils;
 
 use anyhow::Result;
