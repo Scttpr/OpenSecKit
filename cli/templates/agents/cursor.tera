@@ -1,0 +1,64 @@
+# {{ command.name }}
+
+> {{ command.description }}
+
+## Full Instructions
+
+**Fetch from:** {{ command.url }}
+
+## Context
+
+This project uses **OpenSecKit V4** with hub-and-spokes architecture.
+
+### System Model (Hub) - Always Read First
+- **Index**: `.osk/system-model/index.yaml` (~200 lines, quick orientation)
+- **Full sections**: `.osk/system-model/*.yaml` (load as needed)
+
+### Outputs (Spokes)
+- **Compliance**: `.osk/compliance/`
+- **Specifications**: `.osk/specs/`
+
+{% if command.argument -%}
+## Usage
+
+```
+{{ command.name }} {{ command.argument }}
+```
+{% endif %}
+
+{% if command.part -%}
+## Part
+
+This command is part of the **{{ command.part | upper }}** workflow.
+{% if command.part == "discover" -%}
+- Discover commands build the system model (hub)
+- Output goes to `.osk/system-model/`
+{% elif command.part == "comply" -%}
+- Comply commands assess compliance (spoke)
+- Consumes system model, outputs to `.osk/compliance/`
+{% elif command.part == "secure" -%}
+- Secure commands implement shift-left security (spoke)
+- Consumes system model, outputs to `.osk/specs/`
+{% endif %}
+{% endif %}
+
+{% if command.requires | length > 0 -%}
+## Prerequisites
+
+Requires these files to exist:
+{% for req in command.requires -%}
+- `{{ req }}`
+{% endfor %}
+{% endif %}
+
+{% if command.outputs | length > 0 -%}
+## Expected Outputs
+
+Generate these files:
+{% for output in command.outputs -%}
+- `{{ output }}`
+{% endfor %}
+{% endif %}
+
+---
+*OpenSecKit v{{ version }} - {{ command.part | default(value="core") }} phase*

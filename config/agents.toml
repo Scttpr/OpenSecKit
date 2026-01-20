@@ -1,0 +1,125 @@
+# OpenSecKit V4 - AI Agent Configuration
+# This file defines supported agents and their output formats
+# Add an agent = add a [agents.name] section
+
+[meta]
+version = "4.0.0"
+default_agent = "claude-code"
+architecture = "hub-and-spokes"
+
+# =============================================================================
+# OUTPUT FORMATS
+# =============================================================================
+# - slash-command : One file per command in a folder (Claude Code)
+# - single-file   : All commands in one file (Copilot, Gemini)
+# - rules-dir     : One rule file per command (Cursor)
+# - agents-md     : Standard AGENTS.md format (universal)
+
+# =============================================================================
+# V4 PROJECT STRUCTURE
+# =============================================================================
+# .osk/
+# ├── system-model/           # Part 1: Hub (discover outputs)
+# │   ├── index.yaml          # ~200 lines, always loaded
+# │   ├── business.yaml
+# │   ├── architecture.yaml
+# │   ├── data.yaml
+# │   ├── actors.yaml
+# │   ├── boundaries.yaml
+# │   ├── integrations.yaml
+# │   ├── controls.yaml
+# │   ├── tooling.yaml
+# │   ├── team.yaml
+# │   └── gaps.yaml
+# └── compliance/             # Part 2: Spoke (comply outputs)
+#     ├── assessment-rgpd.yaml
+#     ├── assessment-rgpd.md
+#     ├── gap-report-rgpd.md
+#     ├── sub-processor-register.md
+#     ├── assessment-rgs.yaml
+#     ├── assessment-rgs.md
+#     ├── homologation-checklist.md
+#     ├── system-perimeter.md
+#     └── exports/            # Audit-ready documents
+#         ├── rgpd-compliance-report-*.md
+#         └── dossier-homologation-rgs-*.md
+#
+# specs/                      # Part 3: Spoke (secure outputs, co-located with speckit)
+# └── <feature>/
+#     ├── spec.md             # Functional spec (speckit)
+#     ├── security-spec.md    # Security spec with STRIDE analysis
+#     ├── security-plan.md    # Phased implementation plan
+#     ├── security-tasks.md   # Sprint-ready tasks
+#     └── risks.yaml          # Risk register (YAML for programmatic updates)
+
+# =============================================================================
+# AGENTS
+# =============================================================================
+
+[agents.claude-code]
+name = "Claude Code"
+description = "Native slash commands for Claude Code CLI"
+format = "slash-command"
+output_dir = ".claude/commands"
+file_pattern = "{command}.md"
+detect_cmd = "claude"
+template = "claude-code.tera"
+enabled = true
+
+[agents.copilot]
+name = "GitHub Copilot"
+description = "Instructions for GitHub Copilot Chat"
+format = "single-file"
+output_file = ".github/copilot-instructions.md"
+detect_cmd = "gh"
+detect_path = ".github"
+template = "copilot.tera"
+enabled = true
+
+[agents.cursor]
+name = "Cursor"
+description = "Project rules for Cursor AI"
+format = "rules-dir"
+output_dir = ".cursor/rules"
+file_pattern = "{command}.md"
+detect_cmd = "cursor"
+detect_path = ".cursor"
+template = "cursor.tera"
+enabled = true
+
+[agents.gemini]
+name = "Gemini"
+description = "Instructions for Google Gemini"
+format = "single-file"
+output_file = ".gemini/instructions.md"
+detect_cmd = "gemini"
+template = "gemini.tera"
+enabled = true
+
+[agents.windsurf]
+name = "Windsurf"
+description = "Cascade rules for Windsurf"
+format = "rules-dir"
+output_dir = ".windsurf/rules"
+file_pattern = "{command}.md"
+detect_cmd = "windsurf"
+template = "windsurf.tera"
+enabled = false  # Enable when template ready
+
+[agents.aider]
+name = "Aider"
+description = "Configuration for Aider"
+format = "single-file"
+output_file = ".aider.conf.yml"
+detect_cmd = "aider"
+template = "aider.tera"
+enabled = false  # Enable when template ready
+
+# =============================================================================
+# UNIVERSAL AGENTS.md
+# =============================================================================
+
+[universal]
+enabled = true
+output_file = "AGENTS.md"
+template = "AGENTS.md.tera"

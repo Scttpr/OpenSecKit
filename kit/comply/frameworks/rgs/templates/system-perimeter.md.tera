@@ -1,0 +1,277 @@
+# System Perimeter - RGS Assessment
+
+**Last Updated**: {{ assessment_date }}
+**System**: {{ system_name | default(value="[System Name]") }}
+**RGS Level**: {{ rgs_level }}
+**Perimeter Version**: {{ perimeter_version | default(value="1.0") }}
+
+---
+
+## Purpose
+
+This document defines the complete system perimeter for RGS homologation, including all components that process, store, or transmit data. Per RGS requirements, the perimeter includes not just the application codebase but also operational tooling and infrastructure.
+
+**Principle**: Any component that touches data is within the security perimeter.
+
+---
+
+## Perimeter Summary
+
+| Category | Count | In Scope | Out of Scope |
+|----------|-------|----------|--------------|
+| Application Components | {{ perimeter.application.total }} | {{ perimeter.application.in_scope }} | {{ perimeter.application.out_scope }} |
+| External Integrations | {{ perimeter.integrations.total }} | {{ perimeter.integrations.in_scope }} | {{ perimeter.integrations.out_scope }} |
+| Operational Tooling | {{ perimeter.tooling.total }} | {{ perimeter.tooling.in_scope }} | {{ perimeter.tooling.out_scope }} |
+| Infrastructure | {{ perimeter.infrastructure.total }} | {{ perimeter.infrastructure.in_scope }} | {{ perimeter.infrastructure.out_scope }} |
+| **Total** | **{{ perimeter.total.total }}** | **{{ perimeter.total.in_scope }}** | **{{ perimeter.total.out_scope }}** |
+
+---
+
+## Application Components
+
+Components from the codebase that process or store data.
+
+{% for component in application_components %}
+### {{ component.name }}
+
+| Attribute | Value |
+|-----------|-------|
+| ID | {{ component.id }} |
+| Type | {{ component.type }} |
+| Description | {{ component.description }} |
+| Data Handled | {{ component.data_handled | join(sep=", ") }} |
+| Classification | {{ component.classification }} |
+| In Scope | {{ component.in_scope }} |
+
+{% if component.security_controls | length > 0 %}
+**Security Controls**:
+{% for control in component.security_controls %}
+- {{ control }}
+{% endfor %}
+{% endif %}
+
+{% if not component.in_scope %}
+**Exclusion Justification**: {{ component.exclusion_justification }}
+{% endif %}
+
+---
+
+{% endfor %}
+
+## External Integrations
+
+Third-party services integrated with the application (from `integrations.yaml`).
+
+| Service | Category | Data Flow | Location | Certification | In Scope |
+|---------|----------|-----------|----------|---------------|----------|
+{% for integration in integrations %}
+| {{ integration.name }} | {{ integration.category }} | {{ integration.data_flow }} | {{ integration.location }} | {{ integration.certifications | join(sep=", ") | default(value="None") }} | {{ integration.in_scope }} |
+{% endfor %}
+
+{% for integration in integrations %}
+{% if integration.in_scope %}
+### {{ integration.name }}
+
+| Attribute | Value |
+|-----------|-------|
+| ID | {{ integration.id }} |
+| Category | {{ integration.category }} |
+| Purpose | {{ integration.purpose }} |
+| Data Exchanged | {{ integration.data_exchanged | join(sep=", ") }} |
+| Location | {{ integration.location }} |
+| EU-Based | {{ integration.is_eu }} |
+| Certifications | {{ integration.certifications | join(sep=", ") | default(value="None documented") }} |
+| DPA Status | {{ integration.dpa_status }} |
+| RGS Level Approved | {{ integration.rgs_approved }} |
+
+{% if integration.security_measures | length > 0 %}
+**Security Measures**:
+{% for measure in integration.security_measures %}
+- {{ measure }}
+{% endfor %}
+{% endif %}
+
+{% endif %}
+{% endfor %}
+
+---
+
+## Operational Tooling
+
+Tools used for development, operations, and team collaboration (from `tooling.yaml`).
+
+**Critical for RGS**: These tools often process or store data related to the system and must be assessed.
+
+| Tool | Category | Purpose | Location | Certification | In Scope |
+|------|----------|---------|----------|---------------|----------|
+{% for tool in tooling %}
+| {{ tool.name }} | {{ tool.category }} | {{ tool.purpose }} | {{ tool.location }} | {{ tool.certifications | join(sep=", ") | default(value="None") }} | {{ tool.in_scope }} |
+{% endfor %}
+
+{% for tool in tooling %}
+{% if tool.in_scope %}
+### {{ tool.name }}
+
+| Attribute | Value |
+|-----------|-------|
+| ID | {{ tool.id }} |
+| Category | {{ tool.category }} |
+| Purpose | {{ tool.purpose }} |
+| Why In Scope | {{ tool.in_scope_reason }} |
+| Data Potentially Handled | {{ tool.data_handled | join(sep=", ") }} |
+| Location | {{ tool.location }} |
+| EU-Based | {{ tool.is_eu }} |
+| Certifications | {{ tool.certifications | join(sep=", ") | default(value="None documented") }} |
+| RGS Level Approved | {{ tool.rgs_approved }} |
+
+{% if not tool.rgs_approved and (rgs_level == "rgs-star-star" or rgs_level == "rgs-star-star-star") %}
+**Certification Alert**: This tool lacks required certification for {{ rgs_level }}. Consider:
+- Obtaining SecNumCloud certification documentation
+- Migrating to an approved alternative
+- Documenting compensating controls
+{% endif %}
+
+{% endif %}
+{% endfor %}
+
+---
+
+## Infrastructure Providers
+
+Cloud and hosting providers (from `architecture.yaml`).
+
+| Provider | Services | Region | Certification | In Scope |
+|----------|----------|--------|---------------|----------|
+{% for infra in infrastructure %}
+| {{ infra.name }} | {{ infra.services | join(sep=", ") }} | {{ infra.region }} | {{ infra.certifications | join(sep=", ") | default(value="None") }} | {{ infra.in_scope }} |
+{% endfor %}
+
+{% for infra in infrastructure %}
+{% if infra.in_scope %}
+### {{ infra.name }}
+
+| Attribute | Value |
+|-----------|-------|
+| ID | {{ infra.id }} |
+| Provider | {{ infra.provider }} |
+| Services Used | {{ infra.services | join(sep=", ") }} |
+| Region | {{ infra.region }} |
+| EU-Based | {{ infra.is_eu }} |
+| Data Classification | {{ infra.data_classification }} |
+| Certifications | {{ infra.certifications | join(sep=", ") | default(value="None documented") }} |
+| SecNumCloud | {{ infra.secnumcloud | default(value="No") }} |
+| HDS | {{ infra.hds | default(value="No") }} |
+
+**Data Stored**:
+{% for data in infra.data_stored %}
+- {{ data }}
+{% endfor %}
+
+{% if infra.security_controls | length > 0 %}
+**Security Controls**:
+{% for control in infra.security_controls %}
+- {{ control }}
+{% endfor %}
+{% endif %}
+
+{% endif %}
+{% endfor %}
+
+---
+
+## Exclusions
+
+The following components have been explicitly excluded from the perimeter with documented justification.
+
+{% if exclusions | length > 0 %}
+| Component | Category | Justification | Approved By |
+|-----------|----------|---------------|-------------|
+{% for exclusion in exclusions %}
+| {{ exclusion.name }} | {{ exclusion.category }} | {{ exclusion.justification }} | {{ exclusion.approved_by | default(value="Pending") }} |
+{% endfor %}
+{% else %}
+No exclusions. All identified components are in scope.
+{% endif %}
+
+---
+
+## Data Flow Diagram
+
+### External Boundaries
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              INTERNET                                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           SECURITY PERIMETER                                 │
+│                                                                              │
+│  ┌────────────────┐   ┌────────────────┐   ┌────────────────┐              │
+│  │   Application  │   │  Integrations  │   │  Infrastructure│              │
+│  │   Components   │◀──│    (APIs)      │──▶│   (Hosting)    │              │
+│  └────────────────┘   └────────────────┘   └────────────────┘              │
+│          │                    │                    │                        │
+│          ▼                    ▼                    ▼                        │
+│  ┌─────────────────────────────────────────────────────────────────┐       │
+│  │                     Operational Tooling                          │       │
+│  │  (CI/CD, Documentation, Collaboration, Monitoring, Security)    │       │
+│  └─────────────────────────────────────────────────────────────────┘       │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Data Classification Zones
+
+| Zone | Classification | Components |
+|------|----------------|------------|
+{% for zone in classification_zones %}
+| {{ zone.name }} | {{ zone.classification }} | {{ zone.components | join(sep=", ") }} |
+{% endfor %}
+
+---
+
+## Certification Requirements by RGS Level
+
+{% if rgs_level == "rgs-star" %}
+### `RGS*` (Standard) Requirements
+
+- ISO 27001 recommended for all infrastructure providers
+- No mandatory SecNumCloud requirement
+- Standard DPA agreements with all sub-processors
+
+{% elif rgs_level == "rgs-star-star" %}
+### `RGS**` (Renforcé) Requirements
+
+- ISO 27001 required for infrastructure providers
+- SecNumCloud recommended for cloud services handling sensitive data
+- Qualified certificates for authentication
+- HSM for key management
+
+{% else %}
+### `RGS***` (Élevé) Requirements
+
+- SecNumCloud mandatory for all cloud services
+- HDS required for health data
+- Qualified TSA for timestamping
+- WORM storage for audit logs
+- All services must be ANSSI-approved
+
+{% endif %}
+
+---
+
+## Perimeter Change Management
+
+Any changes to the system perimeter require:
+
+1. Impact assessment on security classification
+2. Update to this document
+3. Re-assessment if new components added: `/osk-comply rgs --update`
+4. Commission d'homologation notification if significant changes
+
+---
+
+*Perimeter document generated by OpenSecKit v4 - {{ assessment_date }}*
+*Reference: ANSSI RGS v2.0 Section 5 - Définition du périmètre*

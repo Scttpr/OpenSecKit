@@ -1,0 +1,275 @@
+# OpenSecKit V4 - Compliance Assessment Schema (Base)
+# Version: 4.0.0
+# Purpose: Output schema for Part 2 (Comply)
+# Location: kit/comply/frameworks/_schema/assessment.yaml
+# Usage: .osk/compliance/assessment-<framework>.yaml
+#
+# Framework-specific extensions:
+#   RGPD: kit/comply/frameworks/rgpd/schemas/assessment-extension.yaml
+#   RGS:  kit/comply/frameworks/rgs/schemas/assessment-extension.yaml
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# METADATA
+# ═══════════════════════════════════════════════════════════════════════════════
+
+metadata:
+  schema_version: "4.0.0"
+  framework: "[rgpd|rgs]"
+  framework_version: "[Framework version, e.g., '2016/679' for RGPD]"
+  framework_full_name: "[Full framework name]"
+  assessment_date: "[DATE ISO]"
+  assessor: "[/osk-comply <framework>]"
+  system_model_version: "[metadata.schema_version from system-model.yaml]"
+  system_model_hash: "[SHA256 of system-model.yaml at assessment time]"
+  previous_assessment: "[DATE ISO of previous assessment, if any]"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SUMMARY
+# High-level compliance status
+# ═══════════════════════════════════════════════════════════════════════════════
+
+summary:
+  overall_score: 0              # 0-100 percentage
+  status: "[compliant|partially_compliant|non_compliant|not_assessed]"
+  # Status determination:
+  #   compliant: score >= 90 AND no critical gaps
+  #   partially_compliant: score >= 50 OR has critical gaps
+  #   non_compliant: score < 50
+  #   not_assessed: assessment not completed
+
+  # Control statistics
+  controls:
+    total: 0                    # Total controls in framework
+    applicable: 0               # Controls applicable to this system
+    not_applicable: 0           # Controls marked N/A with justification
+    assessed: 0                 # Controls that were assessed
+    compliant: 0                # Controls fully satisfied
+    partial: 0                  # Controls partially satisfied
+    gap: 0                      # Controls not satisfied
+    not_assessed: 0             # Controls not yet assessed
+
+  # Risk summary
+  risk:
+    critical_gaps: 0            # Number of critical compliance gaps
+    high_gaps: 0
+    medium_gaps: 0
+    low_gaps: 0
+
+  # Trend (if previous assessment exists)
+  trend:
+    score_change: 0             # +/- from previous assessment
+    new_gaps: 0
+    closed_gaps: 0
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SCOPE
+# What parts of the system are in scope for this framework
+# ═══════════════════════════════════════════════════════════════════════════════
+
+scope:
+  description: "[Description of what's in scope]"
+
+  # Components in scope (references system-model)
+  components:
+    included: ["COMP-XXX", "..."]
+    excluded: ["COMP-YYY"]
+    exclusion_justification: "[Why excluded components are out of scope]"
+
+  # Data in scope
+  data:
+    included: ["DATA-XXX", "..."]
+    excluded: ["DATA-YYY"]
+    exclusion_justification: "[Why excluded data is out of scope]"
+
+  # Actors in scope
+  actors:
+    included: ["actor-id", "..."]
+    excluded: []
+
+  # Integrations in scope
+  integrations:
+    included: ["INT-XXX", "..."]
+    excluded: []
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# CONTROL MAPPINGS
+# Detailed assessment of each control/requirement
+# ═══════════════════════════════════════════════════════════════════════════════
+
+mappings:
+  - id: "CTRL-XXX"              # Internal tracking ID
+    # Framework reference
+    framework_ref: "[Article/Control ID, e.g., 'Art. 30' or 'A.8.24']"
+    framework_section: "[Section name]"
+    requirement: "[Short requirement name]"
+    description: "[Full requirement description]"
+
+    # Assessment
+    status: "[compliant|partial|gap|not_applicable|not_assessed]"
+    score: 0                    # 0-100 for this control
+    assessed_date: "[DATE ISO]"
+    assessed_by: "[auto|manual|auditor name]"
+
+    # Evidence from system-model
+    data_sources:
+      - source: "system-model.yaml#[path.to.section]"
+        description: "[What this source provides]"
+
+    evidence:
+      - id: "EVD-XXX"
+        type: "[auto-detected|config|document|screenshot|log|test-result|interview]"
+        description: "[What this evidence demonstrates]"
+        path: "[Path to evidence file or URL]"
+        collected_date: "[DATE ISO]"
+        valid_until: "[DATE ISO]"  # Evidence expiration
+
+    # Gap details (if status != compliant)
+    gap_detail: "[Detailed explanation of what's missing]"
+    gap_severity: "[critical|high|medium|low]"
+    business_impact: "[Impact of this gap]"
+
+    # Remediation
+    remediation:
+      description: "[What needs to be done]"
+      effort: "[low|medium|high]"
+      owner: "[Team or person responsible]"
+      target_date: "[DATE ISO]"
+      linked_tasks: ["TASK-XXX"]  # Tasks in risk-register
+
+    # Cross-framework mapping
+    cross_references:
+      - framework: "[other framework]"
+        control: "[control ID in other framework]"
+        relationship: "[equivalent|partial|related]"
+
+    # Notes
+    notes: "[Additional context or auditor notes]"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# NOT APPLICABLE CONTROLS
+# Controls explicitly marked as not applicable with justification
+# ═══════════════════════════════════════════════════════════════════════════════
+
+not_applicable:
+  - framework_ref: "[Control ID]"
+    requirement: "[Requirement name]"
+    justification: "[Why this control doesn't apply]"
+    approved_by: "[Who approved the N/A status]"
+    approved_date: "[DATE ISO]"
+    review_date: "[DATE ISO - when to re-evaluate]"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# ACTION ITEMS
+# Required actions to achieve/maintain compliance
+# ═══════════════════════════════════════════════════════════════════════════════
+
+action_items:
+  - id: "ACTION-XXX"
+    title: "[Action title]"
+    description: "[Detailed description of what needs to be done]"
+
+    # Priority and categorization
+    priority: "[P0|P1|P2|P3]"
+    # Priority guide:
+    #   P0: Critical gap, immediate action required
+    #   P1: High priority, address within 30 days
+    #   P2: Medium priority, address within 90 days
+    #   P3: Low priority, address within 180 days
+    category: "[technical|process|documentation|training]"
+
+    # Linkage
+    addresses_controls: ["CTRL-XXX", "..."]
+    addresses_gaps: ["GAP-XXX", "..."]
+    linked_risks: ["RISK-XXX", "..."]
+
+    # Assignment
+    owner: "[Team or person]"
+    assignee: "[Specific person]"
+    due_date: "[DATE ISO]"
+
+    # Status tracking
+    status: "[open|in_progress|blocked|completed|deferred]"
+    status_date: "[DATE ISO]"
+    status_notes: "[Status update notes]"
+
+    # Verification
+    acceptance_criteria:
+      - "[Criterion 1]"
+      - "[Criterion 2]"
+    verification_method: "[How to verify completion]"
+    verified_by: null
+    verified_date: null
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# FRAMEWORK-SPECIFIC SECTIONS
+# Load extension schema based on framework:
+#   RGPD: kit/comply/frameworks/rgpd/schemas/assessment-extension.yaml
+#   RGS:  kit/comply/frameworks/rgs/schemas/assessment-extension.yaml
+#
+# The extension adds a framework-specific section (rgpd: or rgs:) with fields
+# relevant to that framework's compliance requirements.
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Include framework extension here based on metadata.framework value
+# Example for RGPD: include rgpd/schemas/assessment-extension.yaml
+# Example for RGS: include rgs/schemas/assessment-extension.yaml
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# CROSS-FRAMEWORK ANALYSIS
+# How this framework maps to others (for multi-framework compliance)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+cross_framework:
+  summary:
+    frameworks_mapped: ["rgpd", "rgs"]
+    shared_controls: 0          # Controls that satisfy multiple frameworks
+    unique_controls: 0          # Controls unique to this framework
+
+  # Shared control mappings
+  shared_controls:
+    - this_control: "CTRL-XXX"
+      satisfies:
+        - framework: "[other framework]"
+          control: "[control ID]"
+          coverage: "[full|partial]"
+
+  # Gap analysis across frameworks
+  cross_framework_gaps:
+    - gap_id: "XGAP-XXX"
+      description: "[Gap that affects multiple frameworks]"
+      affected_frameworks:
+        - framework: "[framework]"
+          controls: ["control IDs"]
+      single_remediation: "[Can one fix address all?]"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# AUDIT TRAIL
+# History of assessment changes
+# ═══════════════════════════════════════════════════════════════════════════════
+
+audit_trail:
+  - date: "[DATE ISO]"
+    action: "[initial_assessment|update|gap_closed|control_added|...]"
+    control: "[CTRL-XXX if applicable]"
+    previous_status: "[previous status]"
+    new_status: "[new status]"
+    changed_by: "[user or command]"
+    notes: "[Change notes]"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# NEXT STEPS
+# Recommended actions and timeline
+# ═══════════════════════════════════════════════════════════════════════════════
+
+next_steps:
+  immediate:                    # Do now (P0)
+    - "[Action description]"
+  short_term:                   # Within 30 days (P1)
+    - "[Action description]"
+  medium_term:                  # Within 90 days (P2)
+    - "[Action description]"
+  scheduled:                    # Recurring activities
+    - activity: "[Activity name]"
+      frequency: "[daily|weekly|monthly|quarterly|annually]"
+      next_due: "[DATE ISO]"
+      owner: "[Owner]"

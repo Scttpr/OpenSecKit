@@ -1,0 +1,146 @@
+# RGS Knowledge Base Manifest
+# Tracks versions and update status of knowledge documents
+
+metadata:
+  framework: "rgs"
+  last_audit: "2026-01-20"
+  maintainer: "OpenSecKit"
+  version: "4.1.0"
+  notes: "Standardized manifest structure to match RGPD framework"
+
+documents:
+  # RGS v2.0 Official Documents
+  - id: "rgs-principal"
+    file: "rgs-v2-document-principal.md"
+    title: "RGS v2.0 Document Principal"
+    source: "https://cyber.gouv.fr/le-referentiel-general-de-securite-rgs"
+    version: "2.0"
+    language: "fr"
+    last_checked: null
+    last_updated: null
+    stability: "frozen" # Published 2014, no updates planned
+    notes: "Main RGS document - 10 chapters covering compliance process"
+
+  # Annexes A - Certificates
+  - id: "rgs-a1"
+    file: "rgs-v2-annexe-a1-certificats-electroniques.md"
+    title: "Annexe A1 - Certificats électroniques"
+    source: "https://cyber.gouv.fr/le-referentiel-general-de-securite-rgs"
+    version: "3.0"
+    language: "fr"
+    stability: "frozen"
+
+  - id: "rgs-a2"
+    file: "rgs-v2-annexe-a2-politique-certification-personne.md"
+    title: "Annexe A2 - PC Type certificats de personne"
+    source: "https://cyber.gouv.fr/le-referentiel-general-de-securite-rgs"
+    version: "3.0"
+    language: "fr"
+    stability: "frozen"
+
+  - id: "rgs-a3"
+    file: "rgs-v2-annexe-a3-politique-certification-services-applicatifs.md"
+    title: "Annexe A3 - PC Type services applicatifs"
+    source: "https://cyber.gouv.fr/le-referentiel-general-de-securite-rgs"
+    version: "3.0"
+    language: "fr"
+    stability: "frozen"
+
+  - id: "rgs-a3-errata"
+    file: "rgs-v2-annexe-a3-errata.md"
+    title: "Annexe A3 - Errata"
+    source: "https://cyber.gouv.fr/le-referentiel-general-de-securite-rgs"
+    version: "1.0"
+    language: "fr"
+    stability: "frozen"
+    notes: "Errata for A3 certification policy"
+
+  - id: "rgs-a4"
+    file: "rgs-v2-annexe-a4-profils-certificats-algorithmes.md"
+    title: "Annexe A4 - Profils de certificats et algorithmes"
+    source: "https://cyber.gouv.fr/le-referentiel-general-de-securite-rgs"
+    version: "3.0"
+    language: "fr"
+    stability: "frozen"
+
+  - id: "rgs-a5"
+    file: "rgs-v2-annexe-a5-politique-horodatage.md"
+    title: "Annexe A5 - Politique d'Horodatage Type"
+    source: "https://cyber.gouv.fr/le-referentiel-general-de-securite-rgs"
+    version: "3.0"
+    language: "fr"
+    stability: "frozen"
+
+  # Annexes B - Cryptographic mechanisms
+  - id: "rgs-b1"
+    file: "rgs-v2-annexe-b1-mecanismes-cryptographiques.md"
+    title: "Annexe B1 - Mécanismes cryptographiques"
+    source: "https://cyber.gouv.fr/le-referentiel-general-de-securite-rgs"
+    version: "2.03"
+    language: "fr"
+    stability: "frozen"
+    notes: "Choice and sizing of cryptographic mechanisms"
+
+  - id: "rgs-b2"
+    file: "rgs-v2-annexe-b2-gestion-cles.md"
+    title: "Annexe B2 - Gestion des clés"
+    source: "https://cyber.gouv.fr/le-referentiel-general-de-securite-rgs"
+    version: "2.0"
+    language: "fr"
+    stability: "frozen"
+    notes: "Key management rules and recommendations"
+
+  - id: "rgs-b3"
+    file: "rgs-v2-annexe-b3-authentification.md"
+    title: "Annexe B3 - Authentification"
+    source: "https://cyber.gouv.fr/le-referentiel-general-de-securite-rgs"
+    version: "1.0"
+    language: "fr"
+    stability: "frozen"
+    notes: "Authentication mechanisms"
+
+  # Annexe C - Audit
+  - id: "rgs-c"
+    file: "rgs-v2-annexe-c-audit-prestataires.md"
+    title: "Annexe C - Audit prestataires"
+    source: "https://cyber.gouv.fr/le-referentiel-general-de-securite-rgs"
+    version: "1.1"
+    language: "fr"
+    stability: "frozen"
+    notes: "Requirements for SSI audit service providers"
+
+  # ANSSI Guides
+  - id: "homologation-guide"
+    file: "guide-homologation-securite.md"
+    title: "Guide d'homologation de sécurité"
+    source: "https://cyber.gouv.fr/publications/lhomologation-de-securite-en-9-etapes-simples"
+    version: "2.1"
+    language: "fr"
+    last_checked: "2025-01"
+    stability: "stable"
+    notes: "9-step homologation process"
+
+  - id: "hygiene-guide"
+    file: "guide-hygiene-informatique.md"
+    title: "Guide d'hygiène informatique"
+    source: "https://cyber.gouv.fr/publications/guide-dhygiene-informatique"
+    version: "2.0"
+    language: "fr"
+    last_checked: "2025-01"
+    stability: "stable"
+    notes: "42 security measures for IS protection"
+
+  - id: "ebios-rm"
+    file: "ebios-risk-manager.md"
+    title: "EBIOS Risk Manager"
+    source: "https://cyber.gouv.fr/la-methode-ebios-risk-manager"
+    version: "2018"
+    language: "fr"
+    stability: "stable"
+    notes: "5 workshops risk analysis methodology"
+
+# Update procedure:
+# 1. Check source URLs for changes
+# 2. Update document content
+# 3. Set last_checked and last_updated dates
+# 4. Update version if applicable

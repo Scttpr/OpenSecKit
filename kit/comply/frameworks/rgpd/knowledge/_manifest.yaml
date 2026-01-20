@@ -1,0 +1,224 @@
+# RGPD/GDPR Knowledge Base Manifest
+# Tracks versions and update status of knowledge documents
+
+metadata:
+  framework: "rgpd"
+  last_audit: "2026-01-20"
+  maintainer: "OpenSecKit"
+  version: "4.1.0"
+  notes: "Cleaned up v4 - removed split PDF references, updated to markdown-first approach"
+
+# =============================================================================
+# CORE KNOWLEDGE (Essential for compliance)
+# Location: knowledge/core/
+# =============================================================================
+core_documents:
+
+  - id: "guide-securite"
+    file: "core/guide-securite.md"
+    title: "Guide de la sécurité des données personnelles (CNIL 2024)"
+    source: "https://www.cnil.fr/fr/guide-de-la-securite-des-donnees-personnelles"
+    version: "2024"
+    language: "fr"
+    last_checked: "2026-01-20"
+    stability: "stable"
+    articles: ["32"]
+    notes: "25 security fiches - Article 32 implementation reference"
+
+  - id: "guide-sous-traitant"
+    file: "core/guide-sous-traitant.md"
+    title: "Guide du sous-traitant"
+    source: "https://www.cnil.fr/sites/cnil/files/atoms/files/rgpd-guide_sous-traitant-cnil.pdf"
+    version: "2017-09"
+    language: "fr"
+    last_checked: "2026-01-20"
+    stability: "stable"
+    articles: ["28"]
+    notes: "Processor obligations, contract clauses - Article 28"
+
+  - id: "aipd-modeles"
+    file: "core/aipd-modeles.md"
+    title: "AIPD - Modèles et méthode"
+    source: "https://www.cnil.fr/fr/RGPD-analyse-impact-protection-des-donnees-aipd"
+    version: "PIA-2"
+    language: "fr"
+    last_checked: "2026-01-20"
+    stability: "stable"
+    articles: ["35"]
+    notes: "DPIA methodology, templates, risk assessment"
+
+  - id: "aipd-liste-obligatoire"
+    file: "core/aipd-liste-obligatoire.md"
+    title: "Liste des traitements nécessitant une AIPD"
+    source: "https://www.cnil.fr/fr/liste-des-types-doperations-de-traitement-pour-lesquelles-une-analyse-dimpact-est-requise"
+    version: "2018-10"
+    language: "fr"
+    last_checked: "2026-01-20"
+    stability: "stable"
+    articles: ["35.4"]
+    notes: "French national mandatory DPIA list"
+
+  - id: "violations-donnees"
+    file: "core/violations-donnees.md"
+    title: "Violations de données personnelles"
+    source: "https://www.cnil.fr/fr/les-violations-de-donnees-personnelles"
+    version: null
+    language: "fr"
+    last_checked: "2026-01-20"
+    stability: "stable"
+    articles: ["33", "34"]
+    notes: "Breach notification procedures"
+
+  - id: "breach-notification"
+    file: "core/breach-notification.md"
+    title: "Breach notification guidance"
+    source: "EDPB Guidelines 9/2022"
+    version: "2.0"
+    language: "fr"
+    last_checked: "2026-01-20"
+    stability: "stable"
+    articles: ["33", "34"]
+    notes: "Detailed breach notification procedures"
+
+  - id: "registre-traitements"
+    file: "core/registre-traitements.md"
+    title: "Registre des activités de traitement"
+    source: "https://www.cnil.fr/fr/RGPD-le-registre-des-activites-de-traitement"
+    version: null
+    language: "fr"
+    last_checked: "2026-01-20"
+    stability: "stable"
+    articles: ["30"]
+    notes: "Records of processing activities (ROPA) guidance"
+
+  - id: "interet-legitime"
+    file: "core/interet-legitime.md"
+    title: "L'intérêt légitime comme base légale"
+    source: "https://www.cnil.fr/fr/les-bases-legales/interet-legitime"
+    version: null
+    language: "fr"
+    last_checked: "2026-01-20"
+    stability: "stable"
+    articles: ["6.1.f"]
+    notes: "Legitimate interest legal basis and balancing test (LIA)"
+
+# =============================================================================
+# REFERENCE DOCUMENTS (For lookup and cross-reference)
+# Location: knowledge/reference/
+# =============================================================================
+reference_documents:
+
+  - id: "rgpd-complet"
+    file: "reference/rgpd-complet.md"
+    title: "Règlement (UE) 2016/679 - RGPD (Texte intégral)"
+    source: "https://eur-lex.europa.eu/legal-content/FR/TXT/?uri=CELEX:32016R0679"
+    version: "2016/679"
+    language: "fr"
+    last_checked: "2026-01-20"
+    stability: "frozen"
+    notes: "Full GDPR regulation - 99 articles, 173 recitals"
+
+  - id: "edpb-droit-acces"
+    file: "reference/edpb-droit-acces.md"
+    title: "Lignes directrices 01/2022 - Droit d'accès"
+    source: "https://www.edpb.europa.eu/our-work-tools/our-documents/guidelines/guidelines-012022-data-subject-rights-right-access_en"
+    version: "2.1"
+    language: "fr"
+    last_checked: "2026-01-20"
+    stability: "stable"
+    articles: ["15"]
+    notes: "Right of access implementation guidance"
+
+  - id: "edpb-breach-examples"
+    file: "reference/edpb-breach-examples.md"
+    title: "Guidelines 01/2021 - Breach notification examples"
+    source: "https://www.edpb.europa.eu/our-work-tools/our-documents/guidelines/guidelines-012021-examples-regarding-personal-data-breach_en"
+    version: "2.0"
+    language: "en"
+    last_checked: "2026-01-20"
+    stability: "stable"
+    articles: ["33", "34"]
+    notes: "18 practical case studies for breach notification"
+
+  - id: "adequacy-list"
+    file: "reference/adequacy-list.yaml"
+    title: "Adequacy Decisions List"
+    source: "https://commission.europa.eu/law/law-topic/data-protection/international-dimension-data-protection/adequacy-decisions_en"
+    version: null
+    language: "en"
+    last_checked: "2026-01-20"
+    stability: "dynamic"
+    articles: ["45"]
+    notes: "Countries with EU adequacy decisions - check quarterly"
+
+  - id: "sccs-2021"
+    file: "reference/sccs-2021.md"
+    title: "Standard Contractual Clauses (2021)"
+    source: "https://commission.europa.eu/law/law-topic/data-protection/international-dimension-data-protection/standard-contractual-clauses-scc_en"
+    version: "2021/914"
+    language: "en"
+    last_checked: "2026-01-20"
+    stability: "stable"
+    articles: ["46"]
+    notes: "Controller-to-Controller and Controller-to-Processor modules"
+
+# =============================================================================
+# OPTIONAL DOCUMENTS (For specific use cases)
+# Location: knowledge/optional/
+# =============================================================================
+optional_documents:
+
+  - id: "guide-dpo"
+    file: "optional/guide-dpo.md"
+    title: "Guide pratique RGPD - Délégués à la protection des données"
+    source: "https://www.cnil.fr/fr/guide-pratique-rgpd-delegues-la-protection-des-donnees"
+    version: null
+    language: "fr"
+    last_checked: "2026-01-20"
+    stability: "stable"
+    articles: ["37", "38", "39"]
+    notes: "DPO designation, missions, independence"
+
+  - id: "cookies-guidelines"
+    file: "optional/cookies-guidelines.md"
+    title: "Lignes directrices cookies et traceurs"
+    source: "https://www.cnil.fr/fr/cookies-et-autres-traceurs"
+    version: "2020-091"
+    language: "fr"
+    last_checked: "2026-01-20"
+    stability: "stable"
+    articles: ["LIL-82"]
+    notes: "Cookie compliance - Article 82 Loi Informatique et Libertés"
+
+# =============================================================================
+# FRENCH NATIONAL LAW
+# Location: knowledge/
+# =============================================================================
+national_law:
+
+  - id: "loi-informatique-libertes"
+    file: "french_law_78-17_1978_complete.md"
+    title: "Loi n° 78-17 du 6 janvier 1978 (Informatique et Libertés)"
+    source: "https://www.legifrance.gouv.fr/loda/id/JORFTEXT000000886460"
+    version: "Consolidée 2024"
+    language: "fr"
+    last_checked: "2026-01-20"
+    stability: "stable"
+    notes: "French data protection law - complements RGPD"
+
+# =============================================================================
+# MAINTENANCE
+# =============================================================================
+#
+# Update procedure:
+# 1. Check source URLs for updates (quarterly recommended)
+# 2. Download updated content
+# 3. Convert to markdown if PDF
+# 4. Update last_checked date
+# 5. Update version if changed
+#
+# Stability levels:
+# - frozen: Will never change (regulations, decisions)
+# - stable: Rarely changes (guidelines, methodologies)
+# - dynamic: Changes regularly (adequacy list, certifications)
+# - occasional: May update without notice (web content)

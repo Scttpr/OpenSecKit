@@ -205,7 +205,7 @@ fn update_stats(json: bool) -> Result<()> {
         };
         println!("{}", serde_json::to_string_pretty(&result)?);
     } else {
-        println!("📊 Updated stats in {}", register_path);
+        println!("» Updated stats in {}", register_path);
         println!("   Total: {} risks", register.stats.total);
         println!(
             "   Open: {}, In progress: {}, Resolved: {}",
@@ -300,9 +300,9 @@ fn update_task(id: &str, done: bool, json: bool) -> Result<()> {
         };
         println!("{}", serde_json::to_string_pretty(&result)?);
     } else {
-        println!("✅ Task {} marked as done in {}", id, file_path);
+        println!("✓ Task {} marked as done in {}", id, file_path);
         if let Some(sha) = commit_sha {
-            println!("📝 Committed: {}", sha);
+            println!("» Committed: {}", sha);
         }
     }
 
@@ -385,7 +385,7 @@ fn update_risk(id: &str, status: &str, json: bool) -> Result<()> {
         };
         println!("{}", serde_json::to_string_pretty(&result)?);
     } else {
-        println!("📝 Risk {} updated to {}", id, status_upper);
+        println!("» Risk {} updated to {}", id, status_upper);
         if let Some(old) = old_status {
             println!("   {} → {}", old, status_upper);
         }
@@ -525,7 +525,7 @@ Resolved:  {resolved_bar}  {resolved}
         };
         println!("{}", serde_json::to_string_pretty(&result)?);
     } else {
-        println!("📊 Dashboard regenerated: {}", dashboard_path_str);
+        println!("» Dashboard regenerated: {}", dashboard_path_str);
         println!("   {} risks ({} open, {} resolved)", total, open, resolved);
         println!(
             "   {} features, {} incidents",

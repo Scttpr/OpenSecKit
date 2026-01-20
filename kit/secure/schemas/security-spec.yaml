@@ -1,0 +1,398 @@
+# Security Specification Schema
+# Version: 4.0.0
+# Used by: /osk-secure specify
+
+$schema: "http://json-schema.org/draft-07/schema#"
+$id: "https://openseckit.dev/schemas/security-spec.yaml"
+title: "Security Specification"
+description: "Feature-level security analysis including threats, requirements, and testing strategy"
+
+type: object
+required:
+  - metadata
+  - context
+  - threat_analysis
+  - requirements
+
+properties:
+  metadata:
+    type: object
+    required:
+      - feature_id
+      - feature_name
+      - created_at
+    properties:
+      feature_id:
+        type: string
+        pattern: "^[a-z0-9-]+$"
+        description: "Feature identifier (e.g., 'payment-flow')"
+      feature_name:
+        type: string
+        description: "Human-readable feature name"
+      created_at:
+        type: string
+        format: date-time
+      system_model_version:
+        type: string
+        description: "Hash of system model at creation time"
+      principle_weights:
+        type: array
+        items:
+          $ref: "#/$defs/PrincipleWeight"
+
+  context:
+    type: object
+    properties:
+      affected_components:
+        type: array
+        items:
+          type: object
+          required: [component_id, name]
+          properties:
+            component_id:
+              type: string
+            name:
+              type: string
+            role:
+              type: string
+      affected_data:
+        type: array
+        items:
+          type: object
+          required: [data_id, name, classification]
+          properties:
+            data_id:
+              type: string
+            name:
+              type: string
+            classification:
+              type: string
+              enum: [public, internal, confidential, restricted]
+            operations:
+              type: array
+              items:
+                type: string
+                enum: [read, write, delete, process, transfer]
+      trust_boundaries_crossed:
+        type: array
+        items:
+          type: object
+          required: [boundary_id, from_zone, to_zone]
+          properties:
+            boundary_id:
+              type: string
+            name:
+              type: string
+            from_zone:
+              type: string
+            to_zone:
+              type: string
+      actors_involved:
+        type: array
+        items:
+          type: object
+          required: [actor_id, name]
+          properties:
+            actor_id:
+              type: string
+            name:
+              type: string
+            privilege_level:
+              type: string
+              enum: [anonymous, authenticated, elevated, admin, system]
+
+  threat_analysis:
+    type: object
+    required:
+      - entry_points
+      - threats
+    properties:
+      entry_points:
+        type: array
+        items:
+          $ref: "#/$defs/EntryPoint"
+      threats:
+        type: array
+        items:
+          $ref: "#/$defs/ThreatEntry"
+      attack_surface_score:
+        type: integer
+        minimum: 1
+        maximum: 5
+
+  requirements:
+    type: object
+    properties:
+      authentication:
+        type: array
+        items:
+          $ref: "#/$defs/Requirement"
+      authorization:
+        type: array
+        items:
+          $ref: "#/$defs/Requirement"
+      validation:
+        type: array
+        items:
+          $ref: "#/$defs/Requirement"
+      cryptography:
+        type: array
+        items:
+          $ref: "#/$defs/Requirement"
+      logging:
+        type: array
+        items:
+          $ref: "#/$defs/Requirement"
+
+  testing_strategy:
+    type: object
+    properties:
+      sast_focus:
+        type: array
+        items:
+          type: string
+      dast_focus:
+        type: array
+        items:
+          type: string
+      penetration_scope:
+        type: array
+        items:
+          type: string
+
+  compliance_mapping:
+    type: object
+    properties:
+      rgpd:
+        type: array
+        items:
+          type: object
+          properties:
+            article:
+              type: string
+            requirement:
+              type: string
+      rgs:
+        type: array
+        items:
+          type: string
+      asvs:
+        type: array
+        items:
+          type: string
+
+  clarifications:
+    type: array
+    items:
+      type: object
+      required: [question, answer, date]
+      properties:
+        question:
+          type: string
+        answer:
+          type: string
+        date:
+          type: string
+          format: date-time
+
+$defs:
+  # The 7 Security Principles that guide feature security analysis.
+  # Note: These are distinct from the Project Constitution (.specify/memory/constitution.md)
+  # which governs OpenSecKit development practices.
+  PrincipleWeight:
+    type: object
+    description: "Weight assigned to one of the 7 Security Principles for a specific feature"
+    required:
+      - principle
+      - weight
+    properties:
+      principle:
+        type: string
+        description: "One of the 7 Security Principles"
+        enum:
+          - I_threat_modeling
+          - II_risk_analysis
+          - III_security_design
+          - IV_security_testing
+          - V_secrets_management
+          - VI_audit_logging
+          - VII_patch_management
+      weight:
+        type: string
+        description: "Relevance of this principle to the feature"
+        enum: [critical, high, medium, low, minimal]
+      rationale:
+        type: string
+        description: "Why this weight was assigned"
+      focus_areas:
+        type: array
+        description: "Specific areas to emphasize for this principle"
+        items:
+          type: string
+
+  EntryPoint:
+    type: object
+    required:
+      - id
+      - type
+      - description
+    properties:
+      id:
+        type: string
+      type:
+        type: string
+        enum: [api_endpoint, web_form, file_upload, webhook, message_queue, scheduled_job]
+      description:
+        type: string
+      location:
+        type: string
+      authentication:
+        type: string
+        enum: [none, basic, token, session, mfa]
+      authorization:
+        type: string
+      input_data:
+        type: array
+        items:
+          type: object
+          properties:
+            field:
+              type: string
+            type:
+              type: string
+            validation_needed:
+              type: string
+            injection_risk:
+              type: string
+              enum: [none, low, medium, high]
+
+  ThreatEntry:
+    type: object
+    required:
+      - id
+      - stride_category
+      - name
+      - scoring
+    properties:
+      id:
+        type: string
+        pattern: "^THREAT-[A-Z]+-[0-9]+$"
+      source_id:
+        type: string
+        description: "Reference to threat library entry"
+      stride_category:
+        type: string
+        enum:
+          - spoofing
+          - tampering
+          - repudiation
+          - information_disclosure
+          - denial_of_service
+          - elevation_of_privilege
+      name:
+        type: string
+      description:
+        type: string
+      attack_vector:
+        type: string
+      affected_entry_point:
+        type: string
+      affected_assets:
+        type: array
+        items:
+          type: string
+      scoring:
+        type: object
+        required: [impact, probability, exposure, score, severity]
+        properties:
+          impact:
+            type: integer
+            minimum: 1
+            maximum: 5
+          probability:
+            type: integer
+            minimum: 1
+            maximum: 5
+          exposure:
+            type: integer
+            minimum: 1
+            maximum: 5
+          score:
+            type: integer
+            minimum: 1
+            maximum: 125
+          severity:
+            type: string
+            enum: [critical, high, medium, low]
+      existing_mitigations:
+        type: array
+        items:
+          type: string
+      required_mitigations:
+        type: array
+        items:
+          type: string
+      external_refs:
+        type: object
+        properties:
+          mitre_attack:
+            type: string
+          capec:
+            type: string
+          cwe:
+            type: string
+          owasp_api:
+            type: string
+
+  Requirement:
+    type: object
+    required:
+      - id
+      - description
+      - criticality
+      - linked_threats
+    properties:
+      id:
+        type: string
+        pattern: "^REQ-[A-Z]+-[0-9]+$"
+      category:
+        type: string
+        enum: [authentication, authorization, validation, cryptography, logging]
+      description:
+        type: string
+      criticality:
+        type: string
+        enum: [MUST, SHOULD, MAY]
+      linked_threats:
+        type: array
+        items:
+          type: string
+      implementation:
+        type: object
+        properties:
+          guidance:
+            type: string
+          code_example:
+            type: string
+          libraries:
+            type: array
+            items:
+              type: string
+      verification:
+        type: object
+        properties:
+          test_method:
+            type: string
+          asvs_ref:
+            type: string
+      compliance:
+        type: object
+        properties:
+          rgpd_articles:
+            type: array
+            items:
+              type: string
+          rgs_requirements:
+            type: array
+            items:
+              type: string

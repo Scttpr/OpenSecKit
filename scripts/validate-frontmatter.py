@@ -13,7 +13,7 @@ failed = False
 
 # Use git ls-files to get only versioned files (respects .gitignore)
 result = subprocess.run(
-    ['git', 'ls-files', 'templates/**/*.md', 'domaines/**/*.md'],
+    ['git', 'ls-files', 'templates/**/*.md', 'frameworks/**/*.md'],
     capture_output=True,
     text=True
 )

@@ -1,0 +1,265 @@
+{# Template: Mesures de Sécurité (Article 32 RGPD) #}
+{# Source: knowledge/core/guide-securite.md (25 fiches CNIL 2024) #}
+{# Input: system-model/controls.yaml, gaps.yaml, architecture.yaml #}
+
+# Mesures de Sécurité des Données Personnelles
+
+> **Article 32 du RGPD** - Sécurité du traitement
+> Document généré le {{ now() | date(format="%d/%m/%Y") }}
+> Référentiel: Guide CNIL Sécurité 2024 (25 fiches)
+
+---
+
+## 1. Synthèse du niveau de sécurité
+
+| Catégorie | Conforme | À améliorer | Non conforme |
+|-----------|----------|-------------|--------------|
+| Pilotage | {{ controls.summary.pilotage.conforme | default(value="?") }} | {{ controls.summary.pilotage.ameliorer | default(value="?") }} | {{ controls.summary.pilotage.non_conforme | default(value="?") }} |
+| Utilisateurs | {{ controls.summary.utilisateurs.conforme | default(value="?") }} | {{ controls.summary.utilisateurs.ameliorer | default(value="?") }} | {{ controls.summary.utilisateurs.non_conforme | default(value="?") }} |
+| Équipements | {{ controls.summary.equipements.conforme | default(value="?") }} | {{ controls.summary.equipements.ameliorer | default(value="?") }} | {{ controls.summary.equipements.non_conforme | default(value="?") }} |
+| Maîtrise données | {{ controls.summary.donnees.conforme | default(value="?") }} | {{ controls.summary.donnees.ameliorer | default(value="?") }} | {{ controls.summary.donnees.non_conforme | default(value="?") }} |
+| Incidents | {{ controls.summary.incidents.conforme | default(value="?") }} | {{ controls.summary.incidents.ameliorer | default(value="?") }} | {{ controls.summary.incidents.non_conforme | default(value="?") }} |
+
+---
+
+## 2. Pilotage de la sécurité
+
+### Fiche 1 - Piloter la sécurité des données
+
+| Mesure | Statut | Commentaire |
+|--------|--------|-------------|
+| Implication de la direction | {{ controls.pilotage.direction | default(value="☐") }} | |
+| Registre des traitements à jour | {{ controls.pilotage.registre | default(value="☐") }} | |
+| Plan d'action sécurité | {{ controls.pilotage.plan_action | default(value="☐") }} | |
+| Contrôle périodique | {{ controls.pilotage.controle | default(value="☐") }} | |
+| Revue de direction annuelle | {{ controls.pilotage.revue | default(value="☐") }} | |
+
+---
+
+## 3. Les Utilisateurs
+
+### Fiche 2 - Définir un cadre pour les utilisateurs
+
+| Mesure | Statut | Commentaire |
+|--------|--------|-------------|
+| Charte informatique | {{ controls.utilisateurs.charte | default(value="☐") }} | |
+| Politique de sécurité | {{ controls.utilisateurs.politique | default(value="☐") }} | |
+| Règles d'utilisation | {{ controls.utilisateurs.regles | default(value="☐") }} | |
+
+### Fiche 3 - Impliquer et former les utilisateurs
+
+| Mesure | Statut | Commentaire |
+|--------|--------|-------------|
+| Sensibilisation sécurité | {{ team.training.security_awareness | default(value="☐") }} | |
+| Formation RGPD | {{ controls.utilisateurs.formation_rgpd | default(value="☐") }} | |
+| Documentation accessible | {{ controls.utilisateurs.documentation | default(value="☐") }} | |
+
+### Fiche 4 - Authentifier les utilisateurs
+
+| Mesure | Statut | Commentaire |
+|--------|--------|-------------|
+| Identifiants uniques | {{ controls.existing_controls.authentication | default(value="☐") }} | |
+| Politique de mots de passe | {{ controls.utilisateurs.mdp_politique | default(value="☐") }} | {{ actors.authentication.method | default(value="") }} |
+| MFA pour accès sensibles | {{ actors.authentication.mfa | default(value="☐") }} | |
+| Verrouillage après échecs | {{ controls.utilisateurs.verrouillage | default(value="☐") }} | |
+
+### Fiche 5 - Gérer les habilitations
+
+| Mesure | Statut | Commentaire |
+|--------|--------|-------------|
+| Profils d'habilitation définis | {{ controls.existing_controls.authorization | default(value="☐") }} | {{ actors.authorization.model | default(value="RBAC/ABAC") }} |
+| Révision périodique des droits | {{ team.access_management.access_reviews | default(value="☐") }} | |
+| Suppression accès au départ | {{ team.access_management.offboarding | default(value="☐") }} | |
+
+---
+
+## 4. Équipements et Infrastructure
+
+### Fiche 6 - Sécuriser les postes de travail
+
+| Mesure | Statut | Commentaire |
+|--------|--------|-------------|
+| Verrouillage automatique | {{ controls.equipements.verrouillage_auto | default(value="☐") }} | |
+| Antivirus/EDR | {{ tooling.security_tools.edr | default(value="☐") }} | |
+| Pare-feu local | {{ controls.equipements.parefeu_local | default(value="☐") }} | |
+| Mises à jour automatiques | {{ controls.equipements.maj_auto | default(value="☐") }} | |
+
+### Fiche 7 - Sécuriser l'informatique mobile
+
+| Mesure | Statut | Commentaire |
+|--------|--------|-------------|
+| Chiffrement des appareils | {{ controls.equipements.chiffrement_mobile | default(value="☐") }} | |
+| MDM/EMM | {{ controls.equipements.mdm | default(value="☐") }} | |
+| Effacement à distance | {{ controls.equipements.wipe_remote | default(value="☐") }} | |
+
+### Fiche 8 - Protéger le réseau informatique
+
+| Mesure | Statut | Commentaire |
+|--------|--------|-------------|
+| Pare-feu périmétrique | {{ controls.existing_controls.network.firewall | default(value="☐") }} | |
+| Segmentation réseau | {{ boundaries.network_segmentation | default(value="☐") }} | |
+| VPN pour accès distants | {{ controls.reseau.vpn | default(value="☐") }} | |
+| Wi-Fi sécurisé (WPA3) | {{ controls.reseau.wifi_secure | default(value="☐") }} | |
+
+### Fiche 9 - Sécuriser les serveurs
+
+| Mesure | Statut | Commentaire |
+|--------|--------|-------------|
+| Durcissement (hardening) | {{ controls.serveurs.hardening | default(value="☐") }} | |
+| Mises à jour régulières | {{ controls.serveurs.patches | default(value="☐") }} | |
+| Accès restreint | {{ controls.serveurs.acces_restreint | default(value="☐") }} | |
+
+### Fiche 10 - Sécuriser les sites web
+
+| Mesure | Statut | Commentaire |
+|--------|--------|-------------|
+| HTTPS obligatoire | {{ controls.web.https | default(value="☐") }} | |
+| En-têtes de sécurité | {{ controls.web.headers | default(value="☐") }} | CSP, HSTS, X-Frame-Options |
+| Protection OWASP Top 10 | {{ controls.web.owasp | default(value="☐") }} | |
+
+### Fiche 11 - Encadrer les développements
+
+| Mesure | Statut | Commentaire |
+|--------|--------|-------------|
+| Revue de code | {{ team.development_processes.code_review | default(value="☐") }} | |
+| SAST/DAST | {{ tooling.security_tools.sast | default(value="☐") }} | |
+| Tests de sécurité | {{ controls.dev.tests_secu | default(value="☐") }} | |
+| Données de test anonymisées | {{ controls.dev.donnees_test | default(value="☐") }} | |
+
+### Fiche 12 - Protéger les locaux
+
+| Mesure | Statut | Commentaire |
+|--------|--------|-------------|
+| Contrôle d'accès physique | {{ controls.physique.controle_acces | default(value="☐") }} | |
+| Zones sécurisées | {{ controls.physique.zones | default(value="☐") }} | |
+| Alarme intrusion | {{ controls.physique.alarme | default(value="☐") }} | |
+
+---
+
+## 5. Maîtrise des Données
+
+### Fiche 13 - Sécuriser les échanges avec l'extérieur
+
+| Mesure | Statut | Commentaire |
+|--------|--------|-------------|
+| Chiffrement des échanges | {{ controls.existing_controls.encryption.in_transit | default(value="☐") }} | |
+| Protocoles sécurisés (SFTP, HTTPS) | {{ controls.echanges.protocoles | default(value="☐") }} | |
+| Contrôle des supports amovibles | {{ controls.echanges.usb | default(value="☐") }} | |
+
+### Fiche 14 - Gérer la sous-traitance
+
+| Mesure | Statut | Commentaire |
+|--------|--------|-------------|
+| Clauses contractuelles Art. 28 | {{ integrations.compliance_summary.dpa_coverage | default(value="☐") }} | |
+| Évaluation sécurité fournisseurs | {{ controls.soustraitance.evaluation | default(value="☐") }} | |
+| Audits sous-traitants | {{ controls.soustraitance.audits | default(value="☐") }} | |
+
+### Fiche 15 - Encadrer la maintenance et fin de vie
+
+| Mesure | Statut | Commentaire |
+|--------|--------|-------------|
+| Effacement sécurisé | {{ controls.maintenance.effacement | default(value="☐") }} | |
+| Destruction certifiée | {{ controls.maintenance.destruction | default(value="☐") }} | |
+| Supervision maintenance | {{ controls.maintenance.supervision | default(value="☐") }} | |
+
+---
+
+## 6. Se Préparer aux Incidents
+
+### Fiche 16 - Tracer les opérations
+
+| Mesure | Statut | Commentaire |
+|--------|--------|-------------|
+| Journalisation des accès | {{ controls.existing_controls.logging | default(value="☐") }} | |
+| Conservation des logs | {{ tooling.observability.logging.retention | default(value="☐") }} | |
+| Protection des logs | {{ controls.logs.protection | default(value="☐") }} | |
+| Analyse des logs | {{ controls.logs.analyse | default(value="☐") }} | SIEM: {{ tooling.observability.siem | default(value="Non") }} |
+
+### Fiche 17 - Sauvegarder
+
+| Mesure | Statut | Commentaire |
+|--------|--------|-------------|
+| Sauvegardes régulières | {{ controls.sauvegardes.frequence | default(value="☐") }} | |
+| Stockage hors site | {{ controls.sauvegardes.hors_site | default(value="☐") }} | |
+| Tests de restauration | {{ controls.sauvegardes.tests | default(value="☐") }} | |
+| Chiffrement des sauvegardes | {{ controls.sauvegardes.chiffrement | default(value="☐") }} | |
+
+### Fiche 18 - Prévoir la continuité et reprise
+
+| Mesure | Statut | Commentaire |
+|--------|--------|-------------|
+| PCA/PRA documenté | {{ controls.continuite.pca_pra | default(value="☐") }} | |
+| RTO/RPO définis | {{ controls.continuite.rto_rpo | default(value="☐") }} | |
+| Tests réguliers | {{ controls.continuite.tests | default(value="☐") }} | |
+
+### Fiche 19 - Gérer les incidents et violations
+
+| Mesure | Statut | Commentaire |
+|--------|--------|-------------|
+| Procédure de gestion des incidents | {{ team.incident_response.plan | default(value="☐") }} | |
+| Procédure notification CNIL | {{ controls.incidents.notification | default(value="☐") }} | |
+| Registre des violations | {{ controls.incidents.registre | default(value="☐") }} | |
+
+---
+
+## 7. Mesures complémentaires (Focus)
+
+### Fiche 20 - Analyse de risques
+
+| Mesure | Statut | Commentaire |
+|--------|--------|-------------|
+| Méthodologie définie | {{ controls.risques.methodologie | default(value="☐") }} | |
+| AIPD réalisées si requises | {{ controls.risques.aipd | default(value="☐") }} | |
+
+### Fiche 21 - Chiffrement, hachage, signature
+
+| Mesure | Statut | Commentaire |
+|--------|--------|-------------|
+| Algorithmes à l'état de l'art | {{ controls.existing_controls.encryption.algorithms | default(value="☐") }} | |
+| Gestion des clés | {{ controls.existing_controls.encryption.key_management | default(value="☐") }} | |
+
+### Fiche 22 - Cloud
+
+| Mesure | Statut | Commentaire |
+|--------|--------|-------------|
+| Contrat conforme RGPD | {{ controls.cloud.contrat | default(value="☐") }} | |
+| Localisation des données | {{ architecture.hosting.location | default(value="☐") }} | |
+| Chiffrement client-side | {{ controls.cloud.chiffrement_client | default(value="☐") }} | |
+
+### Fiche 23-25 - Applications mobiles, IA, API
+
+| Mesure | Statut | Commentaire |
+|--------|--------|-------------|
+| Sécurité des APIs | {{ controls.api.securite | default(value="☐") }} | |
+| Protection des apps mobiles | {{ controls.mobile.protection | default(value="☐") }} | |
+| Gouvernance IA/ML | {{ controls.ia.gouvernance | default(value="☐") }} | |
+
+---
+
+## 8. Lacunes identifiées
+
+{% for gap in gaps.discovery_gaps %}
+{% if gap.category == "security" %}
+| **{{ gap.id }}** | {{ gap.severity }} |
+|---|---|
+| Description | {{ gap.description }} |
+| Ce qui manque | {{ gap.what_is_missing }} |
+| Action | {{ gap.resolution.action }} |
+| Priorité | {{ gap.severity }} |
+
+{% endif %}
+{% endfor %}
+
+---
+
+## 9. Plan d'action
+
+| Priorité | Mesure | Responsable | Échéance | Statut |
+|----------|--------|-------------|----------|--------|
+{% for gap in gaps.discovery_gaps | selectattr("category", "equalto", "security") | sort(attribute="severity") %}
+| {{ gap.severity }} | {{ gap.resolution.action }} | {{ gap.resolution.owner | default(value="À définir") }} | {{ gap.resolution.deadline | default(value="À définir") }} | 🔴 |
+{% endfor %}
+
+---
+
+*Référentiel: Guide CNIL Sécurité des Données Personnelles 2024*

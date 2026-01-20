@@ -1,0 +1,140 @@
+# OpenSecKit Security Principles
+# Machine-readable definitions for the 7 constitutional security principles
+version: "1.0.0"
+
+principles:
+  I:
+    id: threat_modeling
+    name: Threat Modeling
+    name_fr: Modélisation des Menaces
+    description: Identify and analyze potential threats before development
+    methodology: STRIDE
+    deliverables:
+      - security-spec.md
+      - risks.yaml
+    knowledge_path: knowledge/principles/I-threat-modeling/
+    guides:
+      - stride-guide.md
+      - dfd-guide.md
+      - attack-trees-guide.md
+
+  II:
+    id: risk_analysis
+    name: Risk Analysis
+    name_fr: Analyse de Risques
+    description: Score and track risks in a central register
+    methodology: Impact × Probability × Exposure (scale 1-5, max 125)
+    deliverables:
+      - risks.yaml
+    knowledge_path: knowledge/principles/II-risk-analysis/
+    guides:
+      - scoring-methodology.md
+      - register-guide.md
+    thresholds:
+      critical: 75
+      important: 25
+
+  III:
+    id: security_design
+    name: Security by Design
+    name_fr: Sécurité dès la Conception
+    description: Security controls are first-class requirements
+    methodology: OWASP ASVS
+    deliverables:
+      - security-spec.md
+    knowledge_path: knowledge/principles/III-security-design/
+    guides:
+      - authentication-guide.md
+      - authorization-guide.md
+      - encryption-guide.md
+      - asvs-guide.md
+    fundamentals:
+      - least_privilege
+      - defense_in_depth
+      - fail_secure
+      - input_validation
+
+  IV:
+    id: security_testing
+    name: Security Testing
+    name_fr: Tests de Sécurité
+    description: Automated tests, blocking for deployment
+    methodology: SAST/DAST/SCA
+    deliverables:
+      - security-spec.md
+    knowledge_path: knowledge/principles/IV-security-testing/
+    guides:
+      - sast-guide.md
+      - dast-guide.md
+      - sca-guide.md
+      - regression-tests-guide.md
+    rule: No CRITICAL or HIGH vulnerabilities in production
+
+  V:
+    id: secrets_management
+    name: Secrets Management
+    name_fr: Gestion des Secrets
+    description: No secrets in code. Ever.
+    methodology: Vault + Pre-commit scanning
+    deliverables:
+      - security-spec.md
+    knowledge_path: knowledge/principles/V-secrets-management/
+    guides:
+      - vault-guide.md
+      - rotation-guide.md
+      - detection-guide.md
+    rotation_max_days: 90
+
+  VI:
+    id: audit_logging
+    name: Audit Logging
+    name_fr: Traçabilité et Audit
+    description: All sensitive access must be immutably traced
+    methodology: Structured Logging + SIEM
+    deliverables:
+      - security-spec.md
+    knowledge_path: knowledge/principles/VI-audit-logging/
+    guides:
+      - logging-strategy.md
+      - centralization-guide.md
+      - alert-rules-guide.md
+      - siem-integration.md
+    retention_min_years: 1
+
+  VII:
+    id: patch_management
+    name: Patch Management
+    name_fr: Gestion des Correctifs
+    description: Known vulnerabilities have strict correction SLAs
+    methodology: CVSS-based SLA
+    deliverables:
+      - security-spec.md
+    knowledge_path: knowledge/principles/VII-patch-management/
+    guides:
+      - dependency-scanning-guide.md
+      - prioritization-guide.md
+      - sla-guide.md
+      - emergency-procedure.md
+    sla:
+      critical: 48h    # CVSS 9.0-10.0
+      high: 7d         # CVSS 7.0-8.9
+      medium: 30d      # CVSS 4.0-6.9
+      low: backlog     # CVSS 0.1-3.9
+
+# Weight system for principle prioritization
+weights:
+  CRITICAL: 5
+  HIGH: 4
+  MEDIUM: 3
+  LOW: 2
+  NONE: 0
+
+# Default weights (can be overridden per project in .osk/config.toml)
+defaults:
+  threat_modeling: HIGH
+  risk_analysis: HIGH
+  security_design: MEDIUM
+  security_testing: HIGH
+  secrets_management: HIGH
+  audit_logging: MEDIUM
+  patch_management: HIGH

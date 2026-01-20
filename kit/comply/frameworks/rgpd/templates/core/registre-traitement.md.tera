@@ -1,0 +1,191 @@
+{# Template: Registre des Activités de Traitement (Article 30 RGPD) #}
+{# Source: knowledge/core/registre-traitements.md #}
+{# Input: system-model/data.yaml, system-model/business.yaml, system-model/integrations.yaml #}
+{# Additional: organization.yaml #}
+
+# Registre des Activités de Traitement
+
+> **Article 30 du RGPD** - Registre des activités de traitement
+> Document généré le {{ now() | date(format="%d/%m/%Y") }}
+
+---
+
+## 1. Identification du Responsable de Traitement
+
+| Élément | Information |
+|---------|-------------|
+| **Organisme** | {{ organization.legal_entity.name }} |
+| **SIRET** | {{ organization.legal_entity.siret | default(value="À compléter") }} |
+| **Adresse** | {{ organization.legal_entity.address | default(value="À compléter") }} |
+| **Représentant légal** | {{ organization.representant_legal.name | default(value="À compléter") }} ({{ organization.representant_legal.function | default(value="") }}) |
+
+### Délégué à la Protection des Données (DPO)
+
+{% if team.security_roles.dpo is defined %}
+| Élément | Information |
+|---------|-------------|
+| **Nom** | {{ team.security_roles.dpo.name }} |
+| **Email** | {{ team.security_roles.dpo.email }} |
+| **Téléphone** | {{ team.security_roles.dpo.phone | default(value="À compléter") }} |
+{% else %}
+*Aucun DPO désigné* - Vérifier si la désignation est obligatoire (Article 37 RGPD).
+{% endif %}
+
+---
+
+## 2. Registre des Traitements
+
+{% for processing in data.data_categories %}
+### Traitement {{ loop.index }}: {{ processing.name }}
+
+#### Informations générales
+
+| Élément | Description |
+|---------|-------------|
+| **Identifiant** | {{ processing.id }} |
+| **Nom du traitement** | {{ processing.name }} |
+| **Description** | {{ processing.description | default(value="À compléter") }} |
+| **Date de mise en œuvre** | {{ processing.start_date | default(value="À compléter") }} |
+| **Dernière mise à jour** | {{ now() | date(format="%d/%m/%Y") }} |
+
+#### Finalités du traitement (Article 30.1.b)
+
+{% if processing.processing_purposes is defined %}
+{% for purpose in processing.processing_purposes %}
+- {{ purpose }}
+{% endfor %}
+{% else %}
+- *À compléter*
+{% endif %}
+
+#### Base légale (Article 6 RGPD)
+
+| Base légale | {{ processing.legal_basis | default(value="À déterminer") }} |
+|-------------|------|
+{% if processing.legal_basis == "interet_legitime" %}
+| **Intérêt légitime poursuivi** | *Voir analyse de mise en balance (LIA)* |
+{% elif processing.legal_basis == "consentement" %}
+| **Modalités de recueil** | *À documenter* |
+{% elif processing.legal_basis == "contrat" %}
+| **Type de contrat** | *À préciser* |
+{% elif processing.legal_basis == "obligation_legale" %}
+| **Texte de référence** | *À préciser* |
+{% endif %}
+
+#### Catégories de personnes concernées (Article 30.1.c)
+
+{% if data.data_subjects is defined %}
+{% for subject in data.data_subjects %}
+{% if processing.id in subject.data_categories %}
+- **{{ subject.type }}**
+{% endif %}
+{% endfor %}
+{% else %}
+- *À compléter*
+{% endif %}
+
+#### Catégories de données (Article 30.1.c)
+
+| Donnée | Type | Donnée sensible | PII |
+|--------|------|-----------------|-----|
+{% for field in processing.fields %}
+| {{ field.name }} | {{ field.type }} | {% if field.sensitive %}Oui{% else %}Non{% endif %} | {% if field.pii %}Oui{% else %}Non{% endif %} |
+{% endfor %}
+
+{% if processing.classification == "sensible" or processing.fields | selectattr("sensitive", "equalto", true) | list | length > 0 %}
+> ⚠️ **Attention**: Ce traitement porte sur des données sensibles (Article 9 RGPD).
+{% endif %}
+
+#### Destinataires des données (Article 30.1.d)
+
+**Destinataires internes:**
+{% if processing.recipients_internal is defined %}
+{% for recipient in processing.recipients_internal %}
+- {{ recipient }}
+{% endfor %}
+{% else %}
+- *À compléter*
+{% endif %}
+
+**Sous-traitants (Article 28):**
+{% for integration in integrations.integrations %}
+{% if integration.data_exchanged is defined %}
+{% for data_exchange in integration.data_exchanged %}
+{% if data_exchange.data_id == processing.id %}
+| Sous-traitant | {{ integration.name }} ({{ integration.vendor }}) |
+|---------------|------|
+| Finalité | {{ data_exchange.purpose | default(value="À préciser") }} |
+| Contrat Art. 28 | {% if integration.compliance.dpa_signed %}Oui{% else %}**Non - À régulariser**{% endif %} |
+| Localisation données | {{ integration.compliance.data_location | default(value="À vérifier") }} |
+{% endif %}
+{% endfor %}
+{% endif %}
+{% endfor %}
+
+#### Transferts hors UE (Article 30.1.e)
+
+{% if processing.cross_border %}
+| Élément | Information |
+|---------|-------------|
+| **Transfert hors UE** | Oui |
+| **Pays destinataire(s)** | {{ processing.transfer_destinations | join(sep=", ") }} |
+| **Mécanisme de transfert** | {{ processing.transfer_mechanism | default(value="À déterminer") }} |
+
+{% if processing.transfer_mechanism == "adequacy" %}
+*Pays bénéficiant d'une décision d'adéquation de la Commission européenne.*
+{% elif processing.transfer_mechanism == "sccs" %}
+*Clauses Contractuelles Types (CCT) signées.*
+{% elif processing.transfer_mechanism == "bcr" %}
+*Règles d'entreprise contraignantes (BCR) approuvées.*
+{% else %}
+> ⚠️ **Action requise**: Documenter le mécanisme de transfert conforme au Chapitre V du RGPD.
+{% endif %}
+{% else %}
+*Pas de transfert hors UE identifié.*
+{% endif %}
+
+#### Durées de conservation (Article 30.1.f)
+
+{% if processing.retention is defined %}
+| Type | Durée | Base légale | Méthode de suppression |
+|------|-------|-------------|------------------------|
+| Conservation active | {{ processing.retention.period }} | {{ processing.retention.legal_basis | default(value="À justifier") }} | {{ processing.retention.deletion_method | default(value="À définir") }} |
+{% else %}
+| Type | Durée | Base légale | Méthode de suppression |
+|------|-------|-------------|------------------------|
+| Conservation active | *À définir* | *À justifier* | *À définir* |
+{% endif %}
+
+#### Mesures de sécurité (Article 30.1.g)
+
+*Voir document "Mesures de sécurité" pour le détail des mesures techniques et organisationnelles.*
+
+Mesures principales applicables:
+{% for measure in controls.existing_controls | default(value=[]) %}
+- {{ measure }}
+{% endfor %}
+
+---
+
+{% endfor %}
+
+## 3. Synthèse du Registre
+
+| Métrique | Valeur |
+|----------|--------|
+| **Nombre total de traitements** | {{ data.data_categories | length }} |
+| **Traitements avec données sensibles** | {{ data.data_categories | selectattr("classification", "equalto", "sensible") | list | length }} |
+| **Traitements avec transfert hors UE** | {{ data.data_categories | selectattr("cross_border", "equalto", true) | list | length }} |
+| **AIPD requises** | *À évaluer selon liste CNIL* |
+
+---
+
+## 4. Historique des mises à jour
+
+| Date | Modification | Auteur |
+|------|--------------|--------|
+| {{ now() | date(format="%d/%m/%Y") }} | Génération initiale | Système |
+
+---
+
+*Ce registre doit être mis à jour à chaque modification des traitements et tenu à disposition de la CNIL sur demande (Article 30.4 RGPD).*

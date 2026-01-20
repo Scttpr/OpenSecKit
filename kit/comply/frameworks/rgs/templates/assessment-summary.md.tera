@@ -1,0 +1,193 @@
+# RGS Compliance Assessment Summary
+
+**Assessment Date**: {{ assessment_date }}
+**Framework**: RGS v{{ framework_version }} (ANSSI)
+**Target Level**: {{ rgs_level }}
+**Overall Status**: {{ overall_status | upper }}
+**Compliance Score**: {{ overall_score }}%
+
+---
+
+## Executive Summary
+
+This assessment evaluates compliance with the **Référentiel Général de Sécurité (RGS)** based on the full system context including codebase, integrations, operational tooling, and infrastructure.
+
+### Security Level Requirements
+
+| Level | Description | Minimum Score | Your Score | Status |
+|-------|-------------|---------------|------------|--------|
+{% if rgs_level == "rgs-star" %}
+| **`RGS*`** | Standard | 70% | {{ overall_score }}% | {{ overall_status }} |
+| `RGS**` | Renforcé | 85% | - | N/A |
+| `RGS***` | Élevé | 95% | - | N/A |
+{% elif rgs_level == "rgs-star-star" %}
+| `RGS*` | Standard | 70% | - | N/A |
+| **`RGS**`** | Renforcé | 85% | {{ overall_score }}% | {{ overall_status }} |
+| `RGS***` | Élevé | 95% | - | N/A |
+{% else %}
+| `RGS*` | Standard | 70% | - | N/A |
+| `RGS**` | Renforcé | 85% | - | N/A |
+| **`RGS***`** | Élevé | 95% | {{ overall_score }}% | {{ overall_status }} |
+{% endif %}
+
+### Domain Scores
+
+| Domain | ID | Score | Status |
+|--------|-----|-------|--------|
+| Authentification | AUTH | {{ domains.authentification.score }}% | {{ domains.authentification.status }} |
+| Intégrité | INT | {{ domains.integrite.score }}% | {{ domains.integrite.status }} |
+| Confidentialité | CONF | {{ domains.confidentialite.score }}% | {{ domains.confidentialite.status }} |
+| Traçabilité | TRAC | {{ domains.tracabilite.score }}% | {{ domains.tracabilite.status }} |
+| Horodatage | HORO | {{ domains.horodatage.score }}% | {{ domains.horodatage.status }} |
+| Signature | SIG | {{ domains.signature.score }}% | {{ domains.signature.status }} |
+
+### DICP Assessment
+
+| Critère | Niveau Requis | Niveau Atteint | Conformité |
+|---------|---------------|----------------|------------|
+| Disponibilité | {{ dicp_required.d }} | {{ dicp_achieved.d }} | {{ dicp_status.d }} |
+| Intégrité | {{ dicp_required.i }} | {{ dicp_achieved.i }} | {{ dicp_status.i }} |
+| Confidentialité | {{ dicp_required.c }} | {{ dicp_achieved.c }} | {{ dicp_status.c }} |
+| Preuve | {{ dicp_required.p }} | {{ dicp_achieved.p }} | {{ dicp_status.p }} |
+
+---
+
+## System Perimeter
+
+### Components Assessed
+
+| Category | Count | Status |
+|----------|-------|--------|
+| Application Components | {{ components.application }} | Assessed |
+| External Integrations | {{ components.integrations }} | Assessed |
+| Operational Tooling | {{ components.tooling }} | Assessed |
+| Infrastructure | {{ components.infrastructure }} | Assessed |
+
+### Tool Certification Status
+
+Critical for `RGS**` and `RGS***`, services must have appropriate certifications:
+
+| Service | Source | Certification | Required for Level | Status |
+|---------|--------|---------------|-------------------|--------|
+{% for tool in tool_certifications %}
+| {{ tool.name }} | {{ tool.source }} | {{ tool.certifications | join(sep=", ") | default(value="None") }} | {{ tool.required_for }} | {{ tool.status }} |
+{% endfor %}
+
+{% if certification_blockers | length > 0 %}
+### Certification Blockers
+
+The following services lack required certifications for {{ rgs_level }}:
+
+{% for blocker in certification_blockers %}
+- **{{ blocker.name }}** ({{ blocker.source }}): Missing {{ blocker.required_certification }}
+{% endfor %}
+{% endif %}
+
+---
+
+## Compliance Metrics
+
+| Metric | Count |
+|--------|-------|
+| Total Controls for {{ rgs_level }} | {{ total_controls }} |
+| Assessed | {{ assessed_controls }} |
+| Compliant | {{ compliant_controls }} |
+| Partial Compliance | {{ partial_controls }} |
+| Gaps Identified | {{ gap_controls }} |
+| Not Applicable | {{ not_applicable_controls }} |
+
+---
+
+## Cryptographic Validation (ANSSI)
+
+### Algorithm Compliance
+
+| Usage | Algorithm | Key Size | ANSSI Status |
+|-------|-----------|----------|--------------|
+{% for crypto in crypto_validation %}
+| {{ crypto.usage }} | {{ crypto.algorithm }} | {{ crypto.key_size }} | {{ crypto.status }} |
+{% endfor %}
+
+{% if crypto_issues | length > 0 %}
+### Cryptographic Issues
+
+{% for issue in crypto_issues %}
+- **{{ issue.component }}**: {{ issue.description }}
+{% endfor %}
+{% endif %}
+
+---
+
+## Gap Summary by Source
+
+| Source | Critical | High | Medium | Low | Total |
+|--------|----------|------|--------|-----|-------|
+| Codebase | {{ gaps_by_source.codebase.critical }} | {{ gaps_by_source.codebase.high }} | {{ gaps_by_source.codebase.medium }} | {{ gaps_by_source.codebase.low }} | {{ gaps_by_source.codebase.total }} |
+| Tooling | {{ gaps_by_source.tooling.critical }} | {{ gaps_by_source.tooling.high }} | {{ gaps_by_source.tooling.medium }} | {{ gaps_by_source.tooling.low }} | {{ gaps_by_source.tooling.total }} |
+| Infrastructure | {{ gaps_by_source.infrastructure.critical }} | {{ gaps_by_source.infrastructure.high }} | {{ gaps_by_source.infrastructure.medium }} | {{ gaps_by_source.infrastructure.low }} | {{ gaps_by_source.infrastructure.total }} |
+| Process | {{ gaps_by_source.process.critical }} | {{ gaps_by_source.process.high }} | {{ gaps_by_source.process.medium }} | {{ gaps_by_source.process.low }} | {{ gaps_by_source.process.total }} |
+
+---
+
+## Homologation Readiness
+
+{% if homologation_ready %}
+### Status: READY FOR HOMOLOGATION
+
+The system meets all requirements for {{ rgs_level }} homologation.
+
+**Recommended Next Steps:**
+1. Prepare dossier d'homologation
+2. Schedule audit de conformité
+3. Submit to commission d'homologation
+{% else %}
+### Status: NOT READY FOR HOMOLOGATION
+
+The following blockers must be resolved before homologation:
+
+{% for blocker in homologation_blockers %}
+- **{{ blocker.control }}**: {{ blocker.description }}
+{% endfor %}
+
+**Documentation Checklist:**
+{% for doc in documentation_checklist %}
+- {{ doc.status_icon }} {{ doc.name }}: {{ doc.status }}
+{% endfor %}
+{% endif %}
+
+---
+
+## Priority Action Items
+
+{% if action_items | length > 0 %}
+| Priority | Action | Domain | Due |
+|----------|--------|--------|-----|
+{% for action in action_items | slice(end=10) %}
+| {{ action.priority }} | {{ action.title }} | {{ action.domain }} | {{ action.due_date | default(value="-") }} |
+{% endfor %}
+
+{% if action_items | length > 10 %}
+*... and {{ action_items | length - 10 }} additional action items.*
+{% endif %}
+{% else %}
+No action items identified. Full compliance achieved.
+{% endif %}
+
+---
+
+## Next Steps
+
+{% if overall_status == "compliant" %}
+1. Generate homologation documentation: `/osk-comply rgs --export md`
+2. Prepare dossier d'homologation following ANSSI guidelines
+3. Schedule MCS (Maintien en Conditions de Sécurité) reviews
+{% else %}
+1. Address blockers immediately (critical gaps prevent homologation)
+2. Review homologation-checklist.md for requirements
+3. Validate tool certifications for {{ rgs_level }}
+4. Re-run assessment after remediation: `/osk-comply rgs --update`
+{% endif %}
+
+---
+
+*Assessment generated by OpenSecKit v4 - {{ assessment_date }}*

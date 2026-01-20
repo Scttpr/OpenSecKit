@@ -37,6 +37,15 @@ pub enum Commands {
         /// Installer la configuration pour tous les agents
         #[arg(long)]
         all_agents: bool,
+        /// Utiliser les ressources locales du dépôt (pour développement)
+        #[arg(long, short)]
+        local: bool,
+        /// Chemin vers le dépôt OpenSecKit local (implique --local)
+        #[arg(long, value_name = "PATH")]
+        local_path: Option<String>,
+        /// Version spécifique à télécharger (ex: v3.2.0)
+        #[arg(long, short = 'V')]
+        version: Option<String>,
     },
 
     /// Exporter le contexte du projet
@@ -56,15 +65,6 @@ pub enum Commands {
         json: bool,
     },
 
-    /// Créer des structures de fichiers
-    Scaffold {
-        #[command(subcommand)]
-        command: ScaffoldCommands,
-        /// Afficher le résultat en JSON (pour agents AI)
-        #[arg(long)]
-        json: bool,
-    },
-
     /// Mettre à jour les fichiers mécaniquement
     Update {
         #[command(subcommand)]
@@ -78,6 +78,55 @@ pub enum Commands {
     Validate {
         #[command(subcommand)]
         command: ValidateCommands,
+        /// Afficher le résultat en JSON (pour agents AI)
+        #[arg(long)]
+        json: bool,
+    },
+
+    /// Scanner les fichiers du projet (respecte .gitignore)
+    ///
+    /// Parcourt le répertoire en respectant .gitignore et retourne la liste
+    /// des fichiers avec des indices extraits des patterns ignorés.
+    /// Utilisé par les agents AI pour /osk-discover init.
+    #[command(
+        long_about = "Scan project files respecting .gitignore patterns.\n\nOutputs file list with gitignore hints for AI agents to understand project structure.\nUsed by: /osk-discover init, /osk-discover update"
+    )]
+    Scan {
+        /// Chemin à scanner (défaut: répertoire courant)
+        #[arg(short, long)]
+        path: Option<String>,
+        /// Afficher le résultat en JSON (pour agents AI)
+        #[arg(long)]
+        json: bool,
+    },
+
+    /// Générer un ID de composant à partir d'un chemin de fichier
+    ///
+    /// Transforme un chemin de fichier en identifiant de composant normalisé.
+    /// Format: {directory}-{name}, minuscules avec tirets.
+    /// Ex: src/api/users.rs → api-users
+    #[command(
+        long_about = "Generate a normalized component ID from a file path.\n\nFormat: {directory}-{name}, lowercase with hyphens.\nExamples:\n  src/api/users.rs → api-users\n  lib/auth/jwt.py → auth-jwt\n\nUsed by: /osk-discover init to create consistent component identifiers"
+    )]
+    Id {
+        /// Chemin du fichier source
+        path: String,
+        /// Afficher le résultat en JSON (pour agents AI)
+        #[arg(long)]
+        json: bool,
+    },
+
+    /// Lister les fichiers modifiés depuis le dernier scan
+    ///
+    /// Utilise git diff pour détecter les fichiers ajoutés, modifiés ou
+    /// supprimés depuis le dernier scan enregistré dans index.yaml.
+    #[command(
+        long_about = "List files changed since the last system model scan.\n\nReads last_commit from .osk/system-model/index.yaml and compares with HEAD.\nOutputs changed files with change type (added/modified/deleted).\n\nUsed by: /osk-discover update for incremental model updates"
+    )]
+    Changes {
+        /// Commit de référence (défaut: lu depuis index.yaml)
+        #[arg(long)]
+        since: Option<String>,
         /// Afficher le résultat en JSON (pour agents AI)
         #[arg(long)]
         json: bool,
@@ -120,34 +169,6 @@ pub enum CheckCommands {
     Dashboard,
 }
 
-/// Sous-commandes pour osk scaffold
-#[derive(Subcommand)]
-pub enum ScaffoldCommands {
-    /// Créer la structure d'une nouvelle feature
-    Feature {
-        /// Nom de la feature
-        name: String,
-        /// Ne pas créer de branche git
-        #[arg(long)]
-        no_branch: bool,
-    },
-    /// Créer un rapport d'incident
-    Incident {
-        /// Description de l'incident
-        description: String,
-        /// Sévérité (CRITIQUE, IMPORTANT, MODERE, MINEUR)
-        #[arg(long, default_value = "IMPORTANT")]
-        severity: String,
-    },
-    /// Créer la structure RGPD
-    Rgpd,
-    /// Créer la structure RGS
-    Rgs {
-        /// Nom du système
-        system: String,
-    },
-}
-
 /// Sous-commandes pour osk update
 #[derive(Subcommand)]
 pub enum UpdateCommands {
@@ -187,5 +208,17 @@ pub enum ValidateCommands {
     Workflow {
         /// Nom de la feature
         feature: String,
+    },
+    /// Valider le system model (.osk/system-model/)
+    ///
+    /// Vérifie la cohérence du modèle système: schéma YAML, références croisées,
+    /// et contrainte de taille de index.yaml (<200 lignes).
+    #[command(
+        long_about = "Validate the system model for schema compliance and consistency.\n\nChecks:\n- YAML schema validity for all 9 section files\n- Cross-reference integrity (all referenced IDs exist)\n- Index.yaml size constraint (<200 lines)\n\nUsed by: /osk-discover validate, /osk-discover init (final step)"
+    )]
+    SystemModel {
+        /// Chemin vers le system model (défaut: .osk/system-model/)
+        #[arg(short, long)]
+        path: Option<String>,
     },
 }

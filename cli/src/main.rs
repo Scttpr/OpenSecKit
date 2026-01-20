@@ -5,8 +5,7 @@ mod args;
 mod commands;
 mod config;
 mod github;
-mod prompts;
-mod stack;
+mod registry;
 mod utils;
 
 use anyhow::Result;

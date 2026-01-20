@@ -1,0 +1,252 @@
+# OWASP ASVS Component Mapping
+# Version: 4.0.0
+# Maps feature component types to relevant ASVS chapters and levels
+# Based on: OWASP Application Security Verification Standard 4.0.3
+
+metadata:
+  asvs_version: "4.0.3"
+  last_updated: "2026-01-16"
+  description: |
+    Maps common application component types to the most relevant ASVS chapters.
+    Use this mapping to automatically identify applicable security requirements
+    based on the features and components in your application.
+
+# Component type to ASVS chapter mapping
+component_mappings:
+  # Authentication components
+  authentication:
+    description: "Login, registration, password reset, session management"
+    primary_chapters:
+      - chapter: "V2"
+        name: "Authentication"
+        levels: [L1, L2, L3]
+      - chapter: "V3"
+        name: "Session Management"
+        levels: [L1, L2, L3]
+    secondary_chapters:
+      - chapter: "V1.2"
+        name: "Authentication Architecture"
+      - chapter: "V7"
+        name: "Error Handling and Logging"
+
+  # Authorization components
+  authorization:
+    description: "Access control, permissions, roles, RBAC/ABAC"
+    primary_chapters:
+      - chapter: "V4"
+        name: "Access Control"
+        levels: [L1, L2, L3]
+    secondary_chapters:
+      - chapter: "V1.4"
+        name: "Access Control Architecture"
+      - chapter: "V13"
+        name: "API and Web Service"
+
+  # Input handling components
+  input_processing:
+    description: "Forms, search, filters, user-generated content"
+    primary_chapters:
+      - chapter: "V5"
+        name: "Validation, Sanitization and Encoding"
+        levels: [L1, L2, L3]
+    secondary_chapters:
+      - chapter: "V1.5"
+        name: "Input and Output Architecture"
+      - chapter: "V12"
+        name: "Files and Resources"
+
+  # Data storage components
+  data_storage:
+    description: "Database operations, file storage, caching"
+    primary_chapters:
+      - chapter: "V6"
+        name: "Stored Cryptography"
+        levels: [L1, L2, L3]
+      - chapter: "V8"
+        name: "Data Protection"
+        levels: [L1, L2, L3]
+    secondary_chapters:
+      - chapter: "V1.6"
+        name: "Cryptographic Architecture"
+
+  # API components
+  api:
+    description: "REST APIs, GraphQL, webhooks, integrations"
+    primary_chapters:
+      - chapter: "V13"
+        name: "API and Web Service"
+        levels: [L1, L2, L3]
+    secondary_chapters:
+      - chapter: "V3"
+        name: "Session Management"
+      - chapter: "V5"
+        name: "Validation, Sanitization and Encoding"
+
+  # File handling components
+  file_handling:
+    description: "Uploads, downloads, document processing"
+    primary_chapters:
+      - chapter: "V12"
+        name: "Files and Resources"
+        levels: [L1, L2, L3]
+    secondary_chapters:
+      - chapter: "V5"
+        name: "Validation, Sanitization and Encoding"
+      - chapter: "V8"
+        name: "Data Protection"
+
+  # Payment components
+  payment:
+    description: "Payment processing, subscriptions, billing"
+    primary_chapters:
+      - chapter: "V6"
+        name: "Stored Cryptography"
+        levels: [L2, L3]
+      - chapter: "V8"
+        name: "Data Protection"
+        levels: [L2, L3]
+      - chapter: "V10"
+        name: "Malicious Code"
+        levels: [L2, L3]
+    secondary_chapters:
+      - chapter: "V7"
+        name: "Error Handling and Logging"
+      - chapter: "V4"
+        name: "Access Control"
+
+  # Communication components
+  communication:
+    description: "Email, SMS, notifications, messaging"
+    primary_chapters:
+      - chapter: "V9"
+        name: "Communication"
+        levels: [L1, L2, L3]
+    secondary_chapters:
+      - chapter: "V5"
+        name: "Validation, Sanitization and Encoding"
+      - chapter: "V8"
+        name: "Data Protection"
+
+  # Configuration and deployment
+  configuration:
+    description: "Environment config, deployment, infrastructure"
+    primary_chapters:
+      - chapter: "V14"
+        name: "Configuration"
+        levels: [L1, L2, L3]
+    secondary_chapters:
+      - chapter: "V1"
+        name: "Architecture, Design and Threat Modeling"
+
+  # Business logic components
+  business_logic:
+    description: "Workflows, state machines, business rules"
+    primary_chapters:
+      - chapter: "V11"
+        name: "Business Logic"
+        levels: [L1, L2, L3]
+    secondary_chapters:
+      - chapter: "V7"
+        name: "Error Handling and Logging"
+      - chapter: "V4"
+        name: "Access Control"
+
+# Level requirements by application sensitivity
+level_recommendations:
+  # Low sensitivity - public websites, informational apps
+  low:
+    recommended_level: L1
+    description: "Basic security controls for low-risk applications"
+    examples:
+      - "Public marketing website"
+      - "Blog without user accounts"
+      - "Internal documentation"
+
+  # Medium sensitivity - standard business applications
+  medium:
+    recommended_level: L2
+    description: "Standard security controls for business applications"
+    examples:
+      - "E-commerce website"
+      - "SaaS application"
+      - "Internal business tools"
+
+  # High sensitivity - financial, healthcare, critical infrastructure
+  high:
+    recommended_level: L3
+    description: "Advanced security controls for high-value targets"
+    examples:
+      - "Financial services"
+      - "Healthcare applications (PHI)"
+      - "Government systems"
+      - "Critical infrastructure"
+
+# Quick reference for requirement generation
+requirement_templates:
+  # Per ASVS chapter, key requirements at each level
+  V2_Authentication:
+    L1:
+      - "V2.1.1: Verify passwords are at least 12 characters"
+      - "V2.1.5: Verify no password truncation"
+      - "V2.1.7: Verify passwords checked against breach databases"
+      - "V2.2.1: Verify anti-automation controls"
+    L2:
+      - "V2.5.1: Verify password reset doesn't reveal existence"
+      - "V2.7.1: Verify OTP using approved cryptographic algorithms"
+      - "V2.8.1: Verify time-based OTP has lifetime of 30 seconds"
+    L3:
+      - "V2.9.1: Verify cryptographic keys for authentication are stored securely"
+      - "V2.10.1: Verify intra-service authentication uses secure tokens"
+
+  V3_Session_Management:
+    L1:
+      - "V3.2.1: Verify session tokens use at least 64 bits of entropy"
+      - "V3.3.1: Verify logout terminates session"
+      - "V3.4.1: Verify cookie-based tokens have Secure attribute"
+    L2:
+      - "V3.5.1: Verify OAuth tokens are not susceptible to CSRF"
+      - "V3.7.1: Verify application ensures valid session"
+
+  V4_Access_Control:
+    L1:
+      - "V4.1.1: Verify application enforces access control on trusted server"
+      - "V4.1.2: Verify access control fails securely"
+      - "V4.2.1: Verify sensitive operations require authorization checks"
+    L2:
+      - "V4.2.2: Verify access to sensitive data requires ownership verification"
+      - "V4.3.1: Verify administrative interfaces use appropriate authentication"
+
+  V5_Validation:
+    L1:
+      - "V5.1.1: Verify input validation on positive allowlist"
+      - "V5.2.1: Verify untrusted HTML is sanitized"
+      - "V5.3.1: Verify output encoding for context"
+    L2:
+      - "V5.2.6: Verify SVG scriptable content is disabled"
+      - "V5.5.1: Verify serialized objects use integrity checks"
+
+  V6_Cryptography:
+    L1:
+      - "V6.2.1: Verify approved cryptographic algorithms"
+      - "V6.2.3: Verify random number generation uses approved CSPRNG"
+    L2:
+      - "V6.3.1: Verify all keys protected from unauthorized access"
+      - "V6.4.1: Verify key management solution in use"
+
+  V8_Data_Protection:
+    L1:
+      - "V8.1.1: Verify application protects sensitive data from caching"
+      - "V8.2.1: Verify data classification"
+      - "V8.3.1: Verify sensitive data sent to client is necessary"
+    L2:
+      - "V8.3.4: Verify PII removed from debug data"
+      - "V8.3.7: Verify sensitive data removed from obsolete data"
+
+  V13_API:
+    L1:
+      - "V13.1.1: Verify all API keys have authorization"
+      - "V13.2.1: Verify REST uses anti-CSRF tokens"
+      - "V13.4.1: Verify GraphQL has query depth limiting"
+    L2:
+      - "V13.2.6: Verify request payload matches expected Content-Type"
+      - "V13.3.1: Verify OAuth callback URLs are whitelisted"

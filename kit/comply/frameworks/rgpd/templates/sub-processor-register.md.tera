@@ -1,0 +1,175 @@
+# Sub-Processor Register (GDPR Art. 28)
+
+**Last Updated**: {{ assessment_date }}
+**Data Controller**: {{ data_controller | default(value="[Organization Name]") }}
+**Total Sub-Processors**: {{ total_sub_processors }}
+
+---
+
+## Purpose
+
+This register documents all sub-processors engaged by the data controller in accordance with Article 28 of the General Data Protection Regulation (GDPR). Sub-processors are third parties that process personal data on behalf of the controller.
+
+---
+
+## Sub-Processor Summary
+
+| Category | Count | With DPA | Without DPA | Non-EU |
+|----------|-------|----------|-------------|--------|
+| API Integrations | {{ integrations_count }} | {{ integrations_with_dpa }} | {{ integrations_without_dpa }} | {{ integrations_non_eu }} |
+| Operational Tooling | {{ tooling_count }} | {{ tooling_with_dpa }} | {{ tooling_without_dpa }} | {{ tooling_non_eu }} |
+| Infrastructure | {{ infrastructure_count }} | {{ infrastructure_with_dpa }} | {{ infrastructure_without_dpa }} | {{ infrastructure_non_eu }} |
+
+---
+
+## API Integrations (integrations.yaml)
+
+Direct third-party services integrated with the application.
+
+{% for processor in integrations %}
+### {{ processor.name }}
+
+| Attribute | Value |
+|-----------|-------|
+| **ID** | {{ processor.id }} |
+| **Category** | {{ processor.category }} |
+| **Purpose** | {{ processor.purpose }} |
+| **Data Processed** | {{ processor.data_processed | join(sep=", ") }} |
+| **Location** | {{ processor.location }} |
+| **EU-Based** | {{ processor.is_eu }} |
+| **DPA Signed** | {{ processor.dpa_signed }} |
+{% if processor.dpa_date %}| **DPA Date** | {{ processor.dpa_date }} |{% endif %}
+{% if processor.certifications | length > 0 %}| **Certifications** | {{ processor.certifications | join(sep=", ") }} |{% endif %}
+| **Transfer Mechanism** | {{ processor.transfer_mechanism | default(value="N/A") }} |
+| **Compliance Status** | {{ processor.compliance_status }} |
+
+{% if processor.notes %}
+**Notes**: {{ processor.notes }}
+{% endif %}
+
+{% if processor.action_required %}
+**Action Required**: {{ processor.action_required }}
+{% endif %}
+
+---
+
+{% endfor %}
+
+## Operational Tooling (tooling.yaml)
+
+Tools used for development, operations, and team collaboration that may process personal data.
+
+{% for tool in tooling %}
+### {{ tool.name }}
+
+| Attribute | Value |
+|-----------|-------|
+| **ID** | {{ tool.id }} |
+| **Category** | {{ tool.category }} |
+| **Purpose** | {{ tool.purpose }} |
+| **Why In Scope** | {{ tool.in_scope_reason }} |
+| **Data Potentially Processed** | {{ tool.data_processed | join(sep=", ") }} |
+| **Location** | {{ tool.location }} |
+| **EU-Based** | {{ tool.is_eu }} |
+| **DPA Signed** | {{ tool.dpa_signed }} |
+{% if tool.dpa_date %}| **DPA Date** | {{ tool.dpa_date }} |{% endif %}
+{% if tool.certifications | length > 0 %}| **Certifications** | {{ tool.certifications | join(sep=", ") }} |{% endif %}
+| **Transfer Mechanism** | {{ tool.transfer_mechanism | default(value="N/A") }} |
+| **Compliance Status** | {{ tool.compliance_status }} |
+
+{% if tool.notes %}
+**Notes**: {{ tool.notes }}
+{% endif %}
+
+{% if tool.action_required %}
+**Action Required**: {{ tool.action_required }}
+{% endif %}
+
+---
+
+{% endfor %}
+
+## Infrastructure Providers (architecture.yaml)
+
+Cloud and hosting providers that store or process personal data.
+
+{% for infra in infrastructure %}
+### {{ infra.name }}
+
+| Attribute | Value |
+|-----------|-------|
+| **ID** | {{ infra.id }} |
+| **Category** | {{ infra.category }} |
+| **Services Used** | {{ infra.services | join(sep=", ") }} |
+| **Data Stored** | {{ infra.data_stored | join(sep=", ") }} |
+| **Region** | {{ infra.location }} |
+| **EU-Based** | {{ infra.is_eu }} |
+| **DPA Signed** | {{ infra.dpa_signed }} |
+{% if infra.dpa_date %}| **DPA Date** | {{ infra.dpa_date }} |{% endif %}
+{% if infra.certifications | length > 0 %}| **Certifications** | {{ infra.certifications | join(sep=", ") }} |{% endif %}
+| **Transfer Mechanism** | {{ infra.transfer_mechanism | default(value="N/A") }} |
+| **Compliance Status** | {{ infra.compliance_status }} |
+
+{% if infra.notes %}
+**Notes**: {{ infra.notes }}
+{% endif %}
+
+{% if infra.action_required %}
+**Action Required**: {{ infra.action_required }}
+{% endif %}
+
+---
+
+{% endfor %}
+
+## Required Actions
+
+{% if actions_required | length > 0 %}
+The following actions are required to achieve full sub-processor compliance:
+
+| Priority | Sub-Processor | Action Required |
+|----------|---------------|-----------------|
+{% for action in actions_required %}
+| {{ action.priority }} | {{ action.processor }} | {{ action.action }} |
+{% endfor %}
+{% else %}
+All sub-processors have appropriate Data Processing Agreements in place.
+{% endif %}
+
+---
+
+## International Transfer Summary (Art. 44-49)
+
+{% if non_eu_processors | length > 0 %}
+The following sub-processors are located outside the EU/EEA and require appropriate transfer mechanisms:
+
+| Sub-Processor | Location | Transfer Mechanism | Status |
+|---------------|----------|-------------------|--------|
+{% for processor in non_eu_processors %}
+| {{ processor.name }} | {{ processor.location }} | {{ processor.transfer_mechanism | default(value="REQUIRED") }} | {{ processor.transfer_status }} |
+{% endfor %}
+
+### Transfer Mechanisms Reference
+
+- **SCCs**: Standard Contractual Clauses (Commission Decision 2021/914)
+- **Adequacy**: EU adequacy decision in place for the country
+- **BCRs**: Binding Corporate Rules
+- **Derogation**: Art. 49 derogation (limited scope)
+{% else %}
+All sub-processors are located within the EU/EEA. No international transfer mechanisms required.
+{% endif %}
+
+---
+
+## Audit History
+
+| Date | Action | Notes |
+|------|--------|-------|
+{% for entry in audit_history %}
+| {{ entry.date }} | {{ entry.action }} | {{ entry.notes }} |
+{% endfor %}
+
+---
+
+*Register generated by OpenSecKit v4 - {{ assessment_date }}*
+*This document should be reviewed quarterly and updated when sub-processors change.*

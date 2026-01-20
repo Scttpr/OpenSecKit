@@ -36,7 +36,7 @@ pub fn fetch_latest_tag(client: &Client) -> Result<String> {
 
     if !resp.status().is_success() {
         bail!(
-            "Erreur GitHub API : {} (Vérifiez que le dépôt a une Release publique)",
+            "GitHub API error: {} (check that the repository has a public release)",
             resp.status()
         );
     }
@@ -56,10 +56,7 @@ pub fn fetch_repo_tree(client: &Client, tag: &str) -> Result<Vec<GitTreeItem>> {
     let resp = client.get(&url).send()?;
 
     if !resp.status().is_success() {
-        bail!(
-            "Impossible de lire l'arborescence du dépôt : {}",
-            resp.status()
-        );
+        bail!("Failed to read repository tree: {}", resp.status());
     }
 
     let tree_resp: GitTreeResponse = resp.json()?;
@@ -82,19 +79,19 @@ pub fn download_file(
     let resp = client.get(&url).send()?;
 
     if resp.status() == StatusCode::NOT_FOUND {
-        bail!("Fichier distant introuvable (404) : {remote_path}");
+        bail!("Remote file not found (404): {remote_path}");
     }
 
     if !resp.status().is_success() {
-        bail!("Erreur téléchargement {} : {}", remote_path, resp.status());
+        bail!("Download error for {}: {}", remote_path, resp.status());
     }
 
     if let Some(parent) = local_path.parent() {
         fs::create_dir_all(parent)?;
     }
 
-    let content = resp.text().context("Erreur lecture content")?;
-    fs::write(local_path, content).context("Erreur écriture disque")?;
+    let content = resp.text().context("Failed to read response content")?;
+    fs::write(local_path, content).context("Failed to write file to disk")?;
 
     Ok(())
 }

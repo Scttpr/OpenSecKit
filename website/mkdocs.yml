@@ -1,0 +1,129 @@
+site_name: OpenSecKit
+site_url: https://scttpr.github.io/OpenSecKit
+site_description: Framework de sécurité applicative - Security as Code, Multi-Agent Ready
+docs_dir: ../docs
+site_author: Scttpr
+repo_url: https://github.com/Scttpr/OpenSecKit
+repo_name: Scttpr/OpenSecKit
+
+theme:
+  name: material
+  language: fr
+  palette:
+    - scheme: slate
+      primary: deep purple
+      accent: purple
+      toggle:
+        icon: material/brightness-4
+        name: Mode clair
+    - scheme: default
+      primary: deep purple
+      accent: purple
+      toggle:
+        icon: material/brightness-7
+        name: Mode sombre
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.tabs.link
+    - content.code.annotate
+  icon:
+    repo: fontawesome/brands/github
+
+plugins:
+  - search:
+      lang: fr
+
+markdown_extensions:
+  - admonition
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_div_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tilde
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Scttpr/OpenSecKit
+  version:
+    provider: mike
+
+extra_javascript:
+  - https://unpkg.com/mermaid@10/dist/mermaid.min.js
+  - javascripts/mermaid-init.js
+
+nav:
+  - Accueil: index.md
+  - Démarrage:
+    - Installation: getting-started/installation.md
+    - Quickstart: getting-started/quickstart.md
+  - Concepts:
+    - Les 7 Principes: concepts/principles.md
+    - Workflow: concepts/workflow.md
+    - Risk Register: concepts/risk-register.md
+  - Commandes:
+    - Vue d'ensemble: commands/index.md
+    - Configuration:
+      - osk init: commands/osk-init.md
+      - /osk-configure: commands/osk-configure.md
+      - /osk-baseline: commands/osk-baseline.md
+    - Analyse:
+      - /osk-analyze: commands/osk-analyze.md
+      - /osk-specify: commands/osk-specify.md
+      - /osk-harden: commands/osk-harden.md
+    - Planification:
+      - /osk-plan: commands/osk-plan.md
+      - /osk-tasks: commands/osk-tasks.md
+      - /osk-implement: commands/osk-implement.md
+    - Conformité:
+      - /osk-rgpd: commands/osk-rgpd.md
+      - /osk-rgs: commands/osk-rgs.md
+    - Monitoring:
+      - /osk-dashboard: commands/osk-dashboard.md
+      - /osk-pca-pra: commands/osk-pca-pra.md
+      - /osk-incident: commands/osk-incident.md
+    - CLI Scriptables:
+      - osk check: commands/osk-check.md
+      - osk scaffold: commands/osk-scaffold.md
+      - osk update: commands/osk-update.md
+      - osk validate: commands/osk-validate.md
+  - Domaines:
+    - Vue d'ensemble: domains/index.md
+    - RGPD: domains/rgpd.md
+    - RGS: domains/rgs.md
+    - NIS2: domains/nis2.md
+  - Référence:
+    - CLI: reference/cli.md
+    - Structure des fichiers: reference/file-structure.md
+    - Templates: reference/templates.md
+  - Développement:
+    - Contribuer: development/contributing.md
+    - Architecture: development/architecture.md
+  - Changelog: changelog.md

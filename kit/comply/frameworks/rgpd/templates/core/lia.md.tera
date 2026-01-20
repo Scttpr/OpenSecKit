@@ -1,0 +1,187 @@
+{# Template: Analyse de Mise en Balance - Intérêt Légitime (Article 6(1)(f) RGPD) #}
+{# Source: knowledge/core/interet-legitime.md, EDPB Guidelines 1/2024 #}
+{# Input: system-model/data.yaml, business.yaml #}
+{# Additional: assessments/lia-{processing_id}.yaml #}
+
+# Analyse de Mise en Balance (LIA)
+## Intérêt Légitime - Article 6(1)(f) RGPD
+
+> Document généré le {{ now() | date(format="%d/%m/%Y") }}
+> Traitement concerné: **{{ processing.name }}** ({{ processing.id }})
+
+---
+
+## 1. Identification du traitement
+
+| Élément | Description |
+|---------|-------------|
+| **Nom du traitement** | {{ processing.name }} |
+| **Description** | {{ processing.description | default(value="À compléter") }} |
+| **Responsable de traitement** | {{ organization.legal_entity.name }} |
+| **Finalités** | {% for purpose in processing.processing_purposes %}{{ purpose }}{% if not loop.last %}, {% endif %}{% endfor %} |
+
+---
+
+## 2. Test en trois étapes
+
+### Étape 1: L'intérêt poursuivi est-il légitime?
+
+#### 1.1 Identification de l'intérêt
+
+| Question | Réponse |
+|----------|---------|
+| **Quel est l'intérêt poursuivi?** | {{ lia.interet.description | default(value="À décrire précisément") }} |
+| **L'intérêt est-il celui du responsable de traitement ou d'un tiers?** | {{ lia.interet.beneficiaire | default(value="Responsable de traitement / Tiers") }} |
+
+#### 1.2 Critères de légitimité
+
+| Critère | Évaluation | Justification |
+|---------|------------|---------------|
+| **Licite** - L'intérêt n'est pas contraire au droit | {% if lia.interet.licite | default(value=true) %}✅ Oui{% else %}❌ Non{% endif %} | {{ lia.interet.licite_justification | default(value="À justifier") }} |
+| **Clairement articulé** - L'intérêt est défini précisément | {% if lia.interet.articule | default(value=true) %}✅ Oui{% else %}❌ Non{% endif %} | {{ lia.interet.articule_justification | default(value="À justifier") }} |
+| **Réel et présent** - L'intérêt n'est pas hypothétique | {% if lia.interet.reel | default(value=true) %}✅ Oui{% else %}❌ Non{% endif %} | {{ lia.interet.reel_justification | default(value="À justifier") }} |
+
+#### 1.3 Exemples d'intérêts légitimes reconnus (RGPD/EDPB)
+
+- [ ] Prévention de la fraude
+- [ ] Sécurité du réseau et de l'information
+- [ ] Prospection commerciale (clients existants)
+- [ ] Transmission intra-groupe à des fins administratives
+- [ ] Signalement d'infractions pénales
+- [ ] Autre: {{ lia.interet.type_reconnu | default(value="") }}
+
+**Conclusion Étape 1:** {% if lia.etape1.conclusion | default(value="positif") == "positif" %}✅ L'intérêt est légitime{% else %}❌ L'intérêt n'est pas légitime{% endif %}
+
+---
+
+### Étape 2: Le traitement est-il nécessaire à la réalisation de l'intérêt?
+
+#### 2.1 Test de nécessité
+
+| Question | Réponse |
+|----------|---------|
+| **Le traitement permet-il effectivement d'atteindre l'objectif?** | {{ lia.necessite.efficacite | default(value="À évaluer") }} |
+| **Existe-t-il des moyens moins intrusifs pour atteindre le même objectif?** | {{ lia.necessite.alternatives | default(value="À évaluer") }} |
+
+#### 2.2 Alternatives envisagées
+
+| Alternative | Pourquoi non retenue |
+|-------------|---------------------|
+{% for alt in lia.necessite.alternatives_evaluees | default(value=[]) %}
+| {{ alt.description }} | {{ alt.raison_rejet }} |
+{% endfor %}
+{% if lia.necessite.alternatives_evaluees is not defined %}
+| *Aucune alternative documentée* | *À compléter* |
+{% endif %}
+
+#### 2.3 Minimisation des données
+
+| Donnée | Nécessité | Justification |
+|--------|-----------|---------------|
+{% for field in processing.fields %}
+| {{ field.name }} | {% if lia.necessite.donnees[loop.index0].necessaire | default(value=true) %}✅ Nécessaire{% else %}⚠️ À revoir{% endif %} | {{ lia.necessite.donnees[loop.index0].justification | default(value="À justifier") }} |
+{% endfor %}
+
+**Conclusion Étape 2:** {% if lia.etape2.conclusion | default(value="positif") == "positif" %}✅ Le traitement est nécessaire{% else %}❌ Le traitement n'est pas nécessaire{% endif %}
+
+---
+
+### Étape 3: Mise en balance - Les intérêts des personnes prévalent-ils?
+
+#### 3.1 Identification des intérêts et droits des personnes
+
+| Intérêt/Droit de la personne | Impact potentiel |
+|-----------------------------|------------------|
+| Protection de la vie privée | {{ lia.balance.impact_vie_privee | default(value="À évaluer") }} |
+| Liberté d'expression | {{ lia.balance.impact_expression | default(value="Non concerné / À évaluer") }} |
+| Non-discrimination | {{ lia.balance.impact_discrimination | default(value="Non concerné / À évaluer") }} |
+| Intégrité physique et mentale | {{ lia.balance.impact_integrite | default(value="Non concerné / À évaluer") }} |
+| Autres | {{ lia.balance.impact_autres | default(value="") }} |
+
+#### 3.2 Facteurs d'évaluation de l'impact
+
+| Facteur | Évaluation | Commentaire |
+|---------|------------|-------------|
+| **Nature des données** | {{ lia.balance.nature_donnees | default(value="Standard / Sensible") }} | {{ lia.balance.nature_donnees_commentaire | default(value="") }} |
+| **Volume de personnes** | {{ lia.balance.volume | default(value="À quantifier") }} | |
+| **Attentes raisonnables** | {{ lia.balance.attentes | default(value="Conforme / Non conforme") }} | Les personnes s'attendent-elles à ce traitement? |
+| **Relation avec les personnes** | {{ lia.balance.relation | default(value="Clients / Prospects / Autre") }} | |
+| **Personnes vulnérables** | {{ lia.balance.vulnerables | default(value="Non / Oui") }} | Enfants, patients, employés... |
+| **Conséquences négatives** | {{ lia.balance.consequences | default(value="À évaluer") }} | |
+
+#### 3.3 Mesures compensatoires
+
+| Mesure | Mise en œuvre | Effet sur la balance |
+|--------|---------------|---------------------|
+| Transparence renforcée | {{ lia.mesures.transparence | default(value="☐ Oui ☐ Non") }} | Réduit la surprise |
+| Droit d'opposition facilité | {{ lia.mesures.opposition | default(value="☐ Oui ☐ Non") }} | Contrôle accru |
+| Pseudonymisation | {{ lia.mesures.pseudonymisation | default(value="☐ Oui ☐ Non") }} | Réduit le risque |
+| Limitation de la durée | {{ lia.mesures.duree_limitee | default(value="☐ Oui ☐ Non") }} | Minimise l'impact |
+| Chiffrement | {{ lia.mesures.chiffrement | default(value="☐ Oui ☐ Non") }} | Protège en cas de fuite |
+| Autre | {{ lia.mesures.autre | default(value="") }} | |
+
+#### 3.4 Synthèse de la balance
+
+```
+INTÉRÊT LÉGITIME                              DROITS DES PERSONNES
+      │                                              │
+      │  {{ lia.balance.poids_interet | default(value="[___]") }}                              {{ lia.balance.poids_personnes | default(value="[___]") }}  │
+      │◄─────────────────────┼────────────────────►│
+                             │
+                        ÉQUILIBRE
+```
+
+**Conclusion Étape 3:** {% if lia.etape3.conclusion | default(value="positif") == "positif" %}✅ L'intérêt légitime prévaut{% else %}❌ Les droits des personnes prévalent{% endif %}
+
+---
+
+## 3. Conclusion générale
+
+### Récapitulatif
+
+| Étape | Résultat |
+|-------|----------|
+| 1. Légitimité de l'intérêt | {% if lia.etape1.conclusion | default(value="positif") == "positif" %}✅{% else %}❌{% endif %} |
+| 2. Nécessité du traitement | {% if lia.etape2.conclusion | default(value="positif") == "positif" %}✅{% else %}❌{% endif %} |
+| 3. Balance des intérêts | {% if lia.etape3.conclusion | default(value="positif") == "positif" %}✅{% else %}❌{% endif %} |
+
+### Décision
+
+{% if lia.conclusion.valide | default(value=true) %}
+✅ **Le traitement peut être fondé sur l'intérêt légitime (Article 6(1)(f) RGPD)**
+
+Sous réserve de la mise en œuvre des mesures compensatoires identifiées.
+{% else %}
+❌ **Le traitement ne peut pas être fondé sur l'intérêt légitime**
+
+Une autre base légale doit être identifiée (consentement, contrat, etc.) ou le traitement doit être modifié.
+{% endif %}
+
+---
+
+## 4. Validation
+
+| Élément | Information |
+|---------|-------------|
+| **Date de l'analyse** | {{ lia.validation.date | default(value="[DATE]") }} |
+| **Réalisée par** | {{ lia.validation.auteur | default(value="[NOM]") }} |
+| **Validée par le DPO** | {{ lia.validation.dpo | default(value="☐ Oui ☐ Non") }} |
+| **Prochaine révision** | {{ lia.validation.prochaine_revision | default(value="[DATE]") }} |
+
+---
+
+## 5. Suivi et révision
+
+Cette analyse doit être révisée:
+- En cas de modification des finalités du traitement
+- En cas de modification des catégories de données
+- En cas de modification significative du contexte
+- Au minimum tous les {{ lia.revision.periodicite | default(value="2 ans") }}
+
+| Date | Modification | Auteur |
+|------|--------------|--------|
+| {{ now() | date(format="%d/%m/%Y") }} | Création | {{ lia.validation.auteur | default(value="[Auteur]") }} |
+
+---
+
+*Analyse conforme aux exigences de l'Article 6(1)(f) du RGPD et aux Lignes directrices EDPB 1/2024*

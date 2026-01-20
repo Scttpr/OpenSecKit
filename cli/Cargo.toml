@@ -1,6 +1,6 @@
 [package]
 name = "osk"
-version = "3.2.0"
+version = "4.0.0"
 edition = "2021"
 license = "MIT"
 description = "OpenSecKit CLI - Security automation for AI-assisted development"

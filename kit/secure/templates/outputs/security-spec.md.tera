@@ -1,0 +1,349 @@
+# Security Specification: {{ metadata.feature_name }}
+
+**Feature ID**: `{{ metadata.feature_id }}`
+**Created**: {{ metadata.created_at }}
+{% if metadata.system_model_version %}**System Model Version**: {{ metadata.system_model_version }}{% endif %}
+
+---
+
+## Security Principle Weights
+
+| Principle | Weight | Rationale |
+|-----------|--------|-----------|
+{% for pw in metadata.principle_weights -%}
+| {{ pw.principle | replace(from="_", to=" ") }} | {{ pw.weight | upper }} | {{ pw.rationale }} |
+{% endfor %}
+
+---
+
+## Context
+
+### Affected Components
+
+{% if context.affected_components | length > 0 -%}
+| Component ID | Name | Role |
+|--------------|------|------|
+{% for comp in context.affected_components -%}
+| `{{ comp.component_id }}` | {{ comp.name }} | {{ comp.role | default(value="-") }} |
+{% endfor %}
+{% else -%}
+*No components identified*
+{% endif %}
+
+### Affected Data
+
+{% if context.affected_data | length > 0 -%}
+| Data ID | Name | Classification | Operations |
+|---------|------|----------------|------------|
+{% for data in context.affected_data -%}
+| `{{ data.data_id }}` | {{ data.name }} | {{ data.classification | upper }} | {{ data.operations | default(value=[]) | join(sep=", ") }} |
+{% endfor %}
+{% else -%}
+*No sensitive data identified*
+{% endif %}
+
+### Trust Boundaries Crossed
+
+{% if context.trust_boundaries_crossed | length > 0 -%}
+| Boundary | From Zone | To Zone |
+|----------|-----------|---------|
+{% for boundary in context.trust_boundaries_crossed -%}
+| {{ boundary.name | default(value=boundary.boundary_id) }} | {{ boundary.from_zone }} | {{ boundary.to_zone }} |
+{% endfor %}
+{% else -%}
+*No trust boundary crossings*
+{% endif %}
+
+### Actors Involved
+
+{% if context.actors_involved | length > 0 -%}
+| Actor | Privilege Level |
+|-------|-----------------|
+{% for actor in context.actors_involved -%}
+| {{ actor.name }} | {{ actor.privilege_level | default(value="authenticated") | upper }} |
+{% endfor %}
+{% else -%}
+*No actors identified*
+{% endif %}
+
+---
+
+## Threat Analysis
+
+**Attack Surface Score**: {{ threat_analysis.attack_surface_score | default(value=3) }}/5
+
+### Entry Points
+
+{% for ep in threat_analysis.entry_points -%}
+#### {{ ep.id }}: {{ ep.description }}
+
+- **Type**: {{ ep.type }}
+- **Location**: `{{ ep.location | default(value="TBD") }}`
+- **Authentication**: {{ ep.authentication | default(value="none") }}
+- **Authorization**: {{ ep.authorization | default(value="TBD") }}
+
+{% if ep.input_data | length > 0 -%}
+**Input Data**:
+| Field | Type | Validation | Injection Risk |
+|-------|------|------------|----------------|
+{% for input in ep.input_data -%}
+| `{{ input.field }}` | {{ input.type }} | {{ input.validation_needed | default(value="required") }} | {{ input.injection_risk | default(value="low") | upper }} |
+{% endfor %}
+{% endif %}
+
+{% endfor %}
+
+### Identified Threats
+
+{% for threat in threat_analysis.threats -%}
+#### {{ threat.id }}: {{ threat.name }}
+
+| Attribute | Value |
+|-----------|-------|
+| **STRIDE Category** | {{ threat.stride_category | upper }} |
+| **Affected Entry Point** | {{ threat.affected_entry_point | default(value="N/A") }} |
+| **Severity** | **{{ threat.scoring.severity | upper }}** (Score: {{ threat.scoring.score }}/125) |
+| **Impact** | {{ threat.scoring.impact }}/5 |
+| **Probability** | {{ threat.scoring.probability }}/5 |
+| **Exposure** | {{ threat.scoring.exposure }}/5 |
+
+**Description**: {{ threat.description }}
+
+**Attack Vector**: {{ threat.attack_vector }}
+
+{% if threat.affected_assets | length > 0 -%}
+**Affected Assets**: {{ threat.affected_assets | join(sep=", ") }}
+{% endif %}
+
+{% if threat.existing_mitigations | length > 0 -%}
+**Existing Mitigations**:
+{% for mit in threat.existing_mitigations -%}
+- {{ mit }}
+{% endfor %}
+{% endif %}
+
+{% if threat.required_mitigations | length > 0 -%}
+**Required Mitigations**:
+{% for mit in threat.required_mitigations -%}
+- {{ mit }}
+{% endfor %}
+{% endif %}
+
+{% if threat.external_refs -%}
+**External References**:
+{% if threat.external_refs.cwe %}- CWE: [{{ threat.external_refs.cwe }}](https://cwe.mitre.org/data/definitions/{{ threat.external_refs.cwe | replace(from="CWE-", to="") }}.html){% endif %}
+{% if threat.external_refs.owasp_api %}- OWASP API: {{ threat.external_refs.owasp_api }}{% endif %}
+{% if threat.external_refs.mitre_attack %}- MITRE ATT&CK: [{{ threat.external_refs.mitre_attack }}](https://attack.mitre.org/techniques/{{ threat.external_refs.mitre_attack }}/){% endif %}
+{% if threat.external_refs.capec %}- CAPEC: [{{ threat.external_refs.capec }}](https://capec.mitre.org/data/definitions/{{ threat.external_refs.capec | replace(from="CAPEC-", to="") }}.html){% endif %}
+{% endif %}
+
+---
+
+{% endfor %}
+
+## Security Requirements
+
+### Authentication (AUTH)
+
+{% if requirements.authentication | length > 0 -%}
+{% for req in requirements.authentication -%}
+#### {{ req.id }}: {{ req.description }}
+
+- **Criticality**: {{ req.criticality }}
+- **Linked Threats**: {{ req.linked_threats | join(sep=", ") }}
+{% if req.implementation -%}
+- **Guidance**: {{ req.implementation.guidance | default(value="TBD") }}
+{% if req.implementation.libraries | length > 0 %}- **Libraries**: {{ req.implementation.libraries | join(sep=", ") }}{% endif %}
+{% endif %}
+{% if req.verification -%}
+- **Test Method**: {{ req.verification.test_method | default(value="TBD") }}
+{% if req.verification.asvs_ref %}- **ASVS**: {{ req.verification.asvs_ref }}{% endif %}
+{% endif %}
+
+{% endfor %}
+{% else -%}
+*No authentication requirements identified*
+{% endif %}
+
+### Authorization (AUTHZ)
+
+{% if requirements.authorization | length > 0 -%}
+{% for req in requirements.authorization -%}
+#### {{ req.id }}: {{ req.description }}
+
+- **Criticality**: {{ req.criticality }}
+- **Linked Threats**: {{ req.linked_threats | join(sep=", ") }}
+{% if req.implementation -%}
+- **Guidance**: {{ req.implementation.guidance | default(value="TBD") }}
+{% if req.implementation.libraries | length > 0 %}- **Libraries**: {{ req.implementation.libraries | join(sep=", ") }}{% endif %}
+{% endif %}
+{% if req.verification -%}
+- **Test Method**: {{ req.verification.test_method | default(value="TBD") }}
+{% if req.verification.asvs_ref %}- **ASVS**: {{ req.verification.asvs_ref }}{% endif %}
+{% endif %}
+
+{% endfor %}
+{% else -%}
+*No authorization requirements identified*
+{% endif %}
+
+### Input Validation (VAL)
+
+{% if requirements.validation | length > 0 -%}
+{% for req in requirements.validation -%}
+#### {{ req.id }}: {{ req.description }}
+
+- **Criticality**: {{ req.criticality }}
+- **Linked Threats**: {{ req.linked_threats | join(sep=", ") }}
+{% if req.implementation -%}
+- **Guidance**: {{ req.implementation.guidance | default(value="TBD") }}
+{% if req.implementation.libraries | length > 0 %}- **Libraries**: {{ req.implementation.libraries | join(sep=", ") }}{% endif %}
+{% endif %}
+{% if req.verification -%}
+- **Test Method**: {{ req.verification.test_method | default(value="TBD") }}
+{% if req.verification.asvs_ref %}- **ASVS**: {{ req.verification.asvs_ref }}{% endif %}
+{% endif %}
+
+{% endfor %}
+{% else -%}
+*No input validation requirements identified*
+{% endif %}
+
+### Cryptography (CRYPTO)
+
+{% if requirements.cryptography | length > 0 -%}
+{% for req in requirements.cryptography -%}
+#### {{ req.id }}: {{ req.description }}
+
+- **Criticality**: {{ req.criticality }}
+- **Linked Threats**: {{ req.linked_threats | join(sep=", ") }}
+{% if req.implementation -%}
+- **Guidance**: {{ req.implementation.guidance | default(value="TBD") }}
+{% if req.implementation.libraries | length > 0 %}- **Libraries**: {{ req.implementation.libraries | join(sep=", ") }}{% endif %}
+{% endif %}
+{% if req.verification -%}
+- **Test Method**: {{ req.verification.test_method | default(value="TBD") }}
+{% if req.verification.asvs_ref %}- **ASVS**: {{ req.verification.asvs_ref }}{% endif %}
+{% endif %}
+
+{% endfor %}
+{% else -%}
+*No cryptography requirements identified*
+{% endif %}
+
+### Audit Logging (LOG)
+
+{% if requirements.logging | length > 0 -%}
+{% for req in requirements.logging -%}
+#### {{ req.id }}: {{ req.description }}
+
+- **Criticality**: {{ req.criticality }}
+- **Linked Threats**: {{ req.linked_threats | join(sep=", ") }}
+{% if req.implementation -%}
+- **Guidance**: {{ req.implementation.guidance | default(value="TBD") }}
+{% if req.implementation.libraries | length > 0 %}- **Libraries**: {{ req.implementation.libraries | join(sep=", ") }}{% endif %}
+{% endif %}
+{% if req.verification -%}
+- **Test Method**: {{ req.verification.test_method | default(value="TBD") }}
+{% if req.verification.asvs_ref %}- **ASVS**: {{ req.verification.asvs_ref }}{% endif %}
+{% endif %}
+
+{% endfor %}
+{% else -%}
+*No logging requirements identified*
+{% endif %}
+
+---
+
+## Testing Strategy
+
+### SAST Focus Areas
+
+{% if testing_strategy.sast_focus | length > 0 -%}
+{% for focus in testing_strategy.sast_focus -%}
+- {{ focus }}
+{% endfor %}
+{% else -%}
+*TBD*
+{% endif %}
+
+### DAST Focus Areas
+
+{% if testing_strategy.dast_focus | length > 0 -%}
+{% for focus in testing_strategy.dast_focus -%}
+- {{ focus }}
+{% endfor %}
+{% else -%}
+*TBD*
+{% endif %}
+
+### Penetration Testing Scope
+
+{% if testing_strategy.penetration_scope | length > 0 -%}
+{% for scope in testing_strategy.penetration_scope -%}
+- {{ scope }}
+{% endfor %}
+{% else -%}
+*TBD*
+{% endif %}
+
+---
+
+## Compliance Mapping
+
+{% if compliance_mapping -%}
+### RGPD
+
+{% if compliance_mapping.rgpd | length > 0 -%}
+| Article | Requirement |
+|---------|-------------|
+{% for rgpd in compliance_mapping.rgpd -%}
+| {{ rgpd.article }} | {{ rgpd.requirement }} |
+{% endfor %}
+{% else -%}
+*Not applicable*
+{% endif %}
+
+### RGS
+
+{% if compliance_mapping.rgs | length > 0 -%}
+{% for rgs in compliance_mapping.rgs -%}
+- {{ rgs }}
+{% endfor %}
+{% else -%}
+*Not applicable*
+{% endif %}
+
+### OWASP ASVS
+
+{% if compliance_mapping.asvs | length > 0 -%}
+{% for asvs in compliance_mapping.asvs -%}
+- {{ asvs }}
+{% endfor %}
+{% else -%}
+*Not mapped*
+{% endif %}
+{% else -%}
+*No compliance requirements identified*
+{% endif %}
+
+---
+
+## Clarifications
+
+{% if clarifications | length > 0 -%}
+{% for clarification in clarifications -%}
+### Q: {{ clarification.question }}
+
+**A**: {{ clarification.answer }}
+
+*Resolved: {{ clarification.date }}*
+
+{% endfor %}
+{% else -%}
+*No clarifications recorded*
+{% endif %}
+
+---
+
+*Generated by OpenSecKit Secure Phase v4*

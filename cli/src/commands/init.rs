@@ -1,122 +1,524 @@
 //! Init command - project initialization
+//!
+//! V4 Architecture: Minimal setup, auto-detection
+//! - Auto-detects project name from folder/git
+//! - Auto-detects available agents on system
+//! - Downloads: config/registry.toml, config/agents.toml, cli/templates/agents/
+//! - Generates agent command files for detected agents only
 
-use crate::agents::{self, AgentConfig, AgentsConfig, DomainsInfo};
+use crate::agents::{self, AgentConfig, AgentsConfig};
 use crate::args::Agent;
-use crate::config::{
-    DomainsConfig, MemoryConfig, Nis2Config, OskConfig, PrinciplesConfig, ProjectConfig,
-    RgpdConfig, RgsConfig, SpecsConfig, StackConfig,
-};
-use crate::prompts;
-use crate::stack;
-use anyhow::Result;
-use dialoguer::{theme::ColorfulTheme, Input, Select};
+use crate::config::OskConfig;
+use crate::registry::{self, CommandInfo, DomainsInfo};
+use anyhow::{bail, Result};
+use dialoguer::{theme::ColorfulTheme, Confirm, Input};
 use reqwest::blocking::Client;
 use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
+use std::process::Command;
+use walkdir::WalkDir;
 
-const VERSION: &str = "3.2.0";
+const VERSION: &str = "4.0.0";
+
+/// Source for resources (registry, agents config, templates)
+#[derive(Debug, Clone)]
+pub enum ResourceSource {
+    /// Use local files from the repository
+    Local(PathBuf),
+    /// Fetch from a specific version tag
+    Version(String),
+    /// Fetch from the latest release
+    Latest,
+}
 
 #[derive(Default)]
 struct InstallStats {
-    prompts: usize,
-    schemas: usize,
-    outputs: usize,
-    reports: usize,
-    rgpd: usize,
-    rgs: usize,
-    nis2: usize,
+    registry: bool,
+    #[allow(dead_code)]
+    agents_config: bool,
+    #[allow(dead_code)]
     agents_templates: usize,
     errors: Vec<String>,
 }
 
+struct AgentDetection {
+    id: String,
+    name: String,
+    detected: bool,
+    #[allow(dead_code)]
+    reason: String,
+}
+
 struct AgentInstallResult {
+    #[allow(dead_code)]
     agent_id: String,
     agent_name: String,
     files_count: usize,
     output_path: String,
 }
 
+#[allow(clippy::too_many_arguments)]
 pub fn run(
     client: &Client,
     force: bool,
     default: bool,
     agent: Option<Agent>,
     all_agents: bool,
+    local: bool,
+    local_path: Option<String>,
+    version: Option<String>,
 ) -> Result<()> {
-    println!("🚀 Initialisation de OpenSecKit v{}\n", VERSION);
+    // Determine resource source
+    let source = determine_source(local, local_path, version)?;
 
-    let config = load_or_create_config(force, default)?;
-    scaffold_project(&config, force)?;
-    let stats = install_resources(client, force)?;
+    // Print header
+    print_header(&source);
 
+    // Step 1: Get project name
+    let project_name = get_project_name(default)?;
+    println!("  Project: {}\n", project_name);
+
+    // Step 2: Create .osk directory
+    fs::create_dir_all(".osk")?;
+
+    // Step 3: Install resources (registry, agents config, templates)
+    let stats = install_resources(client, force, &source)?;
+
+    // Step 4: Load agents config and detect available agents
     let osk_dir = PathBuf::from(".osk");
     let agents_config = load_agents_config_or_fallback(&osk_dir)?;
-    let selected_agents = select_agents(&agents_config, default, agent, all_agents)?;
-    let prompts_dir = osk_dir.join("prompts");
-    let prompts_info = prompts::parse_prompts_dir(&prompts_dir)?;
-    let domains = detect_domains(&stats);
-    let templates_dir = osk_dir.join("templates");
-    let mut agent_results = Vec::new();
+    let detections = detect_agents(&agents_config);
 
-    for agent_id in &selected_agents {
-        if let Some(agent_config) = agents_config.agents.get(agent_id) {
-            match install_agent(
-                agent_id,
-                agent_config,
-                &prompts_info,
-                &templates_dir,
-                &domains,
-            ) {
-                Ok(result) => agent_results.push(result),
-                Err(e) => eprintln!("   ⚠️  Erreur {}: {}", agent_id, e),
-            }
-        }
+    // Print agent detection results
+    print_agent_detection(&detections);
+
+    // Step 5: Determine which agents to install
+    let selected_agents =
+        select_agents_to_install(&agents_config, &detections, default, agent, all_agents)?;
+
+    if selected_agents.is_empty() {
+        println!("\n  No agents selected for installation.\n");
+        return Ok(());
     }
 
+    // Step 6: Save config
+    let config = OskConfig::new(project_name.clone(), selected_agents.clone());
+    save_config(&config)?;
+
+    // Step 7: Scaffold project directories
+    scaffold_project(force)?;
+
+    // Step 8: Load registry and generate agent files
+    let registry_path = osk_dir.join("registry.toml");
+    let (commands, domains) = load_registry(&registry_path)?;
+
+    let (templates_dir, local_repo) = match &source {
+        ResourceSource::Local(path) => (path.join("cli/templates"), Some(path.as_path())),
+        _ => (osk_dir.join("cli/templates"), None),
+    };
+
+    let agent_results = install_selected_agents(
+        client,
+        &selected_agents,
+        &agents_config,
+        &commands,
+        &templates_dir,
+        &domains,
+        local_repo,
+    );
+
+    // Step 9: Generate AGENTS.md if enabled
     if let Some(ref universal) = agents_config.universal {
         if universal.enabled {
-            if let Err(e) = agents::generate_agents_md(
-                universal,
-                &prompts_info,
-                &templates_dir,
-                VERSION,
-                &domains,
-            ) {
-                eprintln!("   ⚠️  Erreur AGENTS.md: {}", e);
-            }
+            let _ =
+                agents::generate_agents_md(universal, &commands, &templates_dir, VERSION, &domains);
         }
     }
 
-    print_summary(&stats, &agent_results, agents_config.universal.as_ref());
+    // Print summary
+    print_summary(&project_name, &stats, &agent_results, commands.len());
 
     Ok(())
 }
 
-fn load_or_create_config(force: bool, default: bool) -> Result<OskConfig> {
-    let config_path = Path::new(".osk/config.toml");
-    let config_exists = config_path.exists();
-
-    if config_exists && !force {
-        println!("   ℹ️  Configuration existante détectée.");
-        fs::read_to_string(config_path)
-            .and_then(|s| {
-                toml::from_str(&s)
-                    .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))
-            })
-            .or_else(|_| {
-                println!("   ⚠️  Config corrompue, création d'une nouvelle...");
-                if default {
-                    Ok(default_configuration())
-                } else {
-                    prompt_configuration()
-                }
-            })
-    } else if default {
-        Ok(default_configuration())
+fn determine_source(
+    local: bool,
+    local_path: Option<String>,
+    version: Option<String>,
+) -> Result<ResourceSource> {
+    if let Some(path) = local_path {
+        let repo_root = PathBuf::from(&path);
+        validate_repo_root(&repo_root)?;
+        Ok(ResourceSource::Local(
+            repo_root.canonicalize().unwrap_or(repo_root),
+        ))
+    } else if local {
+        let repo_root = find_repo_root()?;
+        Ok(ResourceSource::Local(repo_root))
+    } else if let Some(v) = version {
+        Ok(ResourceSource::Version(v))
     } else {
-        prompt_configuration()
+        Ok(ResourceSource::Latest)
     }
+}
+
+fn print_header(source: &ResourceSource) {
+    let source_label = match source {
+        ResourceSource::Local(path) => format!("local: {}", path.display()),
+        ResourceSource::Version(v) => format!("version: {}", v),
+        ResourceSource::Latest => "latest".to_string(),
+    };
+
+    println!();
+    println!("  ╭─────────────────────────────────────────╮");
+    println!("  │  OpenSecKit v{}                       │", VERSION);
+    println!("  │  Source: {:<30}│", source_label);
+    println!("  ╰─────────────────────────────────────────╯");
+    println!();
+}
+
+fn get_project_name(default: bool) -> Result<String> {
+    // Try to detect from git remote or folder name
+    let detected = detect_project_name();
+
+    if default {
+        return Ok(detected);
+    }
+
+    let name: String = Input::with_theme(&ColorfulTheme::default())
+        .with_prompt("  Project name")
+        .default(detected)
+        .interact_text()?;
+
+    Ok(name)
+}
+
+fn detect_project_name() -> String {
+    // Try git remote first
+    if let Ok(output) = Command::new("git")
+        .args(["remote", "get-url", "origin"])
+        .output()
+    {
+        if output.status.success() {
+            let url = String::from_utf8_lossy(&output.stdout);
+            if let Some(name) = extract_repo_name(&url) {
+                return name;
+            }
+        }
+    }
+
+    // Fall back to current directory name
+    std::env::current_dir()
+        .ok()
+        .and_then(|p| p.file_name().map(|n| n.to_string_lossy().to_string()))
+        .unwrap_or_else(|| "my-project".to_string())
+}
+
+fn extract_repo_name(url: &str) -> Option<String> {
+    let url = url.trim();
+    // Handle both HTTPS and SSH URLs
+    // https://github.com/user/repo.git
+    // git@github.com:user/repo.git
+    let name = url
+        .rsplit('/')
+        .next()
+        .or_else(|| url.rsplit(':').next())?
+        .trim_end_matches(".git")
+        .to_string();
+
+    if name.is_empty() {
+        None
+    } else {
+        Some(name)
+    }
+}
+
+fn detect_agents(config: &AgentsConfig) -> Vec<AgentDetection> {
+    config
+        .agents
+        .iter()
+        .filter(|(_, agent)| agent.enabled)
+        .map(|(id, agent)| {
+            let (detected, reason) = check_agent_available(agent);
+            AgentDetection {
+                id: id.clone(),
+                name: agent.name.clone(),
+                detected,
+                reason,
+            }
+        })
+        .collect()
+}
+
+fn check_agent_available(agent: &AgentConfig) -> (bool, String) {
+    // Check command availability
+    if let Some(ref cmd) = agent.detect_cmd {
+        if Command::new("which")
+            .arg(cmd)
+            .output()
+            .map(|o| o.status.success())
+            .unwrap_or(false)
+        {
+            return (true, format!("`{}` found", cmd));
+        }
+    }
+
+    // Check path existence
+    if let Some(ref path) = agent.detect_path {
+        if Path::new(path).exists() {
+            return (true, format!("`{}` found", path));
+        }
+    }
+
+    // Not detected
+    let reason = match (&agent.detect_cmd, &agent.detect_path) {
+        (Some(cmd), Some(path)) => format!("`{}` or `{}` not found", cmd, path),
+        (Some(cmd), None) => format!("`{}` not found", cmd),
+        (None, Some(path)) => format!("`{}` not found", path),
+        (None, None) => "no detection method".to_string(),
+    };
+
+    (false, reason)
+}
+
+fn print_agent_detection(detections: &[AgentDetection]) {
+    println!("  Detected agents:");
+    for d in detections {
+        let icon = if d.detected { "✓" } else { "✗" };
+        let style = if d.detected { "" } else { " (not detected)" };
+        println!("    {} {}{}", icon, d.name, style);
+    }
+    println!();
+}
+
+fn select_agents_to_install(
+    config: &AgentsConfig,
+    detections: &[AgentDetection],
+    default: bool,
+    agent: Option<Agent>,
+    all_agents: bool,
+) -> Result<Vec<String>> {
+    // If specific agent requested
+    if let Some(a) = agent {
+        return Ok(vec![agent_to_id(&a)]);
+    }
+
+    // If all agents requested
+    if all_agents {
+        return Ok(config
+            .agents
+            .iter()
+            .filter(|(_, a)| a.enabled)
+            .map(|(id, _)| id.clone())
+            .collect());
+    }
+
+    // Get detected agents
+    let detected: Vec<String> = detections
+        .iter()
+        .filter(|d| d.detected)
+        .map(|d| d.id.clone())
+        .collect();
+
+    if detected.is_empty() {
+        if default {
+            // In default mode, use claude-code as fallback
+            return Ok(vec!["claude-code".to_string()]);
+        }
+
+        println!("  No agents auto-detected on your system.");
+        let install_default = Confirm::with_theme(&ColorfulTheme::default())
+            .with_prompt("  Install Claude Code anyway?")
+            .default(true)
+            .interact()?;
+
+        if install_default {
+            return Ok(vec!["claude-code".to_string()]);
+        } else {
+            return Ok(vec![]);
+        }
+    }
+
+    if default {
+        return Ok(detected);
+    }
+
+    // Confirm installation of detected agents
+    let confirm = Confirm::with_theme(&ColorfulTheme::default())
+        .with_prompt(format!(
+            "  Install for {} detected agent(s)?",
+            detected.len()
+        ))
+        .default(true)
+        .interact()?;
+
+    if confirm {
+        Ok(detected)
+    } else {
+        Ok(vec![])
+    }
+}
+
+fn agent_to_id(agent: &Agent) -> String {
+    match agent {
+        Agent::ClaudeCode => "claude-code".to_string(),
+        Agent::Copilot => "copilot".to_string(),
+        Agent::Cursor => "cursor".to_string(),
+        Agent::Gemini => "gemini".to_string(),
+    }
+}
+
+fn save_config(config: &OskConfig) -> Result<()> {
+    let config_path = Path::new(".osk/config.toml");
+    let toml_string = toml::to_string_pretty(config)?;
+    fs::write(config_path, toml_string)?;
+    Ok(())
+}
+
+fn scaffold_project(force: bool) -> Result<()> {
+    // Create minimal directory structure
+    fs::create_dir_all(".osk/system-model")?;
+
+    // Scaffold system model files
+    scaffold_system_model(force)?;
+
+    // Update .gitignore if needed
+    update_gitignore()?;
+
+    Ok(())
+}
+
+fn update_gitignore() -> Result<()> {
+    let gitignore_path = Path::new(".gitignore");
+    let osk_ignore = ".osk/\n";
+
+    if gitignore_path.exists() {
+        let content = fs::read_to_string(gitignore_path)?;
+        if !content.contains(".osk/") && !content.contains(".osk\n") {
+            fs::write(gitignore_path, format!("{}{}", content, osk_ignore))?;
+        }
+    } else {
+        fs::write(gitignore_path, osk_ignore)?;
+    }
+
+    Ok(())
+}
+
+fn load_registry(registry_path: &Path) -> Result<(Vec<CommandInfo>, DomainsInfo)> {
+    if registry_path.exists() {
+        let reg = registry::load_registry(registry_path)?;
+        let cmds = registry::get_commands(&reg);
+        let doms = registry::detect_domains(&reg);
+        Ok((cmds, doms))
+    } else {
+        Ok((Vec::new(), DomainsInfo::default()))
+    }
+}
+
+fn install_selected_agents(
+    client: &Client,
+    selected: &[String],
+    agents_config: &AgentsConfig,
+    commands: &[CommandInfo],
+    templates_dir: &Path,
+    domains: &DomainsInfo,
+    local_repo: Option<&Path>,
+) -> Vec<AgentInstallResult> {
+    let mut results = Vec::new();
+
+    for agent_id in selected {
+        if let Some(agent_config) = agents_config.agents.get(agent_id) {
+            match install_agent(
+                client,
+                agent_id,
+                agent_config,
+                commands,
+                templates_dir,
+                domains,
+                local_repo,
+            ) {
+                Ok(result) => results.push(result),
+                Err(e) => eprintln!("  ⚠ Error installing {}: {}", agent_id, e),
+            }
+        }
+    }
+
+    results
+}
+
+fn install_agent(
+    client: &Client,
+    agent_id: &str,
+    agent_config: &AgentConfig,
+    commands: &[CommandInfo],
+    templates_dir: &Path,
+    domains: &DomainsInfo,
+    local_repo: Option<&Path>,
+) -> Result<AgentInstallResult> {
+    let files_count = agents::generate_agent_files(
+        client,
+        agent_id,
+        agent_config,
+        commands,
+        templates_dir,
+        VERSION,
+        domains,
+        local_repo,
+    )?;
+
+    let output_path = agent_config
+        .output_dir
+        .clone()
+        .or_else(|| agent_config.output_file.clone())
+        .unwrap_or_default();
+
+    Ok(AgentInstallResult {
+        agent_id: agent_id.to_string(),
+        agent_name: agent_config.name.clone(),
+        files_count,
+        output_path,
+    })
+}
+
+fn print_summary(
+    project_name: &str,
+    stats: &InstallStats,
+    agent_results: &[AgentInstallResult],
+    commands_count: usize,
+) {
+    println!();
+    println!("  ╭─────────────────────────────────────────╮");
+    println!("  │  Setup Complete                         │");
+    println!("  ╰─────────────────────────────────────────╯");
+    println!();
+    println!("  Project: {}", project_name);
+    println!("  Config:  .osk/config.toml");
+    println!();
+
+    if !agent_results.is_empty() {
+        println!("  Installed agents:");
+        for result in agent_results {
+            println!(
+                "    ✓ {} → {} ({} files)",
+                result.agent_name, result.output_path, result.files_count
+            );
+        }
+        println!();
+    }
+
+    if stats.errors.is_empty() {
+        println!("  Commands: {} available", commands_count);
+    } else {
+        println!("  ⚠ {} error(s):", stats.errors.len());
+        for err in &stats.errors {
+            println!("    - {}", err);
+        }
+    }
+
+    println!();
+    println!("  Next step: Run /osk-discover to analyze your codebase");
+    println!();
 }
 
 fn load_agents_config_or_fallback(osk_dir: &Path) -> Result<AgentsConfig> {
@@ -130,7 +532,7 @@ fn default_agents_config() -> AgentsConfig {
         "claude-code".to_string(),
         AgentConfig {
             name: "Claude Code".to_string(),
-            description: "Slash commands natifs".to_string(),
+            description: "Native slash commands".to_string(),
             format: "slash-command".to_string(),
             output_dir: Some(".claude/commands".to_string()),
             output_file: None,
@@ -146,7 +548,7 @@ fn default_agents_config() -> AgentsConfig {
         "copilot".to_string(),
         AgentConfig {
             name: "GitHub Copilot".to_string(),
-            description: "Instructions Copilot".to_string(),
+            description: "Copilot instructions".to_string(),
             format: "single-file".to_string(),
             output_dir: None,
             output_file: Some(".github/copilot-instructions.md".to_string()),
@@ -162,7 +564,7 @@ fn default_agents_config() -> AgentsConfig {
         "cursor".to_string(),
         AgentConfig {
             name: "Cursor".to_string(),
-            description: "Règles Cursor".to_string(),
+            description: "Cursor rules".to_string(),
             format: "rules-dir".to_string(),
             output_dir: Some(".cursor/rules".to_string()),
             output_file: None,
@@ -178,7 +580,7 @@ fn default_agents_config() -> AgentsConfig {
         "gemini".to_string(),
         AgentConfig {
             name: "Gemini".to_string(),
-            description: "Instructions Gemini".to_string(),
+            description: "Gemini instructions".to_string(),
             format: "single-file".to_string(),
             output_dir: None,
             output_file: Some(".gemini/instructions.md".to_string()),
@@ -204,328 +606,166 @@ fn default_agents_config() -> AgentsConfig {
     }
 }
 
-fn select_agents(
-    config: &AgentsConfig,
-    default: bool,
-    agent: Option<Agent>,
-    all_agents: bool,
-) -> Result<Vec<String>> {
-    if all_agents {
-        Ok(config
-            .agents
-            .iter()
-            .filter(|(_, a)| a.enabled)
-            .map(|(id, _)| id.clone())
-            .collect())
-    } else if let Some(a) = agent {
-        Ok(vec![agent_to_id(&a)])
-    } else if default {
-        Ok(vec![config.meta.default_agent.clone()])
-    } else {
-        let selected_id = prompt_agent_selection(config)?;
-        Ok(vec![selected_id])
-    }
-}
+/// Scaffold minimal system-model files
+fn scaffold_system_model(force: bool) -> Result<()> {
+    let system_model_dir = Path::new(".osk/system-model");
 
-fn agent_to_id(agent: &Agent) -> String {
-    match agent {
-        Agent::ClaudeCode => "claude-code".to_string(),
-        Agent::Copilot => "copilot".to_string(),
-        Agent::Cursor => "cursor".to_string(),
-        Agent::Gemini => "gemini".to_string(),
-    }
-}
+    let index_content = r#"# OpenSecKit System Model
+# Run /osk-discover to populate
 
-fn prompt_agent_selection(config: &AgentsConfig) -> Result<String> {
-    let mut items: Vec<(String, String)> = config
-        .agents
-        .iter()
-        .filter(|(_, a)| a.enabled)
-        .map(|(id, a)| {
-            let available = agents::is_agent_available(a);
-            let label = if available {
-                format!("{} ✓", a.name)
-            } else {
-                format!("{} (non détecté)", a.name)
-            };
-            (id.clone(), label)
-        })
-        .collect();
+metadata:
+  version: "4.0.0"
+  created_at: null
+  last_scan: null
 
-    items.sort_by(|a, b| a.1.cmp(&b.1));
+project:
+  name: null
+  description: null
 
-    let labels: Vec<&str> = items.iter().map(|(_, l)| l.as_str()).collect();
+sections:
+  - business.yaml
+  - architecture.yaml
+  - data.yaml
+  - actors.yaml
+  - integrations.yaml
+  - controls.yaml
+"#;
 
-    let selection = Select::with_theme(&ColorfulTheme::default())
-        .with_prompt("Quel agent AI voulez-vous configurer ?")
-        .items(&labels)
-        .default(0)
-        .interact()?;
-
-    Ok(items[selection].0.clone())
-}
-
-fn install_agent(
-    agent_id: &str,
-    agent_config: &AgentConfig,
-    prompts_info: &[prompts::PromptInfo],
-    templates_dir: &Path,
-    domains: &DomainsInfo,
-) -> Result<AgentInstallResult> {
-    let files_count = agents::generate_agent_files(
-        agent_id,
-        agent_config,
-        prompts_info,
-        templates_dir,
-        VERSION,
-        domains,
-    )?;
-
-    let output_path = agent_config
-        .output_dir
-        .clone()
-        .or_else(|| agent_config.output_file.clone())
-        .unwrap_or_default();
-
-    Ok(AgentInstallResult {
-        agent_id: agent_id.to_string(),
-        agent_name: agent_config.name.clone(),
-        files_count,
-        output_path,
-    })
-}
-
-fn detect_domains(stats: &InstallStats) -> DomainsInfo {
-    DomainsInfo {
-        rgpd: stats.rgpd > 0,
-        rgs: stats.rgs > 0,
-        nis2: stats.nis2 > 0,
-    }
-}
-
-fn print_summary(
-    stats: &InstallStats,
-    agent_results: &[AgentInstallResult],
-    universal: Option<&agents::UniversalConfig>,
-) {
-    println!("\n   📦 Modules chargés:");
-    println!(
-        "      ✓ Core          {} prompts, {} schemas, {} outputs",
-        stats.prompts, stats.schemas, stats.outputs
-    );
-
-    if stats.rgpd > 0 {
-        println!("      ✓ RGPD          {} fichiers", stats.rgpd);
-    }
-    if stats.rgs > 0 {
-        println!("      ✓ RGS           {} fichiers", stats.rgs);
-    }
-    if stats.nis2 > 0 {
-        println!("      ✓ NIS2          {} fichiers", stats.nis2);
-    }
-    if stats.agents_templates > 0 {
-        println!("      ✓ Templates     {} agents", stats.agents_templates);
-    }
-
-    println!("\n   🤖 Agent(s) configuré(s):");
-    for result in agent_results {
-        println!(
-            "      ✓ {} → {} ({} fichiers)",
-            result.agent_name, result.output_path, result.files_count
-        );
-    }
-
-    if let Some(u) = universal {
-        if u.enabled {
-            println!("      ✓ AGENTS.md (universel)");
-        }
-    }
-
-    if !stats.errors.is_empty() {
-        println!(
-            "\n   ⚠️  {} erreur(s) lors du téléchargement",
-            stats.errors.len()
-        );
-    }
-
-    println!("\n✅ OpenSecKit prêt !");
-
-    if let Some(first) = agent_results.first() {
-        match first.agent_id.as_str() {
-            "claude-code" => {
-                println!("\n💡 Prochaines étapes:");
-                println!("   1. Lancez Claude Code: claude");
-                println!("   2. Exécutez /osk-configure pour analyser votre code");
-            }
-            "copilot" => {
-                println!("\n💡 Prochaines étapes:");
-                println!("   1. Ouvrez VS Code avec GitHub Copilot");
-                println!("   2. Demandez à Copilot d'analyser la sécurité du projet");
-            }
-            "cursor" => {
-                println!("\n💡 Prochaines étapes:");
-                println!("   1. Ouvrez Cursor dans ce projet");
-                println!("   2. Les règles OSK sont automatiquement chargées");
-            }
-            "gemini" => {
-                println!("\n💡 Prochaines étapes:");
-                println!("   1. Utilisez Gemini avec le contexte du projet");
-            }
-            _ => {}
-        }
-    }
-}
-
-fn prompt_configuration() -> Result<OskConfig> {
-    let project_name: String = Input::with_theme(&ColorfulTheme::default())
-        .with_prompt("Nom du projet")
-        .default("MonProjet".to_string())
-        .interact_text()?;
-
-    println!("   🔍 Scan de la stack technique...");
-    let detected_stack = stack::detect();
-
-    let final_stack: String = Input::with_theme(&ColorfulTheme::default())
-        .with_prompt("Stack technique (Validez ou modifiez)")
-        .with_initial_text(detected_stack.clone())
-        .allow_empty(true)
-        .interact_text()?;
-
-    let detected_vec = parse_stack(&detected_stack);
-    let custom_vec = parse_custom_stack(&final_stack, &detected_vec);
-
-    Ok(build_config(project_name, detected_vec, custom_vec))
-}
-
-fn default_configuration() -> OskConfig {
-    println!("   🤖 Mode non-interactif: valeurs par défaut");
-    println!("   🔍 Scan de la stack technique...");
-
-    let detected_stack = stack::detect();
-    let detected_vec = parse_stack(&detected_stack);
-
-    build_config("MonProjet".to_string(), detected_vec, vec![])
-}
-
-fn parse_stack(stack: &str) -> Vec<String> {
-    if stack.trim().is_empty() {
-        vec![]
-    } else {
-        stack
-            .split(',')
-            .map(|s| s.trim().to_string())
-            .filter(|s| !s.is_empty())
-            .collect()
-    }
-}
-
-fn parse_custom_stack(final_stack: &str, detected: &[String]) -> Vec<String> {
-    final_stack
-        .split(',')
-        .map(|s| s.trim().to_string())
-        .filter(|s| !s.is_empty() && !detected.contains(s))
-        .collect()
-}
-
-fn build_config(name: String, detected: Vec<String>, custom: Vec<String>) -> OskConfig {
-    OskConfig {
-        project: Some(ProjectConfig {
-            name,
-            version: None,
-            description: None,
-        }),
-        stack: Some(StackConfig { detected, custom }),
-        domains: Some(DomainsConfig {
-            active: vec![],
-            rgpd: Some(RgpdConfig {
-                enabled: false,
-                niveau: "standard".to_string(),
-                dpia_required: false,
-            }),
-            nis2: Some(Nis2Config {
-                enabled: false,
-                type_entite: String::new(),
-                secteur: String::new(),
-            }),
-            rgs: Some(RgsConfig {
-                enabled: false,
-                niveau: String::new(),
-                perimetre: String::new(),
-            }),
-        }),
-        principles: Some(PrinciplesConfig {
-            threat_modeling: "high".to_string(),
-            risk_analysis: "high".to_string(),
-            security_requirements: "high".to_string(),
-            security_testing: "medium".to_string(),
-            secrets_management: "high".to_string(),
-            audit_logging: "medium".to_string(),
-            patch_management: "medium".to_string(),
-        }),
-        specs: Some(SpecsConfig {
-            counter: 1,
-            features: vec![],
-        }),
-        memory: Some(MemoryConfig {
-            enabled: true,
-            path: ".osk/memory".to_string(),
-        }),
-    }
-}
-
-fn scaffold_project(config: &OskConfig, force: bool) -> Result<()> {
-    fs::create_dir_all(".osk/prompts")?;
-    fs::create_dir_all(".osk/templates")?;
-    fs::create_dir_all(".osk/memory")?;
-    fs::create_dir_all(".osk/specs")?;
-
-    let config_path = Path::new(".osk/config.toml");
-    if !config_path.exists() || force {
-        let toml_string = toml::to_string_pretty(config)?;
-        fs::write(config_path, toml_string)?;
-    }
-
-    if Path::new(".gitignore").exists() {
-        let content = fs::read_to_string(".gitignore")?;
-        if !content.contains(".osk/memory/") {
-            println!("   ℹ️  Pensez à ajouter .osk/memory/ à votre .gitignore");
-        }
-    } else {
-        let gitignore_content = ".osk/memory/\n.osk/config.toml\n";
-        fs::write(".gitignore", gitignore_content)?;
+    let index_path = system_model_dir.join("index.yaml");
+    if !index_path.exists() || force {
+        fs::write(&index_path, index_content)?;
     }
 
     Ok(())
 }
 
-fn install_resources(client: &Client, force: bool) -> Result<InstallStats> {
+fn install_resources(
+    client: &Client,
+    force: bool,
+    source: &ResourceSource,
+) -> Result<InstallStats> {
+    match source {
+        ResourceSource::Local(repo_root) => install_resources_local(repo_root, force),
+        ResourceSource::Version(tag) => install_resources_remote(client, force, tag),
+        ResourceSource::Latest => {
+            use crate::github;
+            let tag = github::fetch_latest_tag(client)?;
+            install_resources_remote(client, force, &tag)
+        }
+    }
+}
+
+fn validate_repo_root(path: &Path) -> Result<()> {
+    let registry = path.join("config/registry.toml");
+    let templates_dir = path.join("cli/templates/agents");
+
+    if !registry.exists() || !templates_dir.exists() {
+        bail!(
+            "Invalid OpenSecKit repository path: {}\n\
+            Missing config/registry.toml or cli/templates/agents/ directory.",
+            path.display()
+        );
+    }
+    Ok(())
+}
+
+fn find_repo_root() -> Result<PathBuf> {
+    let candidates: Vec<PathBuf> = vec![
+        PathBuf::from("."),
+        PathBuf::from(".."),
+        PathBuf::from("../.."),
+    ];
+
+    for candidate in candidates {
+        let registry = candidate.join("config/registry.toml");
+        let templates_dir = candidate.join("cli/templates/agents");
+
+        if registry.exists() && templates_dir.exists() {
+            return Ok(candidate.canonicalize().unwrap_or(candidate));
+        }
+    }
+
+    bail!(
+        "Cannot find OpenSecKit repository root.\n\
+        Run 'osk init --local' from within the repository or use remote mode (default)."
+    )
+}
+
+fn install_resources_local(repo_root: &Path, force: bool) -> Result<InstallStats> {
+    let mut stats = InstallStats::default();
+
+    // Copy config/registry.toml
+    let registry_src = repo_root.join("config/registry.toml");
+    let registry_dest = PathBuf::from(".osk/registry.toml");
+
+    if registry_src.exists() && (!registry_dest.exists() || force) {
+        match fs::copy(&registry_src, &registry_dest) {
+            Ok(_) => stats.registry = true,
+            Err(e) => stats.errors.push(format!("registry.toml: {}", e)),
+        }
+    } else if registry_dest.exists() {
+        stats.registry = true;
+    }
+
+    // Copy config/agents.toml
+    let agents_src = repo_root.join("config/agents.toml");
+    let agents_dest = PathBuf::from(".osk/agents.toml");
+    if agents_src.exists() && (!agents_dest.exists() || force) {
+        match fs::copy(&agents_src, &agents_dest) {
+            Ok(_) => stats.agents_config = true,
+            Err(e) => stats.errors.push(format!("agents.toml: {}", e)),
+        }
+    } else if agents_dest.exists() {
+        stats.agents_config = true;
+    }
+
+    // Count templates (used directly from repo in local mode)
+    let agents_templates_src = repo_root.join("cli/templates/agents");
+    if agents_templates_src.exists() {
+        for entry in WalkDir::new(&agents_templates_src)
+            .into_iter()
+            .filter_map(|e| e.ok())
+        {
+            if entry.file_type().is_file() {
+                stats.agents_templates += 1;
+            }
+        }
+    }
+
+    Ok(stats)
+}
+
+fn install_resources_remote(client: &Client, force: bool, tag: &str) -> Result<InstallStats> {
     use crate::github;
 
     let mut stats = InstallStats::default();
 
-    let tag = match github::fetch_latest_tag(client) {
-        Ok(t) => t,
-        Err(e) => {
-            stats.errors.push(format!("Fetch tag: {}", e));
-            return Ok(stats);
-        }
-    };
-
+    // Download config/registry.toml
     let registry_dest = PathBuf::from(".osk/registry.toml");
     if !registry_dest.exists() || force {
-        if let Err(e) = github::download_file(client, &tag, "registry.toml", &registry_dest) {
+        if let Err(e) = github::download_file(client, tag, "config/registry.toml", &registry_dest) {
             stats.errors.push(format!("registry.toml: {}", e));
+        } else {
+            stats.registry = true;
         }
+    } else {
+        stats.registry = true;
     }
 
+    // Download config/agents.toml
     let agents_dest = PathBuf::from(".osk/agents.toml");
     if !agents_dest.exists() || force {
-        if let Err(e) = github::download_file(client, &tag, "agents.toml", &agents_dest) {
+        if let Err(e) = github::download_file(client, tag, "config/agents.toml", &agents_dest) {
             stats.errors.push(format!("agents.toml: {}", e));
+        } else {
+            stats.agents_config = true;
         }
+    } else {
+        stats.agents_config = true;
     }
 
-    let tree_items = match github::fetch_repo_tree(client, &tag) {
+    // Download cli/templates/agents/
+    let tree_items = match github::fetch_repo_tree(client, tag) {
         Ok(items) => items,
         Err(e) => {
             stats.errors.push(format!("Fetch tree: {}", e));
@@ -538,46 +778,28 @@ fn install_resources(client: &Client, force: bool) -> Result<InstallStats> {
             continue;
         }
 
-        let dest = PathBuf::from(".osk").join(&item.path);
-        if dest.exists() && !force {
-            count_resource(&item.path, &mut stats);
+        if !item.path.starts_with("cli/templates/agents/") {
             continue;
         }
 
-        if item.path.starts_with("prompts/")
-            || item.path.starts_with("templates/")
-            || item.path.starts_with("domaines/")
-            || item.path == "constitution.md"
-        {
-            if let Err(e) = github::download_file(client, &tag, &item.path, &dest) {
-                stats.errors.push(format!("{}: {}", item.path, e));
-            } else {
-                count_resource(&item.path, &mut stats);
-            }
+        let dest = PathBuf::from(".osk").join(&item.path);
+        if dest.exists() && !force {
+            stats.agents_templates += 1;
+            continue;
+        }
+
+        if let Some(parent) = dest.parent() {
+            fs::create_dir_all(parent).ok();
+        }
+
+        if let Err(e) = github::download_file(client, tag, &item.path, &dest) {
+            stats.errors.push(format!("{}: {}", item.path, e));
+        } else {
+            stats.agents_templates += 1;
         }
     }
 
     Ok(stats)
-}
-
-fn count_resource(path: &str, stats: &mut InstallStats) {
-    if path.starts_with("prompts/") && path.ends_with(".md") {
-        stats.prompts += 1;
-    } else if path.starts_with("templates/schemas/") {
-        stats.schemas += 1;
-    } else if path.starts_with("templates/outputs/") {
-        stats.outputs += 1;
-    } else if path.starts_with("templates/reports/") {
-        stats.reports += 1;
-    } else if path.starts_with("templates/agents/") {
-        stats.agents_templates += 1;
-    } else if path.starts_with("domaines/rgpd/") {
-        stats.rgpd += 1;
-    } else if path.starts_with("domaines/gouvernement-rgs/") {
-        stats.rgs += 1;
-    } else if path.starts_with("domaines/nis2/") {
-        stats.nis2 += 1;
-    }
 }
 
 #[cfg(test)]
@@ -585,28 +807,27 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_parse_stack_empty() {
-        assert!(parse_stack("").is_empty());
-        assert!(parse_stack("   ").is_empty());
+    fn test_extract_repo_name_https() {
+        assert_eq!(
+            extract_repo_name("https://github.com/user/my-repo.git"),
+            Some("my-repo".to_string())
+        );
     }
 
     #[test]
-    fn test_parse_stack_single() {
-        let result = parse_stack("rust");
-        assert_eq!(result, vec!["rust"]);
+    fn test_extract_repo_name_ssh() {
+        assert_eq!(
+            extract_repo_name("git@github.com:user/my-repo.git"),
+            Some("my-repo".to_string())
+        );
     }
 
     #[test]
-    fn test_parse_stack_multiple() {
-        let result = parse_stack("rust, python, typescript");
-        assert_eq!(result, vec!["rust", "python", "typescript"]);
-    }
-
-    #[test]
-    fn test_parse_custom_stack() {
-        let detected = vec!["rust".to_string(), "python".to_string()];
-        let result = parse_custom_stack("rust, go, python, java", &detected);
-        assert_eq!(result, vec!["go", "java"]);
+    fn test_extract_repo_name_no_git_suffix() {
+        assert_eq!(
+            extract_repo_name("https://github.com/user/my-repo"),
+            Some("my-repo".to_string())
+        );
     }
 
     #[test]
@@ -615,60 +836,5 @@ mod tests {
         assert_eq!(agent_to_id(&Agent::Copilot), "copilot");
         assert_eq!(agent_to_id(&Agent::Cursor), "cursor");
         assert_eq!(agent_to_id(&Agent::Gemini), "gemini");
-    }
-
-    #[test]
-    fn test_count_resource_prompts() {
-        let mut stats = InstallStats::default();
-        count_resource("prompts/osk-analyze.md", &mut stats);
-        count_resource("prompts/osk-configure.md", &mut stats);
-        assert_eq!(stats.prompts, 2);
-    }
-
-    #[test]
-    fn test_count_resource_templates() {
-        let mut stats = InstallStats::default();
-        count_resource("templates/schemas/context.yaml", &mut stats);
-        count_resource("templates/outputs/report.md", &mut stats);
-        count_resource("templates/agents/cursor.tera", &mut stats);
-        assert_eq!(stats.schemas, 1);
-        assert_eq!(stats.outputs, 1);
-        assert_eq!(stats.agents_templates, 1);
-    }
-
-    #[test]
-    fn test_count_resource_domains() {
-        let mut stats = InstallStats::default();
-        count_resource("domaines/rgpd/checklist.md", &mut stats);
-        count_resource("domaines/gouvernement-rgs/guide.md", &mut stats);
-        count_resource("domaines/nis2/requirements.md", &mut stats);
-        assert_eq!(stats.rgpd, 1);
-        assert_eq!(stats.rgs, 1);
-        assert_eq!(stats.nis2, 1);
-    }
-
-    #[test]
-    fn test_detect_domains() {
-        let stats = InstallStats {
-            rgpd: 3,
-            rgs: 0,
-            nis2: 1,
-            ..Default::default()
-        };
-        let domains = detect_domains(&stats);
-        assert!(domains.rgpd);
-        assert!(!domains.rgs);
-        assert!(domains.nis2);
-    }
-
-    #[test]
-    fn test_default_agents_config() {
-        let config = default_agents_config();
-        assert_eq!(config.meta.default_agent, "claude-code");
-        assert!(config.agents.contains_key("claude-code"));
-        assert!(config.agents.contains_key("copilot"));
-        assert!(config.agents.contains_key("cursor"));
-        assert!(config.agents.contains_key("gemini"));
-        assert!(config.universal.is_some());
     }
 }

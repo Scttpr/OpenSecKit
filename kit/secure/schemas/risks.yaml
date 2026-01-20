@@ -1,0 +1,198 @@
+# Risk Register Schema
+# Version: 4.0.0
+# Used by: /osk-secure specify, /osk-secure implement
+
+$schema: "http://json-schema.org/draft-07/schema#"
+$id: "https://openseckit.dev/schemas/risks.yaml"
+title: "Risk Register"
+description: "Per-feature risk tracking with mitigation status"
+
+type: object
+required:
+  - version
+  - feature_id
+  - created
+  - risks
+
+properties:
+  version:
+    type: string
+    const: "1.0"
+
+  feature_id:
+    type: string
+    pattern: "^[a-z0-9-]+$"
+    description: "Feature identifier matching the spec directory"
+
+  created:
+    type: string
+    format: date-time
+
+  updated:
+    type: string
+    format: date-time
+
+  risks:
+    type: array
+    items:
+      $ref: "#/$defs/RiskEntry"
+
+$defs:
+  RiskEntry:
+    type: object
+    required:
+      - id
+      - threat_id
+      - title
+      - scoring
+      - status
+    properties:
+      id:
+        type: string
+        pattern: "^RISK-[0-9]+$"
+        description: "Unique risk identifier within feature"
+
+      threat_id:
+        type: string
+        description: "Reference to ThreatEntry.id from security-spec"
+
+      title:
+        type: string
+        maxLength: 100
+        description: "Short description of the risk"
+
+      description:
+        type: string
+        description: "Full context and impact explanation"
+
+      scoring:
+        type: object
+        required:
+          - impact
+          - probability
+          - exposure
+          - score
+          - severity
+        properties:
+          impact:
+            type: integer
+            minimum: 1
+            maximum: 5
+            description: "1=Negligible, 2=Minor, 3=Moderate, 4=Major, 5=Critical"
+          probability:
+            type: integer
+            minimum: 1
+            maximum: 5
+            description: "1=Rare, 2=Unlikely, 3=Possible, 4=Likely, 5=Almost certain"
+          exposure:
+            type: integer
+            minimum: 1
+            maximum: 5
+            description: "1=Protected, 2=Limited, 3=Internal, 4=External, 5=Public"
+          score:
+            type: integer
+            minimum: 1
+            maximum: 125
+            description: "Impact × Probability × Exposure"
+          severity:
+            type: string
+            enum:
+              - critical  # 64-125
+              - high      # 27-63
+              - medium    # 8-26
+              - low       # 1-7
+
+      status:
+        type: string
+        enum:
+          - open        # Risk identified, no mitigation started
+          - mitigating  # Mitigation in progress
+          - mitigated   # All mitigations complete
+          - accepted    # Risk accepted (requires justification)
+        description: "Current risk status"
+
+      status_reason:
+        type: string
+        description: "Required justification when status is 'accepted'"
+
+      linked_requirements:
+        type: array
+        items:
+          type: string
+        description: "Requirement IDs that address this risk"
+
+      mitigations:
+        type: array
+        items:
+          $ref: "#/$defs/Mitigation"
+        description: "Tracking of mitigation tasks"
+
+      history:
+        type: array
+        items:
+          $ref: "#/$defs/HistoryEntry"
+        description: "Audit trail of risk changes"
+
+  Mitigation:
+    type: object
+    required:
+      - task_id
+      - control
+      - status
+    properties:
+      task_id:
+        type: string
+        description: "Reference to security task ID"
+
+      control:
+        type: string
+        description: "Description of the mitigation control"
+
+      status:
+        type: string
+        enum:
+          - pending      # Task not started
+          - in_progress  # Task being worked on
+          - complete     # Task finished
+
+      completed_at:
+        type: string
+        format: date-time
+        description: "Timestamp when mitigation was completed"
+
+      evidence:
+        type: string
+        description: "Link to PR, commit, or documentation proving completion"
+
+  HistoryEntry:
+    type: object
+    required:
+      - date
+      - action
+    properties:
+      date:
+        type: string
+        format: date-time
+
+      action:
+        type: string
+        enum:
+          - created
+          - updated
+          - status_changed
+          - mitigation_added
+          - mitigation_completed
+
+      details:
+        type: string
+        description: "Human-readable description of the change"
+
+      actor:
+        type: string
+        description: "Who made the change (user or system)"
+
+# Validation rules (not expressible in JSON Schema)
+# 1. If status == "accepted", status_reason MUST be non-empty
+# 2. score MUST equal impact × probability × exposure
+# 3. If all mitigations have status == "complete", risk status SHOULD be "mitigated"
+# 4. severity must match score ranges: critical (64-125), high (27-63), medium (8-26), low (1-7)

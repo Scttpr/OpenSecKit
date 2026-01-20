@@ -1,0 +1,98 @@
+# AGENTS.md - OpenSecKit Security Instructions
+
+> Universal agent instructions for AI coding assistants
+
+This project uses **OpenSecKit v{{ version }}** for security-as-code with hub-and-spokes architecture.
+
+## Quick Start
+
+1. **Read the system model first**: `.osk/system-model/index.yaml`
+2. **Check existing specs**: `.osk/specs/` before creating new analysis
+3. **Follow the workflow**: Discover → Comply/Secure
+
+## Architecture
+
+```
+.osk/
+├── system-model/      # HUB: System documentation
+│   ├── index.yaml     # Always read first (~200 lines)
+│   ├── business.yaml
+│   ├── architecture.yaml
+│   ├── data.yaml
+│   ├── actors.yaml
+│   ├── trust.yaml
+│   ├── integrations.yaml
+│   ├── security.yaml
+│   └── gaps.yaml
+├── compliance/        # SPOKE: Compliance assessments
+│   └── assessment-*.yaml
+└── specs/             # SPOKE: Feature specifications
+    └── NNN-feature/
+```
+
+## Commands
+
+Commands fetch full instructions from GitHub on-demand via their URL.
+
+### Part 1: DISCOVER (Build the Hub)
+
+| Command | Description |
+|---------|-------------|
+{% for cmd in commands %}{% if cmd.part == "discover" %}| `{{ cmd.name }}` | {{ cmd.description }} |
+{% endif %}{% endfor %}
+
+### Part 2: COMPLY (Regulatory Compliance)
+
+| Command | Description |
+|---------|-------------|
+{% for cmd in commands %}{% if cmd.part == "comply" %}| `{{ cmd.name }}` | {{ cmd.description }} |
+{% endif %}{% endfor %}
+
+### Part 3: SECURE (Shift-Left Security)
+
+| Command | Description |
+|---------|-------------|
+{% for cmd in commands %}{% if cmd.part == "secure" %}| `{{ cmd.name }}` | {{ cmd.description }} |
+{% endif %}{% endfor %}
+
+## The 7 Security Principles
+
+When working on security features, apply these principles:
+
+1. **Threat Modeling** - Identify threats before writing code
+2. **Risk Analysis** - Prioritize based on business impact
+3. **Security by Design** - Build security into architecture
+4. **Security Testing** - SAST, DAST, SCA at every stage
+5. **Secrets Management** - Never hardcode, always rotate
+6. **Audit Logging** - Log security events comprehensively
+7. **Patch Management** - Keep dependencies updated
+
+## Risk Scoring
+
+```
+Score = Impact × Probability × Exposure (1-125)
+
+CRITICAL (>=64): Immediate action required
+HIGH (27-63): Prioritize in current sprint
+MEDIUM (<27): Plan for remediation
+```
+
+## Compliance Domains
+
+{% if domains.rgpd %}- **RGPD**: EU data protection (DPIA, consent, data subject rights)
+{% endif %}{% if domains.rgs %}- **RGS**: French government security (EBIOS RM, homologation)
+{% endif %}{% if domains.nis2 %}- **NIS2**: EU cybersecurity directive
+{% endif %}{% if domains.iso27001 %}- **ISO 27001**: Information security management
+{% endif %}{% if domains.soc2 %}- **SOC 2**: Trust services criteria
+{% endif %}
+
+## Key Rules
+
+1. **Read before write**: Always check existing documentation
+2. **Hub first**: Start with system-model for context
+3. **Constitution required**: Never skip `/osk-secure constitute`
+4. **YAML for data**: Use structured format for risks, tasks
+5. **Update registers**: Keep risk register current
+
+---
+*OpenSecKit v{{ version }} - Security as Code*

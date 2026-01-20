@@ -1,0 +1,280 @@
+# GDPR Gap Analysis Report
+
+**Assessment Date**: {{ assessment_date }}
+**Framework**: RGPD (EU 2016/679)
+**Total Gaps**: {{ total_gaps }}
+**Critical Gaps**: {{ critical_gaps }}
+
+---
+
+## Executive Summary
+
+This report details all GDPR compliance gaps identified during the assessment, organized by article chapter and severity for prioritized remediation.
+
+{% if critical_gaps > 0 %}
+### Critical Issues Requiring Immediate Attention
+
+{% for gap in gaps_by_severity.critical %}
+- **{{ gap.article }}** - {{ gap.name }}: {{ gap.gap_detail }}
+{% endfor %}
+{% endif %}
+
+---
+
+## Gap Overview by Chapter
+
+| Chapter | Article Range | Gaps | Critical | High | Medium | Low |
+|---------|---------------|------|----------|------|--------|-----|
+| Principles | Art. 5-11 | {{ chapters.principles.total }} | {{ chapters.principles.critical }} | {{ chapters.principles.high }} | {{ chapters.principles.medium }} | {{ chapters.principles.low }} |
+| Data Subject Rights | Art. 12-23 | {{ chapters.rights.total }} | {{ chapters.rights.critical }} | {{ chapters.rights.high }} | {{ chapters.rights.medium }} | {{ chapters.rights.low }} |
+| Controller/Processor | Art. 24-43 | {{ chapters.controller_processor.total }} | {{ chapters.controller_processor.critical }} | {{ chapters.controller_processor.high }} | {{ chapters.controller_processor.medium }} | {{ chapters.controller_processor.low }} |
+| International Transfers | Art. 44-50 | {{ chapters.transfers.total }} | {{ chapters.transfers.critical }} | {{ chapters.transfers.high }} | {{ chapters.transfers.medium }} | {{ chapters.transfers.low }} |
+
+---
+
+## Gap Distribution by Source
+
+Understanding where gaps originate helps prioritize remediation efforts:
+
+| Source | Gaps | Description |
+|--------|------|-------------|
+| Codebase | {{ gaps_by_source.codebase | default(value=0) }} | Technical implementation gaps in application code |
+| Tooling | {{ gaps_by_source.tooling | default(value=0) }} | Gaps related to operational tools (Notion, Slack, etc.) |
+| Infrastructure | {{ gaps_by_source.infrastructure | default(value=0) }} | Gaps related to hosting and cloud providers |
+| Process | {{ gaps_by_source.process | default(value=0) }} | Missing or inadequate organizational processes |
+| Documentation | {{ gaps_by_source.documentation | default(value=0) }} | Missing required documentation or policies |
+
+---
+
+## Chapter I: Principles (Art. 5-11)
+
+{% if chapters.principles.gaps | length > 0 %}
+{% for gap in chapters.principles.gaps %}
+### {{ gap.article }}: {{ gap.name }}
+
+**Severity**: {{ gap.severity | upper }}
+**Source**: {{ gap.source }}
+**Status**: {{ gap.status }}
+
+**Requirement**:
+> {{ gap.requirement_text }}
+
+**Gap Identified**:
+{{ gap.gap_detail }}
+
+**Remediation**:
+{{ gap.remediation }}
+
+**Effort**: {{ gap.effort }}
+**Priority**: {{ gap.priority }}
+
+---
+
+{% endfor %}
+{% else %}
+No gaps identified in this chapter.
+{% endif %}
+
+## Chapter III: Data Subject Rights (Art. 12-23)
+
+{% if chapters.rights.gaps | length > 0 %}
+{% for gap in chapters.rights.gaps %}
+### {{ gap.article }}: {{ gap.name }}
+
+**Severity**: {{ gap.severity | upper }}
+**Source**: {{ gap.source }}
+**Status**: {{ gap.status }}
+
+**Requirement**:
+> {{ gap.requirement_text }}
+
+**Gap Identified**:
+{{ gap.gap_detail }}
+
+**Remediation**:
+{{ gap.remediation }}
+
+**Effort**: {{ gap.effort }}
+**Priority**: {{ gap.priority }}
+
+---
+
+{% endfor %}
+{% else %}
+No gaps identified in this chapter.
+{% endif %}
+
+## Chapter IV: Controller and Processor (Art. 24-43)
+
+{% if chapters.controller_processor.gaps | length > 0 %}
+
+### Sub-Processor Compliance (Art. 28)
+
+{% if sub_processor_gaps | length > 0 %}
+The following sub-processors have compliance gaps:
+
+| Sub-Processor | Source | Issue | Action Required |
+|---------------|--------|-------|-----------------|
+{% for sp_gap in sub_processor_gaps %}
+| {{ sp_gap.name }} | {{ sp_gap.source }} | {{ sp_gap.issue }} | {{ sp_gap.action }} |
+{% endfor %}
+{% endif %}
+
+{% for gap in chapters.controller_processor.gaps %}
+### {{ gap.article }}: {{ gap.name }}
+
+**Severity**: {{ gap.severity | upper }}
+**Source**: {{ gap.source }}
+**Status**: {{ gap.status }}
+
+**Requirement**:
+> {{ gap.requirement_text }}
+
+**Gap Identified**:
+{{ gap.gap_detail }}
+
+{% if gap.affected_processors | length > 0 %}
+**Affected Sub-Processors**:
+{% for processor in gap.affected_processors %}
+- {{ processor }}
+{% endfor %}
+{% endif %}
+
+**Remediation**:
+{{ gap.remediation }}
+
+**Effort**: {{ gap.effort }}
+**Priority**: {{ gap.priority }}
+
+---
+
+{% endfor %}
+{% else %}
+No gaps identified in this chapter.
+{% endif %}
+
+## Chapter V: International Transfers (Art. 44-50)
+
+{% if chapters.transfers.gaps | length > 0 %}
+
+### Non-EU Services Requiring Transfer Mechanisms
+
+{% if transfer_gaps | length > 0 %}
+| Service | Location | Current Status | Required Action |
+|---------|----------|----------------|-----------------|
+{% for transfer in transfer_gaps %}
+| {{ transfer.service }} | {{ transfer.location }} | {{ transfer.status }} | {{ transfer.action }} |
+{% endfor %}
+{% endif %}
+
+{% for gap in chapters.transfers.gaps %}
+### {{ gap.article }}: {{ gap.name }}
+
+**Severity**: {{ gap.severity | upper }}
+**Source**: {{ gap.source }}
+**Status**: {{ gap.status }}
+
+**Requirement**:
+> {{ gap.requirement_text }}
+
+**Gap Identified**:
+{{ gap.gap_detail }}
+
+**Remediation**:
+{{ gap.remediation }}
+
+**Effort**: {{ gap.effort }}
+**Priority**: {{ gap.priority }}
+
+---
+
+{% endfor %}
+{% else %}
+No gaps identified in this chapter.
+{% endif %}
+
+---
+
+## Remediation Roadmap
+
+### Immediate Actions (P0 - Within 7 days)
+
+{% for action in actions.p0 %}
+- [ ] **{{ action.id }}**: {{ action.title }}
+  - Gap: {{ action.addresses }}
+  - Source: {{ action.source }}
+{% endfor %}
+
+### Short-term Actions (P1 - Within 30 days)
+
+{% for action in actions.p1 %}
+- [ ] **{{ action.id }}**: {{ action.title }}
+  - Gap: {{ action.addresses }}
+  - Source: {{ action.source }}
+{% endfor %}
+
+### Medium-term Actions (P2 - Within 90 days)
+
+{% for action in actions.p2 %}
+- [ ] **{{ action.id }}**: {{ action.title }}
+  - Gap: {{ action.addresses }}
+  - Source: {{ action.source }}
+{% endfor %}
+
+### Long-term Actions (P3 - Within 180 days)
+
+{% for action in actions.p3 %}
+- [ ] **{{ action.id }}**: {{ action.title }}
+  - Gap: {{ action.addresses }}
+  - Source: {{ action.source }}
+{% endfor %}
+
+---
+
+## Tooling-Specific Recommendations
+
+{% if tooling_recommendations | length > 0 %}
+The following recommendations address gaps related to operational tools:
+
+{% for rec in tooling_recommendations %}
+### {{ rec.tool }}
+
+**Current Status**: {{ rec.status }}
+**Gaps**: {{ rec.gaps | join(sep=", ") }}
+
+**Recommendations**:
+{% for r in rec.recommendations %}
+- {{ r }}
+{% endfor %}
+
+{% endfor %}
+{% else %}
+All operational tools meet GDPR requirements.
+{% endif %}
+
+---
+
+## Infrastructure-Specific Recommendations
+
+{% if infrastructure_recommendations | length > 0 %}
+The following recommendations address gaps related to infrastructure providers:
+
+{% for rec in infrastructure_recommendations %}
+### {{ rec.provider }}
+
+**Current Status**: {{ rec.status }}
+**Gaps**: {{ rec.gaps | join(sep=", ") }}
+
+**Recommendations**:
+{% for r in rec.recommendations %}
+- {{ r }}
+{% endfor %}
+
+{% endfor %}
+{% else %}
+All infrastructure providers meet GDPR requirements.
+{% endif %}
+
+---
+
+*Gap Analysis generated by OpenSecKit v4 - {{ assessment_date }}*

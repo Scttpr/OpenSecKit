@@ -42,6 +42,9 @@ pub fn run(command: ValidateCommands, json: bool) -> Result<()> {
         ValidateCommands::Yaml => validate_yaml(json),
         ValidateCommands::Deps { feature } => validate_deps(&feature, json),
         ValidateCommands::Workflow { feature } => validate_workflow(&feature, json),
+        ValidateCommands::SystemModel { path } => {
+            validate_system_model(path.as_deref().unwrap_or(".osk/system-model"), json)
+        }
     }
 }
 
@@ -115,17 +118,17 @@ fn validate_yaml(json: bool) -> Result<()> {
     } else {
         for file in &checked_files {
             if file.status == "valid" {
-                println!("✅ {}", file.path);
+                println!("✓ {}", file.path);
             } else {
                 println!(
-                    "❌ {}: {}",
+                    "✗ {}: {}",
                     file.path,
                     file.error.as_deref().unwrap_or("unknown error")
                 );
             }
         }
         println!(
-            "\n📊 {} files validated, {} errors",
+            "\n» {} files validated, {} errors",
             valid_count, error_count
         );
     }
@@ -196,14 +199,14 @@ fn validate_deps(feature: &str, json: bool) -> Result<()> {
         println!("   {} tasks found", tasks_file.tasks.len());
 
         for warning in &warnings {
-            println!("   ⚠️  {}", warning);
+            println!("   ⚠  {}", warning);
         }
 
         if has_cycle {
-            println!("\n❌ Circular dependency detected:");
+            println!("\n✗ Circular dependency detected:");
             println!("   {}", cycle_path.join(" → "));
         } else {
-            println!("\n✅ No circular dependencies found");
+            println!("\n✓ No circular dependencies found");
         }
     }
 
@@ -361,20 +364,297 @@ fn validate_workflow(feature: &str, json: bool) -> Result<()> {
         for file in &checked_files {
             let filename = file.path.split('/').next_back().unwrap_or(&file.path);
             match file.status.as_str() {
-                "valid" => println!("✅ {}", filename),
-                "incomplete" => println!("⚠️  {} (empty or TODO)", filename),
-                _ => println!("❌ {} (missing)", filename),
+                "valid" => println!("✓ {}", filename),
+                "incomplete" => println!("⚠  {} (empty or TODO)", filename),
+                _ => println!("✗ {} (missing)", filename),
             }
         }
-        println!("\n📊 Workflow: {}/7 complete", complete_count);
+        println!("\n» Workflow: {}/7 complete", complete_count);
         if complete_count == 7 {
-            println!("✅ Workflow complete for '{}'", feature);
+            println!("✓ Workflow complete for '{}'", feature);
         } else if let Some(ref cmd) = next_command {
-            println!("💡 Next: Run {}", cmd);
+            println!("→ Next: Run {}", cmd);
         }
     }
 
     Ok(())
+}
+
+/// Validate system model files (FR-029)
+/// - Schema validation for all YAML files
+/// - Cross-reference validation (check all referenced IDs exist)
+/// - Index.yaml line count check (<200 lines, FR-028)
+fn validate_system_model(model_path: &str, json: bool) -> Result<()> {
+    use std::path::Path;
+
+    let model_dir = Path::new(model_path);
+    if !model_dir.exists() {
+        bail!(
+            "System model not found at {}. Run `osk init` first.",
+            model_path
+        );
+    }
+
+    let mut checked_files = Vec::new();
+    let mut errors: Vec<SystemModelError> = Vec::new();
+    let mut all_ids: HashSet<String> = HashSet::new();
+    let mut referenced_ids: Vec<(String, String)> = Vec::new(); // (file, referenced_id)
+
+    // List of expected section files
+    let section_files = [
+        "index.yaml",
+        "business.yaml",
+        "architecture.yaml",
+        "data.yaml",
+        "actors.yaml",
+        "trust.yaml",
+        "integrations.yaml",
+        "security.yaml",
+        "gaps.yaml",
+    ];
+
+    // Validate each section file
+    for filename in &section_files {
+        let file_path = model_dir.join(filename);
+        let path_str = file_path.to_string_lossy().to_string();
+
+        if !file_path.exists() {
+            checked_files.push(FileStatus {
+                path: path_str.clone(),
+                status: "missing".to_string(),
+                error: Some("File not found".to_string()),
+            });
+            errors.push(SystemModelError {
+                file: filename.to_string(),
+                line: None,
+                message: "Section file missing".to_string(),
+                severity: "error".to_string(),
+                suggestion: Some(format!("Run `/osk-discover init` to create {}", filename)),
+            });
+            continue;
+        }
+
+        // Read and parse YAML
+        let content = match fs::read_to_string(&file_path) {
+            Ok(c) => c,
+            Err(e) => {
+                checked_files.push(FileStatus {
+                    path: path_str.clone(),
+                    status: "invalid".to_string(),
+                    error: Some(format!("Cannot read file: {}", e)),
+                });
+                continue;
+            }
+        };
+
+        // Check line count for index.yaml (FR-028)
+        if *filename == "index.yaml" {
+            let line_count = content.lines().count();
+            if line_count > 200 {
+                errors.push(SystemModelError {
+                    file: filename.to_string(),
+                    line: Some(200),
+                    message: format!("Index file exceeds 200 lines ({} lines)", line_count),
+                    severity: "error".to_string(),
+                    suggestion: Some(
+                        "Move detailed data to section files, keep only summaries in index"
+                            .to_string(),
+                    ),
+                });
+            }
+        }
+
+        // Parse YAML
+        let yaml_value: serde_yaml::Value = match serde_yaml::from_str(&content) {
+            Ok(v) => v,
+            Err(e) => {
+                checked_files.push(FileStatus {
+                    path: path_str.clone(),
+                    status: "invalid".to_string(),
+                    error: Some(format!("YAML parse error: {}", e)),
+                });
+                errors.push(SystemModelError {
+                    file: filename.to_string(),
+                    line: None,
+                    message: format!("Invalid YAML: {}", e),
+                    severity: "error".to_string(),
+                    suggestion: Some("Check YAML syntax".to_string()),
+                });
+                continue;
+            }
+        };
+
+        // Extract IDs and references
+        extract_ids_and_refs(&yaml_value, filename, &mut all_ids, &mut referenced_ids);
+
+        checked_files.push(FileStatus {
+            path: path_str,
+            status: "valid".to_string(),
+            error: None,
+        });
+    }
+
+    // Cross-reference validation
+    for (file, ref_id) in &referenced_ids {
+        if !all_ids.contains(ref_id) && !ref_id.starts_with("DATA-") && !ref_id.starts_with("COMP-")
+        {
+            // Skip well-known ID patterns that might be placeholders
+            if !ref_id.contains("[") && !ref_id.is_empty() {
+                errors.push(SystemModelError {
+                    file: file.clone(),
+                    line: None,
+                    message: format!("Referenced ID '{}' not found", ref_id),
+                    severity: "warning".to_string(),
+                    suggestion: Some(format!(
+                        "Add definition for '{}' or remove reference",
+                        ref_id
+                    )),
+                });
+            }
+        }
+    }
+
+    let error_count = errors.iter().filter(|e| e.severity == "error").count();
+    let warning_count = errors.iter().filter(|e| e.severity == "warning").count();
+    let valid = error_count == 0;
+
+    if json {
+        let result = SystemModelValidation {
+            valid,
+            path: model_path.to_string(),
+            schema_errors: error_count,
+            reference_errors: warning_count,
+            warnings: warning_count,
+            errors,
+            checked_files,
+        };
+        println!("{}", serde_json::to_string_pretty(&result)?);
+    } else {
+        println!("🔍 Validating system model at {}...\n", model_path);
+
+        for file in &checked_files {
+            let filename = file.path.split('/').next_back().unwrap_or(&file.path);
+            match file.status.as_str() {
+                "valid" => println!("   ✓ {}", filename),
+                "missing" => println!("   ✗ {} (missing)", filename),
+                _ => println!(
+                    "   ✗ {} ({})",
+                    filename,
+                    file.error.as_deref().unwrap_or("invalid")
+                ),
+            }
+        }
+
+        if !errors.is_empty() {
+            println!("\n📋 Issues found:");
+            for err in &errors {
+                let icon = if err.severity == "error" {
+                    "✗"
+                } else {
+                    "⚠"
+                };
+                println!("   {} [{}] {}", icon, err.file, err.message);
+                if let Some(ref suggestion) = err.suggestion {
+                    println!("      → {}", suggestion);
+                }
+            }
+        }
+
+        println!(
+            "\n» Result: {} errors, {} warnings",
+            error_count, warning_count
+        );
+        if valid {
+            println!("✓ System model is valid");
+        } else {
+            println!("✗ System model has validation errors");
+        }
+    }
+
+    if !valid {
+        bail!("System model validation failed with {} errors", error_count)
+    }
+    Ok(())
+}
+
+#[derive(Serialize)]
+struct SystemModelValidation {
+    valid: bool,
+    path: String,
+    schema_errors: usize,
+    reference_errors: usize,
+    warnings: usize,
+    errors: Vec<SystemModelError>,
+    checked_files: Vec<FileStatus>,
+}
+
+#[derive(Serialize)]
+struct SystemModelError {
+    file: String,
+    line: Option<usize>,
+    message: String,
+    severity: String,
+    suggestion: Option<String>,
+}
+
+/// Extract IDs and references from YAML structure
+fn extract_ids_and_refs(
+    value: &serde_yaml::Value,
+    filename: &str,
+    all_ids: &mut HashSet<String>,
+    referenced_ids: &mut Vec<(String, String)>,
+) {
+    match value {
+        serde_yaml::Value::Mapping(map) => {
+            for (key, val) in map {
+                if let serde_yaml::Value::String(key_str) = key {
+                    // Collect IDs
+                    if key_str == "id" {
+                        if let serde_yaml::Value::String(id) = val {
+                            all_ids.insert(id.clone());
+                        }
+                    }
+                    // Collect references (common reference field names)
+                    if key_str == "trust_zone"
+                        || key_str == "component"
+                        || key_str == "actor"
+                        || key_str == "from"
+                        || key_str == "to"
+                        || key_str == "data"
+                        || key_str == "integration"
+                        || key_str == "zone"
+                    {
+                        if let serde_yaml::Value::String(ref_id) = val {
+                            referenced_ids.push((filename.to_string(), ref_id.clone()));
+                        }
+                    }
+                    // Handle arrays of references
+                    if key_str == "actors"
+                        || key_str == "data_created"
+                        || key_str == "stores"
+                        || key_str == "components"
+                        || key_str == "data_flows"
+                        || key_str == "data_shared"
+                    {
+                        if let serde_yaml::Value::Sequence(arr) = val {
+                            for item in arr {
+                                if let serde_yaml::Value::String(ref_id) = item {
+                                    referenced_ids.push((filename.to_string(), ref_id.clone()));
+                                }
+                            }
+                        }
+                    }
+                }
+                extract_ids_and_refs(val, filename, all_ids, referenced_ids);
+            }
+        }
+        serde_yaml::Value::Sequence(arr) => {
+            for item in arr {
+                extract_ids_and_refs(item, filename, all_ids, referenced_ids);
+            }
+        }
+        _ => {}
+    }
 }
 
 #[cfg(test)]

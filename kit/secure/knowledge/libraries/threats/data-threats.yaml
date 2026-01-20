@@ -1,0 +1,323 @@
+# OpenSecKit V4 - Data Handling Threat Library
+# Version: 4.0.0
+# Use: Reference for threat modeling data handling features
+
+metadata:
+  library_id: "data-threats"
+  name: "Data Handling Security Threats"
+  version: "4.0.0"
+  based_on: ["OWASP Data Protection Cheat Sheet", "STRIDE", "GDPR/RGPD Requirements"]
+
+threats:
+  # PII Exposure Threats
+  - id: "DATA-PII-001"
+    name: "PII Exposure in Logs"
+    category: "information_disclosure"
+    stride: "information_disclosure"
+    cwe: "CWE-532"
+    description: "Personal identifiable information written to application logs"
+    attack_vector: "Access log files or log aggregation systems"
+    impact: "Privacy breach, regulatory violation (GDPR Art. 5)"
+    likelihood: "high"
+    indicators:
+      - "Logging full request/response bodies"
+      - "Debug logging in production"
+      - "No log sanitization"
+    mitigations:
+      - "Implement log sanitization for PII fields"
+      - "Use structured logging with field masking"
+      - "Separate security logs from debug logs"
+      - "Implement log retention policies"
+
+  - id: "DATA-PII-002"
+    name: "PII in Error Messages"
+    category: "information_disclosure"
+    stride: "information_disclosure"
+    cwe: "CWE-209"
+    description: "Personal data exposed in error responses"
+    attack_vector: "Trigger errors to extract PII from responses"
+    impact: "Privacy breach, user enumeration"
+    likelihood: "medium"
+    indicators:
+      - "Verbose error messages"
+      - "Stack traces with user data"
+      - "Database errors with query data"
+    mitigations:
+      - "Generic error messages for clients"
+      - "Error ID for correlation without PII"
+      - "Server-side only detailed logging"
+
+  - id: "DATA-PII-003"
+    name: "PII in URLs"
+    category: "information_disclosure"
+    stride: "information_disclosure"
+    cwe: "CWE-598"
+    description: "Personal data included in URL parameters"
+    attack_vector: "Access browser history, server logs, referrer headers"
+    impact: "PII leakage through multiple channels"
+    likelihood: "medium"
+    indicators:
+      - "Email or ID in GET parameters"
+      - "Personal data in query strings"
+      - "No referrer policy"
+    mitigations:
+      - "Use POST for sensitive data"
+      - "Implement Referrer-Policy header"
+      - "Avoid PII in URLs"
+
+  # Data Leakage Threats
+  - id: "DATA-LEAK-001"
+    name: "Excessive Data in API Responses"
+    category: "information_disclosure"
+    stride: "information_disclosure"
+    owasp_api: "API3:2023"
+    cwe: "CWE-200"
+    description: "API returns more data than client needs"
+    attack_vector: "Inspect API responses for hidden fields"
+    impact: "Unintended data exposure"
+    likelihood: "high"
+    indicators:
+      - "Full database objects returned"
+      - "Internal fields in responses"
+      - "No response DTOs"
+    mitigations:
+      - "Use response DTOs"
+      - "Implement field-level authorization"
+      - "Apply data minimization principle"
+
+  - id: "DATA-LEAK-002"
+    name: "Data Exposure via Caching"
+    category: "information_disclosure"
+    stride: "information_disclosure"
+    cwe: "CWE-524"
+    description: "Sensitive data cached in browser or CDN"
+    attack_vector: "Access cached responses from shared systems"
+    impact: "Data exposure to unauthorized users"
+    likelihood: "medium"
+    indicators:
+      - "No cache-control headers"
+      - "Sensitive data on cacheable endpoints"
+      - "Shared CDN caching"
+    mitigations:
+      - "Cache-Control: no-store for sensitive data"
+      - "Vary header for user-specific content"
+      - "Private caching only"
+
+  - id: "DATA-LEAK-003"
+    name: "Backup Data Exposure"
+    category: "information_disclosure"
+    stride: "information_disclosure"
+    cwe: "CWE-530"
+    description: "Sensitive data in unprotected backups"
+    attack_vector: "Access backup files or storage"
+    impact: "Mass data breach"
+    likelihood: "medium"
+    indicators:
+      - "Unencrypted backups"
+      - "Backups in public storage"
+      - "No backup access controls"
+    mitigations:
+      - "Encrypt backups at rest"
+      - "Restrict backup access"
+      - "Regular backup audit"
+
+  # Data Storage Threats
+  - id: "DATA-STORE-001"
+    name: "Unencrypted Sensitive Data at Rest"
+    category: "cryptography"
+    stride: "information_disclosure"
+    cwe: "CWE-311"
+    description: "Sensitive data stored without encryption"
+    attack_vector: "Database breach, filesystem access"
+    impact: "Data breach without cryptographic protection"
+    likelihood: "medium"
+    indicators:
+      - "Plaintext passwords"
+      - "Unencrypted PII in database"
+      - "No column-level encryption"
+    mitigations:
+      - "Hash passwords with bcrypt/argon2"
+      - "Encrypt PII at column level"
+      - "Use transparent data encryption"
+
+  - id: "DATA-STORE-002"
+    name: "Insecure Key Storage"
+    category: "cryptography"
+    stride: "information_disclosure"
+    cwe: "CWE-321"
+    description: "Encryption keys stored alongside encrypted data"
+    attack_vector: "Access data and keys together"
+    impact: "Encryption rendered ineffective"
+    likelihood: "medium"
+    indicators:
+      - "Keys in application config"
+      - "Keys in same database as data"
+      - "No key management system"
+    mitigations:
+      - "Use dedicated key management (KMS)"
+      - "Separate key storage"
+      - "Key rotation policy"
+
+  - id: "DATA-STORE-003"
+    name: "Insufficient Data Retention Controls"
+    category: "configuration"
+    stride: "information_disclosure"
+    cwe: "CWE-404"
+    description: "Data retained beyond necessary period"
+    attack_vector: "Historical data breach exposes old records"
+    impact: "Regulatory violation, expanded breach scope"
+    likelihood: "medium"
+    indicators:
+      - "No data retention policy"
+      - "No automated purging"
+      - "Soft delete without cleanup"
+    mitigations:
+      - "Define retention periods per data type"
+      - "Automated data purging"
+      - "Anonymization for analytics"
+
+  # Data Transfer Threats
+  - id: "DATA-TRANS-001"
+    name: "Unencrypted Data in Transit"
+    category: "cryptography"
+    stride: "information_disclosure"
+    cwe: "CWE-319"
+    description: "Sensitive data transmitted without TLS"
+    attack_vector: "Network sniffing, MITM attack"
+    impact: "Data interception"
+    likelihood: "medium"
+    indicators:
+      - "HTTP endpoints"
+      - "Internal services without TLS"
+      - "Outdated TLS versions"
+    mitigations:
+      - "TLS 1.2+ for all connections"
+      - "HSTS header"
+      - "Certificate pinning for mobile"
+
+  - id: "DATA-TRANS-002"
+    name: "Insecure File Transfer"
+    category: "cryptography"
+    stride: "tampering"
+    cwe: "CWE-319"
+    description: "Files transferred via insecure protocols"
+    attack_vector: "Intercept file transfers"
+    impact: "Data theft, file manipulation"
+    likelihood: "low"
+    indicators:
+      - "FTP without TLS"
+      - "Unencrypted file uploads"
+      - "No integrity verification"
+    mitigations:
+      - "SFTP or HTTPS for transfers"
+      - "File integrity checksums"
+      - "End-to-end encryption for sensitive files"
+
+  - id: "DATA-TRANS-003"
+    name: "Third-Party Data Sharing Without Protection"
+    category: "authorization"
+    stride: "information_disclosure"
+    cwe: "CWE-359"
+    description: "Data shared with third parties without adequate controls"
+    attack_vector: "Third-party breach or misuse"
+    impact: "Data breach via partner, regulatory violation"
+    likelihood: "medium"
+    indicators:
+      - "Full datasets to partners"
+      - "No data processing agreements"
+      - "No audit of third-party access"
+    mitigations:
+      - "Data minimization for sharing"
+      - "Data processing agreements (DPA)"
+      - "Audit third-party access"
+
+  # Data Integrity Threats
+  - id: "DATA-INT-001"
+    name: "Data Tampering Without Detection"
+    category: "tampering"
+    stride: "tampering"
+    cwe: "CWE-354"
+    description: "Data modified without integrity verification"
+    attack_vector: "Modify data in transit or at rest"
+    impact: "Data corruption, fraud"
+    likelihood: "medium"
+    indicators:
+      - "No checksums"
+      - "No audit trail"
+      - "No version control"
+    mitigations:
+      - "Implement integrity checksums"
+      - "Audit logging for data changes"
+      - "Version history for critical data"
+
+  - id: "DATA-INT-002"
+    name: "Mass Data Modification"
+    category: "tampering"
+    stride: "tampering"
+    cwe: "CWE-471"
+    description: "Bulk updates without proper validation"
+    attack_vector: "Exploit batch operations to modify many records"
+    impact: "Large-scale data corruption"
+    likelihood: "low"
+    indicators:
+      - "Unrestricted bulk operations"
+      - "No confirmation for mass changes"
+      - "No rollback capability"
+    mitigations:
+      - "Rate limit bulk operations"
+      - "Require confirmation for mass changes"
+      - "Transaction rollback support"
+
+  # Data Privacy Threats
+  - id: "DATA-PRIV-001"
+    name: "Consent Bypass"
+    category: "authorization"
+    stride: "repudiation"
+    cwe: "CWE-359"
+    description: "Processing data without proper consent"
+    attack_vector: "Process data beyond consented purposes"
+    impact: "GDPR violation, fines up to 4% revenue"
+    likelihood: "medium"
+    indicators:
+      - "No consent tracking"
+      - "Data used beyond original purpose"
+      - "No consent withdrawal mechanism"
+    mitigations:
+      - "Consent management system"
+      - "Purpose-limited data processing"
+      - "Easy consent withdrawal"
+
+  - id: "DATA-PRIV-002"
+    name: "Failed Data Subject Requests"
+    category: "authorization"
+    stride: "repudiation"
+    cwe: "CWE-359"
+    description: "Inability to fulfill GDPR data subject rights"
+    attack_vector: "Regulatory audit or user complaint"
+    impact: "Regulatory fines, reputational damage"
+    likelihood: "medium"
+    indicators:
+      - "No data export capability"
+      - "No deletion process"
+      - "Data scattered across systems"
+    mitigations:
+      - "Implement data export (portability)"
+      - "Implement right to erasure"
+      - "Centralized data inventory"
+
+  - id: "DATA-PRIV-003"
+    name: "Cross-Border Data Transfer Violation"
+    category: "configuration"
+    stride: "repudiation"
+    description: "Data transferred outside allowed jurisdictions"
+    attack_vector: "Regulatory audit of data flows"
+    impact: "GDPR Chapter V violation"
+    likelihood: "medium"
+    indicators:
+      - "Cloud providers in non-adequate countries"
+      - "No SCCs or adequacy decisions"
+      - "Unclear data flows"
+    mitigations:
+      - "Map all data transfers"
+      - "Use EU-based providers or SCCs"
+      - "Document legal basis for transfers"
