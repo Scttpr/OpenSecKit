@@ -670,19 +670,10 @@ fn validate_repo_root(path: &Path) -> Result<()> {
 }
 
 fn find_repo_root() -> Result<PathBuf> {
-    let current_exe = std::env::current_exe().ok();
-
     let candidates: Vec<PathBuf> = vec![
         PathBuf::from("."),
         PathBuf::from(".."),
         PathBuf::from("../.."),
-        current_exe
-            .as_ref()
-            .and_then(|p| p.parent())
-            .and_then(|p| p.parent())
-            .and_then(|p| p.parent())
-            .map(|p| p.to_path_buf())
-            .unwrap_or_default(),
     ];
 
     for candidate in candidates {
