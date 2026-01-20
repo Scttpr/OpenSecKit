@@ -389,7 +389,10 @@ fn validate_system_model(model_path: &str, json: bool) -> Result<()> {
 
     let model_dir = Path::new(model_path);
     if !model_dir.exists() {
-        bail!("System model not found at {}. Run `osk init` first.", model_path);
+        bail!(
+            "System model not found at {}. Run `osk init` first.",
+            model_path
+        );
     }
 
     let mut checked_files = Vec::new();
@@ -453,7 +456,10 @@ fn validate_system_model(model_path: &str, json: bool) -> Result<()> {
                     line: Some(200),
                     message: format!("Index file exceeds 200 lines ({} lines)", line_count),
                     severity: "error".to_string(),
-                    suggestion: Some("Move detailed data to section files, keep only summaries in index".to_string()),
+                    suggestion: Some(
+                        "Move detailed data to section files, keep only summaries in index"
+                            .to_string(),
+                    ),
                 });
             }
         }
@@ -490,7 +496,8 @@ fn validate_system_model(model_path: &str, json: bool) -> Result<()> {
 
     // Cross-reference validation
     for (file, ref_id) in &referenced_ids {
-        if !all_ids.contains(ref_id) && !ref_id.starts_with("DATA-") && !ref_id.starts_with("COMP-") {
+        if !all_ids.contains(ref_id) && !ref_id.starts_with("DATA-") && !ref_id.starts_with("COMP-")
+        {
             // Skip well-known ID patterns that might be placeholders
             if !ref_id.contains("[") && !ref_id.is_empty() {
                 errors.push(SystemModelError {
@@ -498,7 +505,10 @@ fn validate_system_model(model_path: &str, json: bool) -> Result<()> {
                     line: None,
                     message: format!("Referenced ID '{}' not found", ref_id),
                     severity: "warning".to_string(),
-                    suggestion: Some(format!("Add definition for '{}' or remove reference", ref_id)),
+                    suggestion: Some(format!(
+                        "Add definition for '{}' or remove reference",
+                        ref_id
+                    )),
                 });
             }
         }
@@ -527,14 +537,22 @@ fn validate_system_model(model_path: &str, json: bool) -> Result<()> {
             match file.status.as_str() {
                 "valid" => println!("   ✓ {}", filename),
                 "missing" => println!("   ✗ {} (missing)", filename),
-                _ => println!("   ✗ {} ({})", filename, file.error.as_deref().unwrap_or("invalid")),
+                _ => println!(
+                    "   ✗ {} ({})",
+                    filename,
+                    file.error.as_deref().unwrap_or("invalid")
+                ),
             }
         }
 
         if !errors.is_empty() {
             println!("\n📋 Issues found:");
             for err in &errors {
-                let icon = if err.severity == "error" { "✗" } else { "⚠" };
+                let icon = if err.severity == "error" {
+                    "✗"
+                } else {
+                    "⚠"
+                };
                 println!("   {} [{}] {}", icon, err.file, err.message);
                 if let Some(ref suggestion) = err.suggestion {
                     println!("      → {}", suggestion);
@@ -542,7 +560,10 @@ fn validate_system_model(model_path: &str, json: bool) -> Result<()> {
             }
         }
 
-        println!("\n» Result: {} errors, {} warnings", error_count, warning_count);
+        println!(
+            "\n» Result: {} errors, {} warnings",
+            error_count, warning_count
+        );
         if valid {
             println!("✓ System model is valid");
         } else {
@@ -594,17 +615,26 @@ fn extract_ids_and_refs(
                         }
                     }
                     // Collect references (common reference field names)
-                    if key_str == "trust_zone" || key_str == "component" || key_str == "actor"
-                        || key_str == "from" || key_str == "to" || key_str == "data"
-                        || key_str == "integration" || key_str == "zone"
+                    if key_str == "trust_zone"
+                        || key_str == "component"
+                        || key_str == "actor"
+                        || key_str == "from"
+                        || key_str == "to"
+                        || key_str == "data"
+                        || key_str == "integration"
+                        || key_str == "zone"
                     {
                         if let serde_yaml::Value::String(ref_id) = val {
                             referenced_ids.push((filename.to_string(), ref_id.clone()));
                         }
                     }
                     // Handle arrays of references
-                    if key_str == "actors" || key_str == "data_created" || key_str == "stores"
-                        || key_str == "components" || key_str == "data_flows" || key_str == "data_shared"
+                    if key_str == "actors"
+                        || key_str == "data_created"
+                        || key_str == "stores"
+                        || key_str == "components"
+                        || key_str == "data_flows"
+                        || key_str == "data_shared"
                     {
                         if let serde_yaml::Value::Sequence(arr) = val {
                             for item in arr {

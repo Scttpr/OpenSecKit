@@ -21,7 +21,9 @@ pub fn handle(command: Commands, client: &Client) -> Result<()> {
             local,
             local_path,
             version,
-        } => init::run(client, force, default, agent, all_agents, local, local_path, version),
+        } => init::run(
+            client, force, default, agent, all_agents, local, local_path, version,
+        ),
 
         Commands::Ingest { output, path } => ingest::run(&output, true, &path),
 

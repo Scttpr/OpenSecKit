@@ -39,10 +39,7 @@ pub fn run(path: &str, json: bool) -> Result<()> {
 /// ```
 pub fn generate_component_id(path: &Path) -> String {
     // Get file stem (name without extension)
-    let stem = path
-        .file_stem()
-        .and_then(|s| s.to_str())
-        .unwrap_or("");
+    let stem = path.file_stem().and_then(|s| s.to_str()).unwrap_or("");
 
     // Get parent directory
     let parent = path.parent().unwrap_or(Path::new(""));
@@ -54,9 +51,7 @@ pub fn generate_component_id(path: &Path) -> String {
         .unwrap_or(parent);
 
     // Convert path separators to hyphens
-    let parent_str = clean_parent
-        .to_string_lossy()
-        .replace(['/', '\\'], "-");
+    let parent_str = clean_parent.to_string_lossy().replace(['/', '\\'], "-");
 
     // Combine parent and stem
     let id = if parent_str.is_empty() {
@@ -104,10 +99,7 @@ mod tests {
 
     #[test]
     fn test_root_file() {
-        assert_eq!(
-            generate_component_id(Path::new("main.rs")),
-            "main"
-        );
+        assert_eq!(generate_component_id(Path::new("main.rs")), "main");
     }
 
     #[test]

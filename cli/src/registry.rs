@@ -146,8 +146,8 @@ pub fn load_registry(path: &Path) -> Result<Registry> {
     let content = fs::read_to_string(path)
         .with_context(|| format!("Cannot read registry: {}", path.display()))?;
 
-    let registry: Registry = toml::from_str(&content)
-        .with_context(|| "Failed to parse registry.toml")?;
+    let registry: Registry =
+        toml::from_str(&content).with_context(|| "Failed to parse registry.toml")?;
 
     Ok(registry)
 }
@@ -226,20 +226,23 @@ mod tests {
     #[test]
     fn test_detect_domains() {
         let mut commands = HashMap::new();
-        commands.insert("comply-rgpd".to_string(), CommandConfig {
-            url: "https://example.com".to_string(),
-            version: "4.0.0".to_string(),
-            part: "comply".to_string(),
-            phase: "compliance".to_string(),
-            description: "RGPD".to_string(),
-            argument: None,
-            requires: vec![],
-            generates: vec![],
-            model_sections: vec![],
-            domain: Some("rgpd".to_string()),
-            agents: vec![],
-            roles: vec![],
-        });
+        commands.insert(
+            "comply-rgpd".to_string(),
+            CommandConfig {
+                url: "https://example.com".to_string(),
+                version: "4.0.0".to_string(),
+                part: "comply".to_string(),
+                phase: "compliance".to_string(),
+                description: "RGPD".to_string(),
+                argument: None,
+                requires: vec![],
+                generates: vec![],
+                model_sections: vec![],
+                domain: Some("rgpd".to_string()),
+                agents: vec![],
+                roles: vec![],
+            },
+        );
 
         let registry = Registry {
             metadata: RegistryMetadata {

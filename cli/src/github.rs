@@ -56,10 +56,7 @@ pub fn fetch_repo_tree(client: &Client, tag: &str) -> Result<Vec<GitTreeItem>> {
     let resp = client.get(&url).send()?;
 
     if !resp.status().is_success() {
-        bail!(
-            "Failed to read repository tree: {}",
-            resp.status()
-        );
+        bail!("Failed to read repository tree: {}", resp.status());
     }
 
     let tree_resp: GitTreeResponse = resp.json()?;

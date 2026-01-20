@@ -94,13 +94,8 @@ pub fn run(
     print_agent_detection(&detections);
 
     // Step 5: Determine which agents to install
-    let selected_agents = select_agents_to_install(
-        &agents_config,
-        &detections,
-        default,
-        agent,
-        all_agents,
-    )?;
+    let selected_agents =
+        select_agents_to_install(&agents_config, &detections, default, agent, all_agents)?;
 
     if selected_agents.is_empty() {
         println!("\n  No agents selected for installation.\n");
@@ -136,13 +131,8 @@ pub fn run(
     // Step 9: Generate AGENTS.md if enabled
     if let Some(ref universal) = agents_config.universal {
         if universal.enabled {
-            let _ = agents::generate_agents_md(
-                universal,
-                &commands,
-                &templates_dir,
-                VERSION,
-                &domains,
-            );
+            let _ =
+                agents::generate_agents_md(universal, &commands, &templates_dir, VERSION, &domains);
         }
     }
 
@@ -160,7 +150,9 @@ fn determine_source(
     if let Some(path) = local_path {
         let repo_root = PathBuf::from(&path);
         validate_repo_root(&repo_root)?;
-        Ok(ResourceSource::Local(repo_root.canonicalize().unwrap_or(repo_root)))
+        Ok(ResourceSource::Local(
+            repo_root.canonicalize().unwrap_or(repo_root),
+        ))
     } else if local {
         let repo_root = find_repo_root()?;
         Ok(ResourceSource::Local(repo_root))
@@ -262,7 +254,12 @@ fn detect_agents(config: &AgentsConfig) -> Vec<AgentDetection> {
 fn check_agent_available(agent: &AgentConfig) -> (bool, String) {
     // Check command availability
     if let Some(ref cmd) = agent.detect_cmd {
-        if Command::new("which").arg(cmd).output().map(|o| o.status.success()).unwrap_or(false) {
+        if Command::new("which")
+            .arg(cmd)
+            .output()
+            .map(|o| o.status.success())
+            .unwrap_or(false)
+        {
             return (true, format!("`{}` found", cmd));
         }
     }
@@ -349,7 +346,10 @@ fn select_agents_to_install(
 
     // Confirm installation of detected agents
     let confirm = Confirm::with_theme(&ColorfulTheme::default())
-        .with_prompt(format!("  Install for {} detected agent(s)?", detected.len()))
+        .with_prompt(format!(
+            "  Install for {} detected agent(s)?",
+            detected.len()
+        ))
         .default(true)
         .interact()?;
 
@@ -639,7 +639,11 @@ sections:
     Ok(())
 }
 
-fn install_resources(client: &Client, force: bool, source: &ResourceSource) -> Result<InstallStats> {
+fn install_resources(
+    client: &Client,
+    force: bool,
+    source: &ResourceSource,
+) -> Result<InstallStats> {
     match source {
         ResourceSource::Local(repo_root) => install_resources_local(repo_root, force),
         ResourceSource::Version(tag) => install_resources_remote(client, force, tag),
@@ -727,7 +731,10 @@ fn install_resources_local(repo_root: &Path, force: bool) -> Result<InstallStats
     // Count templates (used directly from repo in local mode)
     let agents_templates_src = repo_root.join("cli/templates/agents");
     if agents_templates_src.exists() {
-        for entry in WalkDir::new(&agents_templates_src).into_iter().filter_map(|e| e.ok()) {
+        for entry in WalkDir::new(&agents_templates_src)
+            .into_iter()
+            .filter_map(|e| e.ok())
+        {
             if entry.file_type().is_file() {
                 stats.agents_templates += 1;
             }

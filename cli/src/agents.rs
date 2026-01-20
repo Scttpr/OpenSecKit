@@ -102,7 +102,9 @@ pub fn generate_agent_files(
     tera.add_raw_template(&agent.template, &template_content)?;
 
     match agent.format.as_str() {
-        "slash-command" => generate_slash_commands(client, agent, commands, &tera, version, local_repo),
+        "slash-command" => {
+            generate_slash_commands(client, agent, commands, &tera, version, local_repo)
+        }
         "single-file" => generate_single_file(agent, commands, &tera, version, domains),
         "rules-dir" => generate_rules_dir(agent, commands, &tera, version, domains),
         _ => {
@@ -158,16 +160,27 @@ fn generate_slash_commands(
                 Ok(response) => {
                     if response.status().is_success() {
                         response.text().unwrap_or_else(|_| {
-                            format!("# {}\n\nFailed to read prompt content from {}", cmd.name, cmd.url)
+                            format!(
+                                "# {}\n\nFailed to read prompt content from {}",
+                                cmd.name, cmd.url
+                            )
                         })
                     } else {
                         eprintln!("   ⚠  HTTP {} fetching {}", response.status(), cmd.url);
-                        format!("# {}\n\nFailed to fetch prompt (HTTP {})\nURL: {}", cmd.name, response.status(), cmd.url)
+                        format!(
+                            "# {}\n\nFailed to fetch prompt (HTTP {})\nURL: {}",
+                            cmd.name,
+                            response.status(),
+                            cmd.url
+                        )
                     }
                 }
                 Err(e) => {
                     eprintln!("   ⚠  Error fetching {}: {}", cmd.url, e);
-                    format!("# {}\n\nFailed to fetch prompt: {}\nURL: {}", cmd.name, e, cmd.url)
+                    format!(
+                        "# {}\n\nFailed to fetch prompt: {}\nURL: {}",
+                        cmd.name, e, cmd.url
+                    )
                 }
             }
         };

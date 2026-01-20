@@ -54,7 +54,10 @@ pub fn run(since: Option<&str>, json: bool) -> Result<()> {
         let output = serde_json::to_string_pretty(&result)?;
         println!("{}", output);
     } else if result.changes.is_empty() {
-        println!("No changes detected since {}", &since_commit[..7.min(since_commit.len())]);
+        println!(
+            "No changes detected since {}",
+            &since_commit[..7.min(since_commit.len())]
+        );
     } else {
         println!(
             "» {} changes since {}",
@@ -94,18 +97,19 @@ fn read_last_commit_from_index() -> Result<String> {
         bail!("No system model found. Run `osk init` and `/osk-discover init` first.");
     }
 
-    let content = std::fs::read_to_string(index_path)
-        .context("Failed to read index.yaml")?;
+    let content = std::fs::read_to_string(index_path).context("Failed to read index.yaml")?;
 
     // Parse YAML to find last_commit
-    let yaml: serde_yaml::Value = serde_yaml::from_str(&content)
-        .context("Failed to parse index.yaml")?;
+    let yaml: serde_yaml::Value =
+        serde_yaml::from_str(&content).context("Failed to parse index.yaml")?;
 
     let last_commit = yaml
         .get("metadata")
         .and_then(|m| m.get("last_commit"))
         .and_then(|c| c.as_str())
-        .ok_or_else(|| anyhow::anyhow!("No last_commit found in index.yaml. Use --since <commit>."))?;
+        .ok_or_else(|| {
+            anyhow::anyhow!("No last_commit found in index.yaml. Use --since <commit>.")
+        })?;
 
     Ok(last_commit.to_string())
 }
@@ -130,11 +134,7 @@ pub fn get_changes(since_commit: &str) -> Result<ChangesResult> {
 
     // Get diff with status
     let output = Command::new("git")
-        .args([
-            "diff",
-            "--name-status",
-            &format!("{}..HEAD", since_commit),
-        ])
+        .args(["diff", "--name-status", &format!("{}..HEAD", since_commit)])
         .output()
         .context("Failed to run git diff")?;
 

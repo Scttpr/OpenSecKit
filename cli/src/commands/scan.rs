@@ -25,7 +25,9 @@ pub struct GitignoreHint {
 
 /// Run the scan command
 pub fn run(path: Option<&str>, json: bool) -> Result<()> {
-    let root = path.map(PathBuf::from).unwrap_or_else(|| PathBuf::from("."));
+    let root = path
+        .map(PathBuf::from)
+        .unwrap_or_else(|| PathBuf::from("."));
     let result = scan_directory(&root)?;
 
     if json {
@@ -91,8 +93,7 @@ fn parse_gitignore(root: &Path) -> Result<Vec<String>> {
         return Ok(Vec::new());
     }
 
-    let content = fs::read_to_string(&gitignore_path)
-        .context("Failed to read .gitignore")?;
+    let content = fs::read_to_string(&gitignore_path).context("Failed to read .gitignore")?;
 
     let patterns: Vec<String> = content
         .lines()
@@ -158,7 +159,10 @@ fn analyze_gitignore_patterns(patterns: &[String]) -> Vec<GitignoreHint> {
 
         if let Some(h) = hint {
             // Avoid duplicates
-            if !hints.iter().any(|existing: &GitignoreHint| existing.implies == h.implies) {
+            if !hints
+                .iter()
+                .any(|existing: &GitignoreHint| existing.implies == h.implies)
+            {
                 hints.push(h);
             }
         }
