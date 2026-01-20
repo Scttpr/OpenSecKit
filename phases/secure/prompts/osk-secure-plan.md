@@ -2,7 +2,7 @@
 description: Create implementation plan from security specification with phased approach and code examples
 part: secure
 argument: feature_name
-model_sections: [index, architecture, security]
+model_sections: [index, architecture]
 ---
 
 # Role
@@ -30,8 +30,8 @@ Argument required:
 
 # Templates & Knowledge
 
-**Load from OpenSecKit:**
-- `templates/secure/security-plan.md.tera` → output template
+**Load from OpenSecKit (relative to phases/secure/):**
+- `templates/outputs/security-plan.md.tera` → output template
 - `knowledge/mappings/asvs-component-mapping.yaml` → ASVS implementation patterns
 - System model for tech stack detection
 

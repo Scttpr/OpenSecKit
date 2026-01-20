@@ -226,7 +226,7 @@ roles = ["compliance-analyst"]
 # ════════════════════════════════════════════════════════════════════════════════
 
 [commands.secure-specify]
-url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-secure-specify.md"
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/phases/secure/prompts/osk-secure-specify.md"
 version = "4.0.0"
 part = "secure"
 phase = "specify"
@@ -243,7 +243,7 @@ agents = ["claude-code", "copilot", "cursor", "gemini"]
 roles = ["security-architect"]
 
 [commands.secure-clarify]
-url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-secure-clarify.md"
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/phases/secure/prompts/osk-secure-clarify.md"
 version = "4.0.0"
 part = "secure"
 phase = "clarify"
@@ -256,7 +256,7 @@ agents = ["claude-code", "copilot", "cursor", "gemini"]
 roles = ["security-architect"]
 
 [commands.secure-plan]
-url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-secure-plan.md"
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/phases/secure/prompts/osk-secure-plan.md"
 version = "4.0.0"
 part = "secure"
 phase = "plan"
@@ -270,7 +270,7 @@ agents = ["claude-code", "copilot", "cursor", "gemini"]
 roles = ["security-engineer"]
 
 [commands.secure-tasks]
-url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-secure-tasks.md"
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/phases/secure/prompts/osk-secure-tasks.md"
 version = "4.0.0"
 part = "secure"
 phase = "tasks"
@@ -286,7 +286,7 @@ agents = ["claude-code", "copilot", "cursor", "gemini"]
 roles = ["security-engineer"]
 
 [commands.secure-implement]
-url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/prompts/osk-secure-implement.md"
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/phases/secure/prompts/osk-secure-implement.md"
 version = "4.0.0"
 part = "secure"
 phase = "implement"
@@ -360,49 +360,49 @@ levels = ["standard", "renforce", "*"]
 name = "Threat Modeling"
 name_fr = "Modélisation des menaces"
 description = "Proactive analysis of attack vectors"
-knowledge_path = "knowledge/methodologies/threat-modeling/"
+knowledge_path = "phases/secure/knowledge/principles/I-threat-modeling/"
 methods = ["STRIDE", "DFD", "Attack Trees"]
 
 [principles.II]
 name = "Risk Analysis"
 name_fr = "Analyse de risques"
 description = "Risk scoring and prioritization"
-knowledge_path = "knowledge/methodologies/risk-analysis/"
+knowledge_path = "phases/secure/knowledge/principles/II-risk-analysis/"
 methods = ["Risk Scoring", "Risk Register"]
 
 [principles.III]
 name = "Security by Design"
 name_fr = "Sécurité dès la conception"
 description = "Security controls from the start"
-knowledge_path = "knowledge/methodologies/security-requirements/"
+knowledge_path = "phases/secure/knowledge/principles/III-security-design/"
 methods = ["OWASP ASVS", "Security Requirements"]
 
 [principles.IV]
 name = "Security Testing"
 name_fr = "Tests de sécurité"
 description = "Automated SAST/DAST/SCA"
-knowledge_path = "knowledge/methodologies/security-testing/"
+knowledge_path = "phases/secure/knowledge/principles/IV-security-testing/"
 methods = ["SAST", "DAST", "SCA"]
 
 [principles.V]
 name = "Secrets Management"
 name_fr = "Gestion des secrets"
 description = "No secrets in code"
-knowledge_path = "knowledge/methodologies/secrets-management/"
+knowledge_path = "phases/secure/knowledge/principles/V-secrets-management/"
 methods = ["Vault", "Secret Detection", "Rotation"]
 
 [principles.VI]
 name = "Audit Logging"
 name_fr = "Traçabilité et audit"
 description = "Immutable, centralized logs"
-knowledge_path = "knowledge/methodologies/audit-logging/"
+knowledge_path = "phases/secure/knowledge/principles/VI-audit-logging/"
 methods = ["Structured Logging", "SIEM", "Alerting"]
 
 [principles.VII]
 name = "Patch Management"
 name_fr = "Patch management"
 description = "Strict update SLAs"
-knowledge_path = "knowledge/methodologies/patch-management/"
+knowledge_path = "phases/secure/knowledge/principles/VII-patch-management/"
 methods = ["SCA", "Dependabot", "SLA"]
 
 # ════════════════════════════════════════════════════════════════════════════════

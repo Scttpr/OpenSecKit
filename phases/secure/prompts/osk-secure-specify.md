@@ -36,13 +36,16 @@ Argument required:
 
 # Templates & Knowledge
 
-**Load from OpenSecKit:**
+**Load from OpenSecKit (relative to phases/secure/):**
+- `principles.yaml` → principle definitions and weights
 - `knowledge/libraries/threats/*.yaml` → threat libraries (local-first)
 - `knowledge/mappings/asvs-component-mapping.yaml` → ASVS control mapping
-- `templates/schemas/security-spec.yaml` → output schema
-- `templates/schemas/risks.yaml` → risk register schema
-- `templates/secure/security-spec.md.tera` → output template
-- `templates/secure/risks.yaml.tera` → risk register template
+- `templates/outputs/security-spec.md.tera` → output template
+- `templates/data/risks.yaml.tera` → risk register template
+
+**From root templates/schemas/:**
+- `security-spec.yaml` → output schema
+- `risks.yaml` → risk register schema
 
 **Optional external enrichment:**
 - MITRE ATT&CK (https://attack.mitre.org/) → technique IDs
