@@ -11,7 +11,7 @@ use crate::args::Agent;
 use crate::config::OskConfig;
 use crate::registry::{self, CommandInfo, DomainsInfo};
 use anyhow::{bail, Result};
-use dialoguer::{theme::ColorfulTheme, Confirm, Input};
+use dialoguer::{theme::ColorfulTheme, Confirm, Input, MultiSelect};
 use reqwest::blocking::Client;
 use std::collections::HashMap;
 use std::fs;
@@ -344,20 +344,29 @@ fn select_agents_to_install(
         return Ok(detected);
     }
 
-    // Confirm installation of detected agents
-    let confirm = Confirm::with_theme(&ColorfulTheme::default())
-        .with_prompt(format!(
-            "  Install for {} detected agent(s)?",
-            detected.len()
-        ))
-        .default(true)
+    // Let user select which detected agents to install
+    let detected_agents: Vec<&AgentDetection> = detections.iter().filter(|d| d.detected).collect();
+
+    let agent_names: Vec<String> = detected_agents
+        .iter()
+        .map(|d| d.name.clone())
+        .collect();
+
+    // All detected agents pre-selected by default
+    let defaults: Vec<bool> = vec![true; detected_agents.len()];
+
+    let selections = MultiSelect::with_theme(&ColorfulTheme::default())
+        .with_prompt("  Select agents to install")
+        .items(&agent_names)
+        .defaults(&defaults)
         .interact()?;
 
-    if confirm {
-        Ok(detected)
-    } else {
-        Ok(vec![])
-    }
+    let selected_ids: Vec<String> = selections
+        .iter()
+        .map(|&idx| detected_agents[idx].id.clone())
+        .collect();
+
+    Ok(selected_ids)
 }
 
 fn agent_to_id(agent: &Agent) -> String {
