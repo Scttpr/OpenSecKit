@@ -14,7 +14,6 @@ architecture = "hub-and-spokes"
 
 [paths]
 phases = "phases"
-shared = "shared"
 
 [paths.discover]
 root = "kit/discover"
