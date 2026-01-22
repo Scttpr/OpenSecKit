@@ -157,6 +157,7 @@ roles = ["discovery-analyst"]
 # ════════════════════════════════════════════════════════════════════════════════
 
 [commands.comply]
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/prompts/comply.md"
 version = "5.0.0"
 part = "comply"
 phase = "compliance"
@@ -276,24 +277,6 @@ model_sections = ["index", "architecture"]
 principles = ["I", "II", "III", "IV", "V", "VI", "VII"]
 agents = ["claude-code", "copilot", "cursor", "gemini"]
 roles = ["security-engineer"]
-
-# ════════════════════════════════════════════════════════════════════════════════
-# V3 COMPATIBILITY ALIASES
-# These redirect V3 commands to V4 equivalents
-# ════════════════════════════════════════════════════════════════════════════════
-
-[aliases]
-configure = "discover"            # /osk-configure → /osk-discover
-baseline = "discover"             # /osk-baseline → /osk-discover
-init = "discover"                 # /osk-discover init → /osk-discover
-analyze = "secure-specify"        # /osk-analyze → /osk-secure-specify
-specify = "secure-specify"        # /osk-specify → /osk-secure-specify
-harden = "secure-specify"         # /osk-harden → /osk-secure-specify
-plan = "secure-plan"              # /osk-plan → /osk-secure-plan
-tasks = "secure-tasks"            # /osk-tasks → /osk-secure-tasks
-implement = "secure-implement"    # /osk-implement → /osk-secure-implement
-rgpd = "comply rgpd"              # /osk-rgpd → /osk-comply rgpd
-rgs = "comply rgs"                # /osk-rgs → /osk-comply rgs
 
 # ════════════════════════════════════════════════════════════════════════════════
 # DOMAINS - Compliance Frameworks

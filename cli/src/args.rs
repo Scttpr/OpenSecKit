@@ -23,32 +23,32 @@ pub struct Cli {
 
 #[derive(Subcommand)]
 pub enum Commands {
-    /// Initialiser un projet avec OpenSecKit
+    /// Initialize a project with OpenSecKit
     Init {
-        /// Forcer la réinstallation même si les fichiers existent
+        /// Force reinstall even if files exist
         #[arg(long, short)]
         force: bool,
-        /// Mode non-interactif avec valeurs par défaut (pour CI/tests)
+        /// Non-interactive mode with defaults (for CI/tests)
         #[arg(long, short)]
         default: bool,
-        /// Agent AI cible (si non spécifié, sélection interactive)
+        /// Target AI agent (if not specified, interactive selection)
         #[arg(long, short, value_enum)]
         agent: Option<Agent>,
-        /// Installer la configuration pour tous les agents
+        /// Install configuration for all agents
         #[arg(long)]
         all_agents: bool,
-        /// Utiliser les ressources locales du dépôt (pour développement)
+        /// Use local repository resources (for development)
         #[arg(long, short)]
         local: bool,
-        /// Chemin vers le dépôt OpenSecKit local (implique --local)
+        /// Path to local OpenSecKit repository (implies --local)
         #[arg(long, value_name = "PATH")]
         local_path: Option<String>,
-        /// Version spécifique à télécharger (ex: v3.2.0)
+        /// Specific version to download (e.g., v4.0.0)
         #[arg(long, short = 'V')]
         version: Option<String>,
     },
 
-    /// Exporter le contexte du projet
+    /// Export project context
     Ingest {
         #[arg(short, long, default_value = "context.txt")]
         output: String,
@@ -56,169 +56,69 @@ pub enum Commands {
         path: String,
     },
 
-    /// Vérifier les prérequis pour une commande
-    Check {
-        #[command(subcommand)]
-        command: CheckCommands,
-        /// Afficher le résultat en JSON
-        #[arg(long)]
-        json: bool,
-    },
-
-    /// Mettre à jour les fichiers mécaniquement
-    Update {
-        #[command(subcommand)]
-        command: UpdateCommands,
-        /// Afficher le résultat en JSON (pour agents AI)
-        #[arg(long)]
-        json: bool,
-    },
-
-    /// Valider la cohérence des fichiers
-    Validate {
-        #[command(subcommand)]
-        command: ValidateCommands,
-        /// Afficher le résultat en JSON (pour agents AI)
-        #[arg(long)]
-        json: bool,
-    },
-
-    /// Scanner les fichiers du projet (respecte .gitignore)
+    /// Validate system model
     ///
-    /// Parcourt le répertoire en respectant .gitignore et retourne la liste
-    /// des fichiers avec des indices extraits des patterns ignorés.
-    /// Utilisé par les agents AI pour /osk-discover init.
+    /// Validates the system model for schema compliance and consistency.
+    /// Checks YAML schema validity, cross-reference integrity, and
+    /// index.yaml size constraint (<200 lines).
     #[command(
-        long_about = "Scan project files respecting .gitignore patterns.\n\nOutputs file list with gitignore hints for AI agents to understand project structure.\nUsed by: /osk-discover init, /osk-discover update"
+        long_about = "Validate the system model for schema compliance and consistency.\n\nChecks:\n- YAML schema validity for all section files\n- Cross-reference integrity (all referenced IDs exist)\n- Index.yaml size constraint (<200 lines)\n\nUsed by: /osk-discover-validate"
+    )]
+    Validate {
+        /// Path to system model (default: .osk/system-model/)
+        #[arg(short, long)]
+        path: Option<String>,
+        /// Output as JSON (for AI agents)
+        #[arg(long)]
+        json: bool,
+    },
+
+    /// Scan project files (respects .gitignore)
+    ///
+    /// Traverses the directory respecting .gitignore and returns the list
+    /// of files with hints extracted from ignored patterns.
+    /// Used by AI agents for /osk-discover.
+    #[command(
+        long_about = "Scan project files respecting .gitignore patterns.\n\nOutputs file list with gitignore hints for AI agents to understand project structure.\nUsed by: /osk-discover"
     )]
     Scan {
-        /// Chemin à scanner (défaut: répertoire courant)
+        /// Path to scan (default: current directory)
         #[arg(short, long)]
         path: Option<String>,
-        /// Afficher le résultat en JSON (pour agents AI)
+        /// Output as JSON (for AI agents)
         #[arg(long)]
         json: bool,
     },
 
-    /// Générer un ID de composant à partir d'un chemin de fichier
+    /// Generate a component ID from a file path
     ///
-    /// Transforme un chemin de fichier en identifiant de composant normalisé.
-    /// Format: {directory}-{name}, minuscules avec tirets.
+    /// Transforms a file path into a normalized component identifier.
+    /// Format: {directory}-{name}, lowercase with hyphens.
     /// Ex: src/api/users.rs → api-users
     #[command(
-        long_about = "Generate a normalized component ID from a file path.\n\nFormat: {directory}-{name}, lowercase with hyphens.\nExamples:\n  src/api/users.rs → api-users\n  lib/auth/jwt.py → auth-jwt\n\nUsed by: /osk-discover init to create consistent component identifiers"
+        long_about = "Generate a normalized component ID from a file path.\n\nFormat: {directory}-{name}, lowercase with hyphens.\nExamples:\n  src/api/users.rs → api-users\n  lib/auth/jwt.py → auth-jwt\n\nUsed by: /osk-discover to create consistent component identifiers"
     )]
     Id {
-        /// Chemin du fichier source
+        /// Source file path
         path: String,
-        /// Afficher le résultat en JSON (pour agents AI)
+        /// Output as JSON (for AI agents)
         #[arg(long)]
         json: bool,
     },
 
-    /// Lister les fichiers modifiés depuis le dernier scan
+    /// List files changed since the last scan
     ///
-    /// Utilise git diff pour détecter les fichiers ajoutés, modifiés ou
-    /// supprimés depuis le dernier scan enregistré dans index.yaml.
+    /// Uses git diff to detect files added, modified, or deleted
+    /// since the last scan recorded in index.yaml.
     #[command(
-        long_about = "List files changed since the last system model scan.\n\nReads last_commit from .osk/system-model/index.yaml and compares with HEAD.\nOutputs changed files with change type (added/modified/deleted).\n\nUsed by: /osk-discover update for incremental model updates"
+        long_about = "List files changed since the last system model scan.\n\nReads last_commit from .osk/system-model/index.yaml and compares with HEAD.\nOutputs changed files with change type (added/modified/deleted).\n\nUsed by: /osk-discover for incremental model updates"
     )]
     Changes {
-        /// Commit de référence (défaut: lu depuis index.yaml)
+        /// Reference commit (default: read from index.yaml)
         #[arg(long)]
         since: Option<String>,
-        /// Afficher le résultat en JSON (pour agents AI)
+        /// Output as JSON (for AI agents)
         #[arg(long)]
         json: bool,
-    },
-}
-
-/// Sous-commandes pour osk check
-#[derive(Subcommand)]
-pub enum CheckCommands {
-    /// Vérifier les prérequis pour /osk-configure
-    Configure,
-    /// Vérifier les prérequis pour /osk-analyze
-    Analyze,
-    /// Vérifier les prérequis pour /osk-specify
-    Specify {
-        /// Nom de la feature
-        feature: String,
-    },
-    /// Vérifier les prérequis pour /osk-harden
-    Harden {
-        /// Nom de la feature
-        feature: String,
-    },
-    /// Vérifier les prérequis pour /osk-plan
-    Plan {
-        /// Nom de la feature
-        feature: String,
-    },
-    /// Vérifier les prérequis pour /osk-tasks
-    Tasks {
-        /// Nom de la feature
-        feature: String,
-    },
-    /// Vérifier les prérequis pour /osk-implement
-    Implement {
-        /// Nom de la feature
-        feature: String,
-    },
-    /// Vérifier les prérequis pour /osk-dashboard
-    Dashboard,
-}
-
-/// Sous-commandes pour osk update
-#[derive(Subcommand)]
-pub enum UpdateCommands {
-    /// Recalculer les statistiques du risk-register
-    Stats,
-    /// Mettre à jour le statut d'une tâche
-    Task {
-        /// ID de la tâche (ex: T001)
-        id: String,
-        /// Marquer comme terminée
-        #[arg(long)]
-        done: bool,
-    },
-    /// Mettre à jour le statut d'un risque
-    Risk {
-        /// ID du risque (ex: RISK-AUTH-001)
-        id: String,
-        /// Nouveau statut
-        #[arg(long)]
-        status: String,
-    },
-    /// Régénérer le dashboard
-    Dashboard,
-}
-
-/// Sous-commandes pour osk validate
-#[derive(Subcommand)]
-pub enum ValidateCommands {
-    /// Valider la syntaxe des fichiers YAML
-    Yaml,
-    /// Vérifier les dépendances des tâches
-    Deps {
-        /// Nom de la feature
-        feature: String,
-    },
-    /// Vérifier la complétude du workflow
-    Workflow {
-        /// Nom de la feature
-        feature: String,
-    },
-    /// Valider le system model (.osk/system-model/)
-    ///
-    /// Vérifie la cohérence du modèle système: schéma YAML, références croisées,
-    /// et contrainte de taille de index.yaml (<200 lignes).
-    #[command(
-        long_about = "Validate the system model for schema compliance and consistency.\n\nChecks:\n- YAML schema validity for all 9 section files\n- Cross-reference integrity (all referenced IDs exist)\n- Index.yaml size constraint (<200 lines)\n\nUsed by: /osk-discover validate, /osk-discover init (final step)"
-    )]
-    SystemModel {
-        /// Chemin vers le system model (défaut: .osk/system-model/)
-        #[arg(short, long)]
-        path: Option<String>,
     },
 }

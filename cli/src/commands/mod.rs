@@ -1,10 +1,8 @@
 pub mod changes;
-pub mod check;
 pub mod id;
 pub mod ingest;
 pub mod init;
 pub mod scan;
-pub mod update;
 pub mod validate;
 
 use crate::args::Commands;
@@ -27,11 +25,9 @@ pub fn handle(command: Commands, client: &Client) -> Result<()> {
 
         Commands::Ingest { output, path } => ingest::run(&output, true, &path),
 
-        Commands::Check { command, json } => check::run(command, json),
-
-        Commands::Update { command, json } => update::run(command, json),
-
-        Commands::Validate { command, json } => validate::run(command, json),
+        Commands::Validate { path, json } => {
+            validate::run(path.as_deref().unwrap_or(".osk/system-model"), json)
+        }
 
         Commands::Scan { path, json } => scan::run(path.as_deref(), json),
 
