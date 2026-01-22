@@ -6,7 +6,6 @@ mod commands;
 mod config;
 mod github;
 mod registry;
-mod utils;
 
 use anyhow::Result;
 use clap::Parser;

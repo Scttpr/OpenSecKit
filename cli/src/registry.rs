@@ -86,6 +86,11 @@ pub struct CommandConfig {
     pub agents: Vec<String>,
     #[serde(default)]
     pub roles: Vec<String>,
+    #[serde(default)]
+    pub principles: Vec<String>,
+    /// Framework-specific URLs (for comply command)
+    #[serde(default)]
+    pub frameworks: HashMap<String, String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -215,6 +220,8 @@ mod tests {
             domain: None,
             agents: vec![],
             roles: vec![],
+            principles: vec![],
+            frameworks: HashMap::new(),
         };
 
         let info = CommandInfo::from(("discover-init", &config));
@@ -241,6 +248,8 @@ mod tests {
                 domain: Some("rgpd".to_string()),
                 agents: vec![],
                 roles: vec![],
+                principles: vec![],
+                frameworks: HashMap::new(),
             },
         );
 
