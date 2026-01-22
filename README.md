@@ -1,250 +1,156 @@
 <p align="center">
   <h1 align="center">OpenSecKit</h1>
   <p align="center">
-    <strong>Security as Code, Multi-Agent Ready</strong>
-  </p>
-  <p align="center">
-    Version 4.0.0 | Multi-agent security framework (Claude Code, Copilot, Cursor, Gemini)
+    <strong>Security as Code for AI Coding Assistants</strong>
   </p>
 </p>
 
 <p align="center">
-  <a href="https://scttpr.github.io/OpenSecKit">Documentation</a> •
   <a href="#installation">Installation</a> •
   <a href="#quickstart">Quickstart</a> •
+  <a href="#commands">Commands</a> •
   <a href="#the-7-principles">Principles</a>
 </p>
 
 ---
 
-## Why OpenSecKit?
+## What is OpenSecKit?
 
-- **7 constitutional principles** for comprehensive security
-- **Multi-Agent**: Claude Code, GitHub Copilot, Cursor, Gemini + universal `AGENTS.md`
-- **Three-phase workflow**: Discover → Secure → Comply
-- **Documentation as Code** generated automatically
-- **RGPD/RGS compliance** built-in
+OpenSecKit brings structured security workflows to AI coding assistants. Instead of ad-hoc security advice, it provides:
+
+- **System Model** — Understand your codebase before securing it
+- **Shift-Left Security** — Threat modeling, risk analysis, security specs
+- **Compliance Automation** — RGPD/GDPR and RGS assessments with full audit trail
+
+Works with **Claude Code**, **GitHub Copilot**, **Cursor**, and **Gemini**.
 
 ## Installation
 
 ```bash
-# Install the CLI
+# Install CLI
 cargo install osk
 
-# Initialize a project (auto-detects available agents)
-cd my-project/
+# Initialize in your project
+cd my-project
 osk init
-
-# Or specify agents directly
-osk init --agent copilot
-osk init --agent cursor
-osk init --all-agents
 ```
+
+The CLI auto-detects available AI agents and generates the appropriate configuration files.
 
 ## Quickstart
 
 ```bash
-# Start Claude Code
+# Start your AI assistant (e.g., Claude Code)
 claude
 
 # 1. Build the system model
->>> /osk-discover
+/osk-discover
 
-# 2. Secure a feature
->>> /osk-secure-specify "authentication"
->>> /osk-secure-plan "authentication"
->>> /osk-secure-tasks "authentication"
->>> /osk-secure-implement "authentication"
+# 2. Run compliance assessment
+/osk-comply rgpd
 
-# 3. Compliance assessment
->>> /osk-comply-rgpd
->>> /osk-comply-status
+# 3. Secure a feature
+/osk-secure-specify "authentication"
 ```
 
 ## Workflow
 
 ```
-osk init → /osk-discover → System Model
-                ↓
-    ┌───────────┴───────────┐
-    ↓                       ↓
-/osk-secure-*          /osk-comply-*
-    ↓                       ↓
-Security Specs         Compliance Reports
+                    ┌─────────────────┐
+                    │  /osk-discover  │
+                    │  System Model   │
+                    └────────┬────────┘
+                             │
+              ┌──────────────┴──────────────┐
+              ▼                              ▼
+    ┌─────────────────┐            ┌─────────────────┐
+    │  /osk-secure-*  │            │  /osk-comply    │
+    │  Security Specs │            │  Compliance     │
+    └─────────────────┘            └─────────────────┘
 ```
 
-## Phase 1: Discover
+## Commands
 
-Build a structured system model before security analysis.
+### Discover
 
-```bash
-# Build or update system model (adaptive)
->>> /osk-discover
+Build a system model from your codebase.
 
-# Validate the model
->>> /osk-discover-validate
+| Command | Description |
+|---------|-------------|
+| `/osk-discover` | Analyze codebase and build system model |
+| `/osk-discover-validate` | Validate model integrity |
+| `/osk-discover-docs` | Generate documentation |
 
-# Generate documentation
->>> /osk-discover-docs --audience security
-```
+**Output:** `.osk/system-model/` (index.yaml, architecture.yaml, data.yaml, etc.)
 
-### System Model Structure
+### Comply
 
-```
-.osk/system-model/
-├── index.yaml        # Summary + cross-references
-├── business.yaml     # Domain, processes, journeys
-├── architecture.yaml # Components, data flows
-├── data.yaml         # Data categories, PII
-├── actors.yaml       # Users, roles
-├── boundaries.yaml   # Trust zones and boundaries
-├── integrations.yaml # External services
-├── controls.yaml     # Security controls
-├── tooling.yaml      # Security tools
-├── team.yaml         # Team structure
-└── gaps.yaml         # Identified gaps
-```
+Autonomous compliance assessment workflows.
 
-## Phase 2: Secure
+| Command | Description |
+|---------|-------------|
+| `/osk-comply rgpd` | RGPD/GDPR assessment (5-phase workflow) |
+| `/osk-comply rgs` | RGS assessment with homologation dossier |
+| `/osk-comply-status` | Multi-framework dashboard |
+| `/osk-comply-list` | List available frameworks |
 
-Shift-left security with the 7 principles.
+**Output:** `.osk/comply/<framework>/`
 
-```bash
-# Full security specification (threats, requirements, testing, hardening)
->>> /osk-secure-specify "feature_name"
+### Secure
 
-# Clarify ambiguities
->>> /osk-secure-clarify "feature_name"
+Shift-left security for features.
 
-# Generate implementation plan
->>> /osk-secure-plan "feature_name"
+| Command | Description |
+|---------|-------------|
+| `/osk-secure-specify <feature>` | Threats, requirements, test cases |
+| `/osk-secure-clarify <feature>` | Clarify ambiguities via Q&A |
+| `/osk-secure-plan <feature>` | Implementation plan |
+| `/osk-secure-tasks <feature>` | Ordered tasks with dependencies |
+| `/osk-secure-implement <feature>` | Execute tasks, update risk register |
 
-# Generate ordered tasks
->>> /osk-secure-tasks "feature_name"
-
-# Implement with risk register updates
->>> /osk-secure-implement "feature_name"
-```
-
-### Security Outputs
-
-```
-.osk/specs/001-authentication/
-├── security-spec.md   # Full security specification
-├── risks.yaml         # Risk register
-├── security-plan.md   # Implementation plan
-├── security-tasks.md  # Ordered tasks
-└── tasks.yaml         # Machine-readable tasks
-```
-
-## Phase 3: Comply
-
-Compliance assessment based on the system model.
-
-```bash
-# RGPD/GDPR assessment
->>> /osk-comply-rgpd
-
-# RGS assessment (French public sector)
->>> /osk-comply-rgs
-
-# Multi-framework dashboard
->>> /osk-comply-status
-
-# List available frameworks
->>> /osk-comply-list
-```
-
-### Compliance Outputs
-
-```
-.osk/comply/
-├── rgpd/                         # RGPD framework outputs
-│   ├── workflow-state.yaml       # Workflow progress
-│   ├── processing-inventory.yaml # Phase 1: Processing inventory
-│   ├── aipd/                     # Phase 2: AIPD/DPIA reports
-│   ├── control-assessment.yaml   # Phase 3: Control assessment
-│   ├── gaps-analysis.yaml        # Phase 4: Gap analysis
-│   └── documents/                # Phase 5: Generated documents
-└── rgs/                          # RGS framework outputs
-    ├── workflow-state.yaml       # Workflow progress
-    ├── level-assessment.yaml     # Phase 1: RGS level
-    ├── ebios-rm/                 # Phase 2: EBIOS RM analysis
-    ├── assessment-rgs.yaml       # Phase 3: Control assessment
-    ├── gaps-analysis.yaml        # Phase 4: Gap analysis
-    └── dossier-homologation/     # Phase 5: Homologation dossier
-```
+**Output:** `.osk/specs/<feature>/`
 
 ## The 7 Principles
 
-| # | Principle | Description |
-|---|-----------|-------------|
-| I | Threat Modeling | Proactive threat analysis (STRIDE) |
-| II | Risk Analysis | Risk scoring and prioritization |
-| III | Security by Design | Security requirements from conception |
-| IV | Security Testing | Automated SAST/DAST/SCA tests |
+| # | Principle | Focus |
+|---|-----------|-------|
+| I | Threat Modeling | STRIDE analysis, attack trees |
+| II | Risk Analysis | Scoring, prioritization |
+| III | Security by Design | Requirements from day one |
+| IV | Security Testing | SAST, DAST, SCA |
 | V | Secrets Management | No secrets in code |
-| VI | Audit Logging | Immutable, centralized logs |
-| VII | Patch Management | Strict update SLAs |
+| VI | Audit Logging | Immutable, centralized |
+| VII | Patch Management | Strict SLAs |
+
+## Project Structure
+
+```
+.osk/
+├── system-model/          # Hub: System documentation
+│   ├── index.yaml         # Start here (~200 lines)
+│   ├── architecture.yaml
+│   ├── data.yaml
+│   └── ...
+├── comply/                # Compliance outputs
+│   ├── rgpd/
+│   └── rgs/
+└── specs/                 # Security specifications
+    └── <feature>/
+```
 
 ## CLI Utilities
 
 ```bash
-osk scan --json           # Scan files (respects .gitignore)
-osk id src/api/users.rs   # Generate component ID
-osk changes --json        # List modified files
-osk validate system-model # Validate system model
+osk init                    # Initialize project
+osk init --agent copilot    # Specific agent
+osk init --all-agents       # All agents
+osk scan --json             # Scan files
+osk validate system-model   # Validate model
 ```
-
-## Commands Reference
-
-### Discover
-| Command | Description |
-|---------|-------------|
-| `/osk-discover` | Build or update system model |
-| `/osk-discover-validate` | Validate model (optionally resolve gaps) |
-| `/osk-discover-docs` | Generate documentation |
-
-### Secure
-| Command | Description |
-|---------|-------------|
-| `/osk-secure-specify` | Security specification (threats, requirements, testing) |
-| `/osk-secure-clarify` | Clarify ambiguities and validate assumptions |
-| `/osk-secure-plan` | Consolidated implementation plan |
-| `/osk-secure-tasks` | Generate ordered tasks with dependencies |
-| `/osk-secure-implement` | Implement tasks and update risk register |
-
-### Comply
-| Command | Description |
-|---------|-------------|
-| `/osk-comply-rgpd` | RGPD/GDPR compliance assessment |
-| `/osk-comply-rgs` | RGS compliance with homologation |
-| `/osk-comply-status` | Multi-framework dashboard |
-| `/osk-comply-list` | List available frameworks |
-
-## V3 Compatibility
-
-V3 commands are aliased to their V4 equivalents:
-
-| V3 Command | V4 Equivalent |
-|------------|---------------|
-| `/osk-configure` | `/osk-discover` |
-| `/osk-analyze` | `/osk-secure-specify` |
-| `/osk-specify` | `/osk-secure-specify` |
-| `/osk-harden` | `/osk-secure-specify` |
-| `/osk-plan` | `/osk-secure-plan` |
-| `/osk-tasks` | `/osk-secure-tasks` |
-| `/osk-implement` | `/osk-secure-implement` |
-| `/osk-rgpd` | `/osk-comply-rgpd` |
-| `/osk-rgs` | `/osk-comply-rgs` |
-
-## Documentation
-
-[Full documentation](https://scttpr.github.io/OpenSecKit)
 
 ## Contributing
 
-See [CONTRIBUTING](docs/development/contributing.md)
+See [CONTRIBUTING.md](.github/CONTRIBUTING.md)
 
 ## License
 
