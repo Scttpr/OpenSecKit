@@ -168,11 +168,7 @@ generates = [".osk/comply/<framework>/"]
 model_sections = ["index", "data", "actors", "integrations", "tooling", "architecture", "controls", "business", "boundaries", "team"]
 agents = ["claude-code", "copilot", "cursor", "gemini"]
 roles = ["compliance-analyst"]
-
-# Framework-specific prompts (resolved by argument)
-[commands.comply.frameworks]
-rgpd = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/frameworks/rgpd/prompt.md"
-rgs = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/frameworks/rgs/prompt.md"
+frameworks = { rgpd = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/frameworks/rgpd/prompt.md", rgs = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/frameworks/rgs/prompt.md" }
 
 [commands.comply-list]
 url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/prompts/list.md"
