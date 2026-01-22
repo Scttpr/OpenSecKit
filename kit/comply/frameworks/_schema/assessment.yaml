@@ -1,8 +1,8 @@
-# OpenSecKit V4 - Compliance Assessment Schema (Base)
-# Version: 4.0.0
+# OpenSecKit V5 - Compliance Assessment Schema (Base)
+# Version: 5.0.0
 # Purpose: Output schema for Part 2 (Comply)
 # Location: kit/comply/frameworks/_schema/assessment.yaml
-# Usage: .osk/compliance/assessment-<framework>.yaml
+# Usage: .osk/comply/<framework>/assessment-<framework>.yaml
 #
 # Framework-specific extensions:
 #   RGPD: kit/comply/frameworks/rgpd/schemas/assessment-extension.yaml
@@ -13,7 +13,7 @@
 # ═══════════════════════════════════════════════════════════════════════════════
 
 metadata:
-  schema_version: "4.0.0"
+  schema_version: "5.0.0"
   framework: "[rgpd|rgs]"
   framework_version: "[Framework version, e.g., '2016/679' for RGPD]"
   framework_full_name: "[Full framework name]"

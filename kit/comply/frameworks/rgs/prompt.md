@@ -45,23 +45,13 @@ This framework provides a complete RGS (Referentiel General de Securite) homolog
     roadmap.md          └── annexes/
 ```
 
-## Quick Start
+## Command
 
 ```bash
-# Full workflow (recommended)
-/osk-comply rgs
-
-# Individual phases
-/osk-comply rgs level      # Phase 1: Determine RGS level
-/osk-comply rgs ebios      # Phase 2: EBIOS RM risk analysis
-/osk-comply rgs assess     # Phase 3: Control assessment
-/osk-comply rgs gaps       # Phase 4: Gap analysis
-/osk-comply rgs dossier    # Phase 5: Generate homologation dossier
-
-# Workflow management
-/osk-comply rgs --resume   # Resume interrupted workflow
-/osk-comply rgs --status   # Show current workflow state
+/osk-comply rgs [--update] [--export <md|pdf>]
 ```
+
+The workflow is **autonomous** - it automatically determines which phase to execute based on workflow state and progresses through all phases without manual intervention.
 
 ## Workflow State Management
 
@@ -391,40 +381,17 @@ on_error:
 
 ---
 
-# Commands Reference
+# Flags
 
-## Full Workflow
+## --update
 
-```bash
-/osk-comply rgs
-```
-Runs complete homologation workflow from Phase 1 to Phase 5.
+Re-assess only components that have changed since last run. Compares system-model timestamps with workflow state.
 
-## Individual Phases
+## --export <format>
 
-```bash
-/osk-comply rgs level      # Only Phase 1
-/osk-comply rgs ebios      # Only Phase 2 (requires Phase 1)
-/osk-comply rgs assess     # Only Phase 3 (requires Phase 1)
-/osk-comply rgs gaps       # Only Phase 4 (requires Phase 3)
-/osk-comply rgs dossier    # Only Phase 5 (requires Phase 4)
-```
-
-## Workflow Management
-
-```bash
-/osk-comply rgs --resume   # Resume interrupted workflow
-/osk-comply rgs --status   # Display workflow state
-/osk-comply rgs --reset    # Clear workflow state and start fresh
-```
-
-## Flags
-
-```bash
---update     # Re-assess only changed components
---export md  # Export dossier in Markdown format
---export pdf # Export dossier in PDF format (requires pandoc)
-```
+Export homologation dossier in specified format:
+- `md` - Markdown (default)
+- `pdf` - PDF (requires pandoc)
 
 ---
 

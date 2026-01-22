@@ -17,7 +17,7 @@ This project uses **OpenSecKit v{{ version }}** for security-as-code with hub-an
 ┌───────────────┐       ┌───────────────┐
 │    COMPLY     │       │    SECURE     │
 │   (Spoke)     │       │   (Spoke)     │
-│ .osk/compliance/      │  .osk/specs/  │
+│ .osk/comply/      │  .osk/specs/  │
 └───────────────┘       └───────────────┘
 ```
 

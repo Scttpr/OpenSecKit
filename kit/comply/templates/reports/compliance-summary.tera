@@ -20,7 +20,7 @@ Homologation: **{{ homologation_blockers | length }} blocker(s) to resolve**
 ### Output Files
 
 ```
-.osk/compliance/
+.osk/comply/rgs/
 ├── assessment-rgs.yaml          # Machine-readable assessment
 ├── assessment-rgs.md            # Full assessment report
 ├── homologation-checklist.md    # Pre-homologation checklist
@@ -30,5 +30,5 @@ Homologation: **{{ homologation_blockers | length }} blocker(s) to resolve**
 {% if overall_status == "compliant" %}
 Next: `osk comply rgs --export md` to generate homologation dossier
 {% else %}
-Next: Review `.osk/compliance/assessment-rgs.md` for detailed gaps and remediation steps
+Next: Review `.osk/comply/rgs/assessment-rgs.md` for detailed gaps and remediation steps
 {% endif %}

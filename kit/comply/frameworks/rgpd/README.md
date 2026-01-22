@@ -1,35 +1,73 @@
-# Domaine RGPD
+# Framework RGPD
 
 Conformité au Règlement Général sur la Protection des Données (UE 2016/679).
 
 ## Commande
 
 ```bash
-/osk-rgpd           # Configuration et génération documents
-/osk-rgpd audit     # Audit de conformité
+/osk-comply rgpd              # Évaluation de conformité (workflow autonome 5 phases)
+/osk-comply rgpd --update     # Mise à jour évaluation existante
+/osk-comply rgpd --export md  # Export documents de conformité
 ```
 
-## Workflow V3
+## Workflow v5.0
+
+Le workflow est **autonome** - il progresse automatiquement à travers les 5 phases sans intervention manuelle.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  BROUILLONS PAR FEATURE                                     │
-│                                                             │
-│  /osk-analyze [feature]                                     │
-│       │                                                     │
-│       └──▶ .osk/specs/NNN-feature/rgpd/dpia.md             │
-│            (DPIA brouillon par feature)                     │
+│  PHASE 1: INVENTAIRE DES TRAITEMENTS                        │
+│  ────────────────────────────────────────────────────────── │
+│  • Découverte des activités de traitement                   │
+│  • Identification des bases légales (Art. 6)                │
+│  • Détermination des exigences AIPD                         │
+│  Output: .osk/comply/rgpd/processing-inventory.yaml         │
 └─────────────────────────────────────────────────────────────┘
                           │
                           ▼
 ┌─────────────────────────────────────────────────────────────┐
-│  CONSOLIDATION RGPD                                         │
-│                                                             │
-│  /osk-rgpd                                                  │
-│       │                                                     │
-│       ├──▶ Extraction données depuis .osk/config.toml      │
-│       ├──▶ Consolidation DPIA → dpia-global.md             │
-│       └──▶ Génération documents finaux                      │
+│  PHASE 2: AIPD/DPIA (Conditionnelle)                        │
+│  ────────────────────────────────────────────────────────── │
+│  Méthodologie PIA CNIL en 4 étapes:                         │
+│    1. Étude du contexte                                     │
+│    2. Évaluation des principes fondamentaux                 │
+│    3. Analyse des risques (3 scénarios)                     │
+│    4. Validation (avis DPO, plan d'action)                  │
+│  Output: .osk/comply/rgpd/aipd/{traitement}.yaml            │
+└─────────────────────────────────────────────────────────────┘
+                          │
+                          ▼
+┌─────────────────────────────────────────────────────────────┐
+│  PHASE 3: ÉVALUATION DES CONTRÔLES                          │
+│  ────────────────────────────────────────────────────────── │
+│  • Évaluation Articles 5-50                                 │
+│  • Vérification mécanismes de transfert (SCCs, BCRs)        │
+│  • Conformité sous-traitants (Art. 28)                      │
+│  • Mesures de sécurité (25 fiches CNIL)                     │
+│  Output: .osk/comply/rgpd/control-assessment.yaml           │
+└─────────────────────────────────────────────────────────────┘
+                          │
+                          ▼
+┌─────────────────────────────────────────────────────────────┐
+│  PHASE 4: ANALYSE DES ÉCARTS                                │
+│  ────────────────────────────────────────────────────────── │
+│  • Catégorisation (organisationnel, technique, légal)       │
+│  • Matrice de priorité (BLOQUANT, QUICK_WIN, P1-P3)         │
+│  • Feuille de route de remédiation                          │
+│  Output: .osk/comply/rgpd/gaps-analysis.yaml                │
+└─────────────────────────────────────────────────────────────┘
+                          │
+                          ▼
+┌─────────────────────────────────────────────────────────────┐
+│  PHASE 5: DOCUMENTATION                                     │
+│  ────────────────────────────────────────────────────────── │
+│  Documents générés:                                         │
+│  • Registre de traitement (Art. 30)                         │
+│  • Mesures de sécurité (Art. 32)                            │
+│  • Procédure violation (Art. 33-34)                         │
+│  • Procédure droits (Art. 12-22)                            │
+│  • Politique confidentialité (Art. 13-14)                   │
+│  Output: .osk/comply/rgpd/documents/                        │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -37,137 +75,55 @@ Conformité au Règlement Général sur la Protection des Données (UE 2016/679)
 
 | Fichier | Article RGPD | Description |
 |---------|--------------|-------------|
-| `registre-traitements.md` | Art. 30 | Inventaire des traitements |
-| `dpia-global.md` | Art. 35 | Analyse d'impact consolidée |
-| `procedure-violation.md` | Art. 33-34 | Notification en 72h |
-| `politique-conservation.md` | Art. 5 | Durées de conservation |
-| `mentions-legales.md` | Art. 13-14 | Transparence utilisateurs |
-| `AUDIT-*.md` | - | Rapports d'audit |
+| `registre-traitement.md` | Art. 30 | Inventaire des traitements |
+| `mesures-securite.md` | Art. 32 | Documentation sécurité |
+| `aipd-{traitement}.md` | Art. 35 | Analyse d'impact (si requis) |
+| `lia-{traitement}.md` | Art. 6(1)(f) | Évaluation intérêt légitime |
+| `violation-donnees.md` | Art. 33-34 | Procédure notification 72h |
+| `droits-personnes.md` | Art. 12-22 | Procédure droits des personnes |
+| `politique-confidentialite.md` | Art. 13-14 | Mentions légales |
+| `clause-{sous-traitant}.md` | Art. 28 | Clauses contractuelles |
 
-Tous les fichiers sont générés dans `docs/security/rgpd/`.
+Tous les fichiers sont générés dans `.osk/comply/rgpd/documents/`.
 
-## Configuration
+## AIPD - Quand est-ce obligatoire ?
 
-Les données RGPD sont stockées dans `.osk/config.toml` :
+**Liste obligatoire CNIL** (14 types de traitements) :
+- Données de santé à grande échelle
+- Surveillance systématique des employés
+- Profilage RH
+- Identification biométrique
+- Données de personnes vulnérables
+- Géolocalisation à grande échelle
+- Croisement de bases de données
+- Technologie innovante
 
-```toml
-[domains.rgpd]
-enabled = true
-niveau = "sensible"           # standard | sensible | special
+**Critères CEPD** - AIPD si 2+ critères :
+- Évaluation/notation
+- Décision automatique avec effet juridique
+- Surveillance systématique
+- Données sensibles
+- Grande échelle
+- Croisement de données
+- Personnes vulnérables
+- Technologie innovante
+- Exclusion d'un droit
 
-# DPO
-dpo_nom = "Jean Dupont"
-dpo_email = "dpo@example.com"
-dpo_telephone = "+33 1 23 45 67 89"
+## Base de Connaissances
 
-# Conservation
-durees_conservation = [
-  { type = "logs_connexion", duree = "1 an" },
-  { type = "donnees_client", duree = "3 ans après fin contrat" }
-]
-
-# Traitements principaux
-[[domains.rgpd.traitements]]
-nom = "Gestion des utilisateurs"
-finalite = "Authentification et gestion des comptes"
-base_legale = "contrat"
-donnees = ["nom", "email", "mot_de_passe_hash"]
-destinataires = ["Service technique"]
-```
-
-## Données Partagées
-
-Ces sections de config sont partagées avec `/osk-rgs` :
-
-```toml
-[domains.organisation]
-nom = "Mon Organisation"
-siret = "123 456 789 00000"
-adresse = "1 rue Example, 75001 Paris"
-
-[[domains.suppliers]]         # Art. 28 - Sous-traitants
-nom = "OVH"
-type = "hebergement"
-localisation = "France"
-dpa_signe = true
-contact = "dpo@ovh.com"
-```
-
-## Articles Clés
-
-### Art. 30 - Registre des Traitements
-
-**Obligatoire pour :**
-- Organisations > 250 employés
-- Traitements non occasionnels
-- Données sensibles ou relatives à des condamnations
-
-### Art. 35 - DPIA
-
-**Obligatoire si :**
-- Évaluation systématique (profilage)
-- Traitement grande échelle de données sensibles
-- Surveillance systématique de zones publiques
-
-### Art. 33-34 - Violation de Données
-
-| Délai | Action |
-|-------|--------|
-| 72h | Notification CNIL (si risque) |
-| Sans délai | Notification personnes (si risque élevé) |
-
-## Checklist Conformité
-
-```
-PRE-PRODUCTION
-─────────────
-[ ] Registre des traitements complet
-[ ] Base légale identifiée par traitement
-[ ] DPO désigné (si requis)
-[ ] Mentions légales publiées
-[ ] DPIA réalisée (si risque élevé)
-
-CONTRATS
-────────
-[ ] DPA signés avec sous-traitants
-[ ] Clauses RGPD dans CGV/CGU
-[ ] Transferts hors UE encadrés
-
-TECHNIQUE
-─────────
-[ ] Chiffrement données sensibles
-[ ] Logs d'accès aux données personnelles
-[ ] Procédure de réponse aux demandes (accès, effacement)
-[ ] Procédure de notification violation
-```
-
-## Détection Automatique
-
-`/osk-configure` détecte les patterns RGPD dans le code :
-
-```
-Patterns détectés → Domaine RGPD activé automatiquement :
-  • "user", "email", "password"
-  • "date_of_birth", "address", "phone"
-  • "ip_address", "health", "religion"
-  • "biometric", "RGPD", "GDPR"
-```
-
-## Templates
-
-Les templates RGPD sont dans `frameworks/rgpd/templates/` :
-
-| Template | Usage |
-|----------|-------|
-| `registre-traitements-template.md` | Format registre Art. 30 |
-| `dpia-template.md` | Méthodologie DPIA CNIL |
-| `procedure-violation-template.md` | Notification Art. 33-34 |
-| `dpa-template.md` | Accord sous-traitance Art. 28 |
-
-> `/osk-rgpd` utilise ces templates automatiquement.
+| Fichier | Contenu |
+|---------|---------|
+| `knowledge/core/aipd-modeles.md` | Méthodologie PIA CNIL |
+| `knowledge/core/aipd-liste-obligatoire.md` | Liste CNIL des AIPD obligatoires |
+| `knowledge/core/guide-securite.md` | 25 fiches sécurité CNIL |
+| `knowledge/core/guide-sous-traitant.md` | Obligations sous-traitants |
+| `knowledge/core/violations-donnees.md` | Notification des violations |
+| `knowledge/reference/rgpd-complet.md` | Texte complet RGPD |
+| `knowledge/reference/sccs-2021.md` | Clauses Contractuelles Types |
 
 ## Références
 
 - [CNIL - Guide RGPD](https://www.cnil.fr/fr/rgpd-de-quoi-parle-t-on)
-- [CNIL - Méthodologie DPIA](https://www.cnil.fr/fr/ce-quil-faut-savoir-sur-lanalyse-dimpact-relative-la-protection-des-donnees-dpia)
+- [CNIL - Méthodologie PIA](https://www.cnil.fr/fr/ce-quil-faut-savoir-sur-lanalyse-dimpact-relative-la-protection-des-donnees-dpia)
+- [CNIL - 25 fiches sécurité](https://www.cnil.fr/fr/la-securite-des-donnees-personnelles)
 - [EUR-Lex - Règlement 2016/679](https://eur-lex.europa.eu/legal-content/FR/TXT/?uri=CELEX%3A32016R0679)

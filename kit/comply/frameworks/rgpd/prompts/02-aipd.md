@@ -5,6 +5,11 @@ framework: rgpd
 phase: aipd
 model_sections: [index, data, actors, integrations, tooling, architecture, controls, business, boundaries, team]
 version: "5.0.0"
+knowledge:
+  - core/aipd-modeles.md
+  - core/aipd-liste-obligatoire.md
+  - core/guide-securite.md
+  - reference/rgpd-complet.md
 ---
 
 # Role
@@ -742,9 +747,11 @@ Output files:
 │ │ profiling          │ ○ Pending                                      ││
 │ └────────────────────┴────────────────────────────────────────────────┘│
 │                                                                         │
-│ NEXT:                                                                   │
-│ ○ Continue to next AIPD: /osk-comply rgpd aipd                         │
-│ ○ Proceed to Phase 3: /osk-comply rgpd assess                          │
+│ {{ If more AIPDs pending }}                                            │
+│ ➤ Continuing to next AIPD...                                           │
+│                                                                         │
+│ {{ If all AIPDs completed }}                                           │
+│ ➤ Proceeding to Phase 3: Control Assessment                           │
 │                                                                         │
 │ ACTION ITEMS FROM THIS AIPD:                                           │
 │ • [List measures to implement]                                         │

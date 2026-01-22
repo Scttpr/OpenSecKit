@@ -5,6 +5,13 @@ framework: rgpd
 phase: control-assessment
 model_sections: [index, data, actors, integrations, tooling, architecture, controls, business, boundaries, team]
 version: "5.0.0"
+knowledge:
+  - reference/rgpd-complet.md
+  - core/guide-securite.md
+  - core/guide-sous-traitant.md
+  - core/violations-donnees.md
+  - reference/edpb-droit-acces.md
+  - reference/sccs-2021.md
 ---
 
 # Role
@@ -54,11 +61,7 @@ System Model:
 ⚠️  Phase 1 (Processing Inventory) not found.
 
 Control assessment requires knowledge of your processing activities.
-Please run Phase 1 first:
-
-  /osk-comply rgpd inventory
-
-Or run the full workflow:
+Run the workflow from the beginning:
 
   /osk-comply rgpd
 ```
@@ -849,11 +852,8 @@ Output files:
 │ Files generated:                                                        │
 │ • .osk/comply/rgpd/control-assessment.yaml                             │
 │                                                                         │
-│ NEXT:                                                                   │
-│ ➤ Phase 4: Gap Analysis                                                │
+│ ➤ Proceeding to Phase 4: Gap Analysis                                  │
 │   Consolidate gaps, prioritize, create remediation roadmap             │
-│                                                                         │
-│   Run: /osk-comply rgpd gaps                                           │
 │                                                                         │
 └─────────────────────────────────────────────────────────────────────────┘
 ```

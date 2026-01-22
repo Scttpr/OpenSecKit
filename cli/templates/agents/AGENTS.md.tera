@@ -24,8 +24,8 @@ This project uses **OpenSecKit v{{ version }}** for security-as-code with hub-an
 │   ├── integrations.yaml
 │   ├── security.yaml
 │   └── gaps.yaml
-├── compliance/        # SPOKE: Compliance assessments
-│   └── assessment-*.yaml
+├── comply/            # SPOKE: Compliance assessments
+│   └── <framework>/
 └── specs/             # SPOKE: Feature specifications
     └── NNN-feature/
 ```

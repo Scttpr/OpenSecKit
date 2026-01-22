@@ -705,8 +705,7 @@ if gaps_analysis.blockers > 0:
 │ NEXT STEPS:                                                  │
 │ {{ if blockers > 0 }}                                       │
 │ 1. Resolve blockers (see 07-elements-decision.md)           │
-│ 2. Re-run /osk-comply rgs gaps                              │
-│ 3. Regenerate dossier                                       │
+│ 2. Re-run workflow: /osk-comply rgs --update                │
 │ {{ else }}                                                  │
 │ 1. Review dossier with RSSI                                 │
 │ 2. Submit to commission d'homologation                      │

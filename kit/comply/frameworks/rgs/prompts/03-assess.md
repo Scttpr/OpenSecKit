@@ -5,6 +5,15 @@ framework: rgs
 phase: control-assessment
 model_sections: [index, architecture, controls, data, integrations, tooling, actors, business, boundaries]
 version: "5.0.0"
+knowledge:
+  - rgs-v2-document-principal.md
+  - rgs-v2-annexe-b1-mecanismes-cryptographiques.md
+  - rgs-v2-annexe-b2-gestion-cles.md
+  - rgs-v2-annexe-b3-authentification.md
+  - rgs-v2-annexe-a1-certificats-electroniques.md
+  - guide-homologation-securite.md
+  - guide-hygiene-informatique.md
+  - ebios-risk-manager.md
 ---
 
 # Role
@@ -88,7 +97,7 @@ ERROR: Level assessment not found.
 Phase 3 (Control Assessment) requires Phase 1 (Level Assessment) to be completed.
 The RGS level determines which controls apply and their thresholds.
 
-Run `/osk-comply rgs level` first or restart the full workflow with `/osk-comply rgs`.
+Run the workflow from the beginning: `/osk-comply rgs`
 ```
 
 **If EBIOS RM skipped** (RGS* with user choice):
@@ -186,10 +195,8 @@ Use the level from `.osk/comply/rgs/level-assessment.yaml`.
 
 **If user wants to change level:**
 ```
-To change the RGS level, you must re-run Phase 1:
-/osk-comply rgs level
-
-This will restart the workflow from the beginning.
+To change the RGS level, restart the workflow from the beginning:
+/osk-comply rgs
 ```
 
 ## Step 2: Scope Definition (Full System Perimeter)
@@ -489,19 +496,19 @@ Evidence detection paths:
   pentest_report:
     - docs/security/pentest-*.md
     - docs/security/pentest-*.pdf
-    - .osk/compliance/pentest-report.md
+    - .osk/comply/rgs/pentest-report.md
     - security/audits/pentest-*
 
   incident_response:
     - docs/security/incident-response.md
     - docs/runbooks/incident-response.md
-    - .osk/compliance/incident-response-plan.md
+    - .osk/comply/rgs/incident-response-plan.md
     - INCIDENT_RESPONSE.md
 
   business_continuity:
     - docs/security/pca-pra.md
     - docs/security/business-continuity.md
-    - .osk/compliance/pca-pra.md
+    - .osk/comply/rgs/pca-pra.md
     - docs/disaster-recovery.md
 
   sbom:
@@ -512,7 +519,7 @@ Evidence detection paths:
 
   vulnerability_scans:
     - docs/security/vuln-scan-*.md
-    - .osk/compliance/vulnerability-report.md
+    - .osk/comply/rgs/vulnerability-report.md
     - security/scans/
 
   security_diagrams:
@@ -755,10 +762,10 @@ After user confirmation, generate:
 
 ```yaml
 Output files:
-  - .osk/compliance/assessment-rgs.yaml        # Machine-readable
-  - .osk/compliance/assessment-rgs.md          # Human-readable summary
-  - .osk/compliance/homologation-checklist.md  # Pre-certification checklist
-  - .osk/compliance/system-perimeter.md        # Full system boundary
+  - .osk/comply/rgs/assessment-rgs.yaml        # Machine-readable
+  - .osk/comply/rgs/assessment-rgs.md          # Human-readable summary
+  - .osk/comply/rgs/homologation-checklist.md  # Pre-certification checklist
+  - .osk/comply/rgs/system-perimeter.md        # Full system boundary
 ```
 
 Use templates:
@@ -781,7 +788,7 @@ Re-assess only changed controls since last assessment.
 
 **Step 1: Load Existing Assessment**
 ```yaml
-Load: .osk/compliance/assessment-rgs.yaml
+Load: .osk/comply/rgs/assessment-rgs.yaml
 Extract: system_model_hash, rgs_level, last_assessment_date, control_statuses
 ```
 
@@ -893,10 +900,10 @@ Continue interrupted assessment.
 
 **Step 1: Check for Partial Assessment**
 ```yaml
-Load: .osk/compliance/assessment-rgs.partial.yaml
+Load: .osk/comply/rgs/assessment-rgs.partial.yaml
 
 If not found:
-  "No interrupted assessment found. Run /osk-comply rgs to start new assessment."
+  "No interrupted assessment found. Starting new assessment."
 ```
 
 **Step 2: Display Resume Prompt**
@@ -935,7 +942,7 @@ Resume from `last_control_id + 1`, preserving all previous responses and RGS lev
 **Step 5: On Completion**
 ```bash
 # Remove partial file
-rm .osk/compliance/assessment-rgs.partial.yaml
+rm .osk/comply/rgs/assessment-rgs.partial.yaml
 # Generate full assessment files
 ```
 
@@ -943,7 +950,7 @@ rm .osk/compliance/assessment-rgs.partial.yaml
 
 **Save partial state every 3 controls:**
 ```yaml
-# .osk/compliance/assessment-rgs.partial.yaml
+# .osk/comply/rgs/assessment-rgs.partial.yaml
 started_at: "2024-01-15T10:30:00Z"
 last_saved: "2024-01-15T11:45:00Z"
 rgs_level: "rgs-star-star"
@@ -975,10 +982,10 @@ Generate formatted homologation documentation (dossier d'homologation).
 
 **Step 1: Load Assessment**
 ```yaml
-Load: .osk/compliance/assessment-rgs.yaml
+Load: .osk/comply/rgs/assessment-rgs.yaml
 
 If not found:
-  "No assessment found. Run /osk-comply rgs first."
+  "No assessment found. Run the workflow first: /osk-comply rgs"
 ```
 
 **Step 2: Check for Homologation Blockers**
@@ -992,7 +999,7 @@ Blocker check:
 
 Use template: `kit/comply/frameworks/rgs/templates/export-dossier.md.tera`
 
-Output: `.osk/compliance/exports/dossier-homologation-rgs-[date].md`
+Output: `.osk/comply/rgs/exports/dossier-homologation-rgs-[date].md`
 
 **ANSSI-Compliant Structure:**
 ```
@@ -1027,7 +1034,7 @@ Output: `.osk/compliance/exports/dossier-homologation-rgs-[date].md`
 
 **Step 4: Display Export Summary**
 ```
-Export generated: .osk/compliance/exports/dossier-homologation-rgs-2024-01-15.md
+Export generated: .osk/comply/rgs/exports/dossier-homologation-rgs-2024-01-15.md
 
 Dossier d'Homologation Contents:
 - Présentation du système et périmètre
@@ -1041,9 +1048,8 @@ Dossier d'Homologation Contents:
 
 Next Steps:
 1. Resolve blocker: Tool log retention
-2. Re-run /osk-comply rgs --update
-3. Re-export: /osk-comply rgs --export md
-4. Submit to commission d'homologation
+2. Re-run workflow: /osk-comply rgs --update
+3. Submit to commission d'homologation
 ```
 
 # Rules

@@ -5,6 +5,8 @@ framework: rgpd
 phase: gaps-analysis
 model_sections: [index, data, actors, integrations, tooling, architecture, controls, business, boundaries, team]
 version: "5.0.0"
+knowledge:
+  - reference/rgpd-complet.md
 ---
 
 # Role
@@ -447,11 +449,8 @@ After consolidation: {{ N }} unique gaps
 
 Ready to save? [Y/n]
 
-NEXT:
-➤ Phase 5: Documentation
+➤ Proceeding to Phase 5: Documentation
   Generate compliance documents with gaps embedded as action items
-
-  Run: /osk-comply rgpd generate
 ```
 
 ---

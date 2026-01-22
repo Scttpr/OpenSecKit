@@ -158,15 +158,21 @@ Compliance assessment based on the system model.
 ### Compliance Outputs
 
 ```
-.osk/compliance/
-├── assessment-rgpd.yaml       # RGPD assessment data
-├── assessment-rgpd.md         # Summary report
-├── gap-report-rgpd.md         # Gap analysis
-├── sub-processor-register.md  # Art. 28 register
-├── assessment-rgs.yaml        # RGS assessment data
-├── assessment-rgs.md          # Summary report
-├── homologation-checklist.md  # Homologation checklist
-└── system-perimeter.md        # RGS system perimeter
+.osk/comply/
+├── rgpd/                         # RGPD framework outputs
+│   ├── workflow-state.yaml       # Workflow progress
+│   ├── processing-inventory.yaml # Phase 1: Processing inventory
+│   ├── aipd/                     # Phase 2: AIPD/DPIA reports
+│   ├── control-assessment.yaml   # Phase 3: Control assessment
+│   ├── gaps-analysis.yaml        # Phase 4: Gap analysis
+│   └── documents/                # Phase 5: Generated documents
+└── rgs/                          # RGS framework outputs
+    ├── workflow-state.yaml       # Workflow progress
+    ├── level-assessment.yaml     # Phase 1: RGS level
+    ├── ebios-rm/                 # Phase 2: EBIOS RM analysis
+    ├── assessment-rgs.yaml       # Phase 3: Control assessment
+    ├── gaps-analysis.yaml        # Phase 4: Gap analysis
+    └── dossier-homologation/     # Phase 5: Homologation dossier
 ```
 
 ## The 7 Principles

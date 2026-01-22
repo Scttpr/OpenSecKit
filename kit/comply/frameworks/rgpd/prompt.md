@@ -16,23 +16,13 @@ sub_prompts:
 
 This framework provides structured RGPD (GDPR) compliance workflow following CNIL methodology for processing inventory, impact assessment, control evaluation, gap analysis, and documentation generation.
 
-## Quick Start
+## Command
 
 ```bash
-# Full workflow (recommended)
-/osk-comply rgpd                  # Start/resume 5-phase workflow
-
-# Individual phases
-/osk-comply rgpd inventory        # Phase 1: Processing inventory
-/osk-comply rgpd aipd             # Phase 2: AIPD/DPIA (if required)
-/osk-comply rgpd assess           # Phase 3: Control assessment
-/osk-comply rgpd gaps             # Phase 4: Gap analysis
-/osk-comply rgpd generate         # Phase 5: Documentation
-
-# Utilities
-/osk-comply rgpd status           # View current workflow state
-/osk-comply rgpd resume           # Resume from last phase
+/osk-comply rgpd [--update] [--export <md|pdf>]
 ```
+
+The workflow is **autonomous** - it automatically determines which phase to execute based on workflow state and progresses through all phases without manual intervention.
 
 ## 5-Phase Workflow Architecture
 
@@ -110,7 +100,62 @@ This framework provides structured RGPD (GDPR) compliance workflow following CNI
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
-## Workflow State Management
+---
+
+# Orchestrator Behavior
+
+## Starting a New Workflow
+
+```
+1. Check prerequisites
+   ├── System model exists? ──▶ If no: ERROR "Run /osk-discover first"
+   └── workflow-state.yaml exists?
+       ├── If yes: Prompt "Resume existing workflow or start new?"
+       └── If no: Initialize new workflow-state.yaml
+
+2. Execute Phase 1 (Processing Inventory)
+   └── Save checkpoint after completion
+
+3. Determine Phase 2 path
+   ├── AIPD required? ──▶ Execute Phase 2 for each processing
+   └── AIPD not required? ──▶ Record justification, skip to Phase 3
+
+4. Execute remaining phases sequentially
+   └── Save checkpoint after each phase
+
+5. Generate final documentation
+   └── Display completion summary
+```
+
+## Resuming Workflow
+
+```
+1. Load workflow-state.yaml
+2. Display current state summary
+3. Prompt: "Resume from [current_phase]?"
+4. If yes: Continue from saved state
+5. If no: Offer options
+   ├── Restart from specific phase
+   ├── Start completely new workflow
+   └── Cancel
+```
+
+## Error Handling
+
+```yaml
+on_error:
+  - Save current state to workflow-state.yaml
+  - Log error details
+  - Display recovery options:
+    - Retry current step
+    - Skip current step (if allowed)
+    - Rollback to previous checkpoint
+    - Abort workflow
+```
+
+---
+
+# Workflow State Management
 
 The workflow tracks state in `.osk/comply/rgpd/workflow-state.yaml`:
 
@@ -177,156 +222,23 @@ Phase 5 (Documentation)
     └──► Generates conditional docs based on Phase 1-4
 ```
 
-## Commands Reference
+---
 
-### `/osk-comply rgpd` (Default)
+# Flags
 
-Runs the full workflow, resuming from last incomplete phase.
+## --update
 
-**Behavior:**
-1. Check workflow state
-2. If no state, start Phase 1
-3. If state exists, resume from `current_phase`
-4. Progress through phases sequentially
+Re-assess only components that have changed since last run. Compares system-model timestamps with workflow state.
 
-### `/osk-comply rgpd inventory`
+## --export <format>
 
-**Phase 1: Processing Inventory**
+Export compliance documentation in specified format:
+- `md` - Markdown (default)
+- `pdf` - PDF (requires pandoc)
 
-Discovers and documents all processing activities.
+---
 
-**Output:**
-- `.osk/comply/rgpd/processing-inventory.yaml`
-
-**Key activities:**
-- Data category discovery
-- Legal basis determination
-- Recipient/transfer mapping
-- AIPD trigger detection
-
-See: `prompts/01-inventory.md`
-
-### `/osk-comply rgpd aipd`
-
-**Phase 2: AIPD/DPIA**
-
-Conducts Data Protection Impact Assessment using CNIL methodology.
-
-**Triggers (CNIL mandatory list):**
-- Large-scale health data
-- Systematic employee monitoring
-- HR profiling
-- Biometric identification
-- Vulnerable persons data
-- Location data at scale
-- Cross-referencing datasets
-- Innovative technology
-
-**Output:**
-- `.osk/comply/rgpd/aipd/{processing-name}.yaml`
-
-**CNIL PIA Steps:**
-1. Context study
-2. Principles evaluation
-3. Risk analysis (3 scenarios)
-4. Validation
-
-See: `prompts/02-aipd.md`
-
-### `/osk-comply rgpd assess`
-
-**Phase 3: Control Assessment**
-
-Evaluates compliance against RGPD Articles 5-50.
-
-**Output:**
-- `.osk/comply/rgpd/control-assessment.yaml`
-
-**Evaluation categories:**
-- Principles (Art. 5-11)
-- Rights (Art. 12-22)
-- Controller/Processor (Art. 24-43)
-- Transfers (Art. 44-49)
-
-See: `prompts/03-assess.md`
-
-### `/osk-comply rgpd gaps`
-
-**Phase 4: Gap Analysis**
-
-Analyzes gaps and creates remediation roadmap.
-
-**Output:**
-- `.osk/comply/rgpd/gaps-analysis.yaml`
-
-**Gap categories:**
-- Organizational (policies, procedures)
-- Technical (security measures)
-- Legal (contracts, mechanisms)
-- Evidence (documentation)
-
-**Priority matrix:**
-- P0 BLOCKER: Compliance-blocking issues
-- QUICK WIN: High impact, low effort
-- P1 HIGH: Address within 30 days
-- P2 MEDIUM: Address within 90 days
-- P3 LOW: Improvement opportunities
-
-See: `prompts/04-gaps.md`
-
-### `/osk-comply rgpd generate`
-
-**Phase 5: Documentation**
-
-Generates compliance documents from templates.
-
-**Output:**
-```
-.osk/comply/rgpd/documents/
-├── core/
-│   ├── registre-traitement.md    # Art. 30
-│   ├── mesures-securite.md       # Art. 32
-│   ├── aipd-{processing}.md      # Art. 35 (if required)
-│   └── lia-{processing}.md       # Art. 6(1)(f) (if needed)
-├── contracts/
-│   └── clause-{processor}.md     # Art. 28
-├── procedures/
-│   ├── violation-donnees.md      # Art. 33-34
-│   └── droits-personnes.md       # Art. 12-22
-└── public/
-    └── politique-confidentialite.md  # Art. 13-14
-```
-
-See: `prompts/05-generate.md`
-
-### `/osk-comply rgpd status`
-
-Display current workflow state without running assessment.
-
-```
-RGPD Compliance Workflow Status
-───────────────────────────────
-Started: 2026-01-22
-Last updated: 2026-01-22 14:30
-
-Phase 1: Processing Inventory  ✓ Completed
-         5 processing activities identified
-         2 require AIPD
-
-Phase 2: AIPD/DPIA             ⧗ In Progress
-         analytics: ✓ completed
-         profiling: ⧗ in progress (step 2/4)
-
-Phase 3: Control Assessment    ○ Pending
-
-Phase 4: Gap Analysis          ○ Pending
-
-Phase 5: Documentation         ○ Pending
-
-Resume with: /osk-comply rgpd
-```
-
-## Knowledge Base
+# Knowledge Base
 
 ```
 knowledge/
@@ -369,7 +281,9 @@ schemas/
 └── gaps-analysis.yaml            # Phase 4 output
 ```
 
-## Output Directory Structure
+---
+
+# Output Directory Structure
 
 ```
 .osk/comply/rgpd/
@@ -387,13 +301,15 @@ schemas/
     └── public/
 ```
 
-## Dependencies
+---
+
+# Dependencies
 
 - **Discover phase** must be completed first
 - System model files in `.osk/system-model/`
 - Minimum: `index.yaml` and `data.yaml`
 
-## Related Frameworks
+# Related Frameworks
 
 - `rgs` - French government security standard (RGS/EBIOS RM)
 - Coming: `nis2`, `iso27001`

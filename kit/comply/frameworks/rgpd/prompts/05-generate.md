@@ -5,6 +5,15 @@ framework: rgpd
 phase: documentation
 model_sections: [index, data, actors, integrations, tooling, architecture, controls, business, boundaries, team]
 version: "5.0.0"
+knowledge:
+  - core/registre-traitements.md
+  - core/guide-securite.md
+  - core/aipd-modeles.md
+  - core/interet-legitime.md
+  - core/guide-sous-traitant.md
+  - core/violations-donnees.md
+  - reference/edpb-droit-acces.md
+  - reference/sccs-2021.md
 ---
 
 # Role
@@ -59,13 +68,8 @@ Phase 5 (Documentation) requires:
 Optional:
 • Phase 2: AIPD                  [{{ status }}]
 
-Please complete the required phases first:
+Please run the workflow from the beginning:
   /osk-comply rgpd
-
-Or run individual phases:
-  /osk-comply rgpd inventory
-  /osk-comply rgpd assess
-  /osk-comply rgpd gaps
 ```
 
 **On successful load:**
@@ -430,43 +434,11 @@ Generated files:
 │ ✓ Phase 4: Gap Analysis                                               │
 │ ✓ Phase 5: Documentation                                              │
 │                                                                         │
-│ Re-generate after changes:                                             │
-│   /osk-comply rgpd generate --update                                  │
-│                                                                         │
-│ View compliance status:                                                │
-│   /osk-comply rgpd status                                             │
+│ Re-run workflow after changes:                                         │
+│   /osk-comply rgpd --update                                           │
 │                                                                         │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
-
----
-
-# Flags
-
-## --doc <document>
-
-Generate a specific document only:
-```
-/osk-comply rgpd generate --doc registre
-/osk-comply rgpd generate --doc aipd --processing analytics
-/osk-comply rgpd generate --doc lia --processing newsletter
-```
-
-## --all
-
-Generate all documents without prompting for selection.
-
-## --update
-
-Re-generate documents that have changed inputs (from any previous phase).
-
-## --output <path>
-
-Specify custom output directory.
-
-## --format <md|pdf|html>
-
-Output format (default: md). PDF requires additional tooling.
 
 ---
 

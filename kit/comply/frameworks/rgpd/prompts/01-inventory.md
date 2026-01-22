@@ -5,6 +5,11 @@ framework: rgpd
 phase: inventory
 model_sections: [index, data, actors, integrations, tooling, architecture, controls, business, boundaries, team]
 version: "5.0.0"
+knowledge:
+  - reference/rgpd-complet.md
+  - core/aipd-liste-obligatoire.md
+  - core/registre-traitements.md
+  - core/interet-legitime.md
 ---
 
 # Role
@@ -440,25 +445,20 @@ Output files:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│ 📋 Phase 1 Complete - Next Steps                                         │
+│ ✅ Phase 1 Complete                                                      │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                         │
 │ Files generated:                                                        │
 │ • .osk/comply/rgpd/processing-inventory.yaml                           │
 │                                                                         │
-│ NEXT PHASE:                                                             │
+│ AIPD DETERMINATION:                                                     │
+│ • {{ N }} processing activities requiring impact assessment            │
 │                                                                         │
-│ ➤ Phase 2: AIPD/DPIA (Required)                                        │
-│   You have 2 processing activities requiring impact assessment.        │
+│ {{ If AIPD required }}                                                  │
+│ ➤ Proceeding to Phase 2: AIPD/DPIA                                     │
 │                                                                         │
-│   Run: /osk-comply rgpd aipd                                           │
-│                                                                         │
-│   OR skip and proceed to control assessment:                           │
-│   /osk-comply rgpd assess                                              │
-│                                                                         │
-│   ⚠️  Skipping AIPD when required is a compliance gap.                  │
-│                                                                         │
-│ Continue to Phase 2? [Y/n/skip with justification]                     │
+│ {{ If no AIPD required }}                                               │
+│ ➤ No AIPD required, proceeding to Phase 3: Control Assessment          │
 │                                                                         │
 └─────────────────────────────────────────────────────────────────────────┘
 ```

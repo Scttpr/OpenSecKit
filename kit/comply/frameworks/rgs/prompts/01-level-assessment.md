@@ -5,6 +5,9 @@ framework: rgs
 phase: level-assessment
 model_sections: [index, architecture, data, business, boundaries, actors]
 version: "5.0.0"
+knowledge:
+  - rgs-v2-document-principal.md
+  - guide-homologation-securite.md
 ---
 
 # Role

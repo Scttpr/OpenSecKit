@@ -5,6 +5,9 @@ framework: rgs
 phase: gaps-analysis
 model_sections: [index, architecture, controls, data, integrations, tooling]
 version: "5.0.0"
+knowledge:
+  - guide-homologation-securite.md
+  - guide-hygiene-informatique.md
 ---
 
 # Role
