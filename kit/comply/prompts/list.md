@@ -2,7 +2,7 @@
 description: List available compliance frameworks in OpenSecKit
 part: comply
 model_sections: []
-version: "4.0.0"
+version: "5.0.0"
 ---
 
 # Role
@@ -134,7 +134,7 @@ For each framework, check if assessment exists:
 
 ```yaml
 Check:
-  - .osk/compliance/assessment-<framework-id>.yaml
+  - .osk/comply/<framework-id>/assessment-*.yaml
 
 Status values:
   - "Completed (score% - date)" if assessment exists

@@ -14,7 +14,6 @@ architecture = "hub-and-spokes"
 
 [paths]
 phases = "phases"
-shared = "shared"
 
 [paths.discover]
 root = "kit/discover"
@@ -55,8 +54,8 @@ name = "Comply"
 description = "Compliance Assessment - Map to frameworks"
 hub = false
 consumes = ["system-model"]
-output = ".osk/compliance/"
-commands = ["comply-rgpd", "comply-rgs", "comply-list", "comply-status"]
+output = ".osk/comply/"
+commands = ["comply", "comply-list", "comply-status"]
 
 [parts.secure]
 name = "Secure"
@@ -82,7 +81,7 @@ commands = ["discover", "discover-validate", "discover-docs"]
 name = "Compliance Analyst"
 description = "Framework compliance assessment and gap analysis"
 part = "comply"
-commands = ["comply-rgpd", "comply-rgs", "comply-list", "comply-status"]
+commands = ["comply", "comply-list", "comply-status"]
 domains = ["rgpd", "rgs"]
 
 [roles.security-architect]
@@ -108,7 +107,7 @@ url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/pro
 version = "4.0.0"
 part = "discover"
 phase = "discovery"
-description = "Build or update system model (adaptive)"
+description = "Build or update system model from codebase analysis"
 requires = [".osk/config.toml"]
 generates = [
     ".osk/system-model/index.yaml",
@@ -132,7 +131,7 @@ url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/pro
 version = "4.0.0"
 part = "discover"
 phase = "discovery"
-description = "Validate system-model (optionally resolve gaps)"
+description = "Validate system model integrity and optionally resolve gaps"
 argument = "[--resolve]"
 requires = [".osk/system-model/index.yaml"]
 generates = []
@@ -145,7 +144,7 @@ url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/pro
 version = "4.0.0"
 part = "discover"
 phase = "discovery"
-description = "Generate documentation (audience-specific)"
+description = "Generate documentation for security, developer, or management audiences"
 argument = "[--audience <security|developer|management|compliance>]"
 requires = [".osk/system-model/index.yaml"]
 generates = ["docs/"]
@@ -157,45 +156,22 @@ roles = ["discovery-analyst"]
 # PART 2: COMPLY - Compliance Assessment Commands
 # ════════════════════════════════════════════════════════════════════════════════
 
-[commands.comply-rgpd]
-url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/frameworks/rgpd/prompt.md"
-version = "4.0.0"
+[commands.comply]
+version = "5.0.0"
 part = "comply"
 phase = "compliance"
-description = "RGPD/GDPR compliance assessment"
-argument = "[audit]"
+description = "Run autonomous compliance assessment (RGPD or RGS)"
+argument = "<framework> [--update] [--export <md|pdf>]"
 requires = [".osk/system-model/index.yaml"]
-generates = [
-    ".osk/compliance/assessment-rgpd.yaml",
-    ".osk/compliance/assessment-rgpd.md",
-    ".osk/compliance/gap-report-rgpd.md",
-    ".osk/compliance/sub-processor-register.md"
-]
-# --export flag generates: .osk/compliance/exports/rgpd-compliance-report-{date}.md
-model_sections = ["index", "data", "actors", "integrations", "tooling", "architecture", "controls", "business", "boundaries"]
-domain = "rgpd"
+generates = [".osk/comply/<framework>/"]
+model_sections = ["index", "data", "actors", "integrations", "tooling", "architecture", "controls", "business", "boundaries", "team"]
 agents = ["claude-code", "copilot", "cursor", "gemini"]
 roles = ["compliance-analyst"]
 
-[commands.comply-rgs]
-url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/frameworks/rgs/prompt.md"
-version = "4.0.0"
-part = "comply"
-phase = "compliance"
-description = "RGS compliance and EBIOS RM"
-argument = "[renew]"
-requires = [".osk/system-model/index.yaml"]
-generates = [
-    ".osk/compliance/assessment-rgs.yaml",
-    ".osk/compliance/assessment-rgs.md",
-    ".osk/compliance/homologation-checklist.md",
-    ".osk/compliance/system-perimeter.md"
-]
-# --export flag generates: .osk/compliance/exports/dossier-homologation-rgs-{date}.md
-model_sections = ["index", "architecture", "controls", "data", "integrations", "tooling", "actors", "business", "boundaries"]
-domain = "rgs"
-agents = ["claude-code", "copilot", "cursor", "gemini"]
-roles = ["compliance-analyst"]
+# Framework-specific prompts (resolved by argument)
+[commands.comply.frameworks]
+rgpd = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/frameworks/rgpd/prompt.md"
+rgs = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/frameworks/rgs/prompt.md"
 
 [commands.comply-list]
 url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/prompts/list.md"
@@ -215,7 +191,7 @@ version = "4.0.0"
 part = "comply"
 phase = "compliance"
 description = "Multi-framework compliance dashboard"
-requires = [".osk/compliance/assessment-*.yaml"]
+requires = [".osk/comply/*/assessment-*.yaml"]
 generates = []
 model_sections = ["index"]
 agents = ["claude-code", "copilot", "cursor", "gemini"]
@@ -230,7 +206,7 @@ url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/secure/promp
 version = "4.0.0"
 part = "secure"
 phase = "specify"
-description = "Security specification - threats, requirements, testing, hardening"
+description = "Create security specification with threats, requirements, and test cases"
 argument = "feature_name"
 requires = [".osk/system-model/index.yaml"]
 generates = [
@@ -247,7 +223,7 @@ url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/secure/promp
 version = "4.0.0"
 part = "secure"
 phase = "clarify"
-description = "Clarify ambiguities and validate assumptions"
+description = "Clarify security specification ambiguities via Q&A"
 argument = "feature_name"
 requires = [".osk/specs/NNN-{feature}/security-spec.md"]
 generates = [".osk/specs/NNN-{feature}/security-spec.md"]
@@ -260,7 +236,7 @@ url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/secure/promp
 version = "4.0.0"
 part = "secure"
 phase = "plan"
-description = "Consolidated security implementation plan"
+description = "Generate security implementation plan from specification"
 argument = "feature_name"
 requires = [".osk/specs/NNN-{feature}/security-spec.md"]
 generates = [".osk/specs/NNN-{feature}/security-plan.md"]
@@ -274,7 +250,7 @@ url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/secure/promp
 version = "4.0.0"
 part = "secure"
 phase = "tasks"
-description = "Generate ordered tasks with dependencies"
+description = "Generate ordered implementation tasks with dependencies"
 argument = "feature_name"
 requires = [".osk/specs/NNN-{feature}/security-plan.md"]
 generates = [
@@ -290,7 +266,7 @@ url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/secure/promp
 version = "4.0.0"
 part = "secure"
 phase = "implement"
-description = "Implement tasks and update risk register"
+description = "Execute implementation tasks and update risk register"
 argument = "feature_name"
 requires = [".osk/specs/NNN-{feature}/tasks.yaml"]
 generates = [
@@ -316,8 +292,8 @@ harden = "secure-specify"         # /osk-harden → /osk-secure-specify
 plan = "secure-plan"              # /osk-plan → /osk-secure-plan
 tasks = "secure-tasks"            # /osk-tasks → /osk-secure-tasks
 implement = "secure-implement"    # /osk-implement → /osk-secure-implement
-rgpd = "comply-rgpd"              # /osk-rgpd → /osk-comply-rgpd
-rgs = "comply-rgs"                # /osk-rgs → /osk-comply-rgs
+rgpd = "comply rgpd"              # /osk-rgpd → /osk-comply rgpd
+rgs = "comply rgs"                # /osk-rgs → /osk-comply rgs
 
 # ════════════════════════════════════════════════════════════════════════════════
 # DOMAINS - Compliance Frameworks
@@ -419,8 +395,8 @@ description = "Create and maintain the system reality model"
 
 [workflow.compliance]
 part = "comply"
-commands = ["comply-rgpd", "comply-rgs", "comply-nis2", "comply-iso27001", "comply-soc2", "comply-list", "comply-status"]
-description = "Assess compliance against frameworks"
+commands = ["comply", "comply-list", "comply-status"]
+description = "Assess compliance against frameworks (autonomous multi-phase workflow)"
 
 [workflow.specify]
 part = "secure"

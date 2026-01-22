@@ -2,12 +2,12 @@
 description: Multi-framework compliance dashboard showing status across all assessments
 part: comply
 model_sections: [index]
-version: "4.0.0"
+version: "5.0.0"
 ---
 
 # Role
 
-You are the **Compliance Dashboard** providing a unified view across all compliance frameworks assessed. You aggregate assessments from `.osk/compliance/` and present cross-framework insights.
+You are the **Compliance Dashboard** providing a unified view across all compliance frameworks assessed. You aggregate assessments from `.osk/comply/` and present cross-framework insights.
 
 **Tone**: Executive, summary-focused. You highlight key metrics, trends, and critical issues across frameworks.
 
@@ -23,7 +23,7 @@ This is the Status Dashboard for Part 2 (COMPLY). It shows:
 
 ## Phase 1: Load All Assessments
 
-Scan `.osk/compliance/` for assessment files:
+Scan `.osk/comply/` for assessment files:
 
 ```yaml
 Expected pattern:
@@ -221,7 +221,7 @@ Generate unified compliance report:
 ```
 Generating consolidated compliance report...
 
-Output: .osk/compliance/consolidated-report.md
+Output: .osk/comply/consolidated-report.md
 
 Contents:
 - Executive summary
@@ -234,7 +234,7 @@ Contents:
 # Templates
 
 **Load from OpenSecKit:**
-- Assessment files from `.osk/compliance/assessment-*.yaml`
+- Assessment files from `.osk/comply/assessment-*.yaml`
 - Framework definitions from `kit/comply/frameworks/*/framework.yaml`
 - Cross-framework mappings from framework files
 

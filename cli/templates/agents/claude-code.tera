@@ -1,2 +1,20 @@
-{# Claude Code template - uses raw_content fetched from GitHub #}
+---
+description: {{ command.description }}
+---
+
+# /{{ command.name }}{% if command.argument %} {{ command.argument }}{% endif %}
+
+> {{ command.description }}
+
+| Property | Value |
+|----------|-------|
+{% if command.part %}| Part | **{{ command.part | upper }}** |
+{% endif %}{% if command.requires | length > 0 %}| Requires | {% for req in command.requires %}`{{ req }}`{% if not loop.last %}, {% endif %}{% endfor %} |
+{% endif %}{% if command.outputs | length > 0 %}| Generates | {% for out in command.outputs %}`{{ out }}`{% if not loop.last %}, {% endif %}{% endfor %} |
+{% endif %}
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- Full Prompt Instructions -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+
 {{ raw_content }}

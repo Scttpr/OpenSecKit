@@ -15,7 +15,7 @@ This project uses **OpenSecKit V4** with hub-and-spokes architecture.
 - **Full sections**: `.osk/system-model/*.yaml` (load as needed)
 
 ### Outputs (Spokes)
-- **Compliance**: `.osk/compliance/`
+- **Compliance**: `.osk/comply/`
 - **Specifications**: `.osk/specs/`
 
 {% if command.argument -%}
@@ -35,7 +35,7 @@ This command is part of the **{{ command.part | upper }}** workflow.
 - Output goes to `.osk/system-model/`
 {% elif command.part == "comply" -%}
 - Comply commands assess compliance (spoke)
-- Consumes system model, outputs to `.osk/compliance/`
+- Consumes system model, outputs to `.osk/comply/`
 {% elif command.part == "secure" -%}
 - Secure commands implement shift-left security (spoke)
 - Consumes system model, outputs to `.osk/specs/`

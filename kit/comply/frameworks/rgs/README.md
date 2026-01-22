@@ -66,7 +66,7 @@ Le RGS utilise le modèle DICP (et non CIA) :
 ## Fichiers Générés
 
 ```
-.osk/compliance/
+.osk/comply/rgs/
 ├── assessment-rgs.yaml          # Évaluation machine-readable
 ├── assessment-rgs.md            # Résumé lisible
 ├── homologation-checklist.md    # Checklist pré-homologation

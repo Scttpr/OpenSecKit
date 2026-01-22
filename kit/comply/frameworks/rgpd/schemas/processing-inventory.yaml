@@ -1,0 +1,372 @@
+# RGPD Processing Inventory Schema
+# Output of Phase 1: Processing Inventory
+# Location: .osk/comply/rgpd/processing-inventory.yaml
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: RGPD Processing Inventory
+description: Schema for processing activities inventory (Art. 30 foundation)
+version: "5.0.0"
+
+type: object
+required:
+  - processing_inventory
+properties:
+  processing_inventory:
+    type: object
+    required:
+      - version
+      - timestamp
+      - organization
+      - processing_activities
+      - aipd_summary
+    properties:
+      version:
+        type: string
+        description: Schema version
+        example: "5.0.0"
+
+      timestamp:
+        type: string
+        format: date-time
+        description: Inventory timestamp
+
+      organization:
+        type: object
+        properties:
+          name:
+            type: string
+          siret:
+            type: string
+          address:
+            type: string
+          dpo:
+            type: object
+            properties:
+              name:
+                type: string
+              email:
+                type: string
+              phone:
+                type: string
+
+      # Processing activities list
+      processing_activities:
+        type: array
+        items:
+          type: object
+          required:
+            - id
+            - name
+            - purposes
+            - legal_basis
+            - data_subjects
+            - data_categories
+          properties:
+            id:
+              type: string
+              description: Unique identifier
+            name:
+              type: string
+              description: Processing activity name
+            description:
+              type: string
+            purposes:
+              type: array
+              items:
+                type: string
+                enum:
+                  - service_delivery
+                  - authentication
+                  - communication
+                  - legal_compliance
+                  - marketing
+                  - analytics
+                  - security
+                  - fraud_prevention
+                  - hr_management
+                  - other
+            legal_basis:
+              type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - consent
+                    - contract
+                    - legal_obligation
+                    - vital_interest
+                    - public_interest
+                    - legitimate_interest
+                reference:
+                  type: string
+                  description: RGPD article reference (e.g., "Art. 6.1.a")
+                lia_documented:
+                  type: boolean
+                  description: For legitimate interest - is LIA documented?
+            data_subjects:
+              type: array
+              items:
+                type: string
+                enum:
+                  - customers
+                  - prospects
+                  - employees
+                  - contractors
+                  - partners
+                  - suppliers
+                  - minors
+                  - other
+            data_categories:
+              type: array
+              items:
+                type: object
+                required:
+                  - name
+                  - pii_fields
+                properties:
+                  name:
+                    type: string
+                  pii_fields:
+                    type: array
+                    items:
+                      type: string
+                  sensitive:
+                    type: boolean
+                    description: Art. 9 special category data
+                  sensitive_type:
+                    type: string
+                    enum:
+                      - racial_ethnic
+                      - political
+                      - religious
+                      - trade_union
+                      - genetic
+                      - biometric
+                      - health
+                      - sexual
+                      - criminal
+            retention:
+              type: object
+              properties:
+                period:
+                  type: string
+                  description: Retention period (e.g., "contract + 3 years")
+                justification:
+                  type: string
+                deletion_mechanism:
+                  type: string
+                  enum: [automatic, manual, anonymization]
+            recipients:
+              type: object
+              properties:
+                internal:
+                  type: array
+                  items:
+                    type: string
+                  description: Internal departments
+                external:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - name
+                      - purpose
+                      - country
+                    properties:
+                      name:
+                        type: string
+                      purpose:
+                        type: string
+                      country:
+                        type: string
+                      transfer_mechanism:
+                        type: string
+                        enum:
+                          - eu_location
+                          - adequacy_decision
+                          - sccs_2021
+                          - bcrs
+                          - derogation
+                          - none
+                      dpa_signed:
+                        type: boolean
+            aipd:
+              type: object
+              properties:
+                required:
+                  type: boolean
+                reason:
+                  type: string
+                  description: Why AIPD is/isn't required
+                triggers:
+                  type: array
+                  items:
+                    type: string
+                  description: CNIL list or CEPD criteria matched
+
+      # AIPD requirement summary
+      aipd_summary:
+        type: object
+        required:
+          - required
+        properties:
+          required:
+            type: array
+            items:
+              type: string
+            description: Processing IDs requiring AIPD
+          recommended:
+            type: array
+            items:
+              type: string
+            description: Processing IDs where AIPD is recommended
+          not_required:
+            type: array
+            items:
+              type: string
+            description: Processing IDs not requiring AIPD
+
+      # Legal basis breakdown
+      legal_basis_summary:
+        type: object
+        properties:
+          consent:
+            type: integer
+          contract:
+            type: integer
+          legal_obligation:
+            type: integer
+          legitimate_interest:
+            type: integer
+          other:
+            type: integer
+
+      # Gaps identified during inventory
+      gaps_identified:
+        type: array
+        items:
+          type: object
+          required:
+            - id
+            - type
+            - description
+          properties:
+            id:
+              type: string
+              pattern: "^GAP-INV-[0-9]+$"
+            type:
+              type: string
+              enum:
+                - transfer_mechanism
+                - dpa_missing
+                - legal_basis
+                - retention
+                - documentation
+            processing:
+              type: string
+              description: Related processing activity ID
+            description:
+              type: string
+
+# Example instance
+example:
+  processing_inventory:
+    version: "5.0.0"
+    timestamp: "2026-01-22T10:45:00Z"
+
+    organization:
+      name: "Acme Corp"
+      siret: "12345678901234"
+      address: "123 Rue Example, 75001 Paris"
+      dpo:
+        name: "Jane Doe"
+        email: "dpo@acme.com"
+        phone: "+33 1 23 45 67 89"
+
+    processing_activities:
+      - id: "users"
+        name: "User account management"
+        description: "Management of user accounts for service delivery"
+        purposes: [service_delivery, authentication, communication]
+        legal_basis:
+          type: contract
+          reference: "Art. 6.1.b"
+        data_subjects: [customers]
+        data_categories:
+          - name: "users"
+            pii_fields: [email, name, phone, address]
+            sensitive: false
+        retention:
+          period: "contract + 3 years"
+          justification: "Legal requirement for commercial records"
+          deletion_mechanism: automatic
+        recipients:
+          internal: [IT, support, marketing]
+          external:
+            - name: AWS
+              purpose: hosting
+              country: Ireland
+              transfer_mechanism: eu_location
+              dpa_signed: true
+            - name: SendGrid
+              purpose: email
+              country: US
+              transfer_mechanism: sccs_2021
+              dpa_signed: true
+        aipd:
+          required: false
+          reason: "Standard contract-based processing"
+
+      - id: "analytics"
+        name: "User analytics"
+        description: "Analysis of user behavior for service improvement"
+        purposes: [analytics]
+        legal_basis:
+          type: legitimate_interest
+          reference: "Art. 6.1.f"
+          lia_documented: false
+        data_subjects: [customers]
+        data_categories:
+          - name: "events"
+            pii_fields: [user_id, ip_address, device_id]
+            sensitive: false
+        retention:
+          period: "13 months"
+          justification: "CNIL recommendation for analytics"
+          deletion_mechanism: automatic
+        recipients:
+          internal: [marketing, product]
+          external:
+            - name: Mixpanel
+              purpose: analytics
+              country: US
+              transfer_mechanism: sccs_2021
+              dpa_signed: true
+        aipd:
+          required: true
+          reason: "Large-scale profiling"
+          triggers: ["evaluation_scoring", "large_scale", "combining_datasets"]
+
+    aipd_summary:
+      required: [analytics, profiling]
+      recommended: [newsletter]
+      not_required: [users, payments, support]
+
+    legal_basis_summary:
+      consent: 1
+      contract: 3
+      legal_obligation: 0
+      legitimate_interest: 2
+      other: 0
+
+    gaps_identified:
+      - id: GAP-INV-001
+        type: transfer_mechanism
+        processing: newsletter
+        description: "Notion missing SCCs for US transfer"
+      - id: GAP-INV-002
+        type: documentation
+        processing: analytics
+        description: "LIA not documented for legitimate interest basis"

@@ -1,0 +1,353 @@
+# RGS Gaps Analysis Schema
+# Output of Phase 4: Gap Analysis
+# Location: .osk/comply/rgs/gaps-analysis.yaml
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: RGS Gaps Analysis
+description: Schema for RGS compliance gap analysis and remediation planning
+version: "5.0.0"
+
+type: object
+required:
+  - gaps_analysis
+properties:
+  gaps_analysis:
+    type: object
+    required:
+      - version
+      - timestamp
+      - rgs_level
+      - summary
+      - gaps
+      - remediation_roadmap
+    properties:
+      version:
+        type: string
+        description: Schema version
+        example: "5.0.0"
+
+      timestamp:
+        type: string
+        format: date-time
+        description: Analysis timestamp
+
+      rgs_level:
+        type: string
+        enum: ["RGS*", "RGS**", "RGS***"]
+        description: Target RGS level
+
+      # Summary statistics
+      summary:
+        type: object
+        required:
+          - total_gaps
+          - by_priority
+          - by_category
+        properties:
+          total_gaps:
+            type: integer
+            minimum: 0
+          by_priority:
+            type: object
+            properties:
+              p0_blockers:
+                type: integer
+              quick_wins:
+                type: integer
+              p1_high:
+                type: integer
+              p2_medium:
+                type: integer
+              p3_low:
+                type: integer
+          by_category:
+            type: object
+            properties:
+              codebase:
+                type: integer
+              infrastructure:
+                type: integer
+              tooling:
+                type: integer
+              process:
+                type: integer
+              evidence:
+                type: integer
+
+      # Homologation blockers
+      blockers:
+        type: array
+        items:
+          type: object
+          required:
+            - id
+            - control
+            - category
+            - description
+            - blocking_reason
+          properties:
+            id:
+              type: string
+              pattern: "^GAP-[0-9]+$"
+            control:
+              type: string
+            category:
+              type: string
+              enum: [codebase, infrastructure, tooling, process, evidence]
+            description:
+              type: string
+            blocking_reason:
+              type: string
+            remediation:
+              type: string
+            effort:
+              type: string
+              enum: [low, medium, high]
+            anssi_reference:
+              type: string
+
+      # All gaps
+      gaps:
+        type: array
+        items:
+          type: object
+          required:
+            - id
+            - control
+            - category
+            - priority
+            - description
+          properties:
+            id:
+              type: string
+              pattern: "^GAP-[0-9]+$"
+            control:
+              type: string
+              description: RGS control ID or category
+            category:
+              type: string
+              enum: [codebase, infrastructure, tooling, process, evidence]
+            priority:
+              type: string
+              enum: [p0_blocker, quick_win, p1_high, p2_medium, p3_low]
+            description:
+              type: string
+            current_state:
+              type: string
+            required_state:
+              type: string
+            remediation:
+              type: object
+              properties:
+                action:
+                  type: string
+                owner:
+                  type: string
+                effort:
+                  type: string
+                  enum: [low, medium, high]
+                estimated_hours:
+                  type: integer
+                dependencies:
+                  type: array
+                  items:
+                    type: string
+            impact:
+              type: object
+              properties:
+                score_improvement:
+                  type: number
+                  description: Expected % improvement
+                affected_domain:
+                  type: string
+                  enum: [AUTH, INT, CONF, TRAC, HORO, SIG, TOOL_CERT, EVIDENCE]
+            ebios_risks:
+              type: array
+              items:
+                type: string
+              description: Related EBIOS RM risks
+
+      # Remediation roadmap
+      remediation_roadmap:
+        type: object
+        required:
+          - phases
+        properties:
+          phases:
+            type: array
+            items:
+              type: object
+              required:
+                - name
+                - timeframe
+                - gaps
+              properties:
+                name:
+                  type: string
+                  description: Phase name (e.g., "Immediate", "Short-term")
+                timeframe:
+                  type: string
+                  description: Duration (e.g., "Week 1-2", "Month 1-3")
+                gaps:
+                  type: array
+                  items:
+                    type: string
+                  description: Gap IDs in this phase
+                focus:
+                  type: string
+                  description: Phase focus description
+
+      # Quick wins
+      quick_wins:
+        type: array
+        items:
+          type: object
+          required:
+            - gap_id
+            - impact_score
+            - effort_hours
+            - roi_score
+          properties:
+            gap_id:
+              type: string
+            impact_score:
+              type: number
+              description: Expected score improvement (%)
+            effort_hours:
+              type: integer
+              description: Estimated effort in hours
+            roi_score:
+              type: number
+              minimum: 0
+              maximum: 10
+              description: ROI score (impact/effort ratio)
+
+      # EBIOS RM coverage (if Phase 2 completed)
+      ebios_coverage:
+        type: object
+        properties:
+          risks_addressed:
+            type: array
+            items:
+              type: string
+            description: EBIOS risks addressed by remediation
+          measures_mapped:
+            type: array
+            items:
+              type: object
+              properties:
+                measure:
+                  type: string
+                  description: EBIOS measure ID
+                gap:
+                  type: string
+                  description: Mapped gap ID
+          gaps_not_covered:
+            type: array
+            items:
+              type: string
+            description: Gaps not addressed by EBIOS measures
+
+# Example instance
+example:
+  gaps_analysis:
+    version: "5.0.0"
+    timestamp: "2025-01-21T15:00:00Z"
+    rgs_level: "RGS**"
+
+    summary:
+      total_gaps: 12
+      by_priority:
+        p0_blockers: 2
+        quick_wins: 3
+        p1_high: 2
+        p2_medium: 3
+        p3_low: 2
+      by_category:
+        codebase: 3
+        infrastructure: 4
+        tooling: 2
+        process: 2
+        evidence: 1
+
+    blockers:
+      - id: GAP-01
+        control: "TOOL-CERT"
+        category: infrastructure
+        description: "Cloud provider missing SecNumCloud certification"
+        blocking_reason: "SecNumCloud required for RGS** sensitive workloads"
+        remediation: "Migrate to SecNumCloud provider (OVH, Outscale) or document compensating controls"
+        effort: high
+        anssi_reference: "RGS v2.0 Annexe B1"
+
+      - id: GAP-02
+        control: "RGS-CONF.3"
+        category: infrastructure
+        description: "No HSM for cryptographic key management"
+        blocking_reason: "HSM required for RGS** key management"
+        remediation: "Implement HSM (cloud or on-premise) for key storage"
+        effort: high
+        anssi_reference: "RGS v2.0 Annexe B2"
+
+    gaps:
+      - id: GAP-04
+        control: "RGS-CONF.2"
+        category: codebase
+        priority: quick_win
+        description: "TLS 1.0/1.1 still enabled"
+        current_state: "TLS 1.0, 1.1, 1.2 enabled"
+        required_state: "TLS 1.2+ only"
+        remediation:
+          action: "Update TLS configuration to disable TLS < 1.2"
+          owner: "DevOps"
+          effort: low
+          estimated_hours: 2
+        impact:
+          score_improvement: 5
+          affected_domain: CONF
+        ebios_risks: ["R1"]
+
+    remediation_roadmap:
+      phases:
+        - name: "Immediate"
+          timeframe: "Week 1-2"
+          gaps: ["GAP-04", "GAP-05", "GAP-06"]
+          focus: "Quick wins and critical security improvements"
+
+        - name: "Short-term"
+          timeframe: "Week 3-6"
+          gaps: ["GAP-07", "GAP-08"]
+          focus: "P1 HIGH priority gaps"
+
+        - name: "Medium-term"
+          timeframe: "Week 7-12"
+          gaps: ["GAP-01", "GAP-02", "GAP-03"]
+          focus: "P0 Blockers and infrastructure changes"
+
+        - name: "Long-term"
+          timeframe: "Month 4-6"
+          gaps: ["GAP-09", "GAP-10", "GAP-11", "GAP-12"]
+          focus: "P2/P3 improvements and continuous compliance"
+
+    quick_wins:
+      - gap_id: GAP-04
+        impact_score: 5
+        effort_hours: 2
+        roi_score: 9.5
+      - gap_id: GAP-05
+        impact_score: 3
+        effort_hours: 4
+        roi_score: 8.5
+      - gap_id: GAP-06
+        impact_score: 2
+        effort_hours: 2
+        roi_score: 8.0
+
+    ebios_coverage:
+      risks_addressed: ["R1", "R2", "R3"]
+      measures_mapped:
+        - measure: "MES-02"
+          gap: "GAP-10"
+        - measure: "MES-03"
+          gap: "GAP-02"
+      gaps_not_covered: ["GAP-11", "GAP-12"]

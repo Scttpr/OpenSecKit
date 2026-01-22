@@ -2,170 +2,251 @@
 description: RGPD/GDPR compliance - Main orchestrator prompt
 part: comply
 framework: rgpd
-version: "4.1.0"
+version: "5.0.0"
 model_sections: [index, data, actors, integrations, tooling, architecture, controls, business, boundaries, team]
 sub_prompts:
-  - prompts/assess.md
-  - prompts/generate.md
+  - prompts/01-inventory.md
+  - prompts/02-aipd.md
+  - prompts/03-assess.md
+  - prompts/04-gaps.md
+  - prompts/05-generate.md
 ---
 
-# RGPD Compliance Framework
+# RGPD Compliance Framework v5.0
 
-This framework provides interactive RGPD (GDPR) compliance assessment and document generation.
+This framework provides structured RGPD (GDPR) compliance workflow following CNIL methodology for processing inventory, impact assessment, control evaluation, gap analysis, and documentation generation.
 
-## Quick Start
+## Command
 
 ```bash
-# Full workflow
-/osk-comply rgpd              # Interactive: assess then generate
-
-# Individual phases
-/osk-comply rgpd assess       # Compliance assessment only
-/osk-comply rgpd generate     # Document generation only
+/osk-comply rgpd [--update] [--export <md|pdf>]
 ```
 
-## Workflow Overview
+The workflow is **autonomous** - it automatically determines which phase to execute based on workflow state and progresses through all phases without manual intervention.
+
+## 5-Phase Workflow Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                    RGPD COMPLIANCE WORKFLOW                      │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐      │
-│  │   DISCOVER   │───▶│    ASSESS    │───▶│   GENERATE   │      │
-│  │              │    │              │    │              │      │
-│  │ system-model │    │ compliance   │    │ documents    │      │
-│  │ *.yaml       │    │ evaluation   │    │ *.md         │      │
-│  └──────────────┘    └──────────────┘    └──────────────┘      │
-│                             │                    │              │
-│                             ▼                    ▼              │
-│                    assessment-rgpd.yaml    registre.md          │
-│                    gaps-rgpd.yaml          aipd.md              │
-│                                            politique.md         │
-│                                            ...                  │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────┐
+│                    RGPD COMPLIANCE WORKFLOW v5.0                         │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│  ┌─────────────────────────────────────────────────────────────────┐   │
+│  │ PHASE 1: PROCESSING INVENTORY                                    │   │
+│  │ ─────────────────────────────────────────────────────────────── │   │
+│  │ • Discover all processing activities                            │   │
+│  │ • Map data flows, recipients, transfers                         │   │
+│  │ • Identify legal bases (Art. 6)                                 │   │
+│  │ • Determine AIPD requirement per processing                     │   │
+│  │ Output: .osk/comply/rgpd/processing-inventory.yaml              │   │
+│  └─────────────────────────────────────────────────────────────────┘   │
+│                              │                                          │
+│                              ▼                                          │
+│  ┌─────────────────────────────────────────────────────────────────┐   │
+│  │ PHASE 2: AIPD/DPIA (Conditional)                                 │   │
+│  │ ─────────────────────────────────────────────────────────────── │   │
+│  │ Required if: CNIL mandatory list OR 2+ CEPD criteria met        │   │
+│  │                                                                  │   │
+│  │ CNIL PIA Methodology:                                           │   │
+│  │   Step 1: Context study (scope, data, processes, supports)      │   │
+│  │   Step 2: Fundamental principles evaluation                     │   │
+│  │   Step 3: Risk analysis (3 scenarios)                           │   │
+│  │   Step 4: Validation (DPO opinion, action plan)                 │   │
+│  │                                                                  │   │
+│  │ Output: .osk/comply/rgpd/aipd/{processing-name}.yaml            │   │
+│  └─────────────────────────────────────────────────────────────────┘   │
+│                              │                                          │
+│                              ▼                                          │
+│  ┌─────────────────────────────────────────────────────────────────┐   │
+│  │ PHASE 3: CONTROL ASSESSMENT                                      │   │
+│  │ ─────────────────────────────────────────────────────────────── │   │
+│  │ • Evaluate Articles 5-50 compliance                             │   │
+│  │ • Transfer mechanisms verification (SCCs, BCRs)                 │   │
+│  │ • Processor compliance (Art. 28)                                │   │
+│  │ • Security measures (CNIL 25 fiches)                            │   │
+│  │ Output: .osk/comply/rgpd/control-assessment.yaml                │   │
+│  └─────────────────────────────────────────────────────────────────┘   │
+│                              │                                          │
+│                              ▼                                          │
+│  ┌─────────────────────────────────────────────────────────────────┐   │
+│  │ PHASE 4: GAP ANALYSIS                                            │   │
+│  │ ─────────────────────────────────────────────────────────────── │   │
+│  │ • Gap categorization (organizational, technical, legal)         │   │
+│  │ • Priority matrix (BLOCKER, QUICK_WIN, HIGH, MEDIUM, LOW)       │   │
+│  │ • Remediation roadmap                                           │   │
+│  │ • Quick wins identification                                     │   │
+│  │ Output: .osk/comply/rgpd/gaps-analysis.yaml                     │   │
+│  └─────────────────────────────────────────────────────────────────┘   │
+│                              │                                          │
+│                              ▼                                          │
+│  ┌─────────────────────────────────────────────────────────────────┐   │
+│  │ PHASE 5: DOCUMENTATION                                           │   │
+│  │ ─────────────────────────────────────────────────────────────── │   │
+│  │ Required documents:                                             │   │
+│  │   • Registre de traitement (Art. 30)                           │   │
+│  │   • Mesures de sécurité (Art. 32)                               │   │
+│  │   • Procédure violation (Art. 33-34)                            │   │
+│  │   • Procédure droits (Art. 12-22)                               │   │
+│  │   • Politique confidentialité (Art. 13-14)                      │   │
+│  │ Conditional documents:                                          │   │
+│  │   • AIPD report (if Phase 2 completed)                         │   │
+│  │   • LIA (if legitimate interest used)                          │   │
+│  │   • TIA (if transfers outside EU)                              │   │
+│  │ Contracts:                                                      │   │
+│  │   • Clauses sous-traitant (Art. 28)                            │   │
+│  │ Output: .osk/comply/rgpd/documents/                             │   │
+│  └─────────────────────────────────────────────────────────────────┘   │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
 
-## Commands
+---
 
-### `/osk-comply rgpd` (Default)
+# Orchestrator Behavior
 
-Runs the full interactive workflow:
-1. **Assess** - Evaluate compliance, identify gaps (interactive)
-2. **Generate** - Create required documents (interactive)
-
-### `/osk-comply rgpd assess`
-
-Interactive compliance assessment against RGPD controls.
-
-**What it does:**
-- Loads system-model from discover phase
-- Evaluates each RGPD article (grouped by chapter)
-- **Asks for confirmation** at each step
-- Identifies gaps and missing information
-- Calculates compliance score
-
-**Output:**
-- `.osk/compliance/assessment-rgpd.yaml`
-- `.osk/compliance/assessment-rgpd.md`
-- `.osk/compliance/gaps-rgpd.yaml`
-
-**Flags:**
-- `--update` - Re-assess only changed controls
-- `--quick` - Skip confirmations for compliant controls
-- `--export` - Also generate audit report
-
-See: `prompts/assess.md`
-
-### `/osk-comply rgpd generate`
-
-Interactive document generation from templates.
-
-**What it does:**
-- Loads assessment results and system-model
-- Determines which documents are required
-- **Asks user to select** which documents to generate
-- **Fills information gaps** through dialogue
-- Generates completed compliance documents
-
-**Output:**
-```
-.osk/compliance/documents/rgpd/
-├── core/
-│   ├── registre-traitement.md    # Art. 30
-│   ├── mesures-securite.md       # Art. 32
-│   ├── aipd-{processing}.md      # Art. 35 (if required)
-│   └── lia-{processing}.md       # Art. 6(1)(f) (if needed)
-├── contracts/
-│   └── clause-{processor}.md     # Art. 28
-├── procedures/
-│   ├── violation-donnees.md      # Art. 33-34
-│   └── droits-personnes.md       # Art. 12-22
-└── public/
-    └── politique-confidentialite.md  # Art. 13-14
-```
-
-**Flags:**
-- `--doc <name>` - Generate specific document only
-- `--all` - Generate all without prompting
-- `--update` - Re-generate changed documents
-- `--format <md|pdf|html>` - Output format
-
-See: `prompts/generate.md`
-
-### `/osk-comply rgpd status`
-
-Display current compliance status without running assessment.
+## Starting a New Workflow
 
 ```
-RGPD Compliance Status
-──────────────────────
-Last assessment: 2026-01-15
-Score: 78% (Partial Compliance)
-Critical gaps: 2
-Documents generated: 5/8
+1. Check prerequisites
+   ├── System model exists? ──▶ If no: ERROR "Run /osk-discover first"
+   └── workflow-state.yaml exists?
+       ├── If yes: Prompt "Resume existing workflow or start new?"
+       └── If no: Initialize new workflow-state.yaml
+
+2. Execute Phase 1 (Processing Inventory)
+   └── Save checkpoint after completion
+
+3. Determine Phase 2 path
+   ├── AIPD required? ──▶ Execute Phase 2 for each processing
+   └── AIPD not required? ──▶ Record justification, skip to Phase 3
+
+4. Execute remaining phases sequentially
+   └── Save checkpoint after each phase
+
+5. Generate final documentation
+   └── Display completion summary
 ```
 
-## Templates
+## Resuming Workflow
 
-### Core Documents
+```
+1. Load workflow-state.yaml
+2. Display current state summary
+3. Prompt: "Resume from [current_phase]?"
+4. If yes: Continue from saved state
+5. If no: Offer options
+   ├── Restart from specific phase
+   ├── Start completely new workflow
+   └── Cancel
+```
 
-| Template | Article | Description |
-|----------|---------|-------------|
-| `registre-traitement.md.tera` | 30 | Record of Processing Activities (ROPA) |
-| `mesures-securite.md.tera` | 32 | Security measures (CNIL 25 fiches) |
-| `aipd.md.tera` | 35 | Data Protection Impact Assessment |
-| `lia.md.tera` | 6(1)(f) | Legitimate Interest Assessment |
+## Error Handling
 
-### Contracts
+```yaml
+on_error:
+  - Save current state to workflow-state.yaml
+  - Log error details
+  - Display recovery options:
+    - Retry current step
+    - Skip current step (if allowed)
+    - Rollback to previous checkpoint
+    - Abort workflow
+```
 
-| Template | Article | Description |
-|----------|---------|-------------|
-| `clause-sous-traitant.md.tera` | 28 | Processor contract clauses |
+---
 
-### Procedures
+# Workflow State Management
 
-| Template | Article | Description |
-|----------|---------|-------------|
-| `violation-donnees.md.tera` | 33-34 | Breach notification procedure |
-| `droits-personnes.md.tera` | 12-22 | Data subject rights procedure |
+The workflow tracks state in `.osk/comply/rgpd/workflow-state.yaml`:
 
-### Public
+```yaml
+workflow:
+  version: "5.0.0"
+  started_at: "2026-01-22T10:00:00Z"
+  current_phase: inventory        # Current active phase
+  current_step: null              # Step within phase (for AIPD)
 
-| Template | Article | Description |
-|----------|---------|-------------|
-| `politique-confidentialite.md.tera` | 13-14 | Privacy policy |
+  phases:
+    inventory:
+      status: completed           # pending | in_progress | completed | skipped
+      output: processing-inventory.yaml
+      result:
+        total_processing: 5
+        aipd_required: 2
 
-## Knowledge Base
+    aipd:
+      status: in_progress
+      required: true              # Based on Phase 1 determination
+      processing_activities:
+        - id: analytics
+          status: completed
+        - id: profiling
+          status: in_progress
+
+    control_assessment:
+      status: pending
+
+    gaps_analysis:
+      status: pending
+
+    documentation:
+      status: pending
+```
+
+## Phase Dependencies
+
+```
+Phase 1 (Inventory)
+    │
+    ├──► Phase 2 (AIPD) ─────► if required by Phase 1
+    │         │
+    │         └── Can be skipped if no high-risk processing
+    │
+    ▼
+Phase 3 (Control Assessment)
+    │
+    ├──► Uses Phase 1 processing inventory
+    │
+    ├──► Uses Phase 2 AIPD results (if available)
+    │
+    ▼
+Phase 4 (Gap Analysis)
+    │
+    ├──► Consolidates Phase 3 assessment results
+    │
+    ▼
+Phase 5 (Documentation)
+    │
+    ├──► Uses all previous phases
+    │
+    └──► Generates conditional docs based on Phase 1-4
+```
+
+---
+
+# Flags
+
+## --update
+
+Re-assess only components that have changed since last run. Compares system-model timestamps with workflow state.
+
+## --export <format>
+
+Export compliance documentation in specified format:
+- `md` - Markdown (default)
+- `pdf` - PDF (requires pandoc)
+
+---
+
+# Knowledge Base
 
 ```
 knowledge/
 ├── core/                           # Essential guides
 │   ├── guide-securite.md           # CNIL 25 security fiches
 │   ├── guide-sous-traitant.md      # Processor obligations
-│   ├── aipd-modeles.md             # DPIA methodology
-│   ├── aipd-liste-obligatoire.md   # DPIA mandatory list
+│   ├── aipd-modeles.md             # CNIL PIA methodology
+│   ├── aipd-liste-obligatoire.md   # CNIL mandatory AIPD list
 │   ├── interet-legitime.md         # Legitimate interest
 │   ├── violations-donnees.md       # Breach notification
 │   ├── breach-notification.md      # Breach procedures
@@ -174,11 +255,11 @@ knowledge/
 │   ├── rgpd-complet.md             # Full RGPD text
 │   ├── edpb-droit-acces.md         # Access right guidelines
 │   ├── edpb-breach-examples.md     # Breach case studies
-│   ├── adequacy-list.yaml          # Adequacy decisions
 │   └── sccs-2021.md                # Standard Contractual Clauses
-└── optional/                       # Additional resources
-    ├── guide-dpo.md                # DPO guide
-    └── cookies-guidelines.md       # Cookie compliance
+├── optional/                       # Additional resources
+│   ├── guide-dpo.md                # DPO guide
+│   └── cookies-guidelines.md       # Cookie compliance
+└── french_law_78-17_1978_complete.md  # Loi Informatique et Libertés
 ```
 
 ## Framework Definition
@@ -188,54 +269,47 @@ See `framework.yaml` for:
 - Control categories and criticality
 - Evidence types expected
 - Scoring methodology
-- Cross-framework mapping (ISO 27001, NIS2)
 
-## Interactive Features
+## Schemas
 
-Both assess and generate prompts are **interactive**:
-
-1. **Confirmation steps** - User validates auto-detected findings
-2. **Gap-filling questions** - Missing information requested with clear options
-3. **Review before action** - Preview before generating documents
-4. **Progress saving** - Can pause and resume
-5. **Explanation of requirements** - Plain language alongside legal references
-
-## Output Schema
-
-Assessment output follows the schema at:
-- `kit/comply/frameworks/_schema/assessment.yaml` (base)
-- `kit/comply/frameworks/rgpd/schemas/assessment-extension.yaml` (RGPD-specific)
-
-## Examples
-
-### Quick assessment check
-```bash
-/osk-comply rgpd assess --quick
+```
+schemas/
+├── workflow-state.yaml           # Workflow state tracking
+├── processing-inventory.yaml     # Phase 1 output
+├── aipd.yaml                     # Phase 2 output (CNIL PIA)
+├── control-assessment.yaml       # Phase 3 output
+└── gaps-analysis.yaml            # Phase 4 output
 ```
 
-### Generate only the privacy policy
-```bash
-/osk-comply rgpd generate --doc politique-confidentialite
+---
+
+# Output Directory Structure
+
+```
+.osk/comply/rgpd/
+├── workflow-state.yaml           # Workflow progress
+├── processing-inventory.yaml     # Phase 1
+├── aipd/                         # Phase 2
+│   ├── analytics.yaml
+│   └── profiling.yaml
+├── control-assessment.yaml       # Phase 3
+├── gaps-analysis.yaml            # Phase 4
+└── documents/                    # Phase 5
+    ├── core/
+    ├── contracts/
+    ├── procedures/
+    └── public/
 ```
 
-### Full compliance package
-```bash
-/osk-comply rgpd generate --all
-```
+---
 
-### Update after fixing gaps
-```bash
-/osk-comply rgpd assess --update
-/osk-comply rgpd generate --update
-```
-
-## Dependencies
+# Dependencies
 
 - **Discover phase** must be completed first
 - System model files in `.osk/system-model/`
 - Minimum: `index.yaml` and `data.yaml`
 
-## Related Frameworks
+# Related Frameworks
 
-- `rgs` - French government security standard
+- `rgs` - French government security standard (RGS/EBIOS RM)
 - Coming: `nis2`, `iso27001`

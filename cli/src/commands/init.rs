@@ -347,10 +347,7 @@ fn select_agents_to_install(
     // Let user select which detected agents to install
     let detected_agents: Vec<&AgentDetection> = detections.iter().filter(|d| d.detected).collect();
 
-    let agent_names: Vec<String> = detected_agents
-        .iter()
-        .map(|d| d.name.clone())
-        .collect();
+    let agent_names: Vec<String> = detected_agents.iter().map(|d| d.name.clone()).collect();
 
     // All detected agents pre-selected by default
     let defaults: Vec<bool> = vec![true; detected_agents.len()];

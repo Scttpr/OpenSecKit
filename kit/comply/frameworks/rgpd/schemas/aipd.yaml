@@ -1,0 +1,550 @@
+# RGPD AIPD/DPIA Schema
+# Output of Phase 2: AIPD following CNIL methodology
+# Location: .osk/comply/rgpd/aipd/{processing-name}.yaml
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: RGPD AIPD (DPIA)
+description: Schema for Data Protection Impact Assessment using CNIL methodology
+version: "5.0.0"
+
+type: object
+required:
+  - aipd
+properties:
+  aipd:
+    type: object
+    required:
+      - version
+      - timestamp
+      - processing
+      - context
+      - principles
+      - risks
+      - validation
+    properties:
+      version:
+        type: string
+        description: Schema version
+        example: "5.0.0"
+
+      timestamp:
+        type: string
+        format: date-time
+
+      processing:
+        type: object
+        required:
+          - id
+          - name
+        properties:
+          id:
+            type: string
+          name:
+            type: string
+          description:
+            type: string
+
+      # ============================================
+      # Step 1: Context Study
+      # ============================================
+      context:
+        type: object
+        required:
+          - overview
+          - data_and_processes
+        properties:
+          overview:
+            type: object
+            properties:
+              nature:
+                type: string
+                description: What the processing does
+              scope:
+                type: object
+                properties:
+                  data_subjects_count:
+                    type: string
+                  geographic_scope:
+                    type: string
+                    enum: [local, national, eu, global]
+                  data_volume:
+                    type: string
+              context:
+                type: string
+                description: Business and technical context
+              stakes:
+                type: string
+                description: Stakes for data subjects
+
+          data_and_processes:
+            type: object
+            properties:
+              data_categories:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    category:
+                      type: string
+                    fields:
+                      type: array
+                      items:
+                        type: string
+                    retention:
+                      type: string
+              recipients:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    purpose:
+                      type: string
+              processing_flow:
+                type: object
+                properties:
+                  collection:
+                    type: string
+                  storage:
+                    type: string
+                  processing:
+                    type: array
+                    items:
+                      type: string
+                  output:
+                    type: string
+                  deletion:
+                    type: string
+
+          supporting_assets:
+            type: object
+            properties:
+              hardware:
+                type: array
+                items:
+                  type: string
+              software:
+                type: array
+                items:
+                  type: string
+              networks:
+                type: array
+                items:
+                  type: string
+              people:
+                type: array
+                items:
+                  type: string
+              locations:
+                type: array
+                items:
+                  type: string
+
+      # ============================================
+      # Step 2: Fundamental Principles Evaluation
+      # ============================================
+      principles:
+        type: object
+        required:
+          - proportionality
+          - rights_protection
+        properties:
+          proportionality:
+            type: object
+            properties:
+              purposes:
+                type: object
+                properties:
+                  description:
+                    type: array
+                    items:
+                      type: string
+                  legitimate:
+                    type: boolean
+                  assessment:
+                    type: string
+                    enum: [acceptable, needs_improvement]
+              legal_basis:
+                type: object
+                properties:
+                  type:
+                    type: string
+                  necessary:
+                    type: boolean
+                  less_intrusive_alternatives:
+                    type: boolean
+                  justification:
+                    type: string
+              minimization:
+                type: object
+                properties:
+                  assessment:
+                    type: string
+                    enum: [acceptable, needs_improvement]
+                  fields_to_review:
+                    type: array
+                    items:
+                      type: string
+              data_quality:
+                type: object
+                properties:
+                  measures:
+                    type: array
+                    items:
+                      type: string
+                  assessment:
+                    type: string
+                    enum: [acceptable, needs_improvement]
+              retention:
+                type: object
+                properties:
+                  period:
+                    type: string
+                  justified:
+                    type: boolean
+                  deletion_mechanism:
+                    type: string
+
+          rights_protection:
+            type: object
+            properties:
+              information:
+                type: object
+                properties:
+                  method:
+                    type: array
+                    items:
+                      type: string
+                  complete:
+                    type: boolean
+                  accessible:
+                    type: boolean
+              consent:
+                type: object
+                properties:
+                  applicable:
+                    type: boolean
+                  freely_given:
+                    type: boolean
+                  specific:
+                    type: boolean
+                  informed:
+                    type: boolean
+                  unambiguous:
+                    type: boolean
+                  withdrawable:
+                    type: boolean
+              rights_exercise:
+                type: object
+                properties:
+                  access:
+                    type: string
+                    enum: [implemented, partial, not_implemented]
+                  rectification:
+                    type: string
+                    enum: [implemented, partial, not_implemented]
+                  erasure:
+                    type: string
+                    enum: [implemented, partial, not_implemented]
+                  restriction:
+                    type: string
+                    enum: [implemented, partial, not_implemented]
+                  portability:
+                    type: string
+                    enum: [implemented, partial, not_implemented]
+                  object:
+                    type: string
+                    enum: [implemented, partial, not_implemented]
+              processors:
+                type: object
+                properties:
+                  all_dpa_signed:
+                    type: boolean
+                  art28_compliant:
+                    type: boolean
+              transfers:
+                type: object
+                properties:
+                  outside_eu:
+                    type: boolean
+                  mechanism:
+                    type: string
+                  tia_completed:
+                    type: boolean
+
+          overall_assessment:
+            type: string
+            enum: [acceptable, needs_improvement]
+          corrective_measures:
+            type: array
+            items:
+              type: string
+
+      # ============================================
+      # Step 3: Risk Analysis
+      # ============================================
+      risks:
+        type: object
+        required:
+          - illegitimate_access
+          - unwanted_modification
+          - disappearance
+        properties:
+          illegitimate_access:
+            $ref: "#/$defs/risk_analysis"
+          unwanted_modification:
+            $ref: "#/$defs/risk_analysis"
+          disappearance:
+            $ref: "#/$defs/risk_analysis"
+
+      # ============================================
+      # Step 4: Validation
+      # ============================================
+      validation:
+        type: object
+        required:
+          - risk_cartography
+          - action_plan
+          - dpo_opinion
+        properties:
+          risk_cartography:
+            type: object
+            properties:
+              illegitimate_access:
+                $ref: "#/$defs/risk_position"
+              unwanted_modification:
+                $ref: "#/$defs/risk_position"
+              disappearance:
+                $ref: "#/$defs/risk_position"
+
+          action_plan:
+            type: array
+            items:
+              type: object
+              required:
+                - measure
+                - risk
+                - owner
+              properties:
+                id:
+                  type: string
+                measure:
+                  type: string
+                risk:
+                  type: array
+                  items:
+                    type: string
+                cost:
+                  type: string
+                  enum: ["+", "++", "+++"]
+                owner:
+                  type: string
+                deadline:
+                  type: string
+                status:
+                  type: string
+                  enum: [planned, in_progress, completed]
+
+          residual_risks:
+            type: array
+            items:
+              type: object
+              properties:
+                risk:
+                  type: string
+                initial_zone:
+                  type: string
+                  enum: [green, orange, red]
+                residual_zone:
+                  type: string
+                  enum: [green, orange, red]
+                acceptable:
+                  type: boolean
+
+          dpo_opinion:
+            type: object
+            properties:
+              name:
+                type: string
+              date:
+                type: string
+                format: date
+              opinion:
+                type: string
+                enum: [favorable, favorable_with_conditions, unfavorable]
+              comments:
+                type: string
+
+          data_subject_consultation:
+            type: object
+            properties:
+              consulted:
+                type: boolean
+              method:
+                type: string
+              findings:
+                type: string
+
+          formal_validation:
+            type: object
+            properties:
+              validator_name:
+                type: string
+              validator_role:
+                type: string
+              date:
+                type: string
+                format: date
+              decision:
+                type: string
+                enum: [approved, approved_with_conditions, rejected]
+              cnil_consultation_required:
+                type: boolean
+              review_cycle:
+                type: string
+
+$defs:
+  risk_analysis:
+    type: object
+    properties:
+      sources:
+        type: array
+        items:
+          type: string
+        description: Sources of risk (human internal/external, non-human)
+      threats:
+        type: array
+        items:
+          type: string
+        description: How it could happen
+      impacts:
+        type: array
+        items:
+          type: string
+        description: Impacts on data subjects
+      existing_measures:
+        type: array
+        items:
+          type: string
+        description: Current controls
+      gravity:
+        type: integer
+        minimum: 1
+        maximum: 4
+        description: Impact severity (1=negligible, 4=maximum)
+      likelihood:
+        type: integer
+        minimum: 1
+        maximum: 4
+        description: Probability (1=negligible, 4=maximum)
+
+  risk_position:
+    type: object
+    properties:
+      initial:
+        type: object
+        properties:
+          gravity:
+            type: integer
+          likelihood:
+            type: integer
+          zone:
+            type: string
+            enum: [green, orange, red]
+      residual:
+        type: object
+        properties:
+          gravity:
+            type: integer
+          likelihood:
+            type: integer
+          zone:
+            type: string
+            enum: [green, orange, red]
+
+# Example instance
+example:
+  aipd:
+    version: "5.0.0"
+    timestamp: "2026-01-22T12:00:00Z"
+
+    processing:
+      id: "analytics"
+      name: "User analytics"
+      description: "Analysis of user behavior for service improvement"
+
+    context:
+      overview:
+        nature: "Collects user behavior data to personalize content and improve service"
+        scope:
+          data_subjects_count: "50,000+"
+          geographic_scope: eu
+          data_volume: "10M events/month"
+        context: "Core to product improvement and user experience"
+        stakes: "Users expect some personalization but may be concerned about profiling"
+
+    principles:
+      proportionality:
+        purposes:
+          description: ["Service improvement", "Personalization"]
+          legitimate: true
+          assessment: acceptable
+        legal_basis:
+          type: legitimate_interest
+          necessary: true
+          less_intrusive_alternatives: false
+          justification: "Aggregated analytics insufficient for personalization"
+      rights_protection:
+        information:
+          method: ["Privacy policy", "Cookie notice"]
+          complete: true
+          accessible: true
+      overall_assessment: acceptable
+
+    risks:
+      illegitimate_access:
+        sources: ["External attacker", "Malicious insider"]
+        threats: ["SQL injection", "Credential theft"]
+        impacts: ["Privacy invasion", "Behavioral profiling exposure"]
+        existing_measures: ["Access control", "Encryption"]
+        gravity: 3
+        likelihood: 3
+      unwanted_modification:
+        gravity: 2
+        likelihood: 2
+      disappearance:
+        gravity: 1
+        likelihood: 2
+
+    validation:
+      risk_cartography:
+        illegitimate_access:
+          initial:
+            gravity: 3
+            likelihood: 3
+            zone: orange
+          residual:
+            gravity: 3
+            likelihood: 1
+            zone: green
+      action_plan:
+        - id: "MES-01"
+          measure: "Implement MFA for all analytics access"
+          risk: ["illegitimate_access"]
+          cost: "+"
+          owner: "IT"
+          deadline: "2026-02-15"
+          status: planned
+      dpo_opinion:
+        name: "Jane Doe"
+        date: "2026-01-22"
+        opinion: favorable_with_conditions
+        comments: "Proceed after implementing MFA"
+      formal_validation:
+        validator_name: "John Smith"
+        validator_role: "CTO"
+        date: "2026-01-22"
+        decision: approved_with_conditions
+        cnil_consultation_required: false
+        review_cycle: "annually"
