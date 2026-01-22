@@ -1,0 +1,405 @@
+# RGPD Gaps Analysis Schema
+# Output of Phase 4: Gap Analysis
+# Location: .osk/comply/rgpd/gaps-analysis.yaml
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: RGPD Gaps Analysis
+description: Schema for RGPD compliance gap analysis and remediation planning
+version: "5.0.0"
+
+type: object
+required:
+  - gaps_analysis
+properties:
+  gaps_analysis:
+    type: object
+    required:
+      - version
+      - timestamp
+      - summary
+      - gaps
+      - remediation_roadmap
+    properties:
+      version:
+        type: string
+        description: Schema version
+        example: "5.0.0"
+
+      timestamp:
+        type: string
+        format: date-time
+        description: Analysis timestamp
+
+      # Summary statistics
+      summary:
+        type: object
+        required:
+          - total_gaps
+          - by_priority
+          - by_category
+        properties:
+          total_gaps:
+            type: integer
+            minimum: 0
+          compliance_score:
+            type: number
+            description: Current compliance percentage
+          by_priority:
+            type: object
+            properties:
+              p0_blockers:
+                type: integer
+              quick_wins:
+                type: integer
+              p1_high:
+                type: integer
+              p2_medium:
+                type: integer
+              p3_low:
+                type: integer
+          by_category:
+            type: object
+            properties:
+              organizational:
+                type: integer
+              technical:
+                type: integer
+              legal:
+                type: integer
+              evidence:
+                type: integer
+          by_chapter:
+            type: object
+            properties:
+              principles:
+                type: integer
+                description: Chapter II (Art. 5-11)
+              rights:
+                type: integer
+                description: Chapter III (Art. 12-22)
+              controller:
+                type: integer
+                description: Chapter IV (Art. 24-43)
+              transfers:
+                type: integer
+                description: Chapter V (Art. 44-49)
+
+      # All gaps
+      gaps:
+        type: array
+        items:
+          type: object
+          required:
+            - id
+            - article
+            - category
+            - priority
+            - description
+          properties:
+            id:
+              type: string
+              pattern: "^GAP-[0-9]+$"
+            article:
+              type: string
+              description: RGPD article reference
+            category:
+              type: string
+              enum: [organizational, technical, legal, evidence]
+            priority:
+              type: string
+              enum: [p0_blocker, quick_win, p1_high, p2_medium, p3_low]
+            description:
+              type: string
+            current_state:
+              type: string
+            required_state:
+              type: string
+            source:
+              type: string
+              description: Which phase identified this gap
+              enum: [phase1_inventory, phase2_aipd, phase3_assessment]
+            remediation:
+              type: object
+              properties:
+                action:
+                  type: string
+                owner:
+                  type: string
+                effort:
+                  type: string
+                  enum: [low, medium, high]
+                estimated_hours:
+                  type: integer
+                dependencies:
+                  type: array
+                  items:
+                    type: string
+            impact:
+              type: object
+              properties:
+                score_improvement:
+                  type: number
+                  description: Expected % improvement
+                risk_reduction:
+                  type: string
+                  enum: [low, medium, high]
+
+      # Quick wins
+      quick_wins:
+        type: array
+        items:
+          type: object
+          required:
+            - gap_id
+            - impact_score
+            - effort_hours
+            - roi_score
+          properties:
+            gap_id:
+              type: string
+            impact_score:
+              type: number
+              description: Expected score improvement (%)
+            effort_hours:
+              type: integer
+              description: Estimated effort in hours
+            roi_score:
+              type: number
+              minimum: 0
+              maximum: 10
+              description: ROI score (impact/effort ratio)
+
+      # Remediation roadmap
+      remediation_roadmap:
+        type: object
+        required:
+          - phases
+        properties:
+          phases:
+            type: array
+            items:
+              type: object
+              required:
+                - name
+                - timeframe
+                - gaps
+              properties:
+                name:
+                  type: string
+                  description: Phase name (e.g., "Immediate", "Short-term")
+                timeframe:
+                  type: string
+                  description: Duration (e.g., "Week 1-2", "Week 3-6")
+                gaps:
+                  type: array
+                  items:
+                    type: string
+                  description: Gap IDs in this phase
+                focus:
+                  type: string
+                  description: Phase focus description
+                total_effort_hours:
+                  type: integer
+
+      # Compliance projection
+      compliance_projection:
+        type: object
+        properties:
+          current_score:
+            type: number
+          milestones:
+            type: array
+            items:
+              type: object
+              properties:
+                phase:
+                  type: string
+                timeframe:
+                  type: string
+                projected_score:
+                  type: number
+          target_score:
+            type: number
+
+      # AIPD integration (if Phase 2 completed)
+      aipd_integration:
+        type: object
+        properties:
+          action_items_mapped:
+            type: integer
+            description: Number of AIPD action items mapped to gaps
+          measures_mapped:
+            type: array
+            items:
+              type: object
+              properties:
+                aipd_measure:
+                  type: string
+                  description: AIPD action item ID
+                gap_id:
+                  type: string
+                  description: Mapped gap ID
+          residual_risks:
+            type: array
+            items:
+              type: object
+              properties:
+                risk_id:
+                  type: string
+                status:
+                  type: string
+                  description: Risk status and tracking gap
+
+# Example instance
+example:
+  gaps_analysis:
+    version: "5.0.0"
+    timestamp: "2026-01-22T14:00:00Z"
+
+    summary:
+      total_gaps: 15
+      compliance_score: 62
+      by_priority:
+        p0_blockers: 2
+        quick_wins: 4
+        p1_high: 3
+        p2_medium: 4
+        p3_low: 2
+      by_category:
+        organizational: 4
+        technical: 5
+        legal: 3
+        evidence: 3
+      by_chapter:
+        principles: 2
+        rights: 3
+        controller: 7
+        transfers: 3
+
+    gaps:
+      - id: GAP-001
+        article: "Art. 44-46"
+        category: legal
+        priority: p0_blocker
+        description: "Notion missing transfer mechanism (SCCs)"
+        current_state: "No safeguards for US transfer"
+        required_state: "SCCs 2021 signed"
+        source: phase1_inventory
+        remediation:
+          action: "Contact Notion to sign SCCs"
+          owner: Legal
+          effort: low
+          estimated_hours: 4
+        impact:
+          score_improvement: 4
+          risk_reduction: high
+
+      - id: GAP-006
+        article: "Art. 13-14"
+        category: evidence
+        priority: quick_win
+        description: "Privacy policy incomplete"
+        current_state: "Missing Art. 13 required elements"
+        required_state: "Complete privacy policy"
+        source: phase3_assessment
+        remediation:
+          action: "Update privacy policy with missing elements"
+          owner: DPO
+          effort: low
+          estimated_hours: 4
+        impact:
+          score_improvement: 5
+          risk_reduction: medium
+
+      - id: GAP-008
+        article: "Art. 33-34"
+        category: organizational
+        priority: p1_high
+        description: "Breach procedure not documented"
+        current_state: "Informal process only"
+        required_state: "Documented and tested procedure"
+        source: phase3_assessment
+        remediation:
+          action: "Create breach notification procedure"
+          owner: DPO
+          effort: medium
+          estimated_hours: 16
+        impact:
+          score_improvement: 6
+          risk_reduction: high
+
+    quick_wins:
+      - gap_id: GAP-006
+        impact_score: 5
+        effort_hours: 4
+        roi_score: 9.5
+      - gap_id: GAP-013
+        impact_score: 3
+        effort_hours: 2
+        roi_score: 9.0
+      - gap_id: GAP-001
+        impact_score: 4
+        effort_hours: 4
+        roi_score: 8.5
+      - gap_id: GAP-014
+        impact_score: 2
+        effort_hours: 4
+        roi_score: 8.0
+
+    remediation_roadmap:
+      phases:
+        - name: "Immediate"
+          timeframe: "Week 1-2"
+          gaps: ["GAP-001", "GAP-002", "GAP-006", "GAP-013", "GAP-014"]
+          focus: "Blockers and quick wins"
+          total_effort_hours: 18
+
+        - name: "Short-term"
+          timeframe: "Week 3-6"
+          gaps: ["GAP-008", "GAP-012", "GAP-011", "GAP-004"]
+          focus: "P1 HIGH priority gaps"
+          total_effort_hours: 40
+
+        - name: "Medium-term"
+          timeframe: "Week 7-12"
+          gaps: ["GAP-005", "GAP-009", "GAP-007", "GAP-010"]
+          focus: "P2 MEDIUM priority gaps"
+          total_effort_hours: 60
+
+        - name: "Long-term"
+          timeframe: "Month 4-6"
+          gaps: ["GAP-003", "GAP-015"]
+          focus: "Continuous improvement"
+          total_effort_hours: 40
+
+    compliance_projection:
+      current_score: 62
+      milestones:
+        - phase: "Phase 1 (Immediate)"
+          timeframe: "Week 2"
+          projected_score: 76
+        - phase: "Phase 2 (Short-term)"
+          timeframe: "Week 6"
+          projected_score: 85
+        - phase: "Phase 3 (Medium-term)"
+          timeframe: "Week 12"
+          projected_score: 92
+        - phase: "Phase 4 (Long-term)"
+          timeframe: "Month 6"
+          projected_score: 96
+      target_score: 85
+
+    aipd_integration:
+      action_items_mapped: 3
+      measures_mapped:
+        - aipd_measure: "MES-01"
+          gap_id: "GAP-005"
+        - aipd_measure: "MES-02"
+          gap_id: "GAP-016"
+        - aipd_measure: "MES-03"
+          gap_id: "GAP-017"
+      residual_risks:
+        - risk_id: "R1"
+          status: "GREEN - monitoring only"
+        - risk_id: "R2"
+          status: "ORANGE - pending GAP-016 completion"

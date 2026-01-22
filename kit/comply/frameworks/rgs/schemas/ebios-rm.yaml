@@ -1,0 +1,740 @@
+# EBIOS Risk Manager Schema
+# Output of Phase 2: EBIOS RM (5 Workshops)
+# Location: .osk/comply/rgs/ebios-rm/
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: EBIOS Risk Manager
+description: Schema for EBIOS RM risk analysis outputs
+version: "5.0.0"
+
+# This schema covers all workshop outputs and consolidated files
+
+type: object
+properties:
+  # ============================================
+  # Workshop 1: Cadrage et Socle de Securite
+  # ============================================
+  workshop_1:
+    type: object
+    required:
+      - timestamp
+      - status
+      - scope
+      - business_values
+      - feared_events
+      - security_baseline
+    properties:
+      timestamp:
+        type: string
+        format: date-time
+      status:
+        type: string
+        enum: [completed, partial]
+
+      scope:
+        type: object
+        properties:
+          name:
+            type: string
+          type:
+            type: string
+          domain:
+            type: string
+          missions:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: string
+                name:
+                  type: string
+                description:
+                  type: string
+
+      business_values:
+        type: array
+        items:
+          type: object
+          required:
+            - id
+            - name
+            - security_criteria
+          properties:
+            id:
+              type: string
+              pattern: "^VM[0-9]+$"
+            name:
+              type: string
+            description:
+              type: string
+            security_criteria:
+              type: object
+              properties:
+                disponibilite:
+                  type: integer
+                  minimum: 0
+                  maximum: 4
+                integrite:
+                  type: integer
+                  minimum: 0
+                  maximum: 4
+                confidentialite:
+                  type: integer
+                  minimum: 0
+                  maximum: 4
+            supporting_assets:
+              type: array
+              items:
+                type: string
+
+      supporting_assets:
+        type: object
+        properties:
+          digital:
+            type: array
+            items:
+              $ref: "#/$defs/supporting_asset"
+          physical:
+            type: array
+            items:
+              $ref: "#/$defs/supporting_asset"
+          organizational:
+            type: array
+            items:
+              $ref: "#/$defs/supporting_asset"
+
+      feared_events:
+        type: array
+        items:
+          type: object
+          required:
+            - id
+            - business_value
+            - criterion
+            - severity
+          properties:
+            id:
+              type: string
+              pattern: "^ER-[0-9]+$"
+            business_value:
+              type: string
+            criterion:
+              type: string
+              enum: [disponibilite, integrite, confidentialite, tracabilite]
+            description:
+              type: string
+            severity:
+              type: string
+              enum: [G1, G2, G3, G4]
+            impacts:
+              type: array
+              items:
+                type: string
+
+      security_baseline:
+        type: object
+        properties:
+          applicable_standards:
+            type: array
+            items:
+              type: object
+              properties:
+                name:
+                  type: string
+                mandatory:
+                  type: boolean
+                status:
+                  type: string
+                  enum: [applied, partial, not_applied, in_progress]
+          identified_gaps:
+            type: array
+            items:
+              type: object
+              properties:
+                control:
+                  type: string
+                description:
+                  type: string
+                priority:
+                  type: string
+                  enum: [critical, high, medium, low]
+
+  # ============================================
+  # Workshop 2: Sources de Risque
+  # ============================================
+  workshop_2:
+    type: object
+    required:
+      - timestamp
+      - status
+      - risk_sources
+      - sr_ov_pairs
+      - selected_pairs
+    properties:
+      timestamp:
+        type: string
+        format: date-time
+      status:
+        type: string
+        enum: [completed, partial]
+
+      risk_sources:
+        type: array
+        items:
+          type: object
+          required:
+            - id
+            - category
+            - name
+          properties:
+            id:
+              type: string
+              pattern: "^SR-[0-9]+$"
+            category:
+              type: string
+              enum: [state, organized_crime, terrorist, activist, competitor, insider, amateur]
+            name:
+              type: string
+            description:
+              type: string
+            motivation:
+              type: string
+              enum: [high, medium, low]
+            resources:
+              type: string
+              enum: [high, medium, low]
+            known_activity:
+              type: string
+
+      target_objectives:
+        type: array
+        items:
+          type: object
+          required:
+            - id
+            - name
+            - type
+          properties:
+            id:
+              type: string
+              pattern: "^OV-[0-9]+$"
+            name:
+              type: string
+            type:
+              type: string
+              enum: [espionage, prepositioning, influence, destabilization, profit, ideology, revenge]
+            linked_feared_events:
+              type: array
+              items:
+                type: string
+
+      sr_ov_pairs:
+        type: array
+        items:
+          type: object
+          required:
+            - id
+            - source
+            - objective
+            - pertinence
+          properties:
+            id:
+              type: string
+              pattern: "^SROV-[0-9]+$"
+            source:
+              type: string
+            objective:
+              type: string
+            pertinence:
+              type: integer
+              minimum: 1
+              maximum: 4
+            justification:
+              type: string
+            selected:
+              type: boolean
+
+      selected_pairs:
+        type: array
+        items:
+          type: string
+        description: IDs of selected SR/OV pairs for analysis
+
+  # ============================================
+  # Workshop 3: Scenarios Strategiques
+  # ============================================
+  workshop_3:
+    type: object
+    required:
+      - timestamp
+      - status
+      - ecosystem
+      - strategic_scenarios
+    properties:
+      timestamp:
+        type: string
+        format: date-time
+      status:
+        type: string
+        enum: [completed, partial]
+
+      ecosystem:
+        type: object
+        properties:
+          stakeholders:
+            type: array
+            items:
+              type: object
+              required:
+                - id
+                - name
+                - type
+              properties:
+                id:
+                  type: string
+                  pattern: "^PP-[0-9]+$"
+                name:
+                  type: string
+                type:
+                  type: string
+                  enum: [partner, provider, supplier, client, internal]
+                evaluation:
+                  type: object
+                  properties:
+                    dependance:
+                      type: integer
+                      minimum: 1
+                      maximum: 4
+                    penetration:
+                      type: integer
+                      minimum: 1
+                      maximum: 4
+                    maturite_cyber:
+                      type: integer
+                      minimum: 1
+                      maximum: 4
+                    confiance:
+                      type: integer
+                      minimum: 1
+                      maximum: 4
+                    dangerosite:
+                      type: number
+                criticality:
+                  type: string
+                  enum: [critical, high, medium, low]
+
+      strategic_scenarios:
+        type: array
+        items:
+          type: object
+          required:
+            - id
+            - sr_ov_pair
+            - attack_path
+          properties:
+            id:
+              type: string
+              pattern: "^SS-[0-9]+$"
+            sr_ov_pair:
+              type: string
+            attack_path:
+              type: object
+              properties:
+                type:
+                  type: string
+                  enum: [direct, indirect]
+                via_stakeholder:
+                  type: string
+                target_value:
+                  type: string
+                feared_event:
+                  type: string
+            description:
+              type: string
+            threat_level:
+              type: integer
+              minimum: 1
+              maximum: 4
+
+      ecosystem_measures:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: string
+            stakeholder:
+              type: string
+            type:
+              type: string
+              enum: [contractual, technical, organizational]
+            description:
+              type: string
+            status:
+              type: string
+              enum: [planned, in_progress, implemented]
+
+  # ============================================
+  # Workshop 4: Scenarios Operationnels
+  # ============================================
+  workshop_4:
+    type: object
+    required:
+      - timestamp
+      - status
+      - critical_assets
+      - operational_scenarios
+    properties:
+      timestamp:
+        type: string
+        format: date-time
+      status:
+        type: string
+        enum: [completed, partial]
+
+      critical_assets:
+        type: array
+        items:
+          type: object
+          required:
+            - id
+            - name
+          properties:
+            id:
+              type: string
+              pattern: "^BSC-[0-9]+$"
+            name:
+              type: string
+            type:
+              type: string
+            exposure:
+              type: string
+              enum: [internet, partners, internal]
+            linked_scenarios:
+              type: array
+              items:
+                type: string
+
+      operational_scenarios:
+        type: array
+        items:
+          type: object
+          required:
+            - id
+            - strategic_scenario
+            - elementary_actions
+            - global_likelihood
+          properties:
+            id:
+              type: string
+              pattern: "^SO-[0-9]+$"
+            strategic_scenario:
+              type: string
+            description:
+              type: string
+            elementary_actions:
+              type: array
+              items:
+                type: object
+                properties:
+                  phase:
+                    type: string
+                    enum: [reconnaissance, weaponization, delivery, exploitation, installation, c2, objective]
+                  action:
+                    type: string
+                  likelihood:
+                    type: string
+                    enum: [V1, V2, V3, V4]
+            global_likelihood:
+              type: string
+              enum: [V1, V2, V3, V4]
+            linked_feared_event:
+              type: string
+            severity:
+              type: string
+              enum: [G1, G2, G3, G4]
+
+  # ============================================
+  # Workshop 5: Traitement du Risque
+  # ============================================
+  workshop_5:
+    type: object
+    required:
+      - timestamp
+      - status
+      - risk_assessment
+      - treatment_plan
+      - residual_risks
+    properties:
+      timestamp:
+        type: string
+        format: date-time
+      status:
+        type: string
+        enum: [completed, partial]
+
+      risk_assessment:
+        type: array
+        items:
+          type: object
+          required:
+            - id
+            - operational_scenario
+            - initial
+            - treatment_strategy
+            - residual
+          properties:
+            id:
+              type: string
+              pattern: "^R[0-9]+$"
+            operational_scenario:
+              type: string
+            initial:
+              type: object
+              properties:
+                likelihood:
+                  type: string
+                  enum: [V1, V2, V3, V4]
+                severity:
+                  type: string
+                  enum: [G1, G2, G3, G4]
+                zone:
+                  type: string
+                  enum: [green, orange, red]
+            treatment_strategy:
+              type: string
+              enum: [reduce, accept, transfer, avoid]
+            measures:
+              type: array
+              items:
+                type: string
+            residual:
+              type: object
+              properties:
+                likelihood:
+                  type: string
+                  enum: [V1, V2, V3, V4]
+                severity:
+                  type: string
+                  enum: [G1, G2, G3, G4]
+                zone:
+                  type: string
+                  enum: [green, orange, red]
+            acceptance:
+              type: object
+              properties:
+                accepted:
+                  type: boolean
+                justification:
+                  type: string
+                accepted_by:
+                  type: string
+
+      treatment_plan:
+        type: object
+        properties:
+          measures:
+            type: array
+            items:
+              type: object
+              required:
+                - id
+                - description
+                - category
+              properties:
+                id:
+                  type: string
+                  pattern: "^MES-[0-9]+$"
+                description:
+                  type: string
+                category:
+                  type: string
+                  enum: [governance, protection, defense, resilience]
+                addresses_risks:
+                  type: array
+                  items:
+                    type: string
+                responsible:
+                  type: string
+                cost:
+                  type: string
+                  enum: ["+", "++", "+++"]
+                deadline:
+                  type: string
+                status:
+                  type: string
+                  enum: [planned, in_progress, completed]
+
+      residual_risks:
+        type: array
+        items:
+          type: object
+          required:
+            - id
+            - likelihood
+            - severity
+            - zone
+            - acceptance_status
+          properties:
+            id:
+              type: string
+            description:
+              type: string
+            likelihood:
+              type: string
+              enum: [V1, V2, V3, V4]
+            severity:
+              type: string
+              enum: [G1, G2, G3, G4]
+            zone:
+              type: string
+              enum: [green, orange, red]
+            acceptance_status:
+              type: string
+              enum: [accepted, under_review, rejected]
+            monitoring:
+              type: string
+              enum: [required, optional, none]
+
+      monitoring_framework:
+        type: object
+        properties:
+          kpis:
+            type: array
+            items:
+              type: object
+              properties:
+                name:
+                  type: string
+                target:
+                  type: string
+                frequency:
+                  type: string
+          governance:
+            type: object
+            properties:
+              steering_committee:
+                type: object
+                properties:
+                  frequency:
+                    type: string
+              risk_review:
+                type: object
+                properties:
+                  frequency:
+                    type: string
+              ebios_update:
+                type: object
+                properties:
+                  strategic_cycle:
+                    type: string
+                  operational_cycle:
+                    type: string
+          review_triggers:
+            type: array
+            items:
+              type: string
+
+  # ============================================
+  # Consolidated Risk Register
+  # ============================================
+  risk_register:
+    type: object
+    required:
+      - version
+      - timestamp
+      - risks
+    properties:
+      version:
+        type: string
+      timestamp:
+        type: string
+        format: date-time
+      risks:
+        type: array
+        items:
+          type: object
+          required:
+            - id
+            - description
+            - initial_assessment
+            - treatment
+            - residual_assessment
+          properties:
+            id:
+              type: string
+            description:
+              type: string
+            source:
+              type: string
+            objective:
+              type: string
+            scenario:
+              type: string
+            feared_event:
+              type: string
+            initial_assessment:
+              type: object
+              properties:
+                likelihood:
+                  type: string
+                severity:
+                  type: string
+                risk_level:
+                  type: string
+            treatment:
+              type: object
+              properties:
+                strategy:
+                  type: string
+                measures:
+                  type: array
+                  items:
+                    type: string
+            residual_assessment:
+              type: object
+              properties:
+                likelihood:
+                  type: string
+                severity:
+                  type: string
+                risk_level:
+                  type: string
+            acceptance:
+              type: object
+              properties:
+                status:
+                  type: string
+                date:
+                  type: string
+                authority:
+                  type: string
+            monitoring:
+              type: object
+              properties:
+                review_frequency:
+                  type: string
+                kpis:
+                  type: array
+                  items:
+                    type: string
+
+$defs:
+  supporting_asset:
+    type: object
+    required:
+      - id
+      - name
+    properties:
+      id:
+        type: string
+        pattern: "^BS-[DPO][0-9]+$"
+      name:
+        type: string
+      type:
+        type: string
+      supports:
+        type: array
+        items:
+          type: string

@@ -1,0 +1,250 @@
+# RGS Level Assessment Schema
+# Output of Phase 1: Level Assessment
+# Location: .osk/comply/rgs/level-assessment.yaml
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: RGS Level Assessment
+description: Schema for RGS security level determination
+version: "5.0.0"
+
+type: object
+required:
+  - level_assessment
+properties:
+  level_assessment:
+    type: object
+    required:
+      - version
+      - timestamp
+      - level
+      - dicp
+      - decision
+      - next_phase
+    properties:
+      version:
+        type: string
+        description: Schema version
+        example: "5.0.0"
+
+      timestamp:
+        type: string
+        format: date-time
+        description: Assessment timestamp
+
+      # Determined level
+      level:
+        type: string
+        enum: ["RGS*", "RGS**", "RGS***"]
+        description: Selected RGS security level
+
+      level_name:
+        type: string
+        enum: [Standard, Renforce, Eleve]
+        description: French name for the level
+
+      # Assessment inputs
+      regulatory_status:
+        type: object
+        properties:
+          oiv:
+            type: boolean
+            description: Is system operated by OIV?
+          ose:
+            type: boolean
+            description: Is system designated as OSE?
+          public_facing:
+            type: boolean
+            description: Is system accessible by citizens?
+
+      data_sensitivity:
+        type: object
+        properties:
+          classification:
+            type: string
+            enum: [standard, sensitive, highly_sensitive, classified]
+          special_categories:
+            type: object
+            properties:
+              health:
+                type: boolean
+              financial:
+                type: boolean
+              legal:
+                type: boolean
+              pii:
+                type: boolean
+
+      service_criticality:
+        type: object
+        properties:
+          availability_requirement:
+            type: string
+            enum: [hours, minutes, seconds, zero_tolerance]
+          breach_impact:
+            type: string
+            enum: [minor, significant, high, critical]
+          criticality_score:
+            type: integer
+            minimum: 1
+            maximum: 4
+
+      # DICP requirements
+      dicp:
+        type: object
+        required:
+          - disponibilite
+          - integrite
+          - confidentialite
+          - preuve
+        properties:
+          disponibilite:
+            type: integer
+            minimum: 0
+            maximum: 4
+          integrite:
+            type: integer
+            minimum: 0
+            maximum: 4
+          confidentialite:
+            type: integer
+            minimum: 0
+            maximum: 4
+          preuve:
+            type: integer
+            minimum: 0
+            maximum: 4
+
+      # Decision
+      decision:
+        type: object
+        required:
+          - recommended_level
+          - selected_level
+          - justification
+        properties:
+          recommended_level:
+            type: string
+            enum: ["RGS*", "RGS**", "RGS***"]
+          selected_level:
+            type: string
+            enum: ["RGS*", "RGS**", "RGS***"]
+          justification:
+            type: string
+          downgrade_justification:
+            type: string
+            description: Required if selected < recommended
+
+      # Next phase configuration
+      next_phase:
+        type: object
+        required:
+          - ebios_rm
+        properties:
+          ebios_rm:
+            type: object
+            required:
+              - required
+              - user_choice
+            properties:
+              required:
+                type: boolean
+                description: Is EBIOS RM mandatory for this level?
+              user_choice:
+                type: string
+                enum: [proceed, skip, simplified]
+              skip_justification:
+                type: string
+                description: Required if user_choice is skip
+
+      # Certification requirements preview
+      certification_requirements:
+        type: object
+        properties:
+          cloud:
+            type: object
+            properties:
+              secnumcloud:
+                type: string
+                enum: [mandatory, recommended, optional]
+              iso27001:
+                type: string
+                enum: [mandatory, recommended, optional]
+              hds:
+                type: string
+                enum: [mandatory, recommended, optional, not_applicable]
+          crypto:
+            type: object
+            properties:
+              anssi_approved:
+                type: boolean
+              hsm:
+                type: string
+                enum: [mandatory, recommended, optional]
+              qualified_certs:
+                type: boolean
+          audit:
+            type: object
+            properties:
+              passi:
+                type: string
+                enum: [mandatory, recommended, optional]
+              pentest:
+                type: string
+                enum: [mandatory, recommended, optional]
+
+# Example instance
+example:
+  level_assessment:
+    version: "5.0.0"
+    timestamp: "2025-01-21T10:30:00Z"
+    level: "RGS**"
+    level_name: "Renforce"
+
+    regulatory_status:
+      oiv: false
+      ose: false
+      public_facing: true
+
+    data_sensitivity:
+      classification: "sensitive"
+      special_categories:
+        health: false
+        financial: true
+        legal: false
+        pii: true
+
+    service_criticality:
+      availability_requirement: "minutes"
+      breach_impact: "significant"
+      criticality_score: 3
+
+    dicp:
+      disponibilite: 2
+      integrite: 3
+      confidentialite: 3
+      preuve: 2
+
+    decision:
+      recommended_level: "RGS**"
+      selected_level: "RGS**"
+      justification: "Public-facing service processing financial and personal data requires enhanced security controls."
+      downgrade_justification: null
+
+    next_phase:
+      ebios_rm:
+        required: true
+        user_choice: "proceed"
+        skip_justification: null
+
+    certification_requirements:
+      cloud:
+        secnumcloud: "recommended"
+        iso27001: "mandatory"
+        hds: "not_applicable"
+      crypto:
+        anssi_approved: true
+        hsm: "recommended"
+        qualified_certs: false
+      audit:
+        passi: "recommended"
+        pentest: "recommended"

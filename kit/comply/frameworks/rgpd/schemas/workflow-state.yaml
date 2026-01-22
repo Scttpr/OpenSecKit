@@ -1,0 +1,167 @@
+# RGPD Workflow State Schema
+# Tracks progress through the 5-phase compliance workflow
+# Location: .osk/comply/rgpd/workflow-state.yaml
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: RGPD Workflow State
+description: State tracking for RGPD compliance workflow
+version: "5.0.0"
+
+type: object
+required:
+  - workflow
+properties:
+  workflow:
+    type: object
+    required:
+      - version
+      - started_at
+      - current_phase
+      - phases
+    properties:
+      version:
+        type: string
+        description: Schema version
+        example: "5.0.0"
+
+      started_at:
+        type: string
+        format: date-time
+        description: Workflow start timestamp
+
+      last_updated:
+        type: string
+        format: date-time
+        description: Last state update timestamp
+
+      current_phase:
+        type: string
+        enum:
+          - inventory
+          - aipd
+          - control_assessment
+          - gaps_analysis
+          - documentation
+          - completed
+        description: Current active phase
+
+      current_step:
+        type: string
+        description: Current step within the phase (e.g., "processing-2" for AIPD)
+
+      phases:
+        type: object
+        properties:
+          inventory:
+            $ref: "#/$defs/phase_state"
+          aipd:
+            $ref: "#/$defs/aipd_phase_state"
+          control_assessment:
+            $ref: "#/$defs/phase_state"
+          gaps_analysis:
+            $ref: "#/$defs/phase_state"
+          documentation:
+            $ref: "#/$defs/phase_state"
+
+$defs:
+  phase_state:
+    type: object
+    required:
+      - status
+    properties:
+      status:
+        type: string
+        enum: [pending, in_progress, completed, skipped]
+      started_at:
+        type: string
+        format: date-time
+      completed_at:
+        type: string
+        format: date-time
+      output:
+        type: string
+        description: Output file path
+      result:
+        type: object
+        description: Phase-specific result data
+      skip_reason:
+        type: string
+        description: Justification if phase was skipped
+
+  aipd_phase_state:
+    allOf:
+      - $ref: "#/$defs/phase_state"
+      - type: object
+        properties:
+          required:
+            type: boolean
+            description: Whether AIPD is required based on Phase 1
+          processing_activities:
+            type: array
+            items:
+              type: object
+              required:
+                - id
+                - name
+                - status
+              properties:
+                id:
+                  type: string
+                name:
+                  type: string
+                status:
+                  type: string
+                  enum: [pending, in_progress, completed, skipped]
+                current_step:
+                  type: integer
+                  minimum: 1
+                  maximum: 4
+                  description: Current AIPD step (1-4)
+                output:
+                  type: string
+
+# Example instance
+example:
+  workflow:
+    version: "5.0.0"
+    started_at: "2026-01-22T10:00:00Z"
+    last_updated: "2026-01-22T14:30:00Z"
+    current_phase: "aipd"
+    current_step: "processing-2"
+
+    phases:
+      inventory:
+        status: completed
+        started_at: "2026-01-22T10:00:00Z"
+        completed_at: "2026-01-22T10:45:00Z"
+        output: "processing-inventory.yaml"
+        result:
+          total_processing: 6
+          aipd_required: 2
+          legal_basis_breakdown:
+            contract: 3
+            consent: 1
+            legitimate_interest: 2
+
+      aipd:
+        status: in_progress
+        required: true
+        started_at: "2026-01-22T11:00:00Z"
+        processing_activities:
+          - id: analytics
+            name: "User analytics"
+            status: completed
+            output: "aipd/analytics.yaml"
+          - id: profiling
+            name: "Customer profiling"
+            status: in_progress
+            current_step: 2
+
+      control_assessment:
+        status: pending
+
+      gaps_analysis:
+        status: pending
+
+      documentation:
+        status: pending

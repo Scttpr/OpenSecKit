@@ -1,0 +1,173 @@
+# RGS Workflow State Schema
+# Tracks progress through the 5-phase homologation workflow
+# Location: .osk/comply/rgs/workflow-state.yaml
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: RGS Workflow State
+description: State tracking for RGS homologation workflow
+version: "5.0.0"
+
+type: object
+required:
+  - workflow
+properties:
+  workflow:
+    type: object
+    required:
+      - version
+      - started_at
+      - current_phase
+      - phases
+    properties:
+      version:
+        type: string
+        description: Schema version
+        example: "5.0.0"
+
+      started_at:
+        type: string
+        format: date-time
+        description: Workflow start timestamp
+
+      last_updated:
+        type: string
+        format: date-time
+        description: Last state update timestamp
+
+      current_phase:
+        type: string
+        enum:
+          - level_assessment
+          - ebios_rm
+          - control_assessment
+          - gaps_analysis
+          - dossier_generation
+          - completed
+        description: Current active phase
+
+      current_step:
+        type: string
+        description: Current step within the phase (e.g., "workshop-3")
+
+      phases:
+        type: object
+        properties:
+          level_assessment:
+            $ref: "#/$defs/phase_state"
+          ebios_rm:
+            $ref: "#/$defs/ebios_phase_state"
+          control_assessment:
+            $ref: "#/$defs/phase_state"
+          gaps_analysis:
+            $ref: "#/$defs/phase_state"
+          dossier_generation:
+            $ref: "#/$defs/phase_state"
+
+$defs:
+  phase_state:
+    type: object
+    required:
+      - status
+    properties:
+      status:
+        type: string
+        enum: [pending, in_progress, completed, skipped]
+      started_at:
+        type: string
+        format: date-time
+      completed_at:
+        type: string
+        format: date-time
+      output:
+        type: string
+        description: Output file path
+      result:
+        type: object
+        description: Phase-specific result data
+      skip_reason:
+        type: string
+        description: Justification if phase was skipped
+
+  ebios_phase_state:
+    allOf:
+      - $ref: "#/$defs/phase_state"
+      - type: object
+        properties:
+          required:
+            type: boolean
+            description: Whether EBIOS RM is mandatory for this level
+          workshops:
+            type: array
+            items:
+              type: object
+              required:
+                - id
+                - name
+                - status
+              properties:
+                id:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+                name:
+                  type: string
+                status:
+                  type: string
+                  enum: [pending, in_progress, completed, skipped]
+                output:
+                  type: string
+
+# Example instance
+example:
+  workflow:
+    version: "5.0.0"
+    started_at: "2025-01-21T10:00:00Z"
+    last_updated: "2025-01-21T14:30:00Z"
+    current_phase: "ebios_rm"
+    current_step: "workshop-3"
+
+    phases:
+      level_assessment:
+        status: completed
+        started_at: "2025-01-21T10:00:00Z"
+        completed_at: "2025-01-21T10:30:00Z"
+        output: "level-assessment.yaml"
+        result:
+          determined_level: "RGS**"
+          dicp:
+            d: 2
+            i: 3
+            c: 3
+            p: 2
+
+      ebios_rm:
+        status: in_progress
+        required: true
+        started_at: "2025-01-21T10:35:00Z"
+        workshops:
+          - id: 1
+            name: "Cadrage et socle de securite"
+            status: completed
+            output: "ebios-rm/workshop-1-cadrage.yaml"
+          - id: 2
+            name: "Sources de risque"
+            status: completed
+            output: "ebios-rm/workshop-2-sources.yaml"
+          - id: 3
+            name: "Scenarios strategiques"
+            status: in_progress
+          - id: 4
+            name: "Scenarios operationnels"
+            status: pending
+          - id: 5
+            name: "Traitement du risque"
+            status: pending
+
+      control_assessment:
+        status: pending
+
+      gaps_analysis:
+        status: pending
+
+      dossier_generation:
+        status: pending

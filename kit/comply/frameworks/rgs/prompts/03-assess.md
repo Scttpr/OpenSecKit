@@ -1,10 +1,10 @@
 ---
-description: Interactive RGS compliance assessment with homologation readiness
+description: RGS Control Assessment - 26 controls across 6 domains
 part: comply
 framework: rgs
-phase: assess
+phase: control-assessment
 model_sections: [index, architecture, controls, data, integrations, tooling, actors, business, boundaries]
-version: "4.1.0"
+version: "5.0.0"
 ---
 
 # Role
@@ -17,15 +17,13 @@ You are the **Government Security Specialist** assessing RGS compliance. You eva
 
 # Context
 
-RGS (Référentiel Général de Sécurité) applies to:
-- French government information systems
-- Systems processing government data
-- Public service digital services
-- Operators of essential services (OES/OIV)
+This is **Phase 3** of the RGS Homologation Workflow. You assess 26 RGS controls after:
+- Phase 1: Level Assessment (RGS level determined)
+- Phase 2: EBIOS RM (risk analysis completed or skipped)
 
 RGS v2.0 defines:
 - **Three security levels**: `RGS*` (70%), `RGS**` (85%), `RGS***` (95%)
-- **DICP security model**: Disponibilité, Intégrité, Confidentialité, Preuve (not just CIA)
+- **DICP security model**: Disponibilite, Integrite, Confidentialite, Preuve (not just CIA)
 - **Homologation process** for security certification
 
 **RGS Annexe Structure** (official documents):
@@ -34,27 +32,46 @@ RGS v2.0 defines:
 - **Annexe C**: Audit provider requirements
 
 **Control Domains** (framework categories):
-This framework organizes 22 controls into six functional domains:
+This framework organizes 26 controls into six functional domains:
 - **AUTH**: Authentification (5 controls) - RGS-AUTH.1 to RGS-AUTH.5
-- **INT**: Intégrité (4 controls) - RGS-INT.1 to RGS-INT.4
-- **CONF**: Confidentialité (4 controls) - RGS-CONF.1 to RGS-CONF.4
-- **TRAC**: Traçabilité (5 controls) - RGS-TRAC.1 to RGS-TRAC.5
+- **INT**: Integrite (4 controls) - RGS-INT.1 to RGS-INT.4
+- **CONF**: Confidentialite (4 controls) - RGS-CONF.1 to RGS-CONF.4
+- **TRAC**: Tracabilite (5 controls) - RGS-TRAC.1 to RGS-TRAC.5
 - **HORO**: Horodatage (2 controls) - RGS-HORO.1 to RGS-HORO.2
 - **SIG**: Signature (2 controls) - RGS-SIG.1 to RGS-SIG.2
 
 # Prerequisites
 
-## Phase 1: Prerequisites Check
+## Required Inputs from Previous Phases
 
-**MANDATORY**: Verify system model exists before proceeding.
-
+**From Phase 1 (Level Assessment)**:
 ```yaml
-Required files:
+Required:
+  - .osk/comply/rgs/level-assessment.yaml
+    Extract:
+      - rgs_level (RGS* | RGS** | RGS***)
+      - dicp requirements (D, I, C, P levels)
+      - certification_requirements preview
+```
+
+**From Phase 2 (EBIOS RM)** - if completed:
+```yaml
+Optional but recommended:
+  - .osk/comply/rgs/ebios-rm/risk-register.yaml
+    Extract:
+      - feared_events (link to controls)
+      - residual_risks (document in assessment)
+      - treatment_measures (validate implementation)
+```
+
+**From System Model**:
+```yaml
+Required:
   - .osk/system-model/index.yaml
   - .osk/system-model/architecture.yaml
   - .osk/system-model/controls.yaml
 
-Recommended files:
+Recommended:
   - .osk/system-model/data.yaml
   - .osk/system-model/integrations.yaml
   - .osk/system-model/tooling.yaml
@@ -62,15 +79,27 @@ Recommended files:
   - .osk/system-model/business.yaml
 ```
 
-**If system model missing**:
-```
-ERROR: No system model found.
+## Prerequisites Check
 
-The RGS assessment requires a complete system model.
-Run `/osk-discover` first to build your system model.
+**If level-assessment.yaml missing**:
+```
+ERROR: Level assessment not found.
+
+Phase 3 (Control Assessment) requires Phase 1 (Level Assessment) to be completed.
+The RGS level determines which controls apply and their thresholds.
+
+Run `/osk-comply rgs level` first or restart the full workflow with `/osk-comply rgs`.
 ```
 
-**If incomplete** (missing recommended files):
+**If EBIOS RM skipped** (RGS* with user choice):
+```
+INFO: EBIOS RM was skipped for this assessment.
+
+Proceeding with control assessment using simplified risk context.
+Note: Some controls may require manual risk justification without EBIOS RM data.
+```
+
+**If system model incomplete**:
 ```
 WARNING: Incomplete system model detected.
 
@@ -84,6 +113,24 @@ These sections are important for RGS assessment:
 Options:
 1. Proceed with limited assessment (some controls may be not_assessed)
 2. Run `/osk-discover` first to complete the system model
+```
+
+## Load Context from Previous Phases
+
+```yaml
+# Load from level-assessment.yaml
+rgs_level: {{ level_assessment.level }}
+dicp_requirements:
+  disponibilite: {{ level_assessment.dicp.d }}
+  integrite: {{ level_assessment.dicp.i }}
+  confidentialite: {{ level_assessment.dicp.c }}
+  preuve: {{ level_assessment.dicp.p }}
+
+# Load from EBIOS RM (if available)
+ebios_context:
+  available: {{ ebios_rm.status == "completed" }}
+  feared_events: {{ ebios_rm.feared_events }}
+  risks: {{ ebios_rm.risks }}
 ```
 
 # Knowledge Base
@@ -110,46 +157,42 @@ Consult the knowledge base (`kit/comply/frameworks/rgs/knowledge/`) during asses
 
 # Process
 
-## Phase 2: RGS Level Selection
+## Step 1: Confirm Assessment Context
 
-**MANDATORY**: Determine target RGS level before assessment.
-
-Check if RGS level is defined in system model:
-- Look in `index.yaml` → `compliance.rgs_level`
-- Look in `controls.yaml` → `classification.rgs_level`
-
-If not defined, ask user:
+**Display context from previous phases:**
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ RGS Security Level Selection                                 │
+│ RGS Control Assessment - Context                              │
 ├─────────────────────────────────────────────────────────────┤
 │                                                              │
-│ Select the target RGS security level:                        │
+│ FROM PHASE 1 (Level Assessment):                            │
+│ • Target Level: {{ rgs_level }}                             │
+│ • DICP Requirements: D{{ d }} I{{ i }} C{{ c }} P{{ p }}    │
+│ • Minimum Score: {{ threshold }}%                           │
 │                                                              │
-│ 1. RGS* (Standard)                                          │
-│    - Basic government services                               │
-│    - Standard security controls                              │
-│    - Minimum score: 70%                                      │
+│ FROM PHASE 2 (EBIOS RM):                                    │
+│ • Status: {{ ebios_status }}                                │
+│ • Feared Events: {{ feared_events_count }}                  │
+│ • Risks Identified: {{ risks_count }}                       │
 │                                                              │
-│ 2. RGS** (Renforcé)                                         │
-│    - Sensitive data processing                               │
-│    - Enhanced security controls                              │
-│    - SecNumCloud recommended for cloud services              │
-│    - Qualified certificates for authentication               │
-│    - Minimum score: 85%                                      │
-│                                                              │
-│ 3. RGS*** (Élevé)                                           │
-│    - Critical infrastructure / OIV                           │
-│    - Maximum security controls                               │
-│    - SecNumCloud mandatory for cloud services                │
-│    - Qualified signatures and timestamping                   │
-│    - Minimum score: 95%                                      │
+│ Proceed with control assessment? [Yes] [Adjust context]     │
 │                                                              │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## Phase 3: Scope Definition (Full System Perimeter)
+**Level already determined** - do not re-ask for level selection.
+Use the level from `.osk/comply/rgs/level-assessment.yaml`.
+
+**If user wants to change level:**
+```
+To change the RGS level, you must re-run Phase 1:
+/osk-comply rgs level
+
+This will restart the workflow from the beginning.
+```
+
+## Step 2: Scope Definition (Full System Perimeter)
 
 **MANDATORY**: Present complete system perimeter to user.
 
@@ -248,7 +291,7 @@ Options:
 4. Cancel assessment
 ```
 
-## Phase 4: Domain-by-Domain Assessment
+## Step 3: Domain-by-Domain Assessment
 
 ### 4.1 Evidence Auto-Detection
 
@@ -347,9 +390,246 @@ Required Retention:
 - RGS***: 5 years, WORM storage
 ```
 
-## Phase 5: Homologation Readiness
+## Step 4: Security Evidence Assessment
 
-### 5.1 Assess Homologation Blockers
+**MANDATORY**: Assess availability of key security artifacts required for homologation.
+
+These artifacts provide evidence of operational security maturity beyond technical controls.
+
+### 5.1 Evidence Inventory
+
+Check for existence and currency of security evidence:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ Security Evidence Assessment                                  │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│ HIGH IMPACT (Homologation blockers for RGS**/***):          │
+│                                                              │
+│ ☐ Penetration Test Report                                   │
+│   Status: [Not found | Found | Expired]                     │
+│   Last test: [date or N/A]                                  │
+│   Scope: [Internal | External | Full]                       │
+│   Findings: [Critical: N | High: N | Medium: N | Low: N]    │
+│   Remediation: [% complete]                                 │
+│                                                              │
+│ ☐ Incident Response Plan                                    │
+│   Status: [Not found | Draft | Approved]                    │
+│   Last drill: [date or Never]                               │
+│   Drill result: [Pass | Partial | Fail | N/A]               │
+│   MTTR target: [defined | not defined]                      │
+│                                                              │
+│ ☐ Business Continuity Plan (PCA/PRA)                        │
+│   Status: [Not found | Draft | Approved]                    │
+│   RTO defined: [Yes | No]                                   │
+│   RPO defined: [Yes | No]                                   │
+│   Last test: [date or Never]                                │
+│                                                              │
+│ ☐ Third-Party Audit                                         │
+│   Status: [Not found | Scheduled | Completed]               │
+│   Type: [PASSI | ISO 27001 | SOC 2 | Other]                │
+│   Date: [date or N/A]                                       │
+│   Findings resolved: [% or N/A]                             │
+│                                                              │
+│ MEDIUM IMPACT (Recommended):                                │
+│                                                              │
+│ ☐ SBOM (Software Bill of Materials)                         │
+│   Status: [Not found | Manual | Automated]                  │
+│   Format: [CycloneDX | SPDX | Other]                       │
+│   Last updated: [date or N/A]                               │
+│   Integrated in CI/CD: [Yes | No]                           │
+│                                                              │
+│ ☐ Vulnerability Scan Results                                │
+│   Status: [Not found | Ad-hoc | Scheduled]                  │
+│   Last scan: [date or N/A]                                  │
+│   Tool: [Qualys | Nessus | OpenVAS | Other]                │
+│   Open criticals: [N]                                       │
+│   Open highs: [N]                                           │
+│                                                              │
+│ ☐ Security Awareness Training                               │
+│   Status: [Not found | Optional | Mandatory]                │
+│   Completion rate: [% or N/A]                               │
+│   Last campaign: [date or N/A]                              │
+│   Topics: [Phishing | Data handling | Incident reporting]   │
+│                                                              │
+│ SUPPORTING EVIDENCE (Polish):                               │
+│                                                              │
+│ ☐ Security Architecture Diagram                             │
+│   Status: [Not found | Outdated | Current]                  │
+│   Includes: [Trust boundaries | Data flows | Controls]      │
+│                                                              │
+│ ☐ Data Flow Diagrams (DFD)                                  │
+│   Status: [Not found | Partial | Complete]                  │
+│   Security controls annotated: [Yes | No]                   │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 5.2 Evidence Requirements by RGS Level
+
+| Evidence | RGS* | RGS** | RGS*** |
+|----------|------|-------|--------|
+| Penetration Test | Recommended | Required (annual) | Required (bi-annual) |
+| Incident Response Plan | Recommended | Required | Required + tested |
+| Business Continuity (PCA/PRA) | Optional | Required | Required + tested |
+| Third-Party Audit | Optional | Recommended (PASSI) | Required (PASSI) |
+| SBOM | Optional | Recommended | Required |
+| Vulnerability Scans | Recommended | Required (quarterly) | Required (monthly) |
+| Security Training | Recommended | Required (annual) | Required (bi-annual) |
+| Security Diagrams | Recommended | Required | Required |
+| Data Flow Diagrams | Optional | Recommended | Required |
+
+### 5.3 Auto-Detection
+
+Check common locations for evidence:
+
+```yaml
+Evidence detection paths:
+  pentest_report:
+    - docs/security/pentest-*.md
+    - docs/security/pentest-*.pdf
+    - .osk/compliance/pentest-report.md
+    - security/audits/pentest-*
+
+  incident_response:
+    - docs/security/incident-response.md
+    - docs/runbooks/incident-response.md
+    - .osk/compliance/incident-response-plan.md
+    - INCIDENT_RESPONSE.md
+
+  business_continuity:
+    - docs/security/pca-pra.md
+    - docs/security/business-continuity.md
+    - .osk/compliance/pca-pra.md
+    - docs/disaster-recovery.md
+
+  sbom:
+    - sbom.json
+    - sbom.xml
+    - bom.json
+    - .osk/sbom/
+
+  vulnerability_scans:
+    - docs/security/vuln-scan-*.md
+    - .osk/compliance/vulnerability-report.md
+    - security/scans/
+
+  security_diagrams:
+    - docs/architecture/security-*.md
+    - docs/diagrams/security-*.png
+    - .osk/diagrams/
+```
+
+### 5.4 Evidence Assessment Flow
+
+For each evidence type:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ Penetration Test Assessment                                   │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│ AUTO-DETECTED:                                               │
+│ ✓ Found: docs/security/pentest-2024-q3.pdf                  │
+│   Date: 2024-09-15                                          │
+│   Age: 4 months                                             │
+│                                                              │
+│ VALIDATION:                                                  │
+│ For {{ rgs_level }}, pentest must be:                        │
+│ - Less than 12 months old: ✓                                │
+│ - Scope includes production: [Confirm?]                     │
+│ - Critical findings remediated: [Confirm?]                  │
+│                                                              │
+│ Questions:                                                   │
+│ 1. Was the pentest scope comprehensive (external + internal)?│
+│ 2. How many critical/high findings were identified?         │
+│ 3. What is the remediation status?                          │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+
+Options:
+1. Confirm evidence is valid and complete
+2. Provide additional details
+3. Mark as incomplete (gap)
+4. Mark as not applicable (requires justification for RGS**/***)
+```
+
+### 5.5 Gap Identification
+
+```
+Security Evidence Gaps:
+
+HIGH IMPACT GAPS:
+✗ Incident Response Plan - Not found
+  → BLOCKER for {{ rgs_level }}
+  → Action: Create incident response plan following ANSSI guide
+  → Reference: guide-hygiene-informatique.md, measure #38
+
+✗ Business Continuity (PCA/PRA) - Not found
+  → BLOCKER for RGS**/***
+  → Action: Define RTO/RPO and document recovery procedures
+  → Reference: RGS v2.0, Chapter 4
+
+⚠ Penetration Test - Expired (18 months old)
+  → WARNING: Exceeds 12-month validity for {{ rgs_level }}
+  → Action: Schedule new penetration test
+  → Requirement: PASSI-certified provider for RGS***
+
+MEDIUM IMPACT GAPS:
+⚠ SBOM - Not found
+  → Recommended for supply chain transparency
+  → Action: Generate SBOM using CycloneDX or SPDX format
+  → Tools: syft, trivy, cyclonedx-cli
+
+⚠ Vulnerability Scans - Ad-hoc only
+  → Required quarterly for {{ rgs_level }}
+  → Action: Implement scheduled vulnerability scanning
+  → Tools: OpenVAS, Nessus, Qualys
+
+SUPPORTING GAPS:
+○ Security Architecture Diagram - Outdated
+  → Recommended for homologation dossier
+  → Action: Update to include current tooling and trust boundaries
+```
+
+### 5.6 Evidence Summary
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ Security Evidence Summary - {{ rgs_level }}                   │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│ HIGH IMPACT:                                                 │
+│   ✓ Penetration Test       [Valid, 4 months old]            │
+│   ✗ Incident Response      [MISSING - BLOCKER]              │
+│   ✗ Business Continuity    [MISSING - BLOCKER]              │
+│   ⚠ Third-Party Audit      [Scheduled Q2 2025]              │
+│                                                              │
+│ MEDIUM IMPACT:                                               │
+│   ⚠ SBOM                   [Not automated]                  │
+│   ⚠ Vulnerability Scans    [Ad-hoc, not scheduled]          │
+│   ✓ Security Training      [92% completion]                 │
+│                                                              │
+│ SUPPORTING:                                                  │
+│   ⚠ Security Diagrams      [Outdated]                       │
+│   ✗ Data Flow Diagrams     [MISSING]                        │
+│                                                              │
+│ EVIDENCE SCORE: 4/9 complete                                │
+│ BLOCKERS: 2 (Incident Response, Business Continuity)        │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+
+Options:
+1. Proceed to Homologation Readiness assessment
+2. Document evidence locations
+3. Add evidence manually
+4. Generate evidence checklist
+```
+
+## Step 5: Homologation Readiness Check
+
+### 6.1 Assess Homologation Blockers
 
 ```
 Homologation Readiness Assessment:
@@ -376,7 +656,7 @@ Homologation Readiness Assessment:
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### 5.2 DICP Assessment
+### 6.2 DICP Assessment
 
 Calculate DICP scores:
 
@@ -393,9 +673,12 @@ DICP Security Assessment:
 ⚠ Gaps in Intégrité, Confidentialité, and Preuve require attention.
 ```
 
-## Phase 6: Gap Analysis & Report
+## Step 6: Initial Gap Summary
 
-### 6.1 Categorize Gaps by Source
+**Note**: Detailed gap analysis is performed in Phase 4 (`04-gaps.md`).
+This step provides a preliminary summary for immediate visibility.
+
+### 7.1 Categorize Gaps by Source
 
 ```
 Gap Summary by Source:
@@ -413,7 +696,7 @@ Critical Blockers:
 - Infrastructure: No HSM for key management
 ```
 
-### 6.2 Generate Prioritized Actions
+### 7.2 Generate Prioritized Actions
 
 ```
 Priority Actions:
@@ -431,7 +714,7 @@ P2 (90 days):
 - Implement qualified certificates for authentication
 ```
 
-## Phase 7: Validation
+## Step 7: Validation
 
 **MANDATORY**: Display assessment summary for confirmation.
 
@@ -466,7 +749,7 @@ Options:
 5. Cancel
 ```
 
-## Phase 8: Output Generation
+## Step 8: Output Generation
 
 After user confirmation, generate:
 
@@ -484,7 +767,7 @@ Use templates:
 - `kit/comply/frameworks/rgs/templates/homologation-checklist.md.tera`
 - `kit/comply/frameworks/rgs/templates/system-perimeter.md.tera`
 
-## Phase 9: Terminal Summary
+## Step 9: Terminal Summary
 
 Display final summary using `kit/comply/templates/reports/compliance-summary.tera`.
 

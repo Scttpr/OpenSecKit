@@ -1,92 +1,220 @@
 ---
-description: RGS (French Government Security) compliance - Main orchestrator prompt
+description: RGS (French Government Security) compliance - Full Homologation Workflow Orchestrator
 part: comply
 framework: rgs
-version: "4.1.0"
+version: "5.0.0"
 model_sections: [index, architecture, controls, data, integrations, tooling, actors, business, boundaries]
 sub_prompts:
-  - prompts/assess.md
+  - prompts/01-level-assessment.md
+  - prompts/02-ebios-rm.md
+  - prompts/03-assess.md
+  - prompts/04-gaps.md
+  - prompts/05-dossier.md
 ---
 
-# RGS Compliance Framework
+# RGS Full Homologation Workflow
 
-This framework provides interactive RGS (Référentiel Général de Sécurité) compliance assessment for French government information systems.
-
-## Quick Start
-
-```bash
-# Full workflow
-/osk-comply rgs              # Interactive assessment
-
-# With flags
-/osk-comply rgs --update     # Re-assess changed controls only
-/osk-comply rgs --resume     # Continue interrupted assessment
-/osk-comply rgs --export md  # Generate homologation dossier
-```
+This framework provides a complete RGS (Referentiel General de Securite) homologation workflow for French government information systems, following the ANSSI 9-step homologation process.
 
 ## Workflow Overview
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    RGS COMPLIANCE WORKFLOW                   │
-├─────────────────────────────────────────────────────────────┤
-│                                                              │
-│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐   │
-│  │   DISCOVER   │───▶│    ASSESS    │───▶│    EXPORT    │   │
-│  │              │    │              │    │              │   │
-│  │ system-model │    │ compliance   │    │ homologation │   │
-│  │ *.yaml       │    │ evaluation   │    │ dossier      │   │
-│  └──────────────┘    └──────────────┘    └──────────────┘   │
-│                             │                    │           │
-│                             ▼                    ▼           │
-│                    assessment-rgs.yaml    dossier.md         │
-│                    homologation.md        perimeter.md       │
-│                                                              │
-└─────────────────────────────────────────────────────────────┘
+                        RGS HOMOLOGATION WORKFLOW
+    =========================================================================
+
+    ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+    │   PHASE 1   │     │   PHASE 2   │     │   PHASE 3   │
+    │   LEVEL     │────▶│  EBIOS RM   │────▶│   CONTROL   │
+    │ ASSESSMENT  │     │ (Conditional)│     │ ASSESSMENT  │
+    └─────────────┘     └─────────────┘     └─────────────┘
+          │                   │                   │
+          ▼                   ▼                   ▼
+    level-assessment    ebios-rm/            assessment-rgs
+        .yaml           *.yaml                  .yaml
+                              │
+                              │
+    ┌─────────────┐     ┌─────────────┐
+    │   PHASE 4   │     │   PHASE 5   │
+    │    GAPS     │────▶│   DOSSIER   │
+    │  ANALYSIS   │     │ GENERATION  │
+    └─────────────┘     └─────────────┘
+          │                   │
+          ▼                   ▼
+    gaps-analysis.yaml  dossier-homologation/
+    remediation-        ├── main.md
+    roadmap.md          └── annexes/
 ```
 
-## Commands
+## Quick Start
 
-### `/osk-comply rgs` (Default)
+```bash
+# Full workflow (recommended)
+/osk-comply rgs
 
-Runs interactive RGS compliance assessment:
-1. **Level Selection** - Choose RGS*, RGS**, or RGS***
-2. **Scope Definition** - Define full system perimeter including tooling
-3. **Domain Assessment** - Evaluate 22 controls across 6 domains
-4. **Homologation Check** - Identify blockers for certification
+# Individual phases
+/osk-comply rgs level      # Phase 1: Determine RGS level
+/osk-comply rgs ebios      # Phase 2: EBIOS RM risk analysis
+/osk-comply rgs assess     # Phase 3: Control assessment
+/osk-comply rgs gaps       # Phase 4: Gap analysis
+/osk-comply rgs dossier    # Phase 5: Generate homologation dossier
 
-**Output:**
-- `.osk/compliance/assessment-rgs.yaml`
-- `.osk/compliance/assessment-rgs.md`
-- `.osk/compliance/homologation-checklist.md`
-- `.osk/compliance/system-perimeter.md`
-
-See: `prompts/assess.md`
-
-### `/osk-comply rgs status`
-
-Display current compliance status without running assessment.
-
-```
-RGS Compliance Status
-──────────────────────
-Target Level: RGS**
-Last assessment: 2026-01-15
-Score: 72% (requires 85%)
-Homologation: NOT READY
-Blockers: 2 critical
+# Workflow management
+/osk-comply rgs --resume   # Resume interrupted workflow
+/osk-comply rgs --status   # Show current workflow state
 ```
 
-## RGS Levels
+## Workflow State Management
 
-| Level | Threshold | Use Case |
-|-------|-----------|----------|
-| RGS* | 70% | Basic government services |
-| RGS** | 85% | Sensitive data, SecNumCloud recommended |
-| RGS*** | 95% | Critical infrastructure (OIV), SecNumCloud mandatory |
+The orchestrator maintains workflow state in `.osk/comply/rgs/workflow-state.yaml`:
 
-## Control Domains
+```yaml
+workflow:
+  version: "5.0.0"
+  started_at: "2025-01-21T10:00:00Z"
+  last_updated: "2025-01-21T14:30:00Z"
+  current_phase: "ebios-rm"
+  current_step: "workshop-3"
 
+  phases:
+    level_assessment:
+      status: completed
+      output: "level-assessment.yaml"
+      completed_at: "2025-01-21T10:30:00Z"
+      result:
+        determined_level: "RGS**"
+
+    ebios_rm:
+      status: in_progress
+      required: true
+      workshops:
+        - id: 1
+          name: "Cadrage et socle de securite"
+          status: completed
+        - id: 2
+          name: "Sources de risque"
+          status: completed
+        - id: 3
+          name: "Scenarios strategiques"
+          status: in_progress
+        - id: 4
+          name: "Scenarios operationnels"
+          status: pending
+        - id: 5
+          name: "Traitement du risque"
+          status: pending
+
+    control_assessment:
+      status: pending
+
+    gaps_analysis:
+      status: pending
+
+    dossier_generation:
+      status: pending
+```
+
+---
+
+# Orchestration Logic
+
+## Phase 1: Level Assessment
+
+**Sub-prompt**: `prompts/01-level-assessment.md`
+
+**Purpose**: Determine the appropriate RGS security level based on system characteristics.
+
+**Entry conditions**:
+- System model exists (`.osk/system-model/index.yaml`)
+- No existing level assessment OR user requests reassessment
+
+**Decision tree**:
+```
+System characteristics:
+├── OIV / Critical infrastructure? ───────────────▶ RGS***
+├── Sensitive data (health, legal, financial)? ───▶ RGS**
+├── Public-facing government service? ────────────▶ RGS** (recommended)
+└── Internal administrative system? ──────────────▶ RGS*
+```
+
+**Output**: `.osk/comply/rgs/level-assessment.yaml`
+
+**Next phase determination**:
+```yaml
+if level == "RGS***":
+  next: "ebios_rm"  # Mandatory
+  ebios_required: true
+
+elif level == "RGS**":
+  next: "ebios_rm"  # Strongly recommended
+  ebios_required: true
+  # User can skip with justification
+
+elif level == "RGS*":
+  # Ask user
+  prompt: "EBIOS RM risk analysis is recommended but optional for RGS*. Proceed with EBIOS RM?"
+  if yes: next: "ebios_rm"
+  else: next: "control_assessment"
+```
+
+---
+
+## Phase 2: EBIOS RM (Conditional)
+
+**Sub-prompt**: `prompts/02-ebios-rm.md`
+
+**Purpose**: Conduct formal risk analysis following ANSSI EBIOS Risk Manager methodology.
+
+**Entry conditions**:
+- Level assessment completed
+- EBIOS RM required OR user opted in
+
+**5 Workshops**:
+
+| Workshop | Name | Input | Output |
+|----------|------|-------|--------|
+| 1 | Cadrage et socle de securite | system-model, business.yaml | Scope, feared events, security baseline |
+| 2 | Sources de risque | Workshop 1 | Risk sources, threat actors |
+| 3 | Scenarios strategiques | Workshops 1-2, integrations.yaml | Ecosystem attack paths |
+| 4 | Scenarios operationnels | Workshops 1-3, architecture.yaml | Technical attack scenarios |
+| 5 | Traitement du risque | Workshops 1-4, controls.yaml | Risk treatment plan, residual risks |
+
+**Output**: `.osk/comply/rgs/ebios-rm/`
+```
+ebios-rm/
+├── workshop-1-cadrage.yaml
+├── workshop-2-sources.yaml
+├── workshop-3-strategic.yaml
+├── workshop-4-operational.yaml
+├── workshop-5-treatment.yaml
+├── risk-register.yaml
+├── feared-events.yaml
+└── summary.md
+```
+
+**Skip conditions** (RGS* only):
+```yaml
+if level == "RGS*" and user_skips:
+  record:
+    ebios_rm:
+      status: "skipped"
+      justification: "[user provided]"
+      simplified_risk_analysis: true  # Use simplified approach in Phase 3
+  next: "control_assessment"
+```
+
+---
+
+## Phase 3: Control Assessment
+
+**Sub-prompt**: `prompts/03-assess.md`
+
+**Purpose**: Evaluate 26 RGS controls across 6 domains.
+
+**Entry conditions**:
+- Level assessment completed
+- EBIOS RM completed OR skipped with justification
+
+**Domains**:
 | Domain | Controls | Focus |
 |--------|----------|-------|
 | AUTH | 5 | Authentication mechanisms |
@@ -96,89 +224,292 @@ Blockers: 2 critical
 | HORO | 2 | Timestamping |
 | SIG | 2 | Electronic signatures |
 
-## Templates
+**Input from previous phases**:
+```yaml
+from_level_assessment:
+  - rgs_level
+  - dicp_requirements
 
-| Template | Purpose |
-|----------|---------|
-| `assessment-summary.md.tera` | Human-readable assessment report |
-| `homologation-checklist.md.tera` | Pre-certification checklist |
-| `system-perimeter.md.tera` | Full system boundary definition |
-| `export-dossier.md.tera` | ANSSI-compliant homologation dossier |
-
-## Knowledge Base
-
-```
-knowledge/
-├── rgs-v2-annexe-a1-certificats-electroniques.md
-├── rgs-v2-annexe-b1-mecanismes-cryptographiques.md
-├── rgs-v2-annexe-b2-gestion-cles.md
-├── rgs-v2-annexe-b3-authentification.md
-├── guide-homologation-securite.md
-├── guide-hygiene-informatique.md
-└── ebios-risk-manager.md
+from_ebios_rm:
+  - feared_events (map to controls)
+  - risk_treatment_decisions (validate controls address risks)
+  - residual_risks (document in assessment)
 ```
 
-## Framework Definition
+**Output**: `.osk/comply/rgs/assessment-rgs.yaml`
 
-See `framework.yaml` for:
-- All 22 RGS controls with requirements per level
-- DICP security model mapping
-- Certification requirements (SecNumCloud, HDS)
-- ANSSI cryptographic standards
-- Cross-framework mapping (ISO 27001, RGPD)
+---
 
-## Interactive Features
+## Phase 4: Gap Analysis
 
-The assessment prompt is **interactive**:
+**Sub-prompt**: `prompts/04-gaps.md`
 
-1. **Level selection** - User chooses target RGS level
-2. **Scope confirmation** - User validates system perimeter
-3. **Evidence review** - Auto-detected evidence presented for confirmation
-4. **Gap-filling** - Missing information requested with clear options
-5. **Certification check** - Tool certifications validated per level
-6. **Homologation status** - Clear blockers identification
+**Purpose**: Analyze compliance gaps and generate remediation roadmap.
 
-## Output Schema
+**Entry conditions**:
+- Control assessment completed
 
-Assessment output follows the schema at:
-- `kit/comply/frameworks/_schema/assessment.yaml` (base)
-- `kit/comply/frameworks/rgs/schemas/assessment-extension.yaml` (RGS-specific)
+**Gap categories**:
+```yaml
+categories:
+  - codebase      # Code-level security issues
+  - infrastructure # Hosting, cloud, network
+  - tooling       # CI/CD, monitoring, collaboration
+  - process       # Procedures, policies, documentation
+  - evidence      # Missing security artifacts
+```
 
-## Examples
+**Prioritization**:
+```
+┌────────────┬─────────────────────────────────────────┐
+│ Priority   │ Criteria                                │
+├────────────┼─────────────────────────────────────────┤
+│ P0 BLOCKER │ Prevents homologation                   │
+│ P1 HIGH    │ Required for target level, quick fix   │
+│ P2 MEDIUM  │ Required for target level, effort >1wk │
+│ P3 LOW     │ Recommended improvement                │
+└────────────┴─────────────────────────────────────────┘
+```
 
-### Standard assessment
+**Output**:
+```
+.osk/comply/rgs/
+├── gaps-analysis.yaml
+├── remediation-roadmap.md
+└── quick-wins.md
+```
+
+---
+
+## Phase 5: Dossier Generation
+
+**Sub-prompt**: `prompts/05-dossier.md`
+
+**Purpose**: Generate formal homologation dossier following ANSSI structure.
+
+**Entry conditions**:
+- Gap analysis completed
+- OR user explicitly requests draft with blockers
+
+**ANSSI 9-Step Homologation Structure**:
+
+| Step | Dossier Section | Source |
+|------|-----------------|--------|
+| 1 | Perimetre du systeme | level-assessment.yaml, system-model |
+| 2 | Besoins DICP | level-assessment.yaml |
+| 3 | Analyse des risques | ebios-rm/ OR simplified |
+| 4 | Mesures de securite | assessment-rgs.yaml |
+| 5 | Risques residuels | ebios-rm/workshop-5, gaps-analysis |
+| 6 | Resultats d'audits | assessment-rgs.yaml (evidence) |
+| 7 | Elements de decision | All phases synthesis |
+| 8 | Decision d'homologation | [Commission placeholder] |
+| 9 | Plan de maintien (MCS) | remediation-roadmap.md |
+
+**Output**:
+```
+.osk/comply/rgs/dossier-homologation/
+├── 00-index.md
+├── 01-perimetre.md
+├── 02-dicp.md
+├── 03-analyse-risques.md
+├── 04-mesures-securite.md
+├── 05-risques-residuels.md
+├── 06-audits.md
+├── 07-elements-decision.md
+├── 08-decision-placeholder.md
+├── 09-plan-mcs.md
+└── annexes/
+    ├── A-architecture.md
+    ├── B-controles-rgs.md
+    ├── C-ebios-synthese.md
+    ├── D-certifications.md
+    └── E-ecarts-remediation.md
+```
+
+**Watermark logic**:
+```yaml
+if gaps_analysis.blockers > 0:
+  watermark: "PROJET - [N] points bloquants non resolus"
+  status: "draft"
+else:
+  watermark: null
+  status: "ready_for_commission"
+```
+
+---
+
+# Orchestrator Behavior
+
+## Starting a New Workflow
+
+```
+1. Check prerequisites
+   ├── System model exists? ──▶ If no: ERROR "Run /osk-discover first"
+   └── workflow-state.yaml exists?
+       ├── If yes: Prompt "Resume existing workflow or start new?"
+       └── If no: Initialize new workflow-state.yaml
+
+2. Execute Phase 1 (Level Assessment)
+   └── Save checkpoint after completion
+
+3. Determine Phase 2 path
+   ├── EBIOS required? ──▶ Execute Phase 2
+   └── EBIOS skipped? ──▶ Record justification, skip to Phase 3
+
+4. Execute remaining phases sequentially
+   └── Save checkpoint after each phase
+
+5. Generate final dossier
+   └── Display completion summary
+```
+
+## Resuming Workflow
+
+```
+1. Load workflow-state.yaml
+2. Display current state summary
+3. Prompt: "Resume from [current_phase].[current_step]?"
+4. If yes: Continue from saved state
+5. If no: Offer options
+   ├── Restart from specific phase
+   ├── Start completely new workflow
+   └── Cancel
+```
+
+## Error Handling
+
+```yaml
+on_error:
+  - Save current state to workflow-state.yaml
+  - Log error details
+  - Display recovery options:
+    - Retry current step
+    - Skip current step (if allowed)
+    - Rollback to previous checkpoint
+    - Abort workflow
+```
+
+---
+
+# Commands Reference
+
+## Full Workflow
+
 ```bash
 /osk-comply rgs
 ```
+Runs complete homologation workflow from Phase 1 to Phase 5.
 
-### Update after changes
+## Individual Phases
+
 ```bash
-/osk-comply rgs --update
+/osk-comply rgs level      # Only Phase 1
+/osk-comply rgs ebios      # Only Phase 2 (requires Phase 1)
+/osk-comply rgs assess     # Only Phase 3 (requires Phase 1)
+/osk-comply rgs gaps       # Only Phase 4 (requires Phase 3)
+/osk-comply rgs dossier    # Only Phase 5 (requires Phase 4)
 ```
 
-### Resume interrupted assessment
+## Workflow Management
+
 ```bash
-/osk-comply rgs --resume
+/osk-comply rgs --resume   # Resume interrupted workflow
+/osk-comply rgs --status   # Display workflow state
+/osk-comply rgs --reset    # Clear workflow state and start fresh
 ```
 
-### Generate homologation dossier
+## Flags
+
 ```bash
-/osk-comply rgs --export md
+--update     # Re-assess only changed components
+--export md  # Export dossier in Markdown format
+--export pdf # Export dossier in PDF format (requires pandoc)
 ```
 
-## Dependencies
+---
 
-- **Discover phase** must be completed first
-- System model files in `.osk/system-model/`
-- Minimum: `index.yaml`, `architecture.yaml`, `controls.yaml`
+# Dependencies
 
-## Related Frameworks
+## Required System Model Sections
+
+| Section | Required For |
+|---------|--------------|
+| index.yaml | All phases |
+| architecture.yaml | Phases 2, 3, 5 |
+| controls.yaml | Phases 3, 4, 5 |
+| data.yaml | Phases 1, 2, 3 |
+| integrations.yaml | Phases 2, 3 |
+| tooling.yaml | Phases 3, 4 |
+| actors.yaml | Phases 2, 3 |
+| business.yaml | Phases 1, 2 |
+| boundaries.yaml | Phases 1, 5 |
+
+## Knowledge Base
+
+All sub-prompts have access to:
+- `knowledge/rgs-v2-*.md` - Official RGS v2.0 annexes
+- `knowledge/guide-homologation-securite.md` - ANSSI homologation guide
+- `knowledge/ebios-risk-manager.md` - EBIOS RM methodology
+- `knowledge/guide-hygiene-informatique.md` - 42 security measures
+
+## Schemas
+
+| Schema | Purpose |
+|--------|---------|
+| `schemas/workflow-state.yaml` | Workflow progress tracking |
+| `schemas/level-assessment.yaml` | Phase 1 output |
+| `schemas/ebios-rm.yaml` | Phase 2 output |
+| `schemas/assessment-extension.yaml` | Phase 3 output (existing) |
+| `schemas/gaps-analysis.yaml` | Phase 4 output |
+| `schemas/tool-certifications.yaml` | Certification validation |
+
+---
+
+# Output Structure
+
+After complete workflow:
+
+```
+.osk/comply/rgs/
+├── workflow-state.yaml           # Workflow tracking
+├── level-assessment.yaml         # Phase 1 output
+├── ebios-rm/                     # Phase 2 output
+│   ├── workshop-1-cadrage.yaml
+│   ├── workshop-2-sources.yaml
+│   ├── workshop-3-strategic.yaml
+│   ├── workshop-4-operational.yaml
+│   ├── workshop-5-treatment.yaml
+│   ├── risk-register.yaml
+│   └── summary.md
+├── assessment-rgs.yaml           # Phase 3 output
+├── assessment-rgs.md             # Human-readable summary
+├── gaps-analysis.yaml            # Phase 4 output
+├── remediation-roadmap.md        # Prioritized actions
+├── quick-wins.md                 # Low-effort high-impact fixes
+└── dossier-homologation/         # Phase 5 output
+    ├── 00-index.md
+    ├── 01-perimetre.md
+    ├── 02-dicp.md
+    ├── 03-analyse-risques.md
+    ├── 04-mesures-securite.md
+    ├── 05-risques-residuels.md
+    ├── 06-audits.md
+    ├── 07-elements-decision.md
+    ├── 08-decision-placeholder.md
+    ├── 09-plan-mcs.md
+    └── annexes/
+```
+
+---
+
+# Related Documentation
+
+- `WORKFLOW-AND-SCORING.md` - Scoring algorithms and DICP calculation
+- `CRYPTO-REFERENCE.md` - ANSSI-approved cryptographic algorithms
+- `SYSTEM-MODEL-REQUIREMENTS.md` - Required system model data by control
+- `README.md` - User documentation
+
+# Related Frameworks
 
 - `rgpd` - GDPR data protection compliance
 - Coming: `nis2`, `iso27001`
-
-## Reference Documentation
-
-- `WORKFLOW-AND-SCORING.md` - Scoring algorithm and DICP calculation
-- `CRYPTO-REFERENCE.md` - ANSSI-approved cryptographic algorithms
-- `SYSTEM-MODEL-REQUIREMENTS.md` - Required system model data by control
