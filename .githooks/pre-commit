@@ -3,7 +3,7 @@
 # OpenSecKit pre-commit hook
 # Runs Rust validation checks before allowing commit
 
-echo "🔍 Running pre-commit checks..."
+echo "Running pre-commit checks..."
 
 cd cli
 
@@ -11,8 +11,8 @@ cd cli
 echo "  Checking Rust formatting..."
 if ! cargo fmt -- --check; then
     echo ""
-    echo "❌ Rust formatting check failed!"
-    echo "   Run 'cargo fmt' to fix formatting issues."
+    echo "Rust formatting check failed!"
+    echo "Run 'cargo fmt' to fix formatting issues."
     exit 1
 fi
 
@@ -20,10 +20,10 @@ fi
 echo "  Running clippy..."
 if ! cargo clippy -- -D warnings 2>/dev/null; then
     echo ""
-    echo "❌ Clippy check failed!"
-    echo "   Fix warnings before committing."
+    echo "Clippy check failed!"
+    echo "Fix warnings before committing."
     exit 1
 fi
 
-echo "✅ All pre-commit checks passed!"
+echo "All pre-commit checks passed!"
 exit 0
