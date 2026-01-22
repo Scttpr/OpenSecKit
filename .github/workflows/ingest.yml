@@ -1,10 +1,10 @@
 name: 📦 Ingest
 
 on:
-    push:
-        tags:
-            - "v*"
-    workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
 
 jobs:
   ingest-codebase:
@@ -12,17 +12,19 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           fetch-depth: 0
 
-      - name: Download Latest OpenSecKit
-        run: |
-          DOWNLOAD_URL=$(curl -s https://api.github.com/repos/Scttpr/OpenSecKit/releases/latest \
-            | jq -r '.assets[] | select(.name == "osk-linux-amd64") | .browser_download_url')
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@f7ccc83f9ed1e5b9c81d8a67d7ad1a747e22a561 # master
+        with:
+          toolchain: stable
 
-          wget -O osk "$DOWNLOAD_URL"
-          chmod +x osk
+      - name: Build OSK CLI
+        run: |
+          cd cli
+          cargo build --release
 
       - name: Generate Output Filename
         run: |
@@ -38,12 +40,13 @@ jobs:
           fi
 
           echo "CTX_FILENAME=$FINAL_NAME" >> $GITHUB_ENV
+
       - name: Run Ingest
         run: |
-          ./osk ingest -p . -o ${{ env.CTX_FILENAME }}
+          ./cli/target/release/osk ingest -p . -o ${{ env.CTX_FILENAME }}
 
       - name: Upload Ingest Artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
         with:
           name: ${{ env.CTX_FILENAME }}
           path: ${{ env.CTX_FILENAME }}
