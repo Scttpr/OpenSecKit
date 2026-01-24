@@ -1,0 +1,247 @@
+# OpenSecKit Discover - Workflow State Schema
+# Location: .osk/system-model/workflow-state.yaml
+# Purpose: Track discovery progress, enable resume, support incremental updates
+
+workflow:
+  version: "1.0.0"
+  started_at: "ISO8601 timestamp"
+  last_updated: "ISO8601 timestamp"
+
+  discovery_mode:
+    type: "enum"
+    values: ["full", "incremental", "context", "resume"]
+    description: "Current discovery mode"
+
+  base_commit:
+    type: "string"
+    description: "Git commit SHA at discovery start"
+
+  current_commit:
+    type: "string"
+    description: "Current git commit SHA"
+
+  current_phase:
+    type: "enum"
+    values: ["product_context", "architecture", "domain_model", "ecosystem", "operations", "synthesis", "completed"]
+    description: "Phase currently being executed"
+
+  current_step:
+    type: "string"
+    description: "Step within current phase (e.g., 'component-analysis')"
+
+phases:
+  product_context:
+    status:
+      type: "enum"
+      values: ["pending", "in_progress", "completed", "skipped"]
+    started_at: "ISO8601 timestamp"
+    completed_at: "ISO8601 timestamp"
+    output:
+      - "product.yaml"
+      - "business.yaml"
+      - "glossary.yaml"
+    steps:
+      - id: "product-discovery"
+        status: "enum[pending|in_progress|completed]"
+      - id: "business-context"
+        status: "enum[pending|in_progress|completed]"
+      - id: "glossary-building"
+        status: "enum[pending|in_progress|completed]"
+      - id: "kpi-detection"
+        status: "enum[pending|in_progress|completed]"
+    result:
+      domain: "string"
+      product_name: "string"
+      feature_count: "number"
+      term_count: "number"
+
+  architecture:
+    status: "enum[pending|in_progress|completed|skipped]"
+    started_at: "ISO8601 timestamp"
+    completed_at: "ISO8601 timestamp"
+    output:
+      - "architecture.yaml"
+    steps:
+      - id: "quick-scan"
+        status: "enum[pending|in_progress|completed]"
+      - id: "component-analysis"
+        status: "enum[pending|in_progress|completed]"
+      - id: "tech-stack-detection"
+        status: "enum[pending|in_progress|completed]"
+      - id: "adr-extraction"
+        status: "enum[pending|in_progress|completed]"
+      - id: "data-flow-mapping"
+        status: "enum[pending|in_progress|completed]"
+      - id: "api-inventory"
+        status: "enum[pending|in_progress|completed]"
+      - id: "resilience-analysis"
+        status: "enum[pending|in_progress|completed]"
+    result:
+      component_count: "number"
+      api_count: "number"
+      adr_count: "number"
+      detected_stack: ["array of strings"]
+
+  domain_model:
+    status: "enum[pending|in_progress|completed|skipped]"
+    started_at: "ISO8601 timestamp"
+    completed_at: "ISO8601 timestamp"
+    output:
+      - "data.yaml"
+      - "actors.yaml"
+      - "boundaries.yaml"
+      - "user-journeys.yaml"
+    steps:
+      - id: "entity-extraction"
+        status: "enum[pending|in_progress|completed]"
+      - id: "data-classification"
+        status: "enum[pending|in_progress|completed]"
+      - id: "persona-discovery"
+        status: "enum[pending|in_progress|completed]"
+      - id: "journey-mapping"
+        status: "enum[pending|in_progress|completed]"
+      - id: "actor-identification"
+        status: "enum[pending|in_progress|completed]"
+      - id: "boundary-definition"
+        status: "enum[pending|in_progress|completed]"
+    result:
+      data_category_count: "number"
+      actor_count: "number"
+      journey_count: "number"
+      pii_detected: "boolean"
+
+  ecosystem:
+    status: "enum[pending|in_progress|completed|skipped]"
+    started_at: "ISO8601 timestamp"
+    completed_at: "ISO8601 timestamp"
+    output:
+      - "integrations.yaml"
+      - "supply_chain.yaml"
+    steps:
+      - id: "integration-detection"
+        status: "enum[pending|in_progress|completed]"
+      - id: "integration-documentation"
+        status: "enum[pending|in_progress|completed]"
+      - id: "compliance-assessment"
+        status: "enum[pending|in_progress|completed]"
+      - id: "sbom-generation"
+        status: "enum[pending|in_progress|completed]"
+      - id: "dependency-analysis"
+        status: "enum[pending|in_progress|completed]"
+    result:
+      integration_count: "number"
+      sbom_component_count: "number"
+      critical_dependencies: "number"
+
+  operations:
+    status: "enum[pending|in_progress|completed|skipped]"
+    started_at: "ISO8601 timestamp"
+    completed_at: "ISO8601 timestamp"
+    output:
+      - "controls.yaml"
+      - "tooling.yaml"
+      - "team.yaml"
+      - "operations.yaml"
+    steps:
+      - id: "environment-documentation"
+        status: "enum[pending|in_progress|completed]"
+      - id: "monitoring-analysis"
+        status: "enum[pending|in_progress|completed]"
+      - id: "runbook-creation"
+        status: "enum[pending|in_progress|completed]"
+      - id: "cicd-analysis"
+        status: "enum[pending|in_progress|completed]"
+      - id: "control-detection"
+        status: "enum[pending|in_progress|completed]"
+      - id: "team-mapping"
+        status: "enum[pending|in_progress|completed]"
+    result:
+      control_count: "number"
+      runbook_count: "number"
+      environment_count: "number"
+
+  synthesis:
+    status: "enum[pending|in_progress|completed|skipped]"
+    started_at: "ISO8601 timestamp"
+    completed_at: "ISO8601 timestamp"
+    output:
+      - "gaps.yaml"
+      - "index.yaml"
+      - "documents/"
+    steps:
+      - id: "gap-consolidation"
+        status: "enum[pending|in_progress|completed]"
+      - id: "index-generation"
+        status: "enum[pending|in_progress|completed]"
+      - id: "documentation-generation"
+        status: "enum[pending|in_progress|completed]"
+        sub_steps:
+          - doc: "pm-guide.md"
+            status: "enum[pending|in_progress|completed]"
+          - doc: "dev-guide.md"
+            status: "enum[pending|in_progress|completed]"
+          - doc: "security-guide.md"
+            status: "enum[pending|in_progress|completed]"
+          - doc: "ops-guide.md"
+            status: "enum[pending|in_progress|completed]"
+          - doc: "onboarding.md"
+            status: "enum[pending|in_progress|completed]"
+      - id: "validation"
+        status: "enum[pending|in_progress|completed]"
+    result:
+      gap_count: "number"
+      documents_generated: "number"
+      model_completeness: "percentage"
+
+# Incremental update tracking
+incremental:
+  last_full_discovery: "ISO8601 timestamp"
+
+  change_detection:
+    enabled: "boolean"
+
+    # Map file patterns to affected phases
+    patterns_to_phases:
+      "README.md": ["product_context"]
+      "package.json": ["product_context", "ecosystem"]
+      "Cargo.toml": ["product_context", "ecosystem"]
+      "src/models/**": ["domain_model"]
+      "src/api/**": ["architecture"]
+      "src/auth/**": ["domain_model", "operations"]
+      "src/services/**": ["architecture"]
+      "prisma/schema.prisma": ["domain_model"]
+      "terraform/**": ["architecture", "domain_model"]
+      ".github/workflows/**": ["operations"]
+      "docs/adr/**": ["architecture"]
+      "docs/**": ["product_context"]
+
+  # Pending updates detected from git changes
+  pending_updates:
+    - phase: "string (phase name)"
+      reason: "string (why update needed)"
+      files_changed: "number"
+      priority: "enum[high|medium|low]"
+
+  # Phase dependencies (if phase X re-runs, also re-run these)
+  phase_dependencies:
+    product_context: []
+    architecture: ["domain_model"]
+    domain_model: ["ecosystem"]
+    ecosystem: ["synthesis"]
+    operations: ["synthesis"]
+    synthesis: []
+
+# Gaps accumulated during discovery
+accumulated_gaps:
+  - id: "GAP-XXX"
+    phase: "string (which phase detected it)"
+    category: "string"
+    severity: "enum[critical|high|medium|low]"
+    description: "string"
+
+# Model health indicators
+health:
+  completeness_score: "percentage (0-100)"
+  last_validated: "ISO8601 timestamp"
+  validation_errors: "number"
+  cross_reference_issues: "number"

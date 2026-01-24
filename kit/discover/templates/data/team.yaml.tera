@@ -19,7 +19,9 @@ team:
   location: "{{ team.location }}"
   timezone: "{{ team.timezone }}"
 
-  # Key roles and contacts
+  # Organizational roles (job functions/responsibilities)
+  # Note: These are PEOPLE roles (PM, DevOps Lead), NOT system access roles
+  # For system access roles (Admin, Viewer), see actors.yaml
   roles:
 {% for role in team.roles %}
     - role: "{{ role.role }}"
