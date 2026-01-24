@@ -25,6 +25,8 @@ stats:
   integrations: {{ stats.integrations | default(value=0) }}
   controls: {{ stats.controls | default(value=0) }}
   gaps: {{ stats.gaps | default(value=0) }}
+  apis: {{ stats.apis | default(value=0) }}
+  sbom_components: {{ stats.sbom_components | default(value=0) }}
 
 # ═══ SECTION REFERENCES ═══
 sections:

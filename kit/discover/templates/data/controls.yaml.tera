@@ -39,6 +39,7 @@ existing_controls:
       scope: "{{ ctrl.scope }}"
       algorithm: "{{ ctrl.algorithm }}"
       key_management: "{{ ctrl.key_management }}"
+      components: [{% for c in ctrl.components %}"{{ c }}"{% if not loop.last %}, {% endif %}{% endfor %}]
       effectiveness: "{{ ctrl.effectiveness }}"
 {% endfor %}
 
@@ -50,6 +51,7 @@ existing_controls:
       events_captured: [{% for e in ctrl.events_captured %}"{{ e }}"{% if not loop.last %}, {% endif %}{% endfor %}]
       retention: "{{ ctrl.retention }}"
       siem_integrated: {{ ctrl.siem_integrated }}
+      components: [{% for c in ctrl.components %}"{{ c }}"{% if not loop.last %}, {% endif %}{% endfor %}]
       effectiveness: "{{ ctrl.effectiveness }}"
 {% endfor %}
 
@@ -60,6 +62,7 @@ existing_controls:
       description: "{{ ctrl.description }}"
       type: "{{ ctrl.type }}"
       scope: "{{ ctrl.scope }}"
+      components: [{% for c in ctrl.components %}"{{ c }}"{% if not loop.last %}, {% endif %}{% endfor %}]
       effectiveness: "{{ ctrl.effectiveness }}"
 {% endfor %}
 
@@ -72,5 +75,9 @@ security_processes:
     description: "{{ proc.description }}"
     frequency: "{{ proc.frequency }}"
     last_performed: "{{ proc.last_performed }}"
+    owner: "{{ proc.owner }}"
+    owner_contact: "{{ proc.owner_contact }}"
+    last_tested: "{{ proc.last_tested }}"
+    test_result: "{{ proc.test_result }}"
     documented: {{ proc.documented }}
 {% endfor %}

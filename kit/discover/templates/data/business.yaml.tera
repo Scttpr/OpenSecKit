@@ -6,6 +6,10 @@ metadata:
   section: "business"
   parent: "index.yaml"
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# BUSINESS CONTEXT - Domain, stakeholders, and their concerns
+# ═══════════════════════════════════════════════════════════════════════════════
+
 business_context:
   domain: "{{ domain }}"
   description: "{{ description }}"
@@ -15,6 +19,10 @@ business_context:
     - role: "{{ stakeholder.role }}"
       concerns: [{% for concern in stakeholder.concerns %}"{{ concern }}"{% if not loop.last %}, {% endif %}{% endfor %}]
 {% endfor %}
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# BUSINESS PROCESSES - Critical workflows and their data handling
+# ═══════════════════════════════════════════════════════════════════════════════
 
 business_processes:
 {% for process in processes %}
@@ -35,6 +43,10 @@ business_processes:
       - "{{ compliance }}"
 {% endfor %}
 {% endfor %}
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# BUSINESS RULES - Rules with security implications
+# ═══════════════════════════════════════════════════════════════════════════════
 
 business_rules:
 {% for rule in rules %}

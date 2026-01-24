@@ -57,7 +57,11 @@ security_tools:
     tool: "{{ tool.tool }}"
     vendor: "{{ tool.vendor }}"
     integration: "{{ tool.integration }}"
-    blocking: {{ tool.blocking }}
+    enforcement:
+      blocking: {{ tool.enforcement.blocking }}
+      stage: "{{ tool.enforcement.stage }}"
+      fail_strategy: "{{ tool.enforcement.fail_strategy }}"
+      pipeline_id: "{{ tool.enforcement.pipeline_id }}"
     coverage: "{{ tool.coverage }}"
 {% endfor %}
 
@@ -121,6 +125,36 @@ collaboration:
   project_management:
     platform: "{{ collaboration.project_management.platform }}"
     sso_enabled: {{ collaboration.project_management.sso_enabled }}
+
+  design_tools:
+{% for tool in collaboration.design_tools %}
+    - platform: "{{ tool.platform }}"
+      purpose: "{{ tool.purpose }}"
+      access: "{{ tool.access }}"
+      sso_enabled: {{ tool.sso_enabled }}
+      data_classification: "{{ tool.data_classification }}"
+{% endfor %}
+
+  video_conferencing:
+{% for vc in collaboration.video_conferencing %}
+    - platform: "{{ vc.platform }}"
+      purpose: "{{ vc.purpose }}"
+      recording_enabled: {{ vc.recording_enabled }}
+      recording_storage: "{{ vc.recording_storage }}"
+      sso_enabled: {{ vc.sso_enabled }}
+{% endfor %}
+
+  knowledge_management:
+    wikis:
+{% for wiki in collaboration.knowledge_management.wikis %}
+      - platform: "{{ wiki.platform }}"
+        purpose: "{{ wiki.purpose }}"
+        access: "{{ wiki.access }}"
+{% endfor %}
+    adr_tool: "{{ collaboration.knowledge_management.adr_tool }}"
+    adr_location: "{{ collaboration.knowledge_management.adr_location }}"
+    runbooks_location: "{{ collaboration.knowledge_management.runbooks_location }}"
+    onboarding_docs: "{{ collaboration.knowledge_management.onboarding_docs }}"
 
 secrets_management:
   production:
