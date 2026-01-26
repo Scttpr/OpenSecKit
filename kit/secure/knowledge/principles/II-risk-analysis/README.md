@@ -18,20 +18,20 @@ L'analyse de risques vous aide à :
 
 | Modèle | Phase | Difficulté | Temps | Description |
 |--------|-------|------------|-------|-------------|
-| [modele-notation-risques-planification.md](risk-scoring-template-planning.md) | Planification | Intermédiaire | 30-60 min | Quantifier les risques avec la méthodologie Criticité × Probabilité × Exposition |
-| [modele-registre-risques-tous.md](risk-register-template-all.md) | Toutes Phases | Débutant | 15 min/semaine | Document évolutif suivant tous les risques de sécurité identifiés |
+| [`scoring-methodology.md`](scoring-methodology.md) | Planification | Intermédiaire | 30-60 min | Quantifier les risques avec la méthodologie Criticité × Probabilité × Exposition |
+| [`register-guide.md`](register-guide.md) | Toutes Phases | Débutant | 15 min/semaine | Document évolutif suivant tous les risques de sécurité identifiés |
 
 ## Quand utiliser ces modèles
 
 ### Phase de planification
 
-- ✅ Utiliser la **Notation des Risques** immédiatement après la modélisation des menaces
-- ✅ Initialiser le **registre des risques** pour suivre tous les risques identifiés
+- Utiliser la **Notation des Risques** immédiatement après la modélisation des menaces
+- Initialiser le **registre des risques** pour suivre tous les risques identifiés
 
 ### Toutes Phases (En Continu)
 
-- ✅ Mettre à jour le **registre des risques** chaque semaine avec les nouveaux risques et changements de statut
-- ✅ Ré-exécuter la **Notation des Risques** quand les risques changent ou que de nouvelles informations sont disponibles
+- Mettre à jour le **registre des risques** chaque semaine avec les nouveaux risques et changements de statut
+- Ré-exécuter la **Notation des Risques** quand les risques changent ou que de nouvelles informations sont disponibles
 
 ## Méthodologie de Notation des Risques
 
@@ -80,7 +80,7 @@ Plage de Score Total : 1 (minimal) à 125 (critique)
 
 ### Première analyse de risques ?
 
-**Commencez ici** : [modele-notation-risques-planification.md](risk-scoring-template-planning.md)
+**Commencez ici** : [`scoring-methodology.md`](scoring-methodology.md)
 
 1. **Rassembler le modèle de menaces** : Avoir votre analyse STRIDE ou Arbre d'Attaque prête
 2. **Noter chaque menace** : Utiliser Criticité × Probabilité × Exposition
@@ -90,7 +90,7 @@ Plage de Score Total : 1 (minimal) à 125 (critique)
 
 ### Vous Avez Déjà des Risques Identifiés ?
 
-**Commencez ici** : [modele-registre-risques-tous.md](risk-register-template-all.md)
+**Commencez ici** : [`register-guide.md`](register-guide.md)
 
 1. **Créer votre registre** : Initialiser le document de suivi des risques
 2. **Ajouter tous les risques** : Copier depuis le modèle de menaces avec les scores
@@ -119,10 +119,10 @@ L'analyse de risques fait le lien entre la modélisation des menaces et l'implé
 
 D'après la constitution SSDLC, le Principe II exige :
 
-- ✅ **Notation des risques** complétée pour toutes les menaces identifiées
-- ✅ **Risques > 48** (Élevé et Critique) validés par les parties prenantes appropriées
-- ✅ **Registre des risques** maintenu tout au long du cycle de vie du projet
-- ✅ **Approbation obtenue** avant d'accepter des risques ≥ 80 (Critique)
+- **Notation des risques** complétée pour toutes les menaces identifiées
+- **Risques > 48** (Élevé et Critique) validés par les parties prenantes appropriées
+- **Registre des risques** maintenu tout au long du cycle de vie du projet
+- **Approbation obtenue** avant d'accepter des risques ≥ 80 (Critique)
 
 ### Matrice d'Approbation
 
@@ -146,7 +146,7 @@ D'après la constitution SSDLC, le Principe II exige :
 
 ### Préparation d'audit de sécurité
 
-1. réviser le registre des risques pour la complétude
+1. Réviser le registre des risques pour la complétude
 2. Vérifier que tous les risques élevés sont atténués ou approuvés
 3. Démontrer les tendances des risques dans le temps
 4. Fournir des preuves de gestion continue des risques
@@ -165,12 +165,6 @@ D'après la constitution SSDLC, le Principe II exige :
 2. Réviser les risques acceptés (toujours acceptables ?)
 3. Analyser les tendances des risques
 4. Rapporter à la direction
-
-## Exemples
-
-Voir l'exemple concret :
-
-- [_exemple-ecommerce-risque.md](_exemple-ecommerce-risque.md) - Analyse de risques complète pour une application e-commerce
 
 ## Mapping de conformité
 
@@ -213,4 +207,4 @@ Contributions précieuses :
 
 **Besoin d'Aide ?** Ouvrir une [Discussion GitHub](https://github.com/Scttpr/OpenSecKit/issues) avec le tag `02-risk-analysis`.
 
-**Prochaines étapes** : Après l'analyse de risques, procéder aux [exigences de sécurité](../03-security-requirements/) pour concevoir des contrôles pour les risques prioritaires.
+**Prochaines étapes** : Après l'analyse de risques, procéder aux [exigences de sécurité](../III-security-design/) pour concevoir des contrôles pour les risques prioritaires.

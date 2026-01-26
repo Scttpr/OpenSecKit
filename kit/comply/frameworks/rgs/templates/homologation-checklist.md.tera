@@ -1,3 +1,43 @@
+{#
+================================================================================
+PREPROCESSING REQUIREMENTS
+
+This template requires computed fields that must be prepared before rendering.
+The workflow prompt (kit/comply/frameworks/rgs/prompts/05-dossier.md) is
+responsible for computing these values from raw assessment data.
+
+COMPUTED FIELDS REQUIRED:
+
+1. Status Icons (status_icon):
+   - Use "✅" for complete/compliant/ready
+   - Use "⚠️" for partial/in_progress/warning
+   - Use "❌" for missing/non_compliant/blocker
+   - Use "⏳" for pending/not_started
+
+2. Document Status (doc_status):
+   - Compute from document location existence and validation status
+   - Values: "✅ Complete" | "⚠️ Draft" | "❌ Missing"
+
+3. Control Documentation Counts (documented/total):
+   - Count controls per domain from assessment-extension.yaml
+   - documented: controls with evidence_ref defined
+   - total: all controls for the RGS level
+
+4. Prerequisites (prereqs.*):
+   - system_model: Check .osk/system-model/index.yaml exists
+   - security_level: Check level-assessment.yaml exists
+   - dicp: Check DICP scores are defined
+   - ebios: Check ebios-rm.yaml exists and has scenarios
+
+5. Phase Status Objects:
+   - Aggregate from assessment data with status + status_icon + document
+
+Example preprocessing (pseudo-code):
+   prereqs.system_model = file_exists(".osk/system-model/index.yaml") ? "✅" : "❌"
+   domains.authentification.doc_status = count_documented("AUTH") == total ? "✅" : "⚠️"
+   phase1.risk_analysis.status_icon = ebios.scenarios.length > 0 ? "✅" : "❌"
+================================================================================
+#}
 # Homologation Checklist - RGS {{ rgs_level }}
 
 **Last Updated**: {{ assessment_date }}

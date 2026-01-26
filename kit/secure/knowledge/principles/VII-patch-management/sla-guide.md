@@ -207,7 +207,7 @@ Définir les délais maxim aux (SLA) pour appliquer les correctifs de sécurité
 ```markdown
 ## Demande de dérogation de SLA
 
-**Vulnérabilité** : CVE-2024-XXXXX
+**Vulnérabilité** : [EXAMPLE: CVE-2024-12345]
 **SLA normal** : 7 jours
 **Nouvelle deadline demandée** : 14 jours
 
@@ -340,7 +340,7 @@ graph TD
 
 | CVE | Criticité | Âge (jours) | SLA | Statut | Responsable |
 |-----|-----------|-------------|-----|--------|-------------|
-| CVE-2024-XXXXX | HIGH | 10 | 7 | Tests en cours | John Doe |
+| [EXAMPLE: CVE-2024-12345] | HIGH | 10 | 7 | Tests en cours | John Doe |
 
 ## Actions recommandées
 1. [Action 1]

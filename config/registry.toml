@@ -158,7 +158,7 @@ roles = ["discovery-analyst"]
 
 [commands.comply]
 url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/prompts/comply.md"
-version = "5.0.0"
+version = "4.0.0"
 part = "comply"
 phase = "compliance"
 description = "Run autonomous compliance assessment (RGPD or RGS)"

@@ -18,19 +18,19 @@ Les exigences de sécurité vous aident à :
 
 | Modèle | Phase | Difficulté | Temps | Description |
 |--------|-------|------------|-------|-------------|
-| [checklist-owasp-asvs-conception.md](owasp-asvs-checklist-design.md) | Conception | Intermédiaire | 2-3 heures | Checklist OWASP ASVS complète pour identifier les contrôles de sécurité requis |
-| [modele-exigences-authentification-conception.md](authentication-requirements-template-design.md) | Conception | Intermédiaire | 1-2 heures | Politiques de mots de passe, MFA, gestion de sessions, exigences SSO |
-| [modele-exigences-autorisation-conception.md](authorization-requirements-template-design.md) | Conception | Intermédiaire | 1-2 heures | RBAC, permissions, contrôle d'accès, prévention IDOR |
-| [modele-exigences-chiffrement-conception.md](encryption-requirements-template-design.md) | Conception | Avancé | 1-2 heures | Données au repos, en transit, gestion des clés, algorithmes cryptographiques |
+| [`asvs-guide.md`](asvs-guide.md) | Conception | Intermédiaire | 2-3 heures | Guide OWASP ASVS pour identifier les contrôles de sécurité requis |
+| [`authentication-guide.md`](authentication-guide.md) | Conception | Intermédiaire | 1-2 heures | Politiques de mots de passe, MFA, gestion de sessions, exigences SSO |
+| [`authorization-guide.md`](authorization-guide.md) | Conception | Intermédiaire | 1-2 heures | RBAC, permissions, contrôle d'accès, prévention IDOR |
+| [`encryption-guide.md`](encryption-guide.md) | Conception | Avancé | 1-2 heures | Données au repos, en transit, gestion des clés, algorithmes cryptographiques |
 
 ## Quand utiliser ces modèles
 
 ### Phase de conception
 
-- ✅ Utiliser la **Checklist OWASP ASVS** pour identifier tous les contrôles de sécurité requis
-- ✅ Utiliser les **Exigences d'Authentification** pour concevoir la connexion, MFA, gestion de sessions
-- ✅ Utiliser les **Exigences d'Autorisation** pour concevoir les rôles, permissions, contrôle d'accès
-- ✅ Utiliser les **Exigences de Chiffrement** pour concevoir la protection des données et gestion des clés
+- Utiliser le **Guide OWASP ASVS** pour identifier tous les contrôles de sécurité requis
+- Utiliser le **Guide d'Authentification** pour concevoir la connexion, MFA, gestion de sessions
+- Utiliser le **Guide d'Autorisation** pour concevoir les rôles, permissions, contrôle d'accès
+- Utiliser le **Guide de Chiffrement** pour concevoir la protection des données et gestion des clés
 
 ### Workflow recommandé
 
@@ -39,7 +39,7 @@ Les exigences de sécurité vous aident à :
    ↓
 2. Noter les risques (Principe II)
    ↓
-3. Identifier les contrôles requis (Checklist OWASP ASVS)
+3. Identifier les contrôles requis (Guide OWASP ASVS)
    ↓
 4. Concevoir le système d'authentification
    ↓
@@ -56,31 +56,31 @@ Les exigences de sécurité vous aident à :
 
 ### Première définition d'exigences de sécurité ?
 
-**Commencez ici** : [checklist-owasp-asvs-conception.md](owasp-asvs-checklist-design.md)
+**Commencez ici** : [`asvs-guide.md`](asvs-guide.md)
 
 1. **Déterminer le niveau ASVS** : Niveau 1 (basique), Niveau 2 (standard), ou Niveau 3 (haute sécurité)
 2. **Réviser la checklist ASVS** : Parcourir chaque catégorie d'exigences
 3. **Marquer les exigences applicables** : Cocher celles qui s'appliquent à votre application
-4. **Approfondir** : Utiliser les modèles spécialisés (auth, authz, chiffrement) pour les détails
+4. **Approfondir** : Utiliser les guides spécialisés (auth, authz, chiffrement) pour les détails
 5. **Documenter les décisions** : Capturer la justification pour chaque exigence
 
 ### Besoin d'exigences spécifiques ?
 
-**Authentification** : [modele-exigences-authentification-conception.md](authentication-requirements-template-design.md)
+**Authentification** : [`authentication-guide.md`](authentication-guide.md)
 
 - Politiques de mots de passe, force, stockage (bcrypt)
 - Authentification multi-facteurs (TOTP, SMS)
 - Gestion de sessions (timeouts, cookies)
 - Intégration SSO (OAuth, SAML)
 
-**Autorisation** : [modele-exigences-autorisation-conception.md](authorization-requirements-template-design.md)
+**Autorisation** : [`authorization-guide.md`](authorization-guide.md)
 
 - Définitions de rôles (admin, utilisateur, invité)
 - Matrice de permissions (qui peut faire quoi)
 - RBAC vs ABAC
 - Prévention IDOR
 
-**Chiffrement** : [modele-exigences-chiffrement-conception.md](encryption-requirements-template-design.md)
+**Chiffrement** : [`encryption-guide.md`](encryption-guide.md)
 
 - Configuration TLS (TLS 1.3, suites de chiffrement)
 - Chiffrement de base de données (au repos)
@@ -106,11 +106,11 @@ Les exigences de sécurité font le lien entre conception et implémentation :
 
 D'après la constitution SSDLC, le Principe III exige :
 
-- ✅ **Contrôles de sécurité documentés** en phase de conception (cette checklist)
-- ✅ **Contrôles adressant les menaces identifiées** (lien avec le modèle de menaces)
-- ✅ **Défense en profondeur** (multiples couches de sécurité)
-- ✅ **Principe du moindre privilège** (accès minimal requis)
-- ✅ **Sécurité par défaut** (refus par défaut, échec sécurisé)
+- **Contrôles de sécurité documentés** en phase de conception (cette checklist)
+- **Contrôles adressant les menaces identifiées** (lien avec le modèle de menaces)
+- **Défense en profondeur** (multiples couches de sécurité)
+- **Principe du moindre privilège** (accès minimal requis)
+- **Sécurité par défaut** (refus par défaut, échec sécurisé)
 
 ## Modèles courants d'exigences de sécurité
 
@@ -147,12 +147,6 @@ D'après la constitution SSDLC, le Principe III exige :
 - Pas de PII : Nettoyer les données sensibles des journaux
 - Intégrité : Stockage de journaux immuable (SIEM)
 - Rétention : 90 jours minimum
-
-## Exemples
-
-Voir l'exemple concret :
-
-- [_example-ecommerce-requirements.md](_example-ecommerce-requirements.md) - Exigences de sécurité complètes pour une application e-commerce
 
 ## Mapping de conformité
 
@@ -192,4 +186,4 @@ Contributions précieuses :
 
 **Besoin d'aide ?** Ouvrir une [Discussion GitHub](https://github.com/Scttpr/OpenSecKit/issues) avec le tag `03-security-requirements`.
 
-**Prochaines étapes** : Après avoir défini les exigences de sécurité, procéder aux [tests de sécurité](../04-security-testing/) pour créer des cas de tests vérifiant l'implémentation.
+**Prochaines étapes** : Après avoir défini les exigences de sécurité, procéder aux [tests de sécurité](../IV-security-testing/) pour créer des cas de tests vérifiant l'implémentation.

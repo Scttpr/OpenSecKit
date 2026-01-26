@@ -195,7 +195,11 @@ pub fn run(model_path: &str, json: bool) -> Result<()> {
         if !errors.is_empty() {
             println!("\nIssues found:");
             for err in &errors {
-                let icon = if err.severity == "error" { "✗" } else { "⚠" };
+                let icon = if err.severity == "error" {
+                    "✗"
+                } else {
+                    "⚠"
+                };
                 println!("  {} [{}] {}", icon, err.file, err.message);
                 if let Some(ref suggestion) = err.suggestion {
                     println!("    → {}", suggestion);
@@ -203,7 +207,10 @@ pub fn run(model_path: &str, json: bool) -> Result<()> {
             }
         }
 
-        println!("\nResult: {} errors, {} warnings", error_count, warning_count);
+        println!(
+            "\nResult: {} errors, {} warnings",
+            error_count, warning_count
+        );
         if valid {
             println!("✓ System model is valid");
         } else {

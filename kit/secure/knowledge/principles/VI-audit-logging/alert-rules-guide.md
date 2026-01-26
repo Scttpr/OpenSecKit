@@ -561,7 +561,7 @@ WHERE src IN (list_of_log_servers)
 ```json
 {
   "action_type": "webhook",
-  "webhook_url": "https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXX",
+  "webhook_url": "[EXAMPLE: https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXX]",
   "message": {
     "text": "🚨 Security Alert: {{rule_name}}",
     "attachments": [
