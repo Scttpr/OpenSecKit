@@ -7,6 +7,7 @@
 #   - components[].id → referenced by boundaries.yaml trust_zones[].components
 #   - components[].data_stored/data_processed → data.yaml data_categories[].id
 #   - components[].dependencies[].component → components[].id (self-reference)
+#   - components[].owner → team.yaml team.roles or team.name
 #   - api_inventory[].consumers[].name → actors.yaml or integrations.yaml
 
 metadata:
@@ -53,6 +54,7 @@ components:
         type: "{{ dep.type }}"
 {% endfor %}
 
+    owner: "{{ comp.owner }}"  # Reference to team.yaml
     security_notes: "{{ comp.security_notes }}"
 {% endfor %}
 

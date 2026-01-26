@@ -251,23 +251,27 @@ index:
   audiences:
     - role: "Product Manager"
       relevant_files: ["product.yaml", "business.yaml", "user-journeys.yaml", "glossary.yaml"]
-      quick_start: "docs/pm-guide.md"
+      quick_start: "docs/product.md"
 
     - role: "Developer"
       relevant_files: ["architecture.yaml", "glossary.yaml", "integrations.yaml", "tooling.yaml"]
-      quick_start: "docs/dev-guide.md"
+      quick_start: "docs/developer.md"
 
     - role: "Security Engineer"
       relevant_files: ["controls.yaml", "boundaries.yaml", "data.yaml", "supply_chain.yaml"]
-      quick_start: "docs/security-guide.md"
+      quick_start: "docs/security.md"
 
     - role: "DevOps/SRE"
       relevant_files: ["operations.yaml", "architecture.yaml", "tooling.yaml"]
-      quick_start: "docs/ops-guide.md"
+      quick_start: "docs/operations.md"
 
     - role: "New Team Member"
       relevant_files: ["product.yaml", "glossary.yaml", "team.yaml", "architecture.yaml"]
       quick_start: "docs/onboarding.md"
+
+    - role: "Architect"
+      relevant_files: ["architecture.yaml", "boundaries.yaml", "data.yaml", "integrations.yaml"]
+      quick_start: "docs/architecture.md"
 ```
 
 ---
@@ -301,7 +305,7 @@ Output location: [docs/|.osk/docs/|custom]
 
 #### Generated Documentation Structure
 
-**1. Product Manager Guide (pm-guide.md)**
+**1. Product Overview (product.md)**
 ```markdown
 # {{ product.name }} - Product Overview
 
@@ -334,7 +338,7 @@ Output location: [docs/|.osk/docs/|custom]
 {% endfor %}
 ```
 
-**2. Developer Guide (dev-guide.md)**
+**2. Developer Guide (developer.md)**
 ```markdown
 # {{ product.name }} - Developer Guide
 
@@ -370,7 +374,7 @@ Auth: {{ api.authentication }}
 {{ tooling.testing_guide }}
 ```
 
-**3. Security Guide (security-guide.md)**
+**3. Security Overview (security.md)**
 ```markdown
 # {{ product.name }} - Security Overview
 
@@ -400,7 +404,7 @@ Type: {{ control.type }}
 - Signing: {{ supply_chain.artifact_security.signing.method }}
 ```
 
-**4. Operations Guide (ops-guide.md)**
+**4. Operations Handbook (operations.md)**
 ```markdown
 # {{ product.name }} - Operations Guide
 
@@ -437,6 +441,41 @@ Rollback: {{ deployments.rollback.method }}
 ```
 
 **5. Onboarding Guide (onboarding.md)**
+
+**6. Architecture Guide (architecture.md)**
+```markdown
+# {{ product.name }} - Architecture Guide
+
+## Quick Start
+{{ onboarding.quick_start }}
+
+## Architecture Overview
+{{ architecture.style }} architecture using {{ tech_stack | join(", ") }}
+
+### Components
+{% for component in components %}
+- **{{ component.name }}** ({{ component.type }}): {{ component.description }}
+{% endfor %}
+
+## Data Flows
+{% for flow in data_flows %}
+### {{ flow.name }}
+From: {{ flow.from }} → To: {{ flow.to }}
+Data: {{ flow.data | join(", ") }}
+{% endfor %}
+
+## APIs
+{% for api in apis %}
+### {{ api.name }} ({{ api.version }})
+Base: `{{ api.base_path }}`
+Auth: {{ api.authentication }}
+{% endfor %}
+
+## Integration Points
+{% for int in integrations %}
+- **{{ int.name }}**: {{ int.description }}
+{% endfor %}
+```
 ```markdown
 # Welcome to {{ product.name }}!
 
@@ -507,11 +546,12 @@ System Model Generated:
 └── index.yaml ✓
 
 Documentation Generated:
-├── docs/pm-guide.md ✓
-├── docs/dev-guide.md ✓
-├── docs/security-guide.md ✓
-├── docs/ops-guide.md ✓
-└── docs/onboarding.md ✓
+├── docs/product.md ✓
+├── docs/developer.md ✓
+├── docs/security.md ✓
+├── docs/operations.md ✓
+├── docs/onboarding.md ✓
+└── docs/architecture.md ✓
 
 Statistics:
 - Components: 15
@@ -563,11 +603,12 @@ Generate the following files:
 - Audience routing
 
 ### Documentation files (in docs/)
-- pm-guide.md
-- dev-guide.md
-- security-guide.md
-- ops-guide.md
+- product.md
+- developer.md
+- security.md
+- operations.md
 - onboarding.md
+- architecture.md
 
 ---
 
@@ -581,11 +622,12 @@ phases:
     output:
       - "gaps.yaml"
       - "index.yaml"
-      - "docs/pm-guide.md"
-      - "docs/dev-guide.md"
-      - "docs/security-guide.md"
-      - "docs/ops-guide.md"
+      - "docs/product.md"
+      - "docs/developer.md"
+      - "docs/security.md"
+      - "docs/operations.md"
       - "docs/onboarding.md"
+      - "docs/architecture.md"
     result:
       gap_count: {{ count }}
       health_score: {{ score }}

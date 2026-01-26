@@ -1,0 +1,439 @@
+# Security Overview
+
+**Project**: {{ project.name }}
+**Generated**: {{ metadata.generated_at | date(format="%Y-%m-%d") }}
+**Model Commit**: {{ metadata.last_commit }}
+
+---
+
+## Dashboard
+
+| Metric | Value |
+|--------|-------|
+| Trust Zones | {{ stats.trust_zones }} |
+| Trust Boundaries | {{ boundaries.trust_boundaries | default(value=[]) | length }} |
+| Security Controls | {{ stats.controls }} |
+| Critical Gaps | {{ gaps.gap_summary.by_severity.critical | default(value=0) }} |
+| High Gaps | {{ gaps.gap_summary.by_severity.high | default(value=0) }} |
+| PII Categories | {{ data.pii_count | default(value=0) }} |
+{% if supply_chain.artifact_security.provenance %}| SLSA Level | {{ supply_chain.artifact_security.provenance.slsa_level | default(value="Not assessed") }} |{% endif %}
+
+### Control Coverage
+
+| Category | Status |
+|----------|--------|
+{% if controls.existing_controls.authentication %}| Authentication | {{ controls.existing_controls.authentication[0].effectiveness | default(value="Not assessed") }} |{% endif %}
+{% if controls.existing_controls.authorization %}| Authorization | {{ controls.existing_controls.authorization[0].effectiveness | default(value="Not assessed") }} |{% endif %}
+{% if controls.existing_controls.encryption %}| Encryption | {{ controls.existing_controls.encryption[0].effectiveness | default(value="Not assessed") }} |{% endif %}
+{% if controls.existing_controls.logging %}| Logging | {{ controls.existing_controls.logging[0].effectiveness | default(value="Not assessed") }} |{% endif %}
+{% if controls.existing_controls.network %}| Network | {{ controls.existing_controls.network[0].effectiveness | default(value="Not assessed") }} |{% endif %}
+
+---
+
+## Trust Architecture
+
+{% if boundaries.trust_zones %}
+### Trust Zones
+
+```mermaid
+flowchart TB
+    subgraph External
+        EXT[External/Internet]
+    end
+{% for zone in boundaries.trust_zones %}
+    subgraph {{ zone.id }}[{{ zone.name }} - Trust Level: {{ zone.trust_level }}]
+{% for comp in zone.components %}
+        {{ comp }}
+{% endfor %}
+    end
+{% endfor %}
+{% for boundary in boundaries.trust_boundaries %}
+    {{ boundary.from_zone }} -->|{{ boundary.protocol }}| {{ boundary.to_zone }}
+{% endfor %}
+```
+
+| Zone | Trust Level | Components | Security Controls |
+|------|-------------|------------|-------------------|
+{% for zone in boundaries.trust_zones %}
+| **{{ zone.name }}** | {{ zone.trust_level }} | {{ zone.components | join(sep=", ") }} | {{ zone.security_controls | default(value=[]) | join(sep=", ") }} |
+{% endfor %}
+
+{% for zone in boundaries.trust_zones %}
+### {{ zone.name }}
+
+{{ zone.description | default(value="") }}
+
+| Property | Value |
+|----------|-------|
+| ID | `{{ zone.id }}` |
+| Trust Level | {{ zone.trust_level }} |
+| Network Segment | {{ zone.network_segment | default(value="Not specified") }} |
+| Access Restrictions | {{ zone.access_restrictions | default(value="Not specified") }} |
+
+**Components**: {{ zone.components | join(sep=", ") }}
+
+**Security Controls**: {{ zone.security_controls | default(value=[]) | join(sep=", ") }}
+
+{% endfor %}
+{% else %}
+No trust zones documented.
+{% endif %}
+
+---
+
+## Trust Boundaries
+
+{% if boundaries.trust_boundaries %}
+| ID | From | To | Protocol | Risk Level |
+|----|------|----|----------|------------|
+{% for boundary in boundaries.trust_boundaries %}
+| `{{ boundary.id }}` | {{ boundary.from_zone }} | {{ boundary.to_zone }} | {{ boundary.protocol }}:{{ boundary.port | default(value="*") }} | {{ boundary.risk_level | default(value="Medium") }} |
+{% endfor %}
+
+{% for boundary in boundaries.trust_boundaries %}
+### {{ boundary.name }}
+
+{{ boundary.description | default(value="") }}
+
+| Property | Value |
+|----------|-------|
+| From Zone | {{ boundary.from_zone }} |
+| To Zone | {{ boundary.to_zone }} |
+| Protocol | {{ boundary.protocol }} |
+| Port | {{ boundary.port | default(value="*") }} |
+| Risk Level | {{ boundary.risk_level | default(value="Medium") }} |
+
+**Controls at Boundary:**
+
+| Control | Status |
+|---------|--------|
+| Authentication | {{ boundary.controls.authentication | default(value="Not specified") }} |
+| Authorization | {{ boundary.controls.authorization | default(value="Not specified") }} |
+| Encryption | {{ boundary.controls.encryption | default(value="Not specified") }} |
+| Logging | {{ boundary.controls.logging | default(value="Not specified") }} |
+| Rate Limiting | {{ boundary.controls.rate_limiting | default(value="Not specified") }} |
+| Input Validation | {{ boundary.controls.input_validation | default(value="Not specified") }} |
+
+{% if boundary.data_crossing %}
+**Data Crossing**: {{ boundary.data_crossing | join(sep=", ") }}
+{% endif %}
+
+{% if boundary.threats %}
+**Identified Threats:**
+{% for threat in boundary.threats %}
+- {{ threat }}
+{% endfor %}
+{% endif %}
+
+{% endfor %}
+{% else %}
+No trust boundaries documented.
+{% endif %}
+
+---
+
+## Security Controls Inventory
+
+### Authentication Controls
+
+{% if controls.existing_controls.authentication %}
+| ID | Name | Type | Implementation | Effectiveness |
+|----|------|------|----------------|---------------|
+{% for ctrl in controls.existing_controls.authentication %}
+| `{{ ctrl.id }}` | {{ ctrl.name }} | {{ ctrl.type }} | {{ ctrl.implementation }} | {{ ctrl.effectiveness }} |
+{% endfor %}
+{% else %}
+No authentication controls documented.
+{% endif %}
+
+### Authorization Controls
+
+{% if controls.existing_controls.authorization %}
+| ID | Name | Model | Implementation | Effectiveness |
+|----|------|-------|----------------|---------------|
+{% for ctrl in controls.existing_controls.authorization %}
+| `{{ ctrl.id }}` | {{ ctrl.name }} | {{ ctrl.model }} | {{ ctrl.implementation }} | {{ ctrl.effectiveness }} |
+{% endfor %}
+{% else %}
+No authorization controls documented.
+{% endif %}
+
+### Encryption Controls
+
+{% if controls.existing_controls.encryption %}
+| ID | Name | Scope | Algorithm | Key Management | Effectiveness |
+|----|------|-------|-----------|----------------|---------------|
+{% for ctrl in controls.existing_controls.encryption %}
+| `{{ ctrl.id }}` | {{ ctrl.name }} | {{ ctrl.scope }} | {{ ctrl.algorithm }} | {{ ctrl.key_management }} | {{ ctrl.effectiveness }} |
+{% endfor %}
+{% else %}
+No encryption controls documented.
+{% endif %}
+
+### Logging Controls
+
+{% if controls.existing_controls.logging %}
+| ID | Name | Events Captured | Retention | SIEM Integrated | Effectiveness |
+|----|------|-----------------|-----------|-----------------|---------------|
+{% for ctrl in controls.existing_controls.logging %}
+| `{{ ctrl.id }}` | {{ ctrl.name }} | {{ ctrl.events_captured | join(sep=", ") }} | {{ ctrl.retention }} | {% if ctrl.siem_integrated %}Yes{% else %}No{% endif %} | {{ ctrl.effectiveness }} |
+{% endfor %}
+{% else %}
+No logging controls documented.
+{% endif %}
+
+### Network Controls
+
+{% if controls.existing_controls.network %}
+| ID | Name | Type | Scope | Effectiveness |
+|----|------|------|-------|---------------|
+{% for ctrl in controls.existing_controls.network %}
+| `{{ ctrl.id }}` | {{ ctrl.name }} | {{ ctrl.type }} | {{ ctrl.scope }} | {{ ctrl.effectiveness }} |
+{% endfor %}
+{% else %}
+No network controls documented.
+{% endif %}
+
+---
+
+## Security Processes
+
+{% if controls.security_processes %}
+| Process | Frequency | Last Performed | Owner | Documented |
+|---------|-----------|----------------|-------|------------|
+{% for proc in controls.security_processes %}
+| {{ proc.process }} | {{ proc.frequency }} | {{ proc.last_performed | default(value="Never") }} | {{ proc.owner | default(value="Not assigned") }} | {% if proc.documented %}Yes{% else %}No{% endif %} |
+{% endfor %}
+
+{% for proc in controls.security_processes %}
+### {{ proc.process }}
+
+{{ proc.description | default(value="") }}
+
+| Property | Value |
+|----------|-------|
+| Frequency | {{ proc.frequency }} |
+| Last Performed | {{ proc.last_performed | default(value="Never") }} |
+| Owner | {{ proc.owner | default(value="Not assigned") }} |
+| Documented | {% if proc.documented %}Yes{% else %}No{% endif %} |
+
+{% endfor %}
+{% else %}
+No security processes documented.
+{% endif %}
+
+---
+
+## Threat Surface
+
+### External Integrations with Data Exposure
+
+{% if integrations %}
+| Integration | Vendor | Data Shared | DPA Status | Encryption |
+|-------------|--------|-------------|------------|------------|
+{% for int in integrations %}
+| {{ int.name }} | {{ int.vendor }} | {{ int.data_exchanged | default(value=[]) | map(attribute="data_id") | join(sep=", ") }} | {% if int.compliance.dpa_signed %}Signed{% else %}**Missing**{% endif %} | {% if int.security.encryption_in_transit %}Yes{% else %}No{% endif %} |
+{% endfor %}
+{% endif %}
+
+### PII Storage Locations
+
+{% if data.data_categories %}
+| Data Category | Classification | Storage Locations | Encryption |
+|---------------|----------------|-------------------|------------|
+{% for cat in data.data_categories %}
+{% if cat.classification == "Personal" or cat.classification == "Sensitive" %}
+| {{ cat.name }} | {{ cat.classification }} | {{ cat.storage_locations | default(value=[]) | join(sep=", ") }} | {% if cat.fields %}{% for field in cat.fields %}{% if field.encryption_required %}Yes{% endif %}{% endfor %}{% else %}Not specified{% endif %} |
+{% endif %}
+{% endfor %}
+{% endif %}
+
+### Privileged Accounts
+
+{% if actors.service_accounts %}
+| Account | Purpose | Permissions | Rotation Policy |
+|---------|---------|-------------|-----------------|
+{% for sa in actors.service_accounts %}
+| `{{ sa.id }}` | {{ sa.purpose }} | {{ sa.permissions | join(sep=", ") }} | {{ sa.rotation_policy | default(value="Not defined") }} |
+{% endfor %}
+{% endif %}
+
+{% if actors.roles %}
+**Privileged Roles:**
+{% for role in actors.roles %}
+{% if role.privileged %}
+- **{{ role.name }}**: {{ role.description }}
+{% endif %}
+{% endfor %}
+{% endif %}
+
+---
+
+## Supply Chain Security
+
+{% if supply_chain %}
+### Artifact Security
+
+| Property | Value |
+|----------|-------|
+| Code Signing | {% if supply_chain.artifact_security.signing.enabled %}{{ supply_chain.artifact_security.signing.method }}{% else %}Disabled{% endif %} |
+| Key Management | {{ supply_chain.artifact_security.signing.key_management | default(value="Not specified") }} |
+| Provenance | {% if supply_chain.artifact_security.provenance.enabled %}{{ supply_chain.artifact_security.provenance.format }}{% else %}Disabled{% endif %} |
+| SLSA Level | {{ supply_chain.artifact_security.provenance.slsa_level | default(value="Not assessed") }} |
+| Container Scanning | {% if supply_chain.artifact_security.container_security.scanning_enabled %}Enabled{% else %}Disabled{% endif %} |
+| Container Signing | {% if supply_chain.artifact_security.container_security.signing_enabled %}Enabled{% else %}Disabled{% endif %} |
+
+### Critical Dependencies
+
+{% if supply_chain.third_party_risk.critical_dependencies %}
+| Dependency | Type | Risk Level | Alternatives | Last Reviewed |
+|------------|------|------------|--------------|---------------|
+{% for dep in supply_chain.third_party_risk.critical_dependencies %}
+| {{ dep.name }} | {{ dep.type }} | {{ dep.risk_level }} | {% if dep.alternatives_identified %}Yes{% else %}No{% endif %} | {{ dep.last_reviewed | default(value="Never") }} |
+{% endfor %}
+{% endif %}
+
+### Supply Chain Threats
+
+{% if supply_chain.third_party_risk.supply_chain_threats %}
+| ID | Threat | Likelihood | Impact | Mitigations |
+|----|--------|------------|--------|-------------|
+{% for threat in supply_chain.third_party_risk.supply_chain_threats %}
+| `{{ threat.id }}` | {{ threat.threat }} | {{ threat.likelihood }} | {{ threat.impact }} | {{ threat.mitigations | join(sep=", ") }} |
+{% endfor %}
+{% endif %}
+{% else %}
+No supply chain security configuration documented.
+{% endif %}
+
+---
+
+## Gaps & Risks
+
+{% if gaps.discovery_gaps %}
+### Critical Gaps
+
+{% for gap in gaps.discovery_gaps %}
+{% if gap.severity == "critical" %}
+#### {{ gap.id }}: {{ gap.category }}
+
+**Severity**: 🔴 CRITICAL
+
+{{ gap.description }}
+
+| Property | Value |
+|----------|-------|
+| What is Missing | {{ gap.what_is_missing }} |
+| Why it Matters | {{ gap.why_it_matters }} |
+| Affected Areas | {{ gap.affected_areas | join(sep=", ") }} |
+| Blocks Comply | {% if gap.blocking.comply %}Yes{% else %}No{% endif %} |
+| Blocks Secure | {% if gap.blocking.secure %}Yes{% else %}No{% endif %} |
+
+**Resolution:**
+- Action: {{ gap.resolution.action }}
+- Suggested Source: {{ gap.resolution.suggested_source | default(value="Not specified") }}
+- Effort: {{ gap.resolution.effort | default(value="Not estimated") }}
+
+{% endif %}
+{% endfor %}
+
+### High Gaps
+
+{% for gap in gaps.discovery_gaps %}
+{% if gap.severity == "high" %}
+#### {{ gap.id }}: {{ gap.category }}
+
+**Severity**: 🟠 HIGH
+
+{{ gap.description }}
+
+| Property | Value |
+|----------|-------|
+| What is Missing | {{ gap.what_is_missing }} |
+| Why it Matters | {{ gap.why_it_matters }} |
+| Affected Areas | {{ gap.affected_areas | join(sep=", ") }} |
+| Blocks Comply | {% if gap.blocking.comply %}Yes{% else %}No{% endif %} |
+| Blocks Secure | {% if gap.blocking.secure %}Yes{% else %}No{% endif %} |
+
+**Resolution:**
+- Action: {{ gap.resolution.action }}
+- Effort: {{ gap.resolution.effort | default(value="Not estimated") }}
+
+{% endif %}
+{% endfor %}
+
+### Medium & Low Gaps
+
+| ID | Category | Severity | Description | Blocking |
+|----|----------|----------|-------------|----------|
+{% for gap in gaps.discovery_gaps %}
+{% if gap.severity == "medium" or gap.severity == "low" %}
+| `{{ gap.id }}` | {{ gap.category }} | {{ gap.severity }} | {{ gap.description }} | {% if gap.blocking.comply or gap.blocking.secure %}Yes{% else %}No{% endif %} |
+{% endif %}
+{% endfor %}
+
+### Gap Summary
+
+| Severity | Count |
+|----------|-------|
+| Critical | {{ gaps.gap_summary.by_severity.critical | default(value=0) }} |
+| High | {{ gaps.gap_summary.by_severity.high | default(value=0) }} |
+| Medium | {{ gaps.gap_summary.by_severity.medium | default(value=0) }} |
+| Low | {{ gaps.gap_summary.by_severity.low | default(value=0) }} |
+| **Total** | **{{ gaps.gap_summary.total | default(value=0) }}** |
+
+{% else %}
+No gaps identified.
+{% endif %}
+
+### Recommendations
+
+{% if gaps.recommendations %}
+| Priority | Action | Gaps Addressed | Rationale |
+|----------|--------|----------------|-----------|
+{% for rec in gaps.recommendations %}
+| {{ rec.priority }} | {{ rec.action }} | {{ rec.gaps_addressed | join(sep=", ") }} | {{ rec.rationale }} |
+{% endfor %}
+{% endif %}
+
+---
+
+## Incident Response
+
+{% if team.incident_response %}
+| Property | Value |
+|----------|-------|
+| Plan Documented | {% if team.incident_response.plan_documented %}Yes{% else %}No{% endif %} |
+| Last Updated | {{ team.incident_response.last_updated | default(value="Unknown") }} |
+| Last Tested | {{ team.incident_response.last_tested | default(value="Never") }} |
+| Communication Channel | {{ team.incident_response.communication | default(value="Not specified") }} |
+
+{% if team.incident_response.escalation_matrix %}
+### Escalation Matrix
+
+{{ team.incident_response.escalation_matrix }}
+{% endif %}
+{% endif %}
+
+{% if operations.incident_management %}
+### Severity Levels
+
+| Level | Name | Response Time | Communication |
+|-------|------|---------------|---------------|
+{% for sev in operations.incident_management.severity_levels %}
+| {{ sev.level }} | {{ sev.name }} | {{ sev.response_time }} | {{ sev.communication }} |
+{% endfor %}
+
+### Postmortem Process
+
+| Property | Value |
+|----------|-------|
+| Required For | {{ operations.incident_management.postmortem.required_for | join(sep=", ") }} |
+| Timeline | {{ operations.incident_management.postmortem.timeline }} |
+| Blameless | {% if operations.incident_management.postmortem.blameless %}Yes{% else %}No{% endif %} |
+{% endif %}
+
+---
+
+*Generated by OpenSecKit /osk-discover on {{ metadata.generated_at }}*
+*Model version: {{ metadata.model_version }}*

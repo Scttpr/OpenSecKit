@@ -1,0 +1,392 @@
+# Product Overview
+
+**Project**: {{ project.name }}
+**Generated**: {{ metadata.generated_at | date(format="%Y-%m-%d") }}
+**Model Commit**: {{ metadata.last_commit }}
+
+---
+
+## Dashboard
+
+| Metric | Value |
+|--------|-------|
+| Product | {{ product.name | default(value=project.name) }} |
+| Version | {{ product.version | default(value="Not specified") }} |
+| Maturity | {{ product.maturity | default(value="Not assessed") }} |
+| Features | {{ features | default(value=[]) | length }} |
+| Components | {{ stats.components }} |
+| Integrations | {{ stats.integrations }} |
+| Critical Gaps | {{ gaps.gap_summary.by_severity.critical | default(value=0) }} |
+
+### Health Indicators
+
+| Area | Status |
+|------|--------|
+| RGPD Applicable | {% if compliance_hints.rgpd_applicable %}Yes{% else %}No{% endif %} |
+| PII Detected | {% if compliance_hints.pii_detected %}Yes{% else %}No{% endif %} |
+| DPIA Likely | {% if compliance_hints.dpia_likely %}Yes{% else %}No{% endif %} |
+| RGS Applicable | {% if compliance_hints.rgs_applicable %}Yes{% else %}No{% endif %} |
+| PCI Applicable | {% if compliance_hints.pci_applicable %}Yes{% else %}No{% endif %} |
+
+{% if kpis.business %}
+### Business KPIs
+
+| KPI | Current | Target |
+|-----|---------|--------|
+{% for kpi in kpis.business %}
+| {{ kpi.name }} | {{ kpi.current | default(value="-") }} | {{ kpi.target | default(value="-") }} |
+{% endfor %}
+{% endif %}
+
+---
+
+## Product Identity
+
+{% if product %}
+### Vision
+
+{{ product.vision | default(value="No vision statement defined.") }}
+
+### Value Proposition
+
+{% if product.value_proposition %}
+| Audience | Value |
+|----------|-------|
+| For Users | {{ product.value_proposition.for_users | default(value="Not defined") }} |
+| For Business | {{ product.value_proposition.for_business | default(value="Not defined") }} |
+
+{% if product.value_proposition.differentiators %}
+**Differentiators:**
+{% for diff in product.value_proposition.differentiators %}
+- {{ diff }}
+{% endfor %}
+{% endif %}
+{% endif %}
+
+### Target Audience
+
+{% if product.target_audience %}
+**Primary**: {{ product.target_audience.primary | default(value="Not defined") }}
+
+{% if product.target_audience.secondary %}
+**Secondary:**
+{% for seg in product.target_audience.secondary %}
+- {{ seg }}
+{% endfor %}
+{% endif %}
+
+{% if product.target_audience.anti_personas %}
+**Anti-Personas** (who this is NOT for):
+{% for anti in product.target_audience.anti_personas %}
+- {{ anti }}
+{% endfor %}
+{% endif %}
+{% endif %}
+
+### Product Details
+
+| Property | Value |
+|----------|-------|
+| Name | {{ product.name }} |
+| Tagline | {{ product.tagline | default(value="-") }} |
+| Version | {{ product.version | default(value="-") }} |
+| Product Type | {{ product.product_type | default(value="-") }} |
+| Business Model | {{ product.business_model | default(value="-") }} |
+| Maturity | {{ product.maturity | default(value="-") }} |
+| Repository | {{ product.repository | default(value=project.repository) }} |
+{% else %}
+No product information documented. See `product.yaml`.
+{% endif %}
+
+---
+
+## Features Inventory
+
+{% if features %}
+| ID | Name | Status | Owner | Business Value |
+|----|------|--------|-------|----------------|
+{% for feature in features %}
+| `{{ feature.id }}` | {{ feature.name }} | {{ feature.status }} | {{ feature.owner | default(value="-") }} | {{ feature.business_value | default(value="-") }} |
+{% endfor %}
+
+{% for feature in features %}
+### {{ feature.name }}
+
+{{ feature.description | default(value="") }}
+
+| Property | Value |
+|----------|-------|
+| ID | `{{ feature.id }}` |
+| Status | {{ feature.status }} |
+| Introduced | {{ feature.introduced | default(value="Unknown") }} |
+| Owner | {{ feature.owner | default(value="Not assigned") }} |
+| User Value | {{ feature.user_value | default(value="Not defined") }} |
+| Business Value | {{ feature.business_value | default(value="Not defined") }} |
+
+{% if feature.entry_points %}
+**Entry Points:**
+{% for entry in feature.entry_points %}
+- `{{ entry.method | default(value="GET") }} {{ entry.path }}`
+{% endfor %}
+{% endif %}
+
+{% if feature.dependencies.components or feature.dependencies.integrations %}
+**Dependencies:**
+- Components: {{ feature.dependencies.components | default(value=[]) | join(sep=", ") }}
+- Integrations: {{ feature.dependencies.integrations | default(value=[]) | join(sep=", ") }}
+{% endif %}
+
+{% if feature.metrics %}
+**Metrics:**
+| Metric | Target | Tracking |
+|--------|--------|----------|
+{% for metric in feature.metrics %}
+| {{ metric.name }} | {{ metric.target }} | {{ metric.tracking }} |
+{% endfor %}
+{% endif %}
+
+{% if feature.documentation.user_docs or feature.documentation.technical_docs %}
+**Documentation:**
+- User Docs: {{ feature.documentation.user_docs | default(value="None") }}
+- Technical Docs: {{ feature.documentation.technical_docs | default(value="None") }}
+{% endif %}
+
+---
+
+{% endfor %}
+{% else %}
+No features documented.
+{% endif %}
+
+---
+
+## KPIs
+
+{% if kpis %}
+### Business KPIs
+
+{% if kpis.business %}
+| KPI | Description | Current | Target | Owner |
+|-----|-------------|---------|--------|-------|
+{% for kpi in kpis.business %}
+| {{ kpi.name }} | {{ kpi.description | default(value="-") }} | {{ kpi.current | default(value="-") }} | {{ kpi.target | default(value="-") }} | {{ kpi.owner | default(value="-") }} |
+{% endfor %}
+{% else %}
+No business KPIs defined.
+{% endif %}
+
+### Technical KPIs
+
+{% if kpis.technical %}
+| KPI | Description | Current | Target | SLA |
+|-----|-------------|---------|--------|-----|
+{% for kpi in kpis.technical %}
+| {{ kpi.name }} | {{ kpi.description | default(value="-") }} | {{ kpi.current | default(value="-") }} | {{ kpi.target | default(value="-") }} | {% if kpi.sla %}Yes{% else %}No{% endif %} |
+{% endfor %}
+{% else %}
+No technical KPIs defined.
+{% endif %}
+
+### User Experience KPIs
+
+{% if kpis.user_experience %}
+| KPI | Description | Current | Target | Measurement |
+|-----|-------------|---------|--------|-------------|
+{% for kpi in kpis.user_experience %}
+| {{ kpi.name }} | {{ kpi.description | default(value="-") }} | {{ kpi.current | default(value="-") }} | {{ kpi.target | default(value="-") }} | {{ kpi.measurement_method | default(value="-") }} |
+{% endfor %}
+{% else %}
+No UX KPIs defined.
+{% endif %}
+{% else %}
+No KPIs documented.
+{% endif %}
+
+---
+
+## Roadmap
+
+{% if roadmap %}
+### Current Quarter: {{ roadmap.current_quarter.name | default(value="Unnamed") }}
+
+**Theme**: {{ roadmap.current_quarter.theme | default(value="Not defined") }}
+
+{% if roadmap.current_quarter.priorities %}
+**Priorities:**
+{% for priority in roadmap.current_quarter.priorities %}
+1. {{ priority }}
+{% endfor %}
+{% endif %}
+
+{% if roadmap.current_quarter.key_deliverables %}
+**Key Deliverables:**
+
+| Deliverable | Status | Owner |
+|-------------|--------|-------|
+{% for del in roadmap.current_quarter.key_deliverables %}
+| {{ del.name }} | {{ del.status }} | {{ del.owner | default(value="-") }} |
+{% endfor %}
+{% endif %}
+
+### Future Roadmap
+
+{% if roadmap.future %}
+| Quarter | Theme | Key Items |
+|---------|-------|-----------|
+{% for q in roadmap.future %}
+| {{ q.quarter }} | {{ q.theme }} | {{ q.items | join(sep=", ") }} |
+{% endfor %}
+{% endif %}
+
+### Tech Debt
+
+{% if roadmap.tech_debt %}
+| ID | Description | Impact | Priority | Effort |
+|----|-------------|--------|----------|--------|
+{% for debt in roadmap.tech_debt %}
+| `{{ debt.id }}` | {{ debt.description }} | {{ debt.impact }} | {{ debt.priority }} | {{ debt.estimated_effort | default(value="-") }} |
+{% endfor %}
+{% else %}
+No tech debt items tracked.
+{% endif %}
+{% else %}
+No roadmap documented.
+{% endif %}
+
+---
+
+## Competitive Context
+
+{% if competitive_context %}
+**Market Category**: {{ competitive_context.market_category | default(value="Not defined") }}
+
+{% if competitive_context.competitors %}
+### Competitors
+
+| Competitor | Type | Our Advantage | Their Advantage |
+|------------|------|---------------|-----------------|
+{% for comp in competitive_context.competitors %}
+| {{ comp.name }} | {{ comp.type }} | {{ comp.our_advantage | default(value="-") }} | {{ comp.their_advantage | default(value="-") }} |
+{% endfor %}
+{% endif %}
+
+**Positioning**: {{ competitive_context.positioning | default(value="Not defined") }}
+{% else %}
+No competitive context documented.
+{% endif %}
+
+---
+
+## Team Structure
+
+{% if team %}
+| Property | Value |
+|----------|-------|
+| Team Name | {{ team.team.name | default(value="Not specified") }} |
+| Organization | {{ team.team.organization | default(value="Not specified") }} |
+| Size | {{ team.team.size | default(value="Unknown") }} |
+| Location | {{ team.team.location | default(value="Not specified") }} |
+| Timezone | {{ team.team.timezone | default(value="Not specified") }} |
+
+{% if team.team.roles %}
+### Key Roles
+
+| Role | Responsibilities | Contact |
+|------|------------------|---------|
+{% for role in team.team.roles %}
+| {{ role.role }} | {{ role.responsibilities | default(value="-") }} | {{ role.contact | default(value="-") }} |
+{% endfor %}
+{% endif %}
+
+{% if team.team.security_roles %}
+### Security Roles
+
+| Role | Contact |
+|------|---------|
+| Security Champion | {{ team.team.security_roles.security_champion | default(value="Not assigned") }} |
+| Incident Responder | {{ team.team.security_roles.incident_responder | default(value="Not assigned") }} |
+| Compliance Contact | {{ team.team.security_roles.compliance_contact | default(value="Not assigned") }} |
+{% endif %}
+{% else %}
+No team information documented.
+{% endif %}
+
+---
+
+## Risk Dashboard
+
+{% if gaps.discovery_gaps %}
+### Gaps Requiring Attention
+
+| Severity | ID | Category | Description | Blocking |
+|----------|----|----------|-------------|----------|
+{% for gap in gaps.discovery_gaps %}
+{% if gap.severity == "critical" or gap.severity == "high" %}
+| {{ gap.severity | upper }} | `{{ gap.id }}` | {{ gap.category }} | {{ gap.description }} | {% if gap.blocking.comply or gap.blocking.secure %}Yes{% else %}No{% endif %} |
+{% endif %}
+{% endfor %}
+
+### Gap Summary
+
+| Severity | Count |
+|----------|-------|
+| Critical | {{ gaps.gap_summary.by_severity.critical | default(value=0) }} |
+| High | {{ gaps.gap_summary.by_severity.high | default(value=0) }} |
+| Medium | {{ gaps.gap_summary.by_severity.medium | default(value=0) }} |
+| Low | {{ gaps.gap_summary.by_severity.low | default(value=0) }} |
+{% else %}
+No gaps identified.
+{% endif %}
+
+---
+
+## Data Sensitivity Summary
+
+{% if data.data_categories %}
+### PII Categories
+
+| Category | Classification | Retention | Cross-Border |
+|----------|----------------|-----------|--------------|
+{% for cat in data.data_categories %}
+{% if cat.classification == "Personal" or cat.classification == "Sensitive" %}
+| {{ cat.name }} | {{ cat.classification }} | {{ cat.retention.period | default(value="Not defined") }} | {% if cat.cross_border %}Yes{% else %}No{% endif %} |
+{% endif %}
+{% endfor %}
+
+### Third-Party Data Sharing
+
+{% if integrations %}
+| Third Party | Data Shared | Purpose | DPA |
+|-------------|-------------|---------|-----|
+{% for int in integrations %}
+{% if int.data_exchanged %}
+| {{ int.name }} | {{ int.data_exchanged | map(attribute="data_id") | join(sep=", ") }} | {{ int.data_exchanged[0].purpose | default(value="-") }} | {% if int.compliance.dpa_signed %}Yes{% else %}No{% endif %} |
+{% endif %}
+{% endfor %}
+{% endif %}
+{% endif %}
+
+---
+
+## Compliance Readiness
+
+| Framework | Applicable | Status |
+|-----------|------------|--------|
+| RGPD | {% if compliance_hints.rgpd_applicable %}Yes{% else %}No{% endif %} | {% if compliance_hints.rgpd_applicable %}{% if gaps.gap_summary.by_severity.critical > 0 %}Blocked{% else %}Ready for assessment{% endif %}{% else %}N/A{% endif %} |
+| RGS | {% if compliance_hints.rgs_applicable %}Yes{% else %}No{% endif %} | {% if compliance_hints.rgs_applicable %}Ready for assessment{% else %}N/A{% endif %} |
+| PCI-DSS | {% if compliance_hints.pci_applicable %}Yes{% else %}No{% endif %} | {% if compliance_hints.pci_applicable %}Ready for assessment{% else %}N/A{% endif %} |
+
+{% if compliance_hints.rgpd_applicable %}
+### RGPD Indicators
+
+| Indicator | Value |
+|-----------|-------|
+| PII Detected | {% if compliance_hints.pii_detected %}Yes{% else %}No{% endif %} |
+| DPIA Likely Required | {% if compliance_hints.dpia_likely %}Yes{% else %}No{% endif %} |
+| International Transfers | {% if compliance_hints.international_transfers %}Yes{% else %}No{% endif %} |
+{% endif %}
+
+---
+
+*Generated by OpenSecKit /osk-discover on {{ metadata.generated_at }}*
+*Model version: {{ metadata.model_version }}*

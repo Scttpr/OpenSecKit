@@ -76,20 +76,33 @@ Example: If Business has 3 boxes and 2 are checked → 67%
 
 ### Required Fields by Section
 
+All 16 system model files should be validated:
+
 ### Index
 - [ ] Stats populated
 - [ ] All sections referenced
 - [ ] Cross-references valid
+
+### Product
+- [ ] Product name defined
+- [ ] Vision or description present
+- [ ] Target audience identified
 
 ### Business
 - [ ] Domain identified
 - [ ] At least one process documented
 - [ ] Stakeholders listed
 
+### Glossary
+- [ ] At least 5 domain terms defined
+- [ ] Terms have definitions
+- [ ] Code references included
+
 ### Architecture
 - [ ] Style identified
-- [ ] Components documented
+- [ ] Components documented (with owners)
 - [ ] Data flows mapped
+- [ ] APIs inventoried
 
 ### Data
 - [ ] Categories defined
@@ -102,6 +115,11 @@ Example: If Business has 3 boxes and 2 are checked → 67%
 - [ ] Roles defined
 - [ ] Privileged accounts identified
 
+### User Journeys
+- [ ] At least one persona defined
+- [ ] At least one journey mapped
+- [ ] Journey steps documented
+
 ### Boundaries
 - [ ] Trust zones defined
 - [ ] Boundaries mapped
@@ -111,6 +129,11 @@ Example: If Business has 3 boxes and 2 are checked → 67%
 - [ ] External services listed
 - [ ] Data exchanged documented
 - [ ] DPA status noted
+
+### Supply Chain
+- [ ] SBOM configuration defined
+- [ ] Dependency policies documented
+- [ ] Vulnerability thresholds set
 
 ### Controls
 - [ ] Existing security controls documented
@@ -125,6 +148,11 @@ Example: If Business has 3 boxes and 2 are checked → 67%
 - [ ] Owner identified
 - [ ] Maintainer listed
 - [ ] Security contact defined
+
+### Operations
+- [ ] Environments documented
+- [ ] Alerts defined
+- [ ] At least one runbook present
 
 ### Gaps
 - [ ] All gaps have severity
@@ -179,15 +207,20 @@ System Model Validation Report
 ==============================
 
 Completeness: 82%
+├── Product:       █████████░ 90%
 ├── Business:      ████████░░ 80%
+├── Glossary:      ███████░░░ 70%
 ├── Architecture:  █████████░ 90%
 ├── Data:          ███████░░░ 70%
 ├── Actors:        ██████░░░░ 60%
+├── User Journeys: ███████░░░ 70%
 ├── Boundaries:    ████████░░ 80%
 ├── Integrations:  █████████░ 90%
+├── Supply Chain:  ████████░░ 80%
 ├── Controls:      ███████░░░ 70%
 ├── Tooling:       █████████░ 90%
 ├── Team:          ██████████ 100%
+├── Operations:    ████████░░ 80%
 └── Gaps:          █████░░░░░ 50%
 
 Blocking Issues: 3

@@ -1,0 +1,504 @@
+# Operations Handbook
+
+**Project**: {{ project.name }}
+**Generated**: {{ metadata.generated_at | date(format="%Y-%m-%d") }}
+**Model Commit**: {{ metadata.last_commit }}
+
+---
+
+## Dashboard
+
+| Metric | Value |
+|--------|-------|
+| Environments | {{ operations.environments | default(value=[]) | length }} |
+| Dashboards | {{ operations.monitoring.dashboards | default(value=[]) | length }} |
+| Alerts | {{ operations.alerts | default(value=[]) | length }} |
+| Runbooks | {{ operations.runbooks | default(value=[]) | length }} |
+| Deployment Frequency | {{ operations.deployments.frequency | default(value="Not specified") }} |
+| On-Call Rotation | {{ operations.on_call.rotation.rotation_length | default(value="Not specified") }} |
+
+### Alert Summary by Severity
+
+| Severity | Count |
+|----------|-------|
+| Critical | {{ operations.alerts | default(value=[]) | selectattr("severity", "equalto", "critical") | list | length }} |
+| Warning | {{ operations.alerts | default(value=[]) | selectattr("severity", "equalto", "warning") | list | length }} |
+| Info | {{ operations.alerts | default(value=[]) | selectattr("severity", "equalto", "info") | list | length }} |
+
+---
+
+## Environments
+
+{% if operations.environments %}
+### Overview
+
+| Name | Type | Region | Provider | PII | Access |
+|------|------|--------|----------|-----|--------|
+{% for env in operations.environments %}
+| {{ env.name }} | {{ env.type }} | {{ env.region }} | {{ env.provider }} | {% if env.data.contains_pii %}Yes{% else %}No{% endif %} | {{ env.access.method }} |
+{% endfor %}
+
+{% for env in operations.environments %}
+### {{ env.name }} ({{ env.type }})
+
+| Property | Value |
+|----------|-------|
+| URL | {{ env.url | default(value="Not specified") }} |
+| Region | {{ env.region }} |
+| Provider | {{ env.provider }} |
+
+**Access:**
+
+| Property | Value |
+|----------|-------|
+| Method | {{ env.access.method }} |
+| Requirements | {{ env.access.requirements | default(value=[]) | join(sep=", ") }} |
+| Approval Needed | {% if env.access.approval_needed %}Yes{% else %}No{% endif %} |
+
+**Infrastructure:**
+
+| Component | Value |
+|-----------|-------|
+| Compute | {{ env.infrastructure.compute | default(value="Not specified") }} |
+| Database | {{ env.infrastructure.database | default(value="Not specified") }} |
+| Cache | {{ env.infrastructure.cache | default(value="Not specified") }} |
+| Storage | {{ env.infrastructure.storage | default(value="Not specified") }} |
+
+**Configuration:**
+
+| Property | Value |
+|----------|-------|
+| Config Source | {{ env.configuration.config_source | default(value="Not specified") }} |
+| Secrets Source | {{ env.configuration.secrets_source | default(value="Not specified") }} |
+| Feature Flags | {% if env.configuration.feature_flags %}Enabled{% else %}Disabled{% endif %} |
+
+**Data:**
+
+| Property | Value |
+|----------|-------|
+| Contains PII | {% if env.data.contains_pii %}Yes{% else %}No{% endif %} |
+| Data Refresh | {{ env.data.data_refresh | default(value="Not specified") }} |
+| Retention | {{ env.data.retention | default(value="Not specified") }} |
+
+---
+
+{% endfor %}
+{% else %}
+No environments documented.
+{% endif %}
+
+---
+
+## Monitoring
+
+{% if operations.monitoring %}
+### Dashboards
+
+{% if operations.monitoring.dashboards %}
+| Name | Purpose | Owner | URL |
+|------|---------|-------|-----|
+{% for dash in operations.monitoring.dashboards %}
+| {{ dash.name }} | {{ dash.purpose }} | {{ dash.owner | default(value="-") }} | {{ dash.url | default(value="-") }} |
+{% endfor %}
+
+{% for dash in operations.monitoring.dashboards %}
+#### {{ dash.name }}
+
+{{ dash.purpose }}
+
+| Property | Value |
+|----------|-------|
+| URL | {{ dash.url | default(value="Not specified") }} |
+| Owner | {{ dash.owner | default(value="Not assigned") }} |
+| Refresh Rate | {{ dash.refresh_rate | default(value="Not specified") }} |
+
+**Key Metrics:**
+{% for metric in dash.key_metrics %}
+- {{ metric }}
+{% endfor %}
+
+{% endfor %}
+{% endif %}
+
+### Metrics
+
+{% if operations.monitoring.metrics %}
+| Name | Type | Source | Normal Range | Alert Threshold |
+|------|------|--------|--------------|-----------------|
+{% for metric in operations.monitoring.metrics %}
+| {{ metric.name }} | {{ metric.type }} | {{ metric.source }} | {{ metric.normal_range | default(value="-") }} | {{ metric.alert_threshold | default(value="-") }} |
+{% endfor %}
+{% endif %}
+
+### Logs
+
+{% if operations.monitoring.logs %}
+| Property | Value |
+|----------|-------|
+| Provider | {{ operations.monitoring.logs.provider }} |
+| Retention | {{ operations.monitoring.logs.retention }} |
+| PII Filtering | {% if operations.monitoring.logs.pii_filtering %}Enabled{% else %}Disabled{% endif %} |
+
+{% if operations.monitoring.logs.locations %}
+**Log Locations:**
+
+| Name | Query | Purpose |
+|------|-------|---------|
+{% for loc in operations.monitoring.logs.locations %}
+| {{ loc.name }} | `{{ loc.query }}` | {{ loc.purpose }} |
+{% endfor %}
+{% endif %}
+
+{% if operations.monitoring.logs.search_guide %}
+**Search Guide**: {{ operations.monitoring.logs.search_guide }}
+{% endif %}
+{% endif %}
+
+### Tracing
+
+{% if operations.monitoring.tracing %}
+| Property | Value |
+|----------|-------|
+| Enabled | {% if operations.monitoring.tracing.enabled %}Yes{% else %}No{% endif %} |
+| Provider | {{ operations.monitoring.tracing.provider | default(value="Not specified") }} |
+| Sample Rate | {{ operations.monitoring.tracing.sample_rate | default(value="Not specified") }} |
+{% endif %}
+{% else %}
+No monitoring configuration documented.
+{% endif %}
+
+---
+
+## Alerts
+
+{% if operations.alerts %}
+### Overview
+
+| Name | Severity | Condition | Runbook |
+|------|----------|-----------|---------|
+{% for alert in operations.alerts %}
+| {{ alert.name }} | {{ alert.severity }} | {{ alert.condition }} | {{ alert.runbook | default(value="-") }} |
+{% endfor %}
+
+{% for alert in operations.alerts %}
+### {{ alert.name }}
+
+**ID**: `{{ alert.id }}`
+**Severity**: {{ alert.severity | upper }}
+
+{{ alert.description }}
+
+| Property | Value |
+|----------|-------|
+| Condition | `{{ alert.condition }}` |
+| Threshold | {{ alert.threshold }} |
+| Evaluation Window | {{ alert.evaluation_window }} |
+
+**Notification:**
+
+| Property | Value |
+|----------|-------|
+| Channels | {{ alert.notification.channels | join(sep=", ") }} |
+| Escalation | {{ alert.notification.escalation | default(value="Not specified") }} |
+| Quiet Hours | {% if alert.notification.quiet_hours %}Yes{% else %}No{% endif %} |
+
+{% if alert.runbook %}
+**Runbook**: {{ alert.runbook }}
+{% endif %}
+
+**History:**
+
+| Property | Value |
+|----------|-------|
+| Last Triggered | {{ alert.history.last_triggered | default(value="Never") }} |
+| Frequency | {{ alert.history.frequency | default(value="Unknown") }} |
+| False Positive Rate | {{ alert.history.false_positive_rate | default(value="Unknown") }} |
+
+---
+
+{% endfor %}
+{% else %}
+No alerts documented.
+{% endif %}
+
+---
+
+## Runbooks
+
+{% if operations.runbooks %}
+### Overview
+
+| ID | Name | Trigger | Severity | Owner |
+|----|------|---------|----------|-------|
+{% for runbook in operations.runbooks %}
+| `{{ runbook.id }}` | {{ runbook.name }} | {{ runbook.trigger }} | {{ runbook.severity }} | {{ runbook.owner | default(value="-") }} |
+{% endfor %}
+
+{% for runbook in operations.runbooks %}
+### {{ runbook.name }}
+
+**ID**: `{{ runbook.id }}`
+**Severity**: {{ runbook.severity | upper }}
+
+{{ runbook.description }}
+
+| Property | Value |
+|----------|-------|
+| Trigger | {{ runbook.trigger }} |
+| Owner | {{ runbook.owner | default(value="Not assigned") }} |
+| Last Updated | {{ runbook.last_updated | default(value="Unknown") }} |
+| Last Used | {{ runbook.last_used | default(value="Never") }} |
+
+{% if runbook.prerequisites %}
+**Prerequisites:**
+{% for pre in runbook.prerequisites %}
+- {{ pre }}
+{% endfor %}
+{% endif %}
+
+{% if runbook.diagnosis %}
+**Diagnosis Steps:**
+
+| Step | Action | Command | Expected | If Unexpected |
+|------|--------|---------|----------|---------------|
+{% for diag in runbook.diagnosis %}
+| {{ diag.step }} | {{ diag.action }} | `{{ diag.command | default(value="-") }}` | {{ diag.expected | default(value="-") }} | {{ diag.if_unexpected | default(value="-") }} |
+{% endfor %}
+{% endif %}
+
+{% if runbook.resolution %}
+**Resolution Steps:**
+
+| Scenario | Action | Command | Verification | Rollback |
+|----------|--------|---------|--------------|----------|
+{% for res in runbook.resolution %}
+| {{ res.scenario }} | {{ res.action }} | `{{ res.command | default(value="-") }}` | {{ res.verification | default(value="-") }} | {{ res.rollback | default(value="-") }} |
+{% endfor %}
+{% endif %}
+
+{% if runbook.escalation %}
+**Escalation:**
+
+| Property | Value |
+|----------|-------|
+| When | {{ runbook.escalation.when }} |
+| To | {{ runbook.escalation.to }} |
+| Method | {{ runbook.escalation.method }} |
+{% endif %}
+
+{% if runbook.post_incident %}
+**Post-Incident Checklist:**
+{% for post in runbook.post_incident %}
+- [ ] {{ post }}
+{% endfor %}
+{% endif %}
+
+{% if runbook.related_alerts %}
+**Related Alerts**: {{ runbook.related_alerts | join(sep=", ") }}
+{% endif %}
+
+{% if runbook.related_runbooks %}
+**Related Runbooks**: {{ runbook.related_runbooks | join(sep=", ") }}
+{% endif %}
+
+---
+
+{% endfor %}
+{% else %}
+No runbooks documented.
+{% endif %}
+
+---
+
+## Deployments
+
+{% if operations.deployments %}
+| Property | Value |
+|----------|-------|
+| Strategy | {{ operations.deployments.strategy | default(value="Not specified") }} |
+| Frequency | {{ operations.deployments.frequency | default(value="Not specified") }} |
+| Deployment Windows | {{ operations.deployments.deployment_windows | default(value=[]) | join(sep=", ") }} |
+| Freeze Periods | {{ operations.deployments.freeze_periods | default(value=[]) | join(sep=", ") }} |
+
+{% if operations.deployments.pre_deployment %}
+### Pre-Deployment Checklist
+
+| Step | Command | Required |
+|------|---------|----------|
+{% for step in operations.deployments.pre_deployment %}
+| {{ step.step }} | `{{ step.command | default(value="-") }}` | {% if step.required %}Yes{% else %}No{% endif %} |
+{% endfor %}
+{% endif %}
+
+{% if operations.deployments.deployment_steps %}
+### Deployment Steps
+
+| Step | Action | Command | Verification | Rollback Point |
+|------|--------|---------|--------------|----------------|
+{% for step in operations.deployments.deployment_steps %}
+| {{ step.step }} | {{ step.action }} | `{{ step.command | default(value="-") }}` | {{ step.verification | default(value="-") }} | {% if step.rollback_point %}Yes{% else %}No{% endif %} |
+{% endfor %}
+{% endif %}
+
+{% if operations.deployments.post_deployment %}
+### Post-Deployment Verification
+
+| Step | Action | Duration |
+|------|--------|----------|
+{% for step in operations.deployments.post_deployment %}
+| {{ step.step }} | {{ step.action }} | {{ step.duration | default(value="-") }} |
+{% endfor %}
+{% endif %}
+
+### Rollback Procedure
+
+| Property | Value |
+|----------|-------|
+| Method | {{ operations.deployments.rollback.method | default(value="Not specified") }} |
+| Command | `{{ operations.deployments.rollback.command | default(value="Not specified") }}` |
+| Verification | {{ operations.deployments.rollback.verification | default(value="Not specified") }} |
+| Max Time | {{ operations.deployments.rollback.max_time | default(value="Not specified") }} |
+{% else %}
+No deployment configuration documented.
+{% endif %}
+
+---
+
+## On-Call
+
+{% if operations.on_call %}
+### Rotation
+
+| Property | Value |
+|----------|-------|
+| Provider | {{ operations.on_call.rotation.provider | default(value="Not specified") }} |
+| Schedule URL | {{ operations.on_call.rotation.schedule_url | default(value="Not specified") }} |
+| Rotation Length | {{ operations.on_call.rotation.rotation_length | default(value="Not specified") }} |
+| Handoff Time | {{ operations.on_call.rotation.handoff_time | default(value="Not specified") }} |
+
+### Escalation Policy
+
+{% if operations.on_call.escalation_policy %}
+| Level | Wait | Notify | Method |
+|-------|------|--------|--------|
+{% for level in operations.on_call.escalation_policy %}
+| {{ level.level }} | {{ level.wait }} | {{ level.notify }} | {{ level.method }} |
+{% endfor %}
+{% endif %}
+
+{% if operations.on_call.handoff_checklist %}
+### Handoff Checklist
+
+{% for item in operations.on_call.handoff_checklist %}
+- [ ] {{ item }}
+{% endfor %}
+{% endif %}
+
+### Expectations
+
+| Property | Value |
+|----------|-------|
+| Response Time | {{ operations.on_call.expectations.response_time | default(value="Not specified") }} |
+| Acknowledgment Time | {{ operations.on_call.expectations.acknowledgment_time | default(value="Not specified") }} |
+| Communication Frequency | {{ operations.on_call.expectations.communication_frequency | default(value="Not specified") }} |
+{% else %}
+No on-call configuration documented.
+{% endif %}
+
+---
+
+## Incident Management
+
+{% if operations.incident_management %}
+### Severity Levels
+
+{% if operations.incident_management.severity_levels %}
+| Level | Name | Response Time | Communication |
+|-------|------|---------------|---------------|
+{% for sev in operations.incident_management.severity_levels %}
+| {{ sev.level }} | {{ sev.name }} | {{ sev.response_time }} | {{ sev.communication }} |
+{% endfor %}
+
+{% for sev in operations.incident_management.severity_levels %}
+#### {{ sev.level }}: {{ sev.name }}
+
+{{ sev.description }}
+
+**Response Time**: {{ sev.response_time }}
+**Communication**: {{ sev.communication }}
+
+{% if sev.examples %}
+**Examples:**
+{% for ex in sev.examples %}
+- {{ ex }}
+{% endfor %}
+{% endif %}
+
+{% endfor %}
+{% endif %}
+
+### Communication
+
+| Property | Value |
+|----------|-------|
+| Channel | {{ operations.incident_management.communication.channel | default(value="Not specified") }} |
+| Status Page | {{ operations.incident_management.communication.status_page | default(value="Not specified") }} |
+| Template | {{ operations.incident_management.communication.template | default(value="Not specified") }} |
+
+### Postmortem
+
+| Property | Value |
+|----------|-------|
+| Required For | {{ operations.incident_management.postmortem.required_for | default(value=[]) | join(sep=", ") }} |
+| Template | {{ operations.incident_management.postmortem.template | default(value="Not specified") }} |
+| Timeline | {{ operations.incident_management.postmortem.timeline | default(value="Not specified") }} |
+| Blameless | {% if operations.incident_management.postmortem.blameless %}Yes{% else %}No{% endif %} |
+{% else %}
+No incident management configuration documented.
+{% endif %}
+
+---
+
+## Maintenance
+
+{% if operations.maintenance %}
+### Scheduled Tasks
+
+{% if operations.maintenance.scheduled_tasks %}
+| Name | Frequency | Owner | Last Run |
+|------|-----------|-------|----------|
+{% for task in operations.maintenance.scheduled_tasks %}
+| {{ task.name }} | {{ task.frequency }} | {{ task.owner | default(value="-") }} | {{ task.last_run | default(value="Never") }} |
+{% endfor %}
+
+{% for task in operations.maintenance.scheduled_tasks %}
+#### {{ task.name }}
+
+| Property | Value |
+|----------|-------|
+| Frequency | {{ task.frequency }} |
+| Command | `{{ task.command | default(value="Not specified") }}` |
+| Owner | {{ task.owner | default(value="Not assigned") }} |
+| Last Run | {{ task.last_run | default(value="Never") }} |
+| Documentation | {{ task.documentation | default(value="None") }} |
+
+{% endfor %}
+{% endif %}
+
+### Health Checks
+
+{% if operations.maintenance.health_checks %}
+| Name | Endpoint | Frequency | Timeout |
+|------|----------|-----------|---------|
+{% for check in operations.maintenance.health_checks %}
+| {{ check.name }} | `{{ check.endpoint }}` | {{ check.frequency }} | {{ check.timeout }} |
+{% endfor %}
+{% endif %}
+{% else %}
+No maintenance configuration documented.
+{% endif %}
+
+---
+
+*Generated by OpenSecKit /osk-discover on {{ metadata.generated_at }}*
+*Model version: {{ metadata.model_version }}*

@@ -6,9 +6,8 @@ AI prompts for the Discover phase of OpenSecKit.
 
 | Prompt | Command | Description |
 |--------|---------|-------------|
-| `discover.md` | `/osk-discover` | Build or update system model |
+| `discover.md` | `/osk-discover` | Build or update system model + generate docs |
 | `validate.md` | `/osk-discover-validate` | Validate model integrity |
-| `docs.md` | `/osk-discover-docs` | Generate multi-audience documentation |
 
 ## Orchestrated Phases
 
