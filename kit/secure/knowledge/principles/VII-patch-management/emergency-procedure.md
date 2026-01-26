@@ -61,7 +61,7 @@ La procédure d'urgence est activée si **AU MOINS 2** des critères suivants so
 ```
 🚨 ALERTE SÉCURITÉ CRITIQUE 🚨
 
-CVE: CVE-2024-XXXXX
+CVE: [EXAMPLE: CVE-2024-12345]
 CVSS: 9.8 (Critical)
 Composant affecté: [Nom + version]
 Impact: [RCE / Data breach / DoS]
@@ -286,7 +286,7 @@ Objet: [RÉSOLU] Patch de sécurité critique appliqué
 
 Bonjour,
 
-Une vulnérabilité critique (CVE-2024-XXXXX, CVSS 9.8) a été détectée dans [composant].
+Une vulnérabilité critique ([EXAMPLE: CVE-2024-12345], CVSS 9.8) a été détectée dans [composant].
 
 Actions prises :
 ✅ Patch appliqué en production à [HH:MM]
@@ -355,7 +355,7 @@ Cordialement,
 **Template de post-mortem** :
 
 ```markdown
-# Post-Mortem: CVE-2024-XXXXX
+# Post-Mortem: [EXAMPLE: CVE-2024-12345]
 
 **Date incident** : AAAA-MM-JJ HH:MM
 **Date résolution** : AAAA-MM-JJ HH:MM

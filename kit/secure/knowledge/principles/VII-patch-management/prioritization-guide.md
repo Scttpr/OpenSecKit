@@ -250,7 +250,7 @@ Pas d'exploit  │            │            │            │            │
 
 **Template de documentation** :
 ```markdown
-## Faux Positif : CVE-2024-XXXXX
+## Faux Positif : [EXAMPLE: CVE-2024-12345]
 
 **Scanner** : Snyk
 **Composant** : library-x v1.2.3
