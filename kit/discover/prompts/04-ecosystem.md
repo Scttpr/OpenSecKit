@@ -401,6 +401,15 @@ supply_chain:
 
 **Goal**: Identify who consumes our APIs.
 
+> **Cross-Reference Note**: API consumers documented here should align with:
+> - `architecture.yaml` → `api_inventory[].consumers[]` (internal consumers)
+> - `integrations.yaml` → external systems that call our APIs (external consumers)
+> - `actors.yaml` → user types or service accounts that authenticate to APIs
+>
+> When an API consumer is an external partner or third-party system, create an entry
+> in `integrations.yaml` with `connection.direction: "inbound"` to track them as
+> systems that depend on us (reverse of our outbound integrations).
+
 #### Detection Sources
 
 ```yaml
@@ -416,6 +425,10 @@ consumer_detection:
   logs:
     - user agent analysis
     - API usage patterns
+
+  # Cross-reference with architecture.yaml
+  architecture_apis:
+    - api_inventory[].consumers[] from Phase 2
 ```
 
 #### For Each Consumer

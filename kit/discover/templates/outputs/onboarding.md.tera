@@ -1,0 +1,399 @@
+# Welcome to {{ product.name | default(value=project.name) }}
+
+**Project**: {{ project.name }}
+**Generated**: {{ metadata.generated_at | date(format="%Y-%m-%d") }}
+**Model Commit**: {{ metadata.last_commit }}
+
+---
+
+## Dashboard
+
+| Info | Value |
+|------|-------|
+| Team | {{ team.team.name | default(value="Not specified") }} |
+| Size | {{ team.team.size | default(value="Unknown") }} members |
+| Location | {{ team.team.location | default(value="Not specified") }} |
+{% if team.team.roles %}| Owner | {{ team.team.roles | selectattr("role", "equalto", "Owner") | map(attribute="contact") | first | default(value="Not assigned") }} |{% endif %}
+{% if team.team.security_roles %}| Security Champion | {{ team.team.security_roles.security_champion | default(value="Not assigned") }} |{% endif %}
+
+### Quick Links
+
+| Resource | Link |
+|----------|------|
+| Repository | {{ project.repository | default(value="Not specified") }} |
+{% if tooling.collaboration.documentation %}| Documentation | {{ tooling.collaboration.documentation }} |{% endif %}
+{% if tooling.collaboration.communication %}| Communication | {{ tooling.collaboration.communication }} |{% endif %}
+{% if tooling.collaboration.project_management %}| Project Board | {{ tooling.collaboration.project_management }} |{% endif %}
+
+---
+
+## Product Overview
+
+### What is {{ product.name | default(value=project.name) }}?
+
+{{ product.vision | default(value=project.description | default(value="No description available.")) }}
+
+{% if product.value_proposition %}
+### Value Proposition
+
+**For Users**: {{ product.value_proposition.for_users | default(value="Not defined") }}
+
+**For Business**: {{ product.value_proposition.for_business | default(value="Not defined") }}
+{% endif %}
+
+{% if product.target_audience %}
+### Target Users
+
+**Primary Audience**: {{ product.target_audience.primary | default(value="Not defined") }}
+
+{% if product.target_audience.secondary %}
+**Secondary Audiences:**
+{% for seg in product.target_audience.secondary %}
+- {{ seg }}
+{% endfor %}
+{% endif %}
+{% endif %}
+
+{% if features %}
+### Key Features
+
+| Feature | Description | Status |
+|---------|-------------|--------|
+{% for feature in features | slice(end=5) %}
+| {{ feature.name }} | {{ feature.description | truncate(length=60) }} | {{ feature.status }} |
+{% endfor %}
+{% endif %}
+
+---
+
+## Architecture at a Glance
+
+{% if architecture.architecture_overview %}
+**Architecture Style**: {{ architecture.architecture_overview.style | default(value="Not specified") }}
+{% endif %}
+
+### System Diagram
+
+```mermaid
+flowchart TB
+{% for component in architecture.components | slice(end=10) %}
+    {{ component.id }}[{{ component.name }}]
+{% endfor %}
+{% for flow in architecture.data_flows | slice(end=8) %}
+    {{ flow.from }} --> {{ flow.to }}
+{% endfor %}
+```
+
+### Main Components
+
+{% if architecture.components %}
+| Component | Type | Description |
+|-----------|------|-------------|
+{% for component in architecture.components | slice(end=8) %}
+| **{{ component.name }}** | {{ component.type }} | {{ component.description | default(value="-") | truncate(length=50) }} |
+{% endfor %}
+{% endif %}
+
+### Technology Stack
+
+{% if architecture.tech_stack %}
+| Category | Technologies |
+|----------|--------------|
+{% if architecture.tech_stack.languages %}| Languages | {{ architecture.tech_stack.languages | join(sep=", ") }} |{% endif %}
+{% if architecture.tech_stack.frameworks %}| Frameworks | {{ architecture.tech_stack.frameworks | join(sep=", ") }} |{% endif %}
+{% if architecture.tech_stack.databases %}| Databases | {{ architecture.tech_stack.databases | join(sep=", ") }} |{% endif %}
+{% if architecture.tech_stack.infrastructure %}| Infrastructure | {{ architecture.tech_stack.infrastructure | join(sep=", ") }} |{% endif %}
+{% endif %}
+
+---
+
+## Domain Glossary
+
+{% if glossary.terms %}
+### Key Terms
+
+| Term | Definition |
+|------|------------|
+{% for term in glossary.terms | slice(end=15) %}
+| **{{ term.term }}** | {{ term.definition | truncate(length=80) }} |
+{% endfor %}
+
+{% if glossary.terms | length > 15 %}
+*See full glossary in `glossary.yaml` for {{ glossary.terms | length }} total terms.*
+{% endif %}
+{% endif %}
+
+{% if glossary.acronyms %}
+### Acronyms
+
+| Acronym | Meaning |
+|---------|---------|
+{% for acr in glossary.acronyms %}
+| {{ acr.acronym }} | {{ acr.expansion }} |
+{% endfor %}
+{% endif %}
+
+{% if glossary.language_rules.anti_patterns %}
+### Language Anti-Patterns
+
+| Avoid | Use Instead | Why |
+|-------|-------------|-----|
+{% for anti in glossary.language_rules.anti_patterns %}
+| {{ anti.avoid }} | {{ anti.use_instead }} | {{ anti.reason }} |
+{% endfor %}
+{% endif %}
+
+---
+
+## User Personas
+
+{% if user_journeys.personas %}
+{% for persona in user_journeys.personas | slice(end=4) %}
+### {{ persona.name }}
+
+**Role**: {{ persona.role }}
+
+{{ persona.description }}
+
+| Property | Value |
+|----------|-------|
+| Technical Level | {{ persona.demographics.technical_level | default(value="-") }} |
+| Usage Frequency | {{ persona.demographics.frequency_of_use | default(value="-") }} |
+| Primary Device | {{ persona.demographics.primary_device | default(value="-") }} |
+
+{% if persona.goals %}
+**Goals:**
+{% for goal in persona.goals %}
+- {{ goal }}
+{% endfor %}
+{% endif %}
+
+{% if persona.pain_points %}
+**Pain Points:**
+{% for pain in persona.pain_points %}
+- {{ pain }}
+{% endfor %}
+{% endif %}
+
+{% if persona.quote %}
+> "{{ persona.quote }}"
+{% endif %}
+
+{% endfor %}
+{% else %}
+No user personas documented. See `user-journeys.yaml`.
+{% endif %}
+
+---
+
+## Key User Journeys
+
+{% if user_journeys.journeys %}
+{% for journey in user_journeys.journeys | slice(end=3) %}
+### {{ journey.name }}
+
+**Persona**: {{ journey.persona }}
+**Category**: {{ journey.category | default(value="-") }}
+
+{{ journey.description | default(value="") }}
+
+**Trigger**: {{ journey.trigger }}
+**Outcome**: {{ journey.outcome }}
+
+{% if journey.steps %}
+**Flow:**
+{% for step in journey.steps %}
+{{ step.step }}. {{ step.action }}
+{% endfor %}
+{% endif %}
+
+{% endfor %}
+
+{% if user_journeys.journeys | length > 3 %}
+*See `user-journeys.yaml` for {{ user_journeys.journeys | length }} total journeys.*
+{% endif %}
+{% else %}
+No user journeys documented. See `user-journeys.yaml`.
+{% endif %}
+
+---
+
+## Team & Contacts
+
+{% if team.team %}
+| Property | Value |
+|----------|-------|
+| Team Name | {{ team.team.name | default(value="Not specified") }} |
+| Organization | {{ team.team.organization | default(value="Not specified") }} |
+| Size | {{ team.team.size | default(value="Unknown") }} |
+| Location | {{ team.team.location | default(value="Not specified") }} |
+| Timezone | {{ team.team.timezone | default(value="Not specified") }} |
+{% endif %}
+
+{% if team.team.roles %}
+### Key Contacts
+
+| Role | Contact |
+|------|---------|
+{% for role in team.team.roles %}
+| {{ role.role }} | {{ role.contact | default(value="Not assigned") }} |
+{% endfor %}
+{% endif %}
+
+{% if team.team.security_roles %}
+### Security Contacts
+
+| Role | Contact |
+|------|---------|
+| Security Champion | {{ team.team.security_roles.security_champion | default(value="Not assigned") }} |
+| Incident Responder | {{ team.team.security_roles.incident_responder | default(value="Not assigned") }} |
+| Compliance Contact | {{ team.team.security_roles.compliance_contact | default(value="Not assigned") }} |
+{% endif %}
+
+{% if tooling.collaboration %}
+### Communication Channels
+
+| Type | Channel |
+|------|---------|
+{% if tooling.collaboration.communication %}| Primary Communication | {{ tooling.collaboration.communication }} |{% endif %}
+{% if tooling.collaboration.project_management %}| Project Management | {{ tooling.collaboration.project_management }} |{% endif %}
+{% if tooling.collaboration.documentation %}| Documentation | {{ tooling.collaboration.documentation }} |{% endif %}
+{% if tooling.collaboration.knowledge_management %}| Knowledge Base | {{ tooling.collaboration.knowledge_management }} |{% endif %}
+{% endif %}
+
+---
+
+## Integrations Overview
+
+{% if integrations %}
+### Key External Services
+
+| Service | Vendor | Purpose | Authentication |
+|---------|--------|---------|----------------|
+{% for int in integrations | slice(end=8) %}
+| {{ int.name }} | {{ int.vendor }} | {{ int.description | default(value="-") | truncate(length=40) }} | {{ int.connection.authentication | default(value="-") }} |
+{% endfor %}
+
+{% if integrations | length > 8 %}
+*See `integrations.yaml` for {{ integrations | length }} total integrations.*
+{% endif %}
+{% else %}
+No integrations documented.
+{% endif %}
+
+---
+
+## Getting Started
+
+{% if team.access_management.onboarding %}
+### Onboarding Checklist
+
+| Item | Status |
+|------|--------|
+| Process Documented | {% if team.access_management.onboarding.process_documented %}Yes{% else %}No{% endif %} |
+| Checklist Exists | {% if team.access_management.onboarding.checklist_exists %}Yes{% else %}No{% endif %} |
+| Security Training Required | {% if team.access_management.onboarding.security_training_required %}Yes{% else %}No{% endif %} |
+{% endif %}
+
+### Required Access
+
+{% if operations.environments %}
+| Environment | Access Method | Approval Needed |
+|-------------|---------------|-----------------|
+{% for env in operations.environments %}
+| {{ env.name }} | {{ env.access.method }} | {% if env.access.approval_needed %}Yes{% else %}No{% endif %} |
+{% endfor %}
+{% endif %}
+
+### Development Environment
+
+{% if tooling.source_control %}
+| Property | Value |
+|----------|-------|
+| Platform | {{ tooling.source_control.platform }} |
+| Repository | {{ tooling.source_control.repository }} |
+| Default Branch | {{ tooling.source_control.default_branch }} |
+| Branch Strategy | {{ tooling.source_control.branch_strategy | default(value="Not specified") }} |
+{% endif %}
+
+{% if tooling.development %}
+**Code Quality Tools:**
+{% if tooling.development.code_quality %}
+{% for tool in tooling.development.code_quality %}
+- {{ tool }}
+{% endfor %}
+{% endif %}
+
+{% if tooling.development.pre_commit %}
+**Pre-commit Hooks**: {{ tooling.development.pre_commit }}
+{% endif %}
+{% endif %}
+
+{% if team.training %}
+### Required Training
+
+| Training | Details |
+|----------|---------|
+| Security Awareness | {{ team.training.security_awareness | default(value="Not specified") }} |
+| Secure Coding | {{ team.training.secure_coding | default(value="Not specified") }} |
+{% endif %}
+
+---
+
+## Essential Runbooks
+
+{% if operations.runbooks %}
+| Runbook | Trigger | Severity |
+|---------|---------|----------|
+{% for runbook in operations.runbooks | slice(end=5) %}
+| {{ runbook.name }} | {{ runbook.trigger }} | {{ runbook.severity }} |
+{% endfor %}
+
+{% if operations.runbooks | length > 5 %}
+*See `operations.yaml` for {{ operations.runbooks | length }} total runbooks.*
+{% endif %}
+{% else %}
+No runbooks documented. See `operations.yaml`.
+{% endif %}
+
+---
+
+## Key Gaps to Know
+
+{% if gaps.discovery_gaps %}
+These are known issues that may affect your daily work:
+
+| Severity | Category | Description |
+|----------|----------|-------------|
+{% for gap in gaps.discovery_gaps %}
+{% if gap.severity == "critical" or gap.severity == "high" %}
+| {{ gap.severity | upper }} | {{ gap.category }} | {{ gap.description | truncate(length=60) }} |
+{% endif %}
+{% endfor %}
+
+{% if gaps.recommendations %}
+### Recommended Actions
+
+{% for rec in gaps.recommendations | slice(end=3) %}
+- **{{ rec.action }}** (Priority: {{ rec.priority }})
+{% endfor %}
+{% endif %}
+{% else %}
+No critical gaps identified.
+{% endif %}
+
+---
+
+## Next Steps
+
+1. **Set up your development environment** - Clone the repo and install dependencies
+2. **Complete required training** - Security awareness and secure coding
+3. **Request necessary access** - See Required Access section above
+4. **Read the architecture guide** - See `docs/architecture.md`
+5. **Meet the team** - Reach out to contacts listed above
+6. **Review key runbooks** - Familiarize yourself with incident response
+
+---
+
+*Generated by OpenSecKit /osk-discover on {{ metadata.generated_at }}*
+*Model version: {{ metadata.model_version }}*

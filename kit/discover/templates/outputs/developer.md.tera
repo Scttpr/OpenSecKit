@@ -1,0 +1,385 @@
+# Developer Guide
+
+**Project**: {{ project.name }}
+**Generated**: {{ metadata.generated_at | date(format="%Y-%m-%d") }}
+**Model Commit**: {{ metadata.last_commit }}
+
+---
+
+## Dashboard
+
+| Metric | Value |
+|--------|-------|
+| Components | {{ stats.components }} |
+| APIs | {{ stats.apis | default(value=0) }} |
+| Integrations | {{ stats.integrations }} |
+| Glossary Terms | {{ glossary.terms | default(value=[]) | length }} |
+| Tech Stack | {{ architecture.tech_stack.languages | default(value=[]) | join(sep=", ") }}{% if architecture.tech_stack.frameworks %}, {{ architecture.tech_stack.frameworks | join(sep=", ") }}{% endif %} |
+
+---
+
+## Quick Start
+
+{% if tooling.source_control %}
+### Repository Setup
+
+```bash
+# Clone the repository
+git clone {{ tooling.source_control.repository }}
+
+# Switch to default branch
+git checkout {{ tooling.source_control.default_branch }}
+```
+
+| Property | Value |
+|----------|-------|
+| Platform | {{ tooling.source_control.platform }} |
+| Default Branch | {{ tooling.source_control.default_branch }} |
+| Branch Strategy | {{ tooling.source_control.branch_strategy | default(value="Not specified") }} |
+| Protected Branches | {{ tooling.source_control.protected_branches | default(value=[]) | join(sep=", ") }} |
+{% endif %}
+
+{% if tooling.development %}
+### Development Environment
+
+{% if tooling.development.ide_recommendations %}
+**Recommended IDEs**: {{ tooling.development.ide_recommendations | join(sep=", ") }}
+{% endif %}
+
+{% if tooling.development.code_quality %}
+**Code Quality Tools**:
+{% for tool in tooling.development.code_quality %}
+- {{ tool }}
+{% endfor %}
+{% endif %}
+
+{% if tooling.development.pre_commit %}
+**Pre-commit Hooks**: {{ tooling.development.pre_commit }}
+{% endif %}
+{% endif %}
+
+---
+
+## Architecture Overview
+
+{% if architecture.architecture_overview %}
+**Style**: {{ architecture.architecture_overview.style | default(value="Not specified") }}
+
+{{ architecture.architecture_overview.description | default(value="") }}
+{% endif %}
+
+### Technology Stack
+
+{% if architecture.tech_stack %}
+| Category | Technologies |
+|----------|--------------|
+{% if architecture.tech_stack.languages %}| Languages | {{ architecture.tech_stack.languages | join(sep=", ") }} |{% endif %}
+{% if architecture.tech_stack.frameworks %}| Frameworks | {{ architecture.tech_stack.frameworks | join(sep=", ") }} |{% endif %}
+{% if architecture.tech_stack.databases %}| Databases | {{ architecture.tech_stack.databases | join(sep=", ") }} |{% endif %}
+{% if architecture.tech_stack.infrastructure %}| Infrastructure | {{ architecture.tech_stack.infrastructure | join(sep=", ") }} |{% endif %}
+{% endif %}
+
+### System Diagram
+
+```mermaid
+flowchart TB
+{% for component in architecture.components %}
+    {{ component.id }}[{{ component.name }}]
+{% endfor %}
+{% for flow in architecture.data_flows %}
+    {{ flow.from }} --> |{{ flow.data | join(sep=", ") }}| {{ flow.to }}
+{% endfor %}
+```
+
+---
+
+## Components Reference
+
+{% for component in architecture.components %}
+### {{ component.name }}
+
+| Property | Value |
+|----------|-------|
+| ID | `{{ component.id }}` |
+| Type | {{ component.type }} |
+| Technology | {{ component.technology }} |
+| Location | {{ component.location | default(value="Not specified") }} |
+
+{{ component.description | default(value="") }}
+
+{% if component.interfaces %}
+**Interfaces:**
+
+| Type | Protocol | Authentication |
+|------|----------|----------------|
+{% for iface in component.interfaces %}
+| {{ iface.type }} | {{ iface.protocol }} | {{ iface.authentication | default(value="-") }} |
+{% endfor %}
+{% endif %}
+
+{% if component.dependencies %}
+**Dependencies:**
+{% for dep in component.dependencies %}
+- `{{ dep.component }}` ({{ dep.type }})
+{% endfor %}
+{% endif %}
+
+---
+
+{% endfor %}
+
+## Domain Glossary
+
+Understanding the domain is crucial for effective development. These terms are used throughout the codebase.
+
+{% if glossary.terms %}
+| Term | Definition | Category |
+|------|------------|----------|
+{% for term in glossary.terms %}
+| **{{ term.term }}** | {{ term.definition }} | {{ term.category | default(value="-") }} |
+{% endfor %}
+{% endif %}
+
+{% if glossary.acronyms %}
+### Acronyms
+
+| Acronym | Expansion |
+|---------|-----------|
+{% for acr in glossary.acronyms %}
+| {{ acr.acronym }} | {{ acr.expansion }} |
+{% endfor %}
+{% endif %}
+
+{% if glossary.bounded_contexts %}
+### Bounded Contexts
+
+{% for ctx in glossary.bounded_contexts %}
+#### {{ ctx.name }}
+
+{{ ctx.description }}
+
+**Owner**: {{ ctx.owner | default(value="Not assigned") }}
+
+{% if ctx.entities %}
+**Entities**: {{ ctx.entities | map(attribute="name") | join(sep=", ") }}
+{% endif %}
+
+{% endfor %}
+{% endif %}
+
+---
+
+## API Reference
+
+{% if architecture.api_inventory %}
+| ID | Name | Version | Type | Base Path | Auth |
+|----|------|---------|------|-----------|------|
+{% for api in architecture.api_inventory %}
+| `{{ api.id }}` | {{ api.name }} | {{ api.version }} | {{ api.type }} | `{{ api.base_path }}` | {{ api.authentication | default(value="-") }} |
+{% endfor %}
+
+{% for api in architecture.api_inventory %}
+### {{ api.name }} ({{ api.version }})
+
+| Property | Value |
+|----------|-------|
+| Type | {{ api.type }} |
+| Base Path | `{{ api.base_path }}` |
+| Authentication | {{ api.authentication | default(value="None") }} |
+| Authorization | {{ api.authorization | default(value="None") }} |
+| Rate Limiting | {{ api.rate_limiting | default(value="Not configured") }} |
+| Versioning Strategy | {{ api.versioning_strategy | default(value="Not specified") }} |
+{% if api.documentation %}| Documentation | {{ api.documentation }} |{% endif %}
+
+{% if api.consumers %}
+**Consumers**: {{ api.consumers | join(sep=", ") }}
+{% endif %}
+
+{% endfor %}
+{% else %}
+No APIs documented.
+{% endif %}
+
+---
+
+## Data Model
+
+{% if data.data_categories %}
+### Data Categories
+
+| ID | Name | Classification | Description |
+|----|------|----------------|-------------|
+{% for cat in data.data_categories %}
+| `{{ cat.id }}` | {{ cat.name }} | {{ cat.classification }} | {{ cat.description | default(value="-") | truncate(length=50) }} |
+{% endfor %}
+
+{% for cat in data.data_categories %}
+### {{ cat.name }}
+
+{{ cat.description | default(value="") }}
+
+**Classification**: {{ cat.classification }}
+
+{% if cat.fields %}
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+{% for field in cat.fields %}
+| `{{ field.name }}` | {{ field.type }} | {% if field.required %}Yes{% else %}No{% endif %} | {{ field.description | default(value="-") }} |
+{% endfor %}
+{% endif %}
+
+{% endfor %}
+{% else %}
+No data categories documented.
+{% endif %}
+
+---
+
+## Integration Points
+
+{% if integrations %}
+### External Services
+
+| Name | Vendor | Type | Authentication | Documentation |
+|------|--------|------|----------------|---------------|
+{% for int in integrations %}
+| {{ int.name }} | {{ int.vendor }} | {{ int.type }} | {{ int.connection.authentication }} | {{ int.documentation | default(value="-") }} |
+{% endfor %}
+
+{% for int in integrations %}
+### {{ int.name }}
+
+| Property | Value |
+|----------|-------|
+| Vendor | {{ int.vendor }} |
+| Type | {{ int.type }} |
+| Endpoint | `{{ int.connection.endpoint }}` |
+| Protocol | {{ int.connection.protocol }} |
+| Authentication | {{ int.connection.authentication }} |
+
+{{ int.description | default(value="") }}
+
+{% if int.data_exchanged %}
+**Data Exchanged:**
+
+| Data | Direction | Purpose |
+|------|-----------|---------|
+{% for data in int.data_exchanged %}
+| {{ data.data_id }} | {{ data.direction }} | {{ data.purpose }} |
+{% endfor %}
+{% endif %}
+
+{% endfor %}
+{% else %}
+No integrations documented.
+{% endif %}
+
+---
+
+## Development Workflow
+
+### CI/CD Pipelines
+
+{% if tooling.ci_cd.pipelines %}
+| ID | Name | Trigger | Environment | SAST | Tests |
+|----|------|---------|-------------|------|-------|
+{% for pipeline in tooling.ci_cd.pipelines %}
+| `{{ pipeline.id }}` | {{ pipeline.name }} | {{ pipeline.trigger }} | {{ pipeline.environment }} | {% if pipeline.sast_required %}Yes{% else %}No{% endif %} | {% if pipeline.tests_required %}Yes{% else %}No{% endif %} |
+{% endfor %}
+{% endif %}
+
+### Code Quality
+
+{% if tooling.security_tools %}
+| Category | Tool | Stage | Blocking |
+|----------|------|-------|----------|
+{% for tool in tooling.security_tools %}
+| {{ tool.category }} | {{ tool.tool }} | {{ tool.enforcement.stage | default(value="-") }} | {% if tool.enforcement.blocking %}Yes{% else %}No{% endif %} |
+{% endfor %}
+{% endif %}
+
+---
+
+## Environments
+
+{% if operations.environments %}
+| Name | Type | URL | Access Method |
+|------|------|-----|---------------|
+{% for env in operations.environments %}
+| {{ env.name }} | {{ env.type }} | {{ env.url | default(value="Not specified") }} | {{ env.access.method }} |
+{% endfor %}
+{% endif %}
+
+---
+
+## Testing
+
+{% if tooling.development.testing %}
+### Testing Strategy
+
+| Type | Tool | Coverage Target |
+|------|------|-----------------|
+{% for test in tooling.development.testing %}
+| {{ test.type }} | {{ test.tool }} | {{ test.coverage_target | default(value="-") }} |
+{% endfor %}
+{% endif %}
+
+---
+
+## Troubleshooting
+
+### Common Issues
+
+{% if operations.runbooks %}
+| Issue | Runbook | Severity |
+|-------|---------|----------|
+{% for runbook in operations.runbooks | slice(end=5) %}
+| {{ runbook.trigger }} | {{ runbook.name }} | {{ runbook.severity }} |
+{% endfor %}
+{% endif %}
+
+### Monitoring & Debugging
+
+{% if tooling.observability %}
+| Type | Tool/Service |
+|------|--------------|
+{% if tooling.observability.apm %}| APM | {{ tooling.observability.apm }} |{% endif %}
+{% if tooling.observability.logging %}| Logging | {{ tooling.observability.logging }} |{% endif %}
+{% if tooling.observability.error_tracking %}| Error Tracking | {{ tooling.observability.error_tracking }} |{% endif %}
+{% endif %}
+
+---
+
+## Team & Contacts
+
+{% if team.team.roles %}
+| Role | Contact |
+|------|---------|
+{% for role in team.team.roles %}
+| {{ role.role }} | {{ role.contact | default(value="Not assigned") }} |
+{% endfor %}
+{% endif %}
+
+{% if team.team.security_roles %}
+### Security Contacts
+
+| Role | Contact |
+|------|---------|
+| Security Champion | {{ team.team.security_roles.security_champion | default(value="Not assigned") }} |
+{% endif %}
+
+---
+
+## Related Documentation
+
+| Document | Purpose |
+|----------|---------|
+| `docs/architecture.md` | Detailed architecture guide |
+| `docs/security.md` | Security controls and boundaries |
+| `docs/operations.md` | Operational procedures and runbooks |
+| `docs/onboarding.md` | New team member guide |
+
+---
+
+*Generated by OpenSecKit /osk-discover on {{ metadata.generated_at }}*
+*Model version: {{ metadata.model_version }}*

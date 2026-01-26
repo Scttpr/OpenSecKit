@@ -329,11 +329,12 @@ After all phases complete:
     ├── gaps.yaml              # Identified gaps, remediation
     │
     └── docs/                  # Generated documentation
-        ├── pm-guide.md        # For Product Managers
-        ├── dev-guide.md       # For Developers
-        ├── security-guide.md  # For Security Engineers
-        ├── ops-guide.md       # For DevOps/SRE
-        └── onboarding.md      # For New Team Members
+        ├── product.md         # For Product Managers
+        ├── developer.md       # For Developers
+        ├── security.md        # For Security Engineers
+        ├── operations.md      # For DevOps/SRE
+        ├── onboarding.md      # For New Team Members
+        └── architecture.md    # For Architects
 ```
 
 ---
@@ -371,11 +372,12 @@ Phases Completed:
 └── Gaps: 38 (3 critical)
 
 📚 Documentation Generated:
-├── docs/pm-guide.md
-├── docs/dev-guide.md
-├── docs/security-guide.md
-├── docs/ops-guide.md
-└── docs/onboarding.md
+├── docs/product.md
+├── docs/developer.md
+├── docs/security.md
+├── docs/operations.md
+├── docs/onboarding.md
+└── docs/architecture.md
 
 🏥 Health Score: 78/100
 ├── Documentation: 85%
@@ -390,6 +392,7 @@ Phases Completed:
 💡 Next Steps:
 1. Review gaps.yaml and prioritize remediation
 2. Share docs/onboarding.md with new team members
+   Share docs/architecture.md with architects and senior developers
 3. Run /osk-secure for threat modeling
 4. Run /osk-comply for compliance assessment
 5. Set up SBOM generation in CI pipeline
@@ -411,6 +414,67 @@ Phases Completed:
 8. **Preserve manual**: Never overwrite `_note:` or `_manual:` fields
 9. **Index limit**: Keep index.yaml under 200 lines
 10. **Documentation**: Always generate audience-specific docs in Phase 6
+
+---
+
+# Phase Data Flow
+
+Each phase builds on outputs from previous phases. When executing a phase, load relevant data from earlier phases:
+
+```
+┌──────────────────┐
+│ Phase 1: Product │
+│ (no dependencies)│
+└────────┬─────────┘
+         │ product.yaml, business.yaml, glossary.yaml
+         ▼
+┌──────────────────┐
+│ Phase 2: Arch    │◄── Uses: glossary terms for component naming
+└────────┬─────────┘
+         │ architecture.yaml (components, APIs, data flows)
+         ▼
+┌──────────────────┐
+│ Phase 3: Domain  │◄── Uses: components for data mapping, APIs for journeys
+└────────┬─────────┘
+         │ data.yaml, actors.yaml, boundaries.yaml, user-journeys.yaml
+         ▼
+┌──────────────────┐
+│ Phase 4: Ecosystem│◄── Uses: data categories for integration data exchange
+└────────┬─────────┘
+         │ integrations.yaml, supply_chain.yaml
+         ▼
+┌──────────────────┐
+│ Phase 5: Ops     │◄── Uses: components for ownership, boundaries for controls
+└────────┬─────────┘
+         │ controls.yaml, tooling.yaml, team.yaml, operations.yaml
+         ▼
+┌──────────────────┐
+│ Phase 6: Synth   │◄── Uses: ALL previous outputs for validation & docs
+└──────────────────┘
+         │ gaps.yaml, index.yaml, docs/*.md
+```
+
+## What Each Phase Loads
+
+| Phase | Loads from Previous Phases | Purpose |
+|-------|---------------------------|---------|
+| 1 | — | Bootstrap from codebase |
+| 2 | `glossary.yaml` | Use domain terms for naming |
+| 3 | `architecture.yaml`, `glossary.yaml` | Map data to components, link terms to entities |
+| 4 | `data.yaml`, `architecture.yaml` | Reference data categories in integrations |
+| 5 | `architecture.yaml`, `boundaries.yaml`, `actors.yaml` | Assign component owners, map controls to zones |
+| 6 | All 14 files | Cross-validate, generate comprehensive docs |
+
+## Cross-Reference Integrity
+
+When a phase references IDs from earlier phases, those IDs **must exist**:
+
+- `data_flows[].from/to` → must reference valid `components[].id`
+- `trust_zones[].components[]` → must reference valid `components[].id`
+- `integrations[].data_exchanged[].data_id` → must reference valid `data_categories[].id`
+- `user_types[].glossary_term` → should reference valid `glossary.terms[].term`
+
+Phase 6 validates all cross-references before completing.
 
 ---
 

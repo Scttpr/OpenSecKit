@@ -1,0 +1,412 @@
+# Architecture Guide
+
+**Project**: {{ project.name }}
+**Generated**: {{ metadata.generated_at | date(format="%Y-%m-%d") }}
+**Model Commit**: {{ metadata.last_commit }}
+
+---
+
+## Dashboard
+
+| Metric | Value |
+|--------|-------|
+| Components | {{ stats.components }} |
+| APIs | {{ stats.apis | default(value=0) }} |
+| Data Flows | {{ stats.data_flows | default(value=0) }} |
+| Data Categories | {{ stats.data_categories }} |
+| Integrations | {{ stats.integrations }} |
+| Tech Stack | {{ architecture.tech_stack.languages | default(value=[]) | join(sep=", ") }}{% if architecture.tech_stack.frameworks %}, {{ architecture.tech_stack.frameworks | join(sep=", ") }}{% endif %} |
+{% if operations.resilience %}| RTO / RPO | {{ operations.resilience.rto | default(value="Not defined") }} / {{ operations.resilience.rpo | default(value="Not defined") }} |{% endif %}
+{% if supply_chain.artifact_security.provenance %}| SLSA Level | {{ supply_chain.artifact_security.provenance.slsa_level | default(value="Not assessed") }} |{% endif %}
+
+---
+
+## Architecture Overview
+
+{% if architecture.architecture_overview %}
+**Style**: {{ architecture.architecture_overview.style | default(value="Not specified") }}
+
+{{ architecture.architecture_overview.description | default(value="") }}
+{% endif %}
+
+### Technology Stack
+
+{% if architecture.tech_stack %}
+| Category | Technologies |
+|----------|--------------|
+{% if architecture.tech_stack.languages %}| Languages | {{ architecture.tech_stack.languages | join(sep=", ") }} |{% endif %}
+{% if architecture.tech_stack.frameworks %}| Frameworks | {{ architecture.tech_stack.frameworks | join(sep=", ") }} |{% endif %}
+{% if architecture.tech_stack.databases %}| Databases | {{ architecture.tech_stack.databases | join(sep=", ") }} |{% endif %}
+{% if architecture.tech_stack.infrastructure %}| Infrastructure | {{ architecture.tech_stack.infrastructure | join(sep=", ") }} |{% endif %}
+{% endif %}
+
+### System Diagram
+
+```mermaid
+flowchart TB
+{% for component in architecture.components %}
+    {{ component.id }}[{{ component.name }}]
+{% endfor %}
+{% for flow in architecture.data_flows %}
+    {{ flow.from }} --> |{{ flow.data | join(sep=", ") }}| {{ flow.to }}
+{% endfor %}
+```
+
+---
+
+## Components Reference
+
+{% for component in architecture.components %}
+### {{ component.name }}
+
+| Property | Value |
+|----------|-------|
+| ID | `{{ component.id }}` |
+| Type | {{ component.type }} |
+| Technology | {{ component.technology }} |
+| Location | {{ component.location | default(value="Not specified") }} |
+
+{{ component.description | default(value="") }}
+
+{% if component.interfaces %}
+**Interfaces:**
+
+| Type | Protocol | Authentication | Authorization |
+|------|----------|----------------|---------------|
+{% for iface in component.interfaces %}
+| {{ iface.type }} | {{ iface.protocol }} | {{ iface.authentication | default(value="-") }} | {{ iface.authorization | default(value="-") }} |
+{% endfor %}
+{% endif %}
+
+{% if component.data_stored %}
+**Data Stored**: {{ component.data_stored | join(sep=", ") }}
+{% endif %}
+
+{% if component.data_processed %}
+**Data Processed**: {{ component.data_processed | join(sep=", ") }}
+{% endif %}
+
+{% if component.dependencies %}
+**Dependencies:**
+{% for dep in component.dependencies %}
+- `{{ dep.component }}` ({{ dep.type }})
+{% endfor %}
+{% endif %}
+
+{% if component.security_notes %}
+**Security Notes**: {{ component.security_notes }}
+{% endif %}
+
+---
+
+{% endfor %}
+
+## API Inventory
+
+{% if architecture.api_inventory %}
+| ID | Name | Version | Type | Base Path | Auth | Status |
+|----|------|---------|------|-----------|------|--------|
+{% for api in architecture.api_inventory %}
+| `{{ api.id }}` | {{ api.name }} | {{ api.version }} | {{ api.type }} | `{{ api.base_path }}` | {{ api.authentication | default(value="-") }} | {{ api.deprecation_status | default(value="Active") }} |
+{% endfor %}
+
+{% for api in architecture.api_inventory %}
+### {{ api.name }} ({{ api.version }})
+
+| Property | Value |
+|----------|-------|
+| Type | {{ api.type }} |
+| Base Path | `{{ api.base_path }}` |
+| Authentication | {{ api.authentication | default(value="None") }} |
+| Authorization | {{ api.authorization | default(value="None") }} |
+| Rate Limiting | {{ api.rate_limiting | default(value="Not configured") }} |
+| Versioning Strategy | {{ api.versioning_strategy | default(value="Not specified") }} |
+| Deprecation Status | {{ api.deprecation_status | default(value="Active") }} |
+{% if api.documentation %}| Documentation | {{ api.documentation }} |{% endif %}
+
+{% if api.consumers %}
+**Consumers**: {{ api.consumers | join(sep=", ") }}
+{% endif %}
+
+{% endfor %}
+{% else %}
+No APIs documented.
+{% endif %}
+
+---
+
+## Data Flows
+
+{% if architecture.data_flows %}
+```mermaid
+flowchart LR
+{% for flow in architecture.data_flows %}
+    {{ flow.from }} -->|{{ flow.protocol }}| {{ flow.to }}
+{% endfor %}
+```
+
+| ID | Name | From | To | Data | Protocol | Encryption |
+|----|------|------|----|------|----------|------------|
+{% for flow in architecture.data_flows %}
+| `{{ flow.id }}` | {{ flow.name }} | {{ flow.from }} | {{ flow.to }} | {{ flow.data | join(sep=", ") }} | {{ flow.protocol }} | {% if flow.encryption.enabled %}{{ flow.encryption.algorithm }} ({{ flow.encryption.protocol }} {{ flow.encryption.version }}){% else %}None{% endif %} |
+{% endfor %}
+{% else %}
+No data flows documented.
+{% endif %}
+
+---
+
+## Resilience & Disaster Recovery
+
+{% if architecture.resilience %}
+| Property | Value |
+|----------|-------|
+| Backup Strategy | {{ architecture.resilience.backup_strategy | default(value="Not defined") }} |
+| Disaster Recovery | {{ architecture.resilience.disaster_recovery | default(value="Not defined") }} |
+| High Availability | {{ architecture.resilience.high_availability | default(value="Not defined") }} |
+{% if architecture.resilience.rto %}| RTO | {{ architecture.resilience.rto }} |{% endif %}
+{% if architecture.resilience.rpo %}| RPO | {{ architecture.resilience.rpo }} |{% endif %}
+{% if architecture.resilience.failover_strategy %}| Failover Strategy | {{ architecture.resilience.failover_strategy }} |{% endif %}
+{% if architecture.resilience.load_balancing %}| Load Balancing | {{ architecture.resilience.load_balancing }} |{% endif %}
+{% else %}
+No resilience configuration documented.
+{% endif %}
+
+---
+
+## Data Dictionary
+
+{% if data.data_categories %}
+| ID | Name | Classification | Storage | Retention |
+|----|------|----------------|---------|-----------|
+{% for cat in data.data_categories %}
+| `{{ cat.id }}` | {{ cat.name }} | {{ cat.classification }} | {{ cat.storage_locations | default(value=[]) | join(sep=", ") }} | {{ cat.retention.period | default(value="Not defined") }} |
+{% endfor %}
+
+{% for cat in data.data_categories %}
+### {{ cat.name }}
+
+{{ cat.description | default(value="") }}
+
+**Classification**: {{ cat.classification }}
+
+{% if cat.fields %}
+| Field | Type | PII | Sensitive | Encryption Required |
+|-------|------|-----|-----------|---------------------|
+{% for field in cat.fields %}
+| {{ field.name }} | {{ field.type }} | {% if field.pii %}Yes{% else %}No{% endif %} | {% if field.sensitive %}Yes{% else %}No{% endif %} | {% if field.encryption_required %}Yes{% else %}No{% endif %} |
+{% endfor %}
+{% endif %}
+
+{% endfor %}
+{% else %}
+No data categories documented.
+{% endif %}
+
+---
+
+## Integration Points
+
+{% if integrations %}
+| ID | Name | Vendor | Type | Protocol | Direction | Criticality |
+|----|------|--------|------|----------|-----------|-------------|
+{% for int in integrations %}
+| `{{ int.id }}` | {{ int.name }} | {{ int.vendor }} | {{ int.type }} | {{ int.connection.protocol }} | {{ int.connection.direction }} | {{ int.criticality | default(value="Medium") }} |
+{% endfor %}
+
+{% for int in integrations %}
+### {{ int.name }}
+
+| Property | Value |
+|----------|-------|
+| Vendor | {{ int.vendor }} |
+| Type | {{ int.type }} |
+| Endpoint | `{{ int.connection.endpoint }}` |
+| Protocol | {{ int.connection.protocol }} |
+| Authentication | {{ int.connection.authentication }} |
+| Direction | {{ int.connection.direction }} |
+| Criticality | {{ int.criticality | default(value="Medium") }} |
+{% if int.fallback_strategy %}| Fallback Strategy | {{ int.fallback_strategy }} |{% endif %}
+
+{% if int.data_exchanged %}
+**Data Exchanged:**
+
+| Data | Direction | Purpose |
+|------|-----------|---------|
+{% for data in int.data_exchanged %}
+| {{ data.data_id }} | {{ data.direction }} | {{ data.purpose }} |
+{% endfor %}
+{% endif %}
+
+{% endfor %}
+{% else %}
+No integrations documented.
+{% endif %}
+
+---
+
+## Development Tooling
+
+### Source Control
+
+{% if tooling.source_control %}
+| Property | Value |
+|----------|-------|
+| Platform | {{ tooling.source_control.platform }} |
+| Repository | {{ tooling.source_control.repository }} |
+| Default Branch | {{ tooling.source_control.default_branch }} |
+| Branch Strategy | {{ tooling.source_control.branch_strategy | default(value="Not defined") }} |
+| Protected Branches | {{ tooling.source_control.protected_branches | default(value=[]) | join(sep=", ") }} |
+| Require Reviews | {% if tooling.source_control.require_reviews %}Yes{% else %}No{% endif %} |
+| Require CI Pass | {% if tooling.source_control.require_ci_pass %}Yes{% else %}No{% endif %} |
+{% endif %}
+
+### CI/CD Pipelines
+
+{% if tooling.ci_cd.pipelines %}
+| ID | Name | Trigger | Environment | SAST | Tests |
+|----|------|---------|-------------|------|-------|
+{% for pipeline in tooling.ci_cd.pipelines %}
+| `{{ pipeline.id }}` | {{ pipeline.name }} | {{ pipeline.trigger }} | {{ pipeline.environment }} | {% if pipeline.sast_required %}Yes{% else %}No{% endif %} | {% if pipeline.tests_required %}Yes{% else %}No{% endif %} |
+{% endfor %}
+{% endif %}
+
+### Security Tools
+
+{% if tooling.security_tools %}
+| Category | Tool | Vendor | Enforcement | Blocking |
+|----------|------|--------|-------------|----------|
+{% for tool in tooling.security_tools %}
+| {{ tool.category }} | {{ tool.tool }} | {{ tool.vendor }} | {{ tool.enforcement.stage | default(value="-") }} | {% if tool.enforcement.blocking %}Yes{% else %}No{% endif %} |
+{% endfor %}
+{% endif %}
+
+### Observability
+
+{% if tooling.observability %}
+| Type | Tool/Service |
+|------|--------------|
+{% if tooling.observability.apm %}| APM | {{ tooling.observability.apm }} |{% endif %}
+{% if tooling.observability.logging %}| Logging | {{ tooling.observability.logging }} |{% endif %}
+{% if tooling.observability.alerting %}| Alerting | {{ tooling.observability.alerting }} |{% endif %}
+{% if tooling.observability.error_tracking %}| Error Tracking | {{ tooling.observability.error_tracking }} |{% endif %}
+{% endif %}
+
+---
+
+## Supply Chain
+
+{% if supply_chain %}
+### SBOM Generation
+
+| Property | Value |
+|----------|-------|
+| Enabled | {% if supply_chain.sbom.generation.enabled %}Yes{% else %}No{% endif %} |
+{% if supply_chain.sbom.generation.tool %}| Tool | {{ supply_chain.sbom.generation.tool }} ({{ supply_chain.sbom.generation.tool_version }}) |{% endif %}
+{% if supply_chain.sbom.generation.format %}| Format | {{ supply_chain.sbom.generation.format }} |{% endif %}
+{% if supply_chain.sbom.generation.frequency %}| Frequency | {{ supply_chain.sbom.generation.frequency }} |{% endif %}
+| CI Integrated | {% if supply_chain.sbom.generation.ci_integrated %}Yes{% else %}No{% endif %} |
+{% if supply_chain.sbom.generation.last_generated %}| Last Generated | {{ supply_chain.sbom.generation.last_generated }} |{% endif %}
+
+### Vulnerability Scanning
+
+| Property | Value |
+|----------|-------|
+| Enabled | {% if supply_chain.sbom.vulnerability_scanning.enabled %}Yes{% else %}No{% endif %} |
+{% if supply_chain.sbom.vulnerability_scanning.tool %}| Tool | {{ supply_chain.sbom.vulnerability_scanning.tool }} |{% endif %}
+{% if supply_chain.sbom.vulnerability_scanning.frequency %}| Frequency | {{ supply_chain.sbom.vulnerability_scanning.frequency }} |{% endif %}
+{% if supply_chain.sbom.vulnerability_scanning.blocking_threshold %}| Blocking Threshold | {{ supply_chain.sbom.vulnerability_scanning.blocking_threshold }} |{% endif %}
+
+### Dependency Policies
+
+{% if supply_chain.dependency_policies.license_policy %}
+**License Policy:**
+- Allowed: {{ supply_chain.dependency_policies.license_policy.allowed_licenses | join(sep=", ") }}
+- Blocked: {{ supply_chain.dependency_policies.license_policy.blocked_licenses | default(value=[]) | join(sep=", ") }}
+- Enforcement: {{ supply_chain.dependency_policies.license_policy.enforcement }}
+{% endif %}
+
+### Artifact Security
+
+| Property | Value |
+|----------|-------|
+| Signing Enabled | {% if supply_chain.artifact_security.signing.enabled %}Yes{% else %}No{% endif %} |
+{% if supply_chain.artifact_security.signing.method %}| Signing Method | {{ supply_chain.artifact_security.signing.method }} |{% endif %}
+| Provenance Enabled | {% if supply_chain.artifact_security.provenance.enabled %}Yes{% else %}No{% endif %} |
+{% if supply_chain.artifact_security.provenance.slsa_level %}| SLSA Level | {{ supply_chain.artifact_security.provenance.slsa_level }} |{% endif %}
+{% else %}
+No supply chain configuration documented.
+{% endif %}
+
+---
+
+## Domain Glossary
+
+{% if glossary.terms %}
+| Term | Definition | Category |
+|------|------------|----------|
+{% for term in glossary.terms %}
+| **{{ term.term }}** | {{ term.definition }} | {{ term.category | default(value="-") }} |
+{% endfor %}
+{% endif %}
+
+{% if glossary.acronyms %}
+### Acronyms
+
+| Acronym | Expansion |
+|---------|-----------|
+{% for acr in glossary.acronyms %}
+| {{ acr.acronym }} | {{ acr.expansion }} |
+{% endfor %}
+{% endif %}
+
+{% if glossary.bounded_contexts %}
+### Bounded Contexts
+
+{% for ctx in glossary.bounded_contexts %}
+#### {{ ctx.name }}
+
+{{ ctx.description }}
+
+**Owner**: {{ ctx.owner | default(value="Not assigned") }}
+
+{% if ctx.entities %}
+**Entities**: {{ ctx.entities | map(attribute="name") | join(sep=", ") }}
+{% endif %}
+
+{% endfor %}
+{% endif %}
+
+---
+
+## Environments Overview
+
+{% if operations.environments %}
+| Name | Type | Region | Provider | Contains PII |
+|------|------|--------|----------|--------------|
+{% for env in operations.environments %}
+| {{ env.name }} | {{ env.type }} | {{ env.region }} | {{ env.provider }} | {% if env.data.contains_pii %}Yes{% else %}No{% endif %} |
+{% endfor %}
+
+{% for env in operations.environments %}
+### {{ env.name }} ({{ env.type }})
+
+| Property | Value |
+|----------|-------|
+| URL | {{ env.url | default(value="Not specified") }} |
+| Region | {{ env.region }} |
+| Provider | {{ env.provider }} |
+| Access Method | {{ env.access.method }} |
+| Approval Needed | {% if env.access.approval_needed %}Yes{% else %}No{% endif %} |
+| Config Source | {{ env.configuration.config_source | default(value="Not specified") }} |
+| Secrets Source | {{ env.configuration.secrets_source | default(value="Not specified") }} |
+
+{% endfor %}
+{% else %}
+No environments documented.
+{% endif %}
+
+---
+
+*Generated by OpenSecKit /osk-discover on {{ metadata.generated_at }}*
+*Model version: {{ metadata.model_version }}*

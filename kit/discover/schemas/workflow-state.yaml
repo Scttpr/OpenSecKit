@@ -176,13 +176,15 @@ phases:
       - id: "documentation-generation"
         status: "enum[pending|in_progress|completed]"
         sub_steps:
-          - doc: "pm-guide.md"
+          - doc: "product.md"
             status: "enum[pending|in_progress|completed]"
-          - doc: "dev-guide.md"
+          - doc: "developer.md"
             status: "enum[pending|in_progress|completed]"
-          - doc: "security-guide.md"
+          - doc: "architecture.md"
             status: "enum[pending|in_progress|completed]"
-          - doc: "ops-guide.md"
+          - doc: "security.md"
+            status: "enum[pending|in_progress|completed]"
+          - doc: "operations.md"
             status: "enum[pending|in_progress|completed]"
           - doc: "onboarding.md"
             status: "enum[pending|in_progress|completed]"
@@ -222,12 +224,13 @@ incremental:
       files_changed: "number"
       priority: "enum[high|medium|low]"
 
-  # Phase dependencies (if phase X re-runs, also re-run these)
+  # Phase dependencies (if phase X re-runs, also re-run downstream phases)
+  # Flow: product_context → architecture → domain_model → ecosystem → operations → synthesis
   phase_dependencies:
-    product_context: []
+    product_context: ["architecture"]
     architecture: ["domain_model"]
     domain_model: ["ecosystem"]
-    ecosystem: ["synthesis"]
+    ecosystem: ["operations"]
     operations: ["synthesis"]
     synthesis: []
 
