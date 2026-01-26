@@ -77,11 +77,10 @@ Build a system model from your codebase.
 
 | Command | Description |
 |---------|-------------|
-| `/osk-discover` | Analyze codebase and build system model |
+| `/osk-discover` | Analyze codebase, build system model, generate docs |
 | `/osk-discover-validate` | Validate model integrity |
-| `/osk-discover-docs` | Generate documentation |
 
-**Output:** `.osk/system-model/` (index.yaml, architecture.yaml, data.yaml, etc.)
+**Output:** `.osk/system-model/*.yaml` + `docs/*.md`
 
 ### Comply
 
