@@ -414,6 +414,7 @@ For each document:
 - [ ] Mermaid diagrams generated (where applicable)
 - [ ] Cross-references to other docs are correct
 - [ ] Links to YAML files use relative paths (`../system-model/*.yaml`)
+- [ ] **File written to `.osk/docs/` using Write tool**
 
 #### Documentation Menu
 
@@ -425,12 +426,12 @@ Selected language: {{ language_name }} ({{ language_code }})
 Fetching templates from OpenSecKit repository...
 
 Generating documentation:
-[x] docs/product.md      ← product{{ lang_suffix }}.md.tera
-[x] docs/architecture.md ← architecture{{ lang_suffix }}.md.tera
-[x] docs/developer.md    ← developer{{ lang_suffix }}.md.tera
-[x] docs/security.md     ← security{{ lang_suffix }}.md.tera
-[x] docs/operations.md   ← operations{{ lang_suffix }}.md.tera
-[x] docs/onboarding.md   ← onboarding{{ lang_suffix }}.md.tera
+[x] .osk/docs/product.md      ← product{{ lang_suffix }}.md.tera
+[x] .osk/docs/architecture.md ← architecture{{ lang_suffix }}.md.tera
+[x] .osk/docs/developer.md    ← developer{{ lang_suffix }}.md.tera
+[x] .osk/docs/security.md     ← security{{ lang_suffix }}.md.tera
+[x] .osk/docs/operations.md   ← operations{{ lang_suffix }}.md.tera
+[x] .osk/docs/onboarding.md   ← onboarding{{ lang_suffix }}.md.tera
 
 Output location: .osk/docs/
 Language: {{ language_code }}
@@ -536,7 +537,7 @@ Generate the following files:
 - Health scores
 - Audience routing
 
-### Documentation files (in docs/)
+### Documentation files (in .osk/docs/)
 
 **CRITICAL**: You MUST create each documentation file. For each file:
 
