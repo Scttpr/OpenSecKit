@@ -252,27 +252,27 @@ index:
   audiences:
     - role: "Product Manager"
       relevant_files: ["product.yaml", "business.yaml", "user-journeys.yaml", "glossary.yaml"]
-      quick_start: "docs/product.md"
+      quick_start: ".osk/docs/product.md"
 
     - role: "Developer"
       relevant_files: ["architecture.yaml", "glossary.yaml", "integrations.yaml", "tooling.yaml"]
-      quick_start: "docs/developer.md"
+      quick_start: ".osk/docs/developer.md"
 
     - role: "Security Engineer"
       relevant_files: ["controls.yaml", "boundaries.yaml", "data.yaml", "supply_chain.yaml"]
-      quick_start: "docs/security.md"
+      quick_start: ".osk/docs/security.md"
 
     - role: "DevOps/SRE"
       relevant_files: ["operations.yaml", "architecture.yaml", "tooling.yaml"]
-      quick_start: "docs/operations.md"
+      quick_start: ".osk/docs/operations.md"
 
     - role: "New Team Member"
       relevant_files: ["product.yaml", "glossary.yaml", "team.yaml", "architecture.yaml"]
-      quick_start: "docs/onboarding.md"
+      quick_start: ".osk/docs/onboarding.md"
 
     - role: "Architect"
       relevant_files: ["architecture.yaml", "boundaries.yaml", "data.yaml", "integrations.yaml"]
-      quick_start: "docs/architecture.md"
+      quick_start: ".osk/docs/architecture.md"
 ```
 
 ---
@@ -353,11 +353,11 @@ Base URL: `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/discove
 
 #### Template Rendering Process
 
-For each documentation file:
+**You MUST create each documentation file.** For each documentation file:
 
-1. **Fetch the template** from the URL above
+1. **Fetch the template** from the URL above using WebFetch
 2. **Read the template header** to understand ownership rules (what it OWNS vs REFERENCES)
-3. **Load all generated YAML files** as context data:
+3. **Load all generated YAML files** as context data from `.osk/system-model/`:
    - `product.yaml`, `business.yaml`, `glossary.yaml`
    - `architecture.yaml`, `data.yaml`, `actors.yaml`
    - `boundaries.yaml`, `user-journeys.yaml`, `integrations.yaml`
@@ -367,6 +367,7 @@ For each documentation file:
 5. **Generate Mermaid diagrams** where the template specifies them
 6. **Include all dashboard metrics** as defined in the template
 7. **Ensure cross-references** link to the correct related documents
+8. **Write the rendered content** to `.osk/docs/{filename}.md` using the Write tool
 
 #### Template Variable Mapping
 
@@ -431,11 +432,13 @@ Generating documentation:
 [x] docs/operations.md   ← operations{{ lang_suffix }}.md.tera
 [x] docs/onboarding.md   ← onboarding{{ lang_suffix }}.md.tera
 
-Output location: docs/
+Output location: .osk/docs/
 Language: {{ language_code }}
 ```
 
 Where `{{ lang_suffix }}` is empty for English, or `.{lang}` for other languages (e.g., `.fr` for French).
+
+**IMPORTANT**: After displaying this menu, you MUST actually create each file using the Write tool.
 
 ---
 
@@ -468,12 +471,12 @@ System Model Generated:
 └── index.yaml ✓
 
 Documentation Generated:
-├── docs/product.md ✓
-├── docs/developer.md ✓
-├── docs/security.md ✓
-├── docs/operations.md ✓
-├── docs/onboarding.md ✓
-└── docs/architecture.md ✓
+├── .osk/docs/product.md ✓
+├── .osk/docs/developer.md ✓
+├── .osk/docs/security.md ✓
+├── .osk/docs/operations.md ✓
+├── .osk/docs/onboarding.md ✓
+└── .osk/docs/architecture.md ✓
 
 Statistics:
 - Components: 15
@@ -535,13 +538,23 @@ Generate the following files:
 
 ### Documentation files (in docs/)
 
-Documentation templates are defined in Step 6.4 above. Fetch each template before generating:
-- product.md ← product.md.tera
-- developer.md ← developer.md.tera
-- security.md ← security.md.tera
-- operations.md ← operations.md.tera
-- onboarding.md ← onboarding.md.tera
-- architecture.md ← architecture.md.tera
+**CRITICAL**: You MUST create each documentation file. For each file:
+
+1. **Fetch the template** from GitHub using WebFetch
+2. **Load context** from all generated YAML files in `.osk/system-model/`
+3. **Render the template** by replacing Tera variables with actual data
+4. **Write the file** to `.osk/docs/{filename}.md` using the Write tool
+
+| Template | Output File |
+|----------|-------------|
+| product.md.tera | `.osk/docs/product.md` |
+| developer.md.tera | `.osk/docs/developer.md` |
+| security.md.tera | `.osk/docs/security.md` |
+| operations.md.tera | `.osk/docs/operations.md` |
+| onboarding.md.tera | `.osk/docs/onboarding.md` |
+| architecture.md.tera | `.osk/docs/architecture.md` |
+
+**DO NOT skip file creation.** Each documentation file must be written to disk.
 
 ---
 
@@ -555,12 +568,12 @@ phases:
     output:
       - "gaps.yaml"
       - "index.yaml"
-      - "docs/product.md"
-      - "docs/developer.md"
-      - "docs/security.md"
-      - "docs/operations.md"
-      - "docs/onboarding.md"
-      - "docs/architecture.md"
+      - ".osk/docs/product.md"
+      - ".osk/docs/developer.md"
+      - ".osk/docs/security.md"
+      - ".osk/docs/operations.md"
+      - ".osk/docs/onboarding.md"
+      - ".osk/docs/architecture.md"
     result:
       gap_count: {{ count }}
       health_score: {{ score }}
