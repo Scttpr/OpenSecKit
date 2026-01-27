@@ -461,11 +461,18 @@ Disaster Recovery:
 
 ### Template
 
-**Fetch YAML template before generating output** to ensure correct structure:
+**Fetch YAML template from latest release before generating output.**
+
+**Step 1**: Get latest release tag:
+```bash
+gh api repos/Scttpr/OpenSecKit/releases/latest --jq '.tag_name'
+```
+
+**Step 2**: Fetch template using the tag:
 
 | Output | Template URL |
 |--------|--------------|
-| `architecture.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/data/architecture.yaml.tera` |
+| `architecture.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/discover/templates/data/architecture.yaml.tera` |
 
 Generate `architecture.yaml` with all sections:
 

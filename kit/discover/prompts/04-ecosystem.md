@@ -463,12 +463,19 @@ api_consumer:
 
 ### Templates
 
-**Fetch YAML templates before generating outputs** to ensure correct structure:
+**Fetch YAML templates from latest release before generating outputs.**
+
+**Step 1**: Get latest release tag:
+```bash
+gh api repos/Scttpr/OpenSecKit/releases/latest --jq '.tag_name'
+```
+
+**Step 2**: Fetch templates using the tag:
 
 | Output | Template URL |
 |--------|--------------|
-| `integrations.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/data/integrations.yaml.tera` |
-| `supply_chain.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/data/supply_chain.yaml.tera` |
+| `integrations.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/discover/templates/data/integrations.yaml.tera` |
+| `supply_chain.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/discover/templates/data/supply_chain.yaml.tera` |
 
 Generate the following files:
 

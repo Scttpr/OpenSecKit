@@ -282,16 +282,23 @@ index:
 
 #### Template Repository
 
-**CRITICAL**: Before generating each documentation file, fetch the corresponding Tera template from the OpenSecKit repository. Templates define the exact structure, sections, and data mappings required.
+**CRITICAL**: Before generating each documentation file, fetch the corresponding Tera template from the latest OpenSecKit release.
+
+**Step 1**: Get latest release tag:
+```bash
+gh api repos/Scttpr/OpenSecKit/releases/latest --jq '.tag_name'
+```
+
+**Step 2**: Fetch templates using the tag:
 
 | Output File | Template URL |
 |-------------|--------------|
-| `docs/product.md` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/outputs/product.md.tera` |
-| `docs/architecture.md` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/outputs/architecture.md.tera` |
-| `docs/developer.md` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/outputs/developer.md.tera` |
-| `docs/security.md` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/outputs/security.md.tera` |
-| `docs/operations.md` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/outputs/operations.md.tera` |
-| `docs/onboarding.md` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/outputs/onboarding.md.tera` |
+| `docs/product.md` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/discover/templates/outputs/product.md.tera` |
+| `docs/architecture.md` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/discover/templates/outputs/architecture.md.tera` |
+| `docs/developer.md` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/discover/templates/outputs/developer.md.tera` |
+| `docs/security.md` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/discover/templates/outputs/security.md.tera` |
+| `docs/operations.md` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/discover/templates/outputs/operations.md.tera` |
+| `docs/onboarding.md` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/discover/templates/outputs/onboarding.md.tera` |
 
 #### Template Rendering Process
 
@@ -450,12 +457,12 @@ Next Steps:
 
 ### YAML Templates
 
-**Fetch YAML templates before generating outputs** to ensure correct structure:
+**Fetch YAML templates from latest release before generating outputs.**
 
 | Output | Template URL |
 |--------|--------------|
-| `gaps.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/data/gaps.yaml.tera` |
-| `index.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/data/index.yaml.tera` |
+| `gaps.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/discover/templates/data/gaps.yaml.tera` |
+| `index.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/discover/templates/data/index.yaml.tera` |
 
 Generate the following files:
 

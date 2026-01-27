@@ -390,14 +390,21 @@ trust_boundaries:
 
 ### Templates
 
-**Fetch YAML templates before generating outputs** to ensure correct structure:
+**Fetch YAML templates from latest release before generating outputs.**
+
+**Step 1**: Get latest release tag:
+```bash
+gh api repos/Scttpr/OpenSecKit/releases/latest --jq '.tag_name'
+```
+
+**Step 2**: Fetch templates using the tag:
 
 | Output | Template URL |
 |--------|--------------|
-| `data.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/data/data.yaml.tera` |
-| `actors.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/data/actors.yaml.tera` |
-| `boundaries.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/data/boundaries.yaml.tera` |
-| `user-journeys.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/data/user-journeys.yaml.tera` |
+| `data.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/discover/templates/data/data.yaml.tera` |
+| `actors.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/discover/templates/data/actors.yaml.tera` |
+| `boundaries.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/discover/templates/data/boundaries.yaml.tera` |
+| `user-journeys.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/discover/templates/data/user-journeys.yaml.tera` |
 
 Generate the following files:
 
