@@ -131,16 +131,18 @@ Ready to generate documents.
 
 # Knowledge Base for Generation
 
-| Document Type | Knowledge Reference |
-|---------------|---------------------|
-| Processing Register | `knowledge/core/registre-traitements.md` |
-| Security Measures | `knowledge/core/guide-securite.md` (25 fiches CNIL) |
-| DPIA | `knowledge/core/aipd-modeles.md` |
-| LIA | `knowledge/core/interet-legitime.md` |
-| Processor Clauses | `knowledge/core/guide-sous-traitant.md` |
-| Breach Procedure | `knowledge/core/violations-donnees.md` |
-| Data Subject Rights | `knowledge/reference/edpb-droit-acces.md` |
-| SCCs | `knowledge/reference/sccs-2021.md` |
+Fetch from OpenSecKit GitHub (`https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/frameworks/rgpd/knowledge/`):
+
+| Document Type | URL |
+|---------------|-----|
+| Processing Register | `core/registre-traitements.md` |
+| Security Measures | `core/guide-securite.md` (25 fiches CNIL) |
+| DPIA | `core/aipd-modeles.md` |
+| LIA | `core/interet-legitime.md` |
+| Processor Clauses | `core/guide-sous-traitant.md` |
+| Breach Procedure | `core/violations-donnees.md` |
+| Data Subject Rights | `reference/edpb-droit-acces.md` |
+| SCCs | `reference/sccs-2021.md` |
 
 ---
 

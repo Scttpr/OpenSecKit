@@ -144,10 +144,10 @@ ebios_context:
 
 # Knowledge Base
 
-Consult the knowledge base (`kit/comply/frameworks/rgs/knowledge/`) during assessment:
+Fetch from OpenSecKit GitHub (`https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/frameworks/rgs/knowledge/`):
 
-| When Assessing | Consult | For |
-|----------------|---------|-----|
+| When Assessing | URL | For |
+|----------------|-----|-----|
 | Authentication controls | `rgs-v2-annexe-b3-authentification.md` | Authentication mechanisms requirements |
 | Cryptographic validation | `rgs-v2-annexe-b1-mecanismes-cryptographiques.md` | ANSSI-approved algorithms and key sizes |
 | Key management | `rgs-v2-annexe-b2-gestion-cles.md` | Key lifecycle and protection requirements |
@@ -768,15 +768,17 @@ Output files:
   - .osk/comply/rgs/system-perimeter.md        # Full system boundary
 ```
 
-Use templates:
+Fetch templates from GitHub (base: `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/`):
 - `kit/comply/templates/data/assessment.yaml.tera`
 - `kit/comply/frameworks/rgs/templates/assessment-summary.md.tera`
 - `kit/comply/frameworks/rgs/templates/homologation-checklist.md.tera`
 - `kit/comply/frameworks/rgs/templates/system-perimeter.md.tera`
 
+Combine base URL with each path to fetch.
+
 ## Step 9: Terminal Summary
 
-Display final summary using `kit/comply/templates/reports/compliance-summary.tera`.
+Fetch and use template from GitHub: `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/templates/reports/compliance-summary.tera`
 
 # Flags
 
@@ -997,7 +999,7 @@ Blocker check:
 
 **Step 3: Generate Dossier d'Homologation**
 
-Use template: `kit/comply/frameworks/rgs/templates/export-dossier.md.tera`
+Fetch template from GitHub: `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/frameworks/rgs/templates/export-dossier.md.tera`
 
 Output: `.osk/comply/rgs/exports/dossier-homologation-rgs-[date].md`
 

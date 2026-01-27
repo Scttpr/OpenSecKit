@@ -30,19 +30,21 @@ This is **Phase 2: AIPD/DPIA** of the RGPD compliance workflow.
 
 **CNIL PIA Methodology (3 guides):**
 1. La Méthode - The approach (this prompt implements it)
-2. Les Modèles - Templates (in `knowledge/core/aipd-modeles.md`)
+2. Les Modèles - Templates (fetch `core/aipd-modeles.md` from GitHub)
 3. Les Bases de Connaissances - Controls catalog
 
 **Output:** `.osk/comply/rgpd/aipd/{processing-name}.yaml`
 
 # Knowledge Base
 
-| Topic | File | Usage |
-|-------|------|-------|
-| PIA templates | `knowledge/core/aipd-modeles.md` | Forms and checklists |
-| Mandatory list | `knowledge/core/aipd-liste-obligatoire.md` | AIPD triggers |
-| Security measures | `knowledge/core/guide-securite.md` | Control evaluation |
-| RGPD full text | `knowledge/reference/rgpd-complet.md` | Article references |
+Fetch from OpenSecKit GitHub (`https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/frameworks/rgpd/knowledge/`):
+
+| Topic | URL | Usage |
+|-------|-----|-------|
+| PIA templates | `core/aipd-modeles.md` | Forms and checklists |
+| Mandatory list | `core/aipd-liste-obligatoire.md` | AIPD triggers |
+| Security measures | `core/guide-securite.md` | Control evaluation |
+| RGPD full text | `reference/rgpd-complet.md` | Article references |
 
 ---
 

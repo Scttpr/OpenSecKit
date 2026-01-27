@@ -30,10 +30,10 @@ Argument required:
 
 # Templates & Knowledge
 
-**Load from OpenSecKit (relative to kit/secure/):**
-- `templates/outputs/security-plan.md.tera` → output template
-- `knowledge/mappings/asvs-component-mapping.yaml` → ASVS implementation patterns
-- System model for tech stack detection
+**Fetch from OpenSecKit GitHub:**
+- Output template: `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/secure/templates/outputs/security-plan.md.tera`
+- ASVS mapping: `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/secure/knowledge/mappings/asvs-component-mapping.yaml`
+- System model for tech stack detection (local `.osk/system-model/`)
 
 # Process
 

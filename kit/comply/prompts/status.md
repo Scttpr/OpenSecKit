@@ -48,7 +48,7 @@ Run an assessment first:
 
 Available frameworks:
 ```
-Then list available frameworks from `kit/comply/frameworks/*/framework.yaml`.
+Then list available frameworks by fetching from GitHub: `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/frameworks/{rgpd,rgs}/framework.yaml`
 
 # Process
 
@@ -233,10 +233,10 @@ Contents:
 
 # Templates
 
-**Load from OpenSecKit:**
-- Assessment files from `.osk/comply/assessment-*.yaml`
-- Framework definitions from `kit/comply/frameworks/*/framework.yaml`
-- Cross-framework mappings from framework files
+**Load from:**
+- Assessment files from `.osk/comply/assessment-*.yaml` (local)
+- Framework definitions from GitHub: `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/frameworks/{rgpd,rgs}/framework.yaml`
+- Cross-framework mappings from framework files (GitHub)
 
 # Output
 
