@@ -2,7 +2,7 @@
 # Three-part architecture: Discover → Comply → Secure
 
 [metadata]
-version = "4.0.0"
+version = "1.0.0"
 description = "Security as Code - Hub & Spokes Architecture"
 repository = "https://github.com/Scttpr/OpenSecKit"
 supported_agents = ["claude-code", "copilot", "cursor", "gemini"]
@@ -99,8 +99,8 @@ principles = ["IV", "V", "VI", "VII"]
 # ════════════════════════════════════════════════════════════════════════════════
 
 [commands.discover]
-url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/prompts/discover.md"
-version = "4.0.0"
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/v1.0.0/kit/discover/prompts/discover.md"
+version = "1.0.0"
 part = "discover"
 phase = "discovery"
 description = "Build or update system model from codebase analysis"
@@ -123,8 +123,8 @@ agents = ["claude-code", "copilot", "cursor", "gemini"]
 roles = ["discovery-analyst"]
 
 [commands.discover-validate]
-url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/prompts/validate.md"
-version = "4.0.0"
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/v1.0.0/kit/discover/prompts/validate.md"
+version = "1.0.0"
 part = "discover"
 phase = "discovery"
 description = "Validate system model integrity and optionally resolve gaps"
@@ -140,8 +140,8 @@ roles = ["discovery-analyst"]
 # ════════════════════════════════════════════════════════════════════════════════
 
 [commands.comply]
-url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/prompts/comply.md"
-version = "4.0.0"
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/v1.0.0/kit/comply/prompts/comply.md"
+version = "1.0.0"
 part = "comply"
 phase = "compliance"
 description = "Run autonomous compliance assessment (RGPD or RGS)"
@@ -151,11 +151,11 @@ generates = [".osk/comply/<framework>/"]
 model_sections = ["index", "data", "actors", "integrations", "tooling", "architecture", "controls", "business", "boundaries", "team"]
 agents = ["claude-code", "copilot", "cursor", "gemini"]
 roles = ["compliance-analyst"]
-frameworks = { rgpd = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/frameworks/rgpd/prompt.md", rgs = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/frameworks/rgs/prompt.md" }
+frameworks = { rgpd = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/v1.0.0/kit/comply/frameworks/rgpd/prompt.md", rgs = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/v1.0.0/kit/comply/frameworks/rgs/prompt.md" }
 
 [commands.comply-list]
-url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/prompts/list.md"
-version = "4.0.0"
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/v1.0.0/kit/comply/prompts/list.md"
+version = "1.0.0"
 part = "comply"
 phase = "compliance"
 description = "List available compliance frameworks"
@@ -166,8 +166,8 @@ agents = ["claude-code", "copilot", "cursor", "gemini"]
 roles = ["compliance-analyst"]
 
 [commands.comply-status]
-url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/prompts/status.md"
-version = "4.0.0"
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/v1.0.0/kit/comply/prompts/status.md"
+version = "1.0.0"
 part = "comply"
 phase = "compliance"
 description = "Multi-framework compliance dashboard"
@@ -182,8 +182,8 @@ roles = ["compliance-analyst"]
 # ════════════════════════════════════════════════════════════════════════════════
 
 [commands.secure-specify]
-url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/secure/prompts/osk-secure-specify.md"
-version = "4.0.0"
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/v1.0.0/kit/secure/prompts/osk-secure-specify.md"
+version = "1.0.0"
 part = "secure"
 phase = "specify"
 description = "Create security specification with threats, requirements, and test cases"
@@ -199,8 +199,8 @@ agents = ["claude-code", "copilot", "cursor", "gemini"]
 roles = ["security-architect"]
 
 [commands.secure-clarify]
-url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/secure/prompts/osk-secure-clarify.md"
-version = "4.0.0"
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/v1.0.0/kit/secure/prompts/osk-secure-clarify.md"
+version = "1.0.0"
 part = "secure"
 phase = "clarify"
 description = "Clarify security specification ambiguities via Q&A"
@@ -212,8 +212,8 @@ agents = ["claude-code", "copilot", "cursor", "gemini"]
 roles = ["security-architect"]
 
 [commands.secure-plan]
-url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/secure/prompts/osk-secure-plan.md"
-version = "4.0.0"
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/v1.0.0/kit/secure/prompts/osk-secure-plan.md"
+version = "1.0.0"
 part = "secure"
 phase = "plan"
 description = "Generate security implementation plan from specification"
@@ -226,8 +226,8 @@ agents = ["claude-code", "copilot", "cursor", "gemini"]
 roles = ["security-engineer"]
 
 [commands.secure-tasks]
-url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/secure/prompts/osk-secure-tasks.md"
-version = "4.0.0"
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/v1.0.0/kit/secure/prompts/osk-secure-tasks.md"
+version = "1.0.0"
 part = "secure"
 phase = "tasks"
 description = "Generate ordered implementation tasks with dependencies"
@@ -242,8 +242,8 @@ agents = ["claude-code", "copilot", "cursor", "gemini"]
 roles = ["security-engineer"]
 
 [commands.secure-implement]
-url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/secure/prompts/osk-secure-implement.md"
-version = "4.0.0"
+url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/v1.0.0/kit/secure/prompts/osk-secure-implement.md"
+version = "1.0.0"
 part = "secure"
 phase = "implement"
 description = "Execute implementation tasks and update risk register"
