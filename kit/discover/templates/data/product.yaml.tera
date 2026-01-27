@@ -4,6 +4,15 @@
 # Purpose: Core product understanding for PMs, stakeholders, and onboarding
 #
 # Audiences: Product Managers, Stakeholders, New Team Members
+#
+# ┌─────────────────────────────────────────────────────────────────────────────┐
+# │ OWNS: Product identity, features, KPIs, roadmap                             │
+# │                                                                             │
+# │ REFERENCE (do not duplicate):                                               │
+# │   - User types → actors.yaml                                                │
+# │   - Stakeholders → business.yaml                                            │
+# │   - Tech stack versions → supply_chain.yaml                                 │
+# └─────────────────────────────────────────────────────────────────────────────┘
 
 metadata:
   section: "product"

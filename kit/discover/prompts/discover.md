@@ -414,6 +414,43 @@ Phases Completed:
 8. **Preserve manual**: Never overwrite `_note:` or `_manual:` fields
 9. **Index limit**: Keep index.yaml under 200 lines
 10. **Documentation**: Always generate audience-specific docs in Phase 6
+11. **Single source of truth**: Each concept should be defined in exactly ONE file - see ownership rules below
+12. **Reference, don't duplicate**: When data belongs to another file, use IDs to reference it
+
+---
+
+# Ownership Rules
+
+**CRITICAL**: Each file owns specific data. Reference, don't duplicate.
+
+| File | Owns |
+|------|------|
+| `actors.yaml` | User types, system access roles, service accounts |
+| `architecture.yaml` | Components, data flows, APIs, resilience patterns |
+| `boundaries.yaml` | Trust zones, trust boundaries |
+| `business.yaml` | Domain, stakeholders, org types, business processes |
+| `controls.yaml` | All security controls (auth, authz, encryption, logging, network) |
+| `data.yaml` | Data categories, PII classification, data subjects |
+| `glossary.yaml` | Domain vocabulary, acronyms, language rules |
+| `integrations.yaml` | External services, third-party vendors |
+| `operations.yaml` | Environments, monitoring, alerts, jobs, queues, runbooks |
+| `product.yaml` | Product identity, features, KPIs, roadmap |
+| `supply_chain.yaml` | Versions, SBOM, dependencies, artifact security |
+| `team.yaml` | Team structure, org roles, training, incident response |
+| `tooling.yaml` | CI/CD, security tools, dev tools, collaboration |
+| `user-journeys.yaml` | UX personas, user journeys, touchpoints |
+
+**Reference Pattern**: Use IDs from owning files:
+```yaml
+# GOOD - reference control ID
+security_controls: ["ctrl-2fa-admin", "ctrl-rbac"]
+
+# BAD - duplicating control details
+security_controls:
+  - name: "2FA"
+    method: "TOTP"
+    required: true
+```
 
 ---
 

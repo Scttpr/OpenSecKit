@@ -3,6 +3,13 @@
 # Output: .osk/system-model/controls.yaml
 # Purpose: Controls detected IN the codebase (authentication, authorization, encryption)
 # Note: For security tools AROUND the code (SAST, DAST, CI/CD gates), see tooling.yaml
+#
+# ┌─────────────────────────────────────────────────────────────────────────────┐
+# │ OWNS: All security controls (auth, authz, encryption, logging, network)     │
+# │                                                                             │
+# │ Other files should reference control IDs, not duplicate details.            │
+# │ Example: security_controls: ["ctrl-2fa-admin", "ctrl-rbac"]                 │
+# └─────────────────────────────────────────────────────────────────────────────┘
 
 metadata:
   section: "controls"

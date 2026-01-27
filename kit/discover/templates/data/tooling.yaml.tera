@@ -3,6 +3,15 @@
 # Output: .osk/system-model/tooling.yaml
 # Purpose: Development & operations ecosystem (CI/CD, security tools, collaboration)
 # Note: This captures tools AROUND the codebase, not security controls IN the code (see controls.yaml)
+#
+# ┌─────────────────────────────────────────────────────────────────────────────┐
+# │ OWNS: CI/CD, security tools, dev tools, collaboration                       │
+# │                                                                             │
+# │ REFERENCE (do not duplicate):                                               │
+# │   - Environment details → operations.yaml                                   │
+# │   - Monitoring metrics/dashboards → operations.yaml                         │
+# │   - External service configs → integrations.yaml                            │
+# └─────────────────────────────────────────────────────────────────────────────┘
 
 metadata:
   section: "tooling"

@@ -4,6 +4,12 @@
 # Purpose: Operational knowledge for DevOps, on-call, and incident response
 #
 # Audiences: DevOps, SRE, On-Call Engineers, New Team Members
+#
+# ┌─────────────────────────────────────────────────────────────────────────────┐
+# │ OWNS: Environments, monitoring, alerts, jobs, queues, runbooks              │
+# │                                                                             │
+# │ Other files should reference environment names, not duplicate details.      │
+# └─────────────────────────────────────────────────────────────────────────────┘
 
 metadata:
   section: "operations"

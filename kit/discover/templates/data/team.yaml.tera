@@ -3,6 +3,14 @@
 # Output: .osk/system-model/team.yaml
 # Purpose: Team structure, roles, and organizational processes
 # Note: Tool-specific governance is in tooling.yaml
+#
+# ┌─────────────────────────────────────────────────────────────────────────────┐
+# │ OWNS: Team structure, org roles, training, incident response                │
+# │                                                                             │
+# │ REFERENCE (do not duplicate):                                               │
+# │   - Stakeholders → business.yaml                                            │
+# │   - System access roles → actors.yaml                                       │
+# └─────────────────────────────────────────────────────────────────────────────┘
 
 metadata:
   section: "team"

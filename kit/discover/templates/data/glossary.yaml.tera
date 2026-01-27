@@ -4,6 +4,17 @@
 # Purpose: Shared vocabulary for team alignment and onboarding
 #
 # Audiences: Everyone - PMs, Developers, Analysts, New Team Members
+#
+# ┌─────────────────────────────────────────────────────────────────────────────┐
+# │ OWNS: Domain vocabulary, acronyms, language rules                           │
+# │                                                                             │
+# │ REFERENCE (do not duplicate):                                               │
+# │   - Entity/model definitions → data.yaml                                    │
+# │   - Organization types → business.yaml                                      │
+# │   - User types → actors.yaml                                                │
+# │                                                                             │
+# │ Glossary is for VOCABULARY only - "what does X mean?", not schemas.         │
+# └─────────────────────────────────────────────────────────────────────────────┘
 
 metadata:
   section: "glossary"
