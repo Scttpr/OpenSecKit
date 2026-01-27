@@ -217,6 +217,7 @@ index:
     generated_at: "{{ timestamp }}"
     last_full_discovery: "{{ timestamp }}"
     generator: "OpenSecKit Discover v{{ version }}"
+    documentation_language: "{{ language_code }}"  # en|fr|es|de
 
   sections:
     - file: "product.yaml"
@@ -276,7 +277,49 @@ index:
 
 ---
 
-### Step 6.4: Documentation Generation
+### Step 6.4: Language Selection
+
+**Goal**: Allow the user to choose the language for generated documentation.
+
+#### Language Selection Prompt
+
+Before generating documentation, present the language options to the user:
+
+```
+🌐 Documentation Language Selection
+===================================
+
+Please select the language for generated documentation:
+
+  1. English (en) - Default
+  2. Français (fr)
+  3. Español (es)
+  4. Deutsch (de)
+
+Your choice [1-4, default: 1]: ___
+```
+
+#### Supported Languages
+
+| Code | Language | Template Suffix |
+|------|----------|-----------------|
+| `en` | English | (default, no suffix) |
+| `fr` | Français | `.fr` |
+| `es` | Español | `.es` |
+| `de` | Deutsch | `.de` |
+
+#### Store Language Preference
+
+Store the selected language in the workflow state:
+
+```yaml
+workflow:
+  documentation_language: "{{ selected_language_code }}"  # en|fr|es|de
+```
+
+---
+
+### Step 6.5: Documentation Generation
 
 **Goal**: Generate audience-specific documentation from the system model using official templates.
 
@@ -289,16 +332,24 @@ index:
 gh api repos/Scttpr/OpenSecKit/releases/latest --jq '.tag_name'
 ```
 
-**Step 2**: Fetch templates using the tag:
+**Step 2**: Fetch templates using the tag and selected language:
 
-| Output File | Template URL |
-|-------------|--------------|
-| `docs/product.md` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/discover/templates/outputs/product.md.tera` |
-| `docs/architecture.md` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/discover/templates/outputs/architecture.md.tera` |
-| `docs/developer.md` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/discover/templates/outputs/developer.md.tera` |
-| `docs/security.md` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/discover/templates/outputs/security.md.tera` |
-| `docs/operations.md` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/discover/templates/outputs/operations.md.tera` |
-| `docs/onboarding.md` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/discover/templates/outputs/onboarding.md.tera` |
+For the selected language code (`{lang}`), use this template URL pattern:
+- English (`en`): `{template}.md.tera` (default)
+- Other languages: `{template}.{lang}.md.tera`
+
+| Output File | Template URL (English) | Template URL (Other: replace `{lang}`) |
+|-------------|------------------------|----------------------------------------|
+| `docs/product.md` | `.../outputs/product.md.tera` | `.../outputs/product.{lang}.md.tera` |
+| `docs/architecture.md` | `.../outputs/architecture.md.tera` | `.../outputs/architecture.{lang}.md.tera` |
+| `docs/developer.md` | `.../outputs/developer.md.tera` | `.../outputs/developer.{lang}.md.tera` |
+| `docs/security.md` | `.../outputs/security.md.tera` | `.../outputs/security.{lang}.md.tera` |
+| `docs/operations.md` | `.../outputs/operations.md.tera` | `.../outputs/operations.{lang}.md.tera` |
+| `docs/onboarding.md` | `.../outputs/onboarding.md.tera` | `.../outputs/onboarding.{lang}.md.tera` |
+
+Base URL: `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/discover/templates/outputs/`
+
+**Fallback**: If a language-specific template is not found (404), fall back to the English template and translate the content during generation.
 
 #### Template Rendering Process
 
@@ -369,22 +420,26 @@ For each document:
 📚 Documentation Generation
 ===========================
 
+Selected language: {{ language_name }} ({{ language_code }})
 Fetching templates from OpenSecKit repository...
 
 Generating documentation:
-[x] docs/product.md      ← product.md.tera
-[x] docs/architecture.md ← architecture.md.tera
-[x] docs/developer.md    ← developer.md.tera
-[x] docs/security.md     ← security.md.tera
-[x] docs/operations.md   ← operations.md.tera
-[x] docs/onboarding.md   ← onboarding.md.tera
+[x] docs/product.md      ← product{{ lang_suffix }}.md.tera
+[x] docs/architecture.md ← architecture{{ lang_suffix }}.md.tera
+[x] docs/developer.md    ← developer{{ lang_suffix }}.md.tera
+[x] docs/security.md     ← security{{ lang_suffix }}.md.tera
+[x] docs/operations.md   ← operations{{ lang_suffix }}.md.tera
+[x] docs/onboarding.md   ← onboarding{{ lang_suffix }}.md.tera
 
 Output location: docs/
+Language: {{ language_code }}
 ```
+
+Where `{{ lang_suffix }}` is empty for English, or `.{lang}` for other languages (e.g., `.fr` for French).
 
 ---
 
-### Step 6.5: Final Summary
+### Step 6.6: Final Summary
 
 **Goal**: Present completion summary and next steps.
 
@@ -510,12 +565,14 @@ phases:
       gap_count: {{ count }}
       health_score: {{ score }}
       documentation_generated: {{ count }}
+      documentation_language: "{{ language_code }}"
 
 workflow:
   status: "completed"
   completed_at: "{{ timestamp }}"
   total_duration: "{{ duration }}"
   files_generated: {{ count }}
+  documentation_language: "{{ language_code }}"
 ```
 
 ---
