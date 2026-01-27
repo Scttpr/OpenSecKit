@@ -29,23 +29,24 @@ Run prerequisite check:
 
 Required:
 - `.osk/system-model/` directory with index.yaml, architecture.yaml, data.yaml
-- `knowledge/libraries/threats/` with at least one threat library
+- Internet access to fetch threat libraries from GitHub
 
 Argument required:
 - `feature_name` - Feature identifier (e.g., "payment-flow", "user-auth")
 
 # Templates & Knowledge
 
-**Load from OpenSecKit (relative to kit/secure/):**
-- `principles.yaml` → principle definitions and weights
-- `knowledge/libraries/threats/*.yaml` → threat libraries (local-first)
-- `knowledge/mappings/asvs-component-mapping.yaml` → ASVS control mapping
-- `templates/outputs/security-spec.md.tera` → output template
-- `templates/data/risks.yaml.tera` → risk register template
+**Fetch from OpenSecKit GitHub:**
+- Principles: `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/secure/principles.yaml`
+- Threat libraries: `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/secure/knowledge/libraries/threats/`
+  - `api-threats.yaml`, `auth-threats.yaml`, `data-threats.yaml`, `web-threats.yaml`
+- ASVS mapping: `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/secure/knowledge/mappings/asvs-component-mapping.yaml`
+- Output template: `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/secure/templates/outputs/security-spec.md.tera`
+- Risk template: `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/secure/templates/data/risks.yaml.tera`
 
-**From kit/secure/schemas/:**
-- `security-spec.yaml` → output schema
-- `risks.yaml` → risk register schema
+**Schemas:**
+- `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/secure/schemas/security-spec.yaml`
+- `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/secure/schemas/risks.yaml`
 
 **Optional external enrichment:**
 - MITRE ATT&CK (https://attack.mitre.org/) → technique IDs
@@ -116,7 +117,7 @@ For each entry point and trust boundary crossing, analyze threats using the loca
 
 ### 4.1 Load Threat Library
 
-Read all files from `knowledge/libraries/threats/*.yaml`:
+Fetch threat library files from GitHub:
 - `api-threats.yaml` - API-specific threats
 - `auth-threats.yaml` - Authentication threats
 - `data-threats.yaml` - Data handling threats

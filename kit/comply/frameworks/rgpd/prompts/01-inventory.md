@@ -55,12 +55,14 @@ Recommended:
 
 # Knowledge Base
 
-| Topic | File | Usage |
-|-------|------|-------|
-| RGPD full text | `knowledge/reference/rgpd-complet.md` | Art. 30 requirements |
-| AIPD mandatory list | `knowledge/core/aipd-liste-obligatoire.md` | AIPD trigger detection |
-| Processing register | `knowledge/core/registre-traitements.md` | Field definitions |
-| Legitimate interest | `knowledge/core/interet-legitime.md` | Legal basis guidance |
+Fetch from OpenSecKit GitHub (`https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/frameworks/rgpd/knowledge/`):
+
+| Topic | URL | Usage |
+|-------|-----|-------|
+| RGPD full text | `reference/rgpd-complet.md` | Art. 30 requirements |
+| AIPD mandatory list | `core/aipd-liste-obligatoire.md` | AIPD trigger detection |
+| Processing register | `core/registre-traitements.md` | Field definitions |
+| Legitimate interest | `core/interet-legitime.md` | Legal basis guidance |
 
 ---
 

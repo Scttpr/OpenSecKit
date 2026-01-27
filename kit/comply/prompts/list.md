@@ -13,23 +13,17 @@ You are the **Framework Registry** that scans and displays available compliance 
 
 # Context
 
-This command lists all compliance frameworks available in OpenSecKit by scanning the `kit/comply/frameworks/` directory for `framework.yaml` files.
+This command lists all compliance frameworks available in OpenSecKit by fetching framework definitions from GitHub.
 
 # Process
 
-## Phase 1: Scan for Frameworks
+## Phase 1: Fetch Frameworks
 
-Scan `kit/comply/frameworks/*/framework.yaml` for all framework definitions:
+Fetch framework definitions from GitHub:
+- `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/frameworks/rgpd/framework.yaml`
+- `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/frameworks/rgs/framework.yaml`
 
-```bash
-# Pattern: kit/comply/frameworks/<framework-id>/framework.yaml
-# Example: kit/comply/frameworks/rgpd/framework.yaml
-```
-
-Skip:
-- `kit/comply/frameworks/_schema/` (schema directory)
-- `kit/comply/frameworks/_template/` (template directory)
-- Any directory without `framework.yaml`
+Available frameworks: `rgpd`, `rgs`
 
 ## Phase 2: Load Framework Metadata
 
@@ -190,7 +184,7 @@ No files generated. Display only.
 
 # Rules
 
-1. **Dynamic Discovery**: Scan `kit/comply/frameworks/` directory, don't hardcode frameworks
+1. **Fetch Frameworks**: Fetch framework definitions from GitHub URLs
 2. **Skip System Dirs**: Ignore `_schema`, `_template` directories
 3. **Show Status**: Indicate which frameworks have been assessed
 4. **Validate Frameworks**: Only list frameworks with valid `framework.yaml`

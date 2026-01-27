@@ -80,14 +80,16 @@ Loading AIPD results (Phase 2)...
 
 # Knowledge Base
 
-| Topic | File | Usage |
-|-------|------|-------|
-| RGPD full text | `knowledge/reference/rgpd-complet.md` | Article requirements |
-| Security measures | `knowledge/core/guide-securite.md` | CNIL 25 fiches |
-| Processor guide | `knowledge/core/guide-sous-traitant.md` | Art. 28 checklist |
-| Breach procedures | `knowledge/core/violations-donnees.md` | Art. 33-34 |
-| Data subject rights | `knowledge/reference/edpb-droit-acces.md` | Art. 15-22 |
-| SCCs | `knowledge/reference/sccs-2021.md` | Transfer mechanisms |
+Fetch from OpenSecKit GitHub (`https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/frameworks/rgpd/knowledge/`):
+
+| Topic | URL | Usage |
+|-------|-----|-------|
+| RGPD full text | `reference/rgpd-complet.md` | Article requirements |
+| Security measures | `core/guide-securite.md` | CNIL 25 fiches |
+| Processor guide | `core/guide-sous-traitant.md` | Art. 28 checklist |
+| Breach procedures | `core/violations-donnees.md` | Art. 33-34 |
+| Data subject rights | `reference/edpb-droit-acces.md` | Art. 15-22 |
+| SCCs | `reference/sccs-2021.md` | Transfer mechanisms |
 
 ---
 
