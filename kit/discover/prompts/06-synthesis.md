@@ -278,241 +278,101 @@ index:
 
 ### Step 6.4: Documentation Generation
 
-**Goal**: Generate audience-specific documentation from the system model.
+**Goal**: Generate audience-specific documentation from the system model using official templates.
 
-#### Documentation Templates
+#### Template Repository
+
+**CRITICAL**: Before generating each documentation file, fetch the corresponding Tera template from the OpenSecKit repository. Templates define the exact structure, sections, and data mappings required.
+
+| Output File | Template URL |
+|-------------|--------------|
+| `docs/product.md` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/outputs/product.md.tera` |
+| `docs/architecture.md` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/outputs/architecture.md.tera` |
+| `docs/developer.md` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/outputs/developer.md.tera` |
+| `docs/security.md` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/outputs/security.md.tera` |
+| `docs/operations.md` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/outputs/operations.md.tera` |
+| `docs/onboarding.md` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/outputs/onboarding.md.tera` |
+
+#### Template Rendering Process
+
+For each documentation file:
+
+1. **Fetch the template** from the URL above
+2. **Read the template header** to understand ownership rules (what it OWNS vs REFERENCES)
+3. **Load all generated YAML files** as context data:
+   - `product.yaml`, `business.yaml`, `glossary.yaml`
+   - `architecture.yaml`, `data.yaml`, `actors.yaml`
+   - `boundaries.yaml`, `user-journeys.yaml`, `integrations.yaml`
+   - `supply_chain.yaml`, `controls.yaml`, `tooling.yaml`
+   - `team.yaml`, `operations.yaml`, `gaps.yaml`, `index.yaml`
+4. **Render the template** by replacing Tera variables with actual data
+5. **Generate Mermaid diagrams** where the template specifies them
+6. **Include all dashboard metrics** as defined in the template
+7. **Ensure cross-references** link to the correct related documents
+
+#### Template Variable Mapping
+
+Templates use Tera syntax. Map YAML data to template variables:
+
+```
+Template Variable          →  YAML Source
+─────────────────────────────────────────────────────
+{{ project.name }}         →  index.yaml → project.name
+{{ metadata.generated_at }} →  Current timestamp
+{{ product.* }}            →  product.yaml
+{{ features }}             →  product.yaml → features[]
+{{ architecture.* }}       →  architecture.yaml
+{{ data.* }}               →  data.yaml
+{{ actors.* }}             →  actors.yaml
+{{ boundaries.* }}         →  boundaries.yaml
+{{ user_journeys.* }}      →  user-journeys.yaml
+{{ integrations }}         →  integrations.yaml → integrations[]
+{{ supply_chain.* }}       →  supply_chain.yaml
+{{ controls.* }}           →  controls.yaml
+{{ tooling.* }}            →  tooling.yaml
+{{ team.* }}               →  team.yaml
+{{ operations.* }}         →  operations.yaml
+{{ gaps.* }}               →  gaps.yaml
+{{ glossary.* }}           →  glossary.yaml
+{{ stats.* }}              →  index.yaml → stats
+{{ compliance_hints.* }}   →  index.yaml → compliance_hints
+{{ kpis.* }}               →  product.yaml → kpis
+{{ roadmap.* }}            →  product.yaml → roadmap
+{{ business_context.* }}   →  business.yaml → business_context
+{{ business_processes }}   →  business.yaml → business_processes
+{{ business_rules }}       →  business.yaml → business_rules
+```
+
+#### Generation Checklist
+
+For each document:
+
+- [ ] Template fetched from GitHub
+- [ ] Template header ownership rules read
+- [ ] All YAML context files loaded
+- [ ] All template sections rendered
+- [ ] Dashboard metrics included
+- [ ] Mermaid diagrams generated (where applicable)
+- [ ] Cross-references to other docs are correct
+- [ ] Links to YAML files use relative paths (`../system-model/*.yaml`)
+
+#### Documentation Menu
 
 ```
 📚 Documentation Generation
 ===========================
 
-Select documentation to generate:
+Fetching templates from OpenSecKit repository...
 
-[x] README.md - Project overview
-[x] ARCHITECTURE.md - Technical architecture
-[x] SECURITY.md - Security overview
-[x] ONBOARDING.md - New team member guide
-[ ] API.md - API documentation
-[ ] RUNBOOKS.md - Operational runbooks
-[ ] GLOSSARY.md - Domain glossary
+Generating documentation:
+[x] docs/product.md      ← product.md.tera
+[x] docs/architecture.md ← architecture.md.tera
+[x] docs/developer.md    ← developer.md.tera
+[x] docs/security.md     ← security.md.tera
+[x] docs/operations.md   ← operations.md.tera
+[x] docs/onboarding.md   ← onboarding.md.tera
 
-Custom documentation:
-> [User can specify additional docs]
-
-Output format: [markdown|html|confluence]
-Output location: [docs/|.osk/docs/|custom]
-```
-
-#### Generated Documentation Structure
-
-**1. Product Overview (product.md)**
-```markdown
-# {{ product.name }} - Product Overview
-
-## What is {{ product.name }}?
-{{ product.description }}
-
-## Who uses it?
-{% for persona in personas %}
-### {{ persona.name }}
-{{ persona.description }}
-**Goals:** {{ persona.goals | join(", ") }}
-{% endfor %}
-
-## Key User Journeys
-{% for journey in top_journeys %}
-### {{ journey.name }}
-{{ journey.description }}
-**Steps:** {{ journey.step_count }}
-**Success Rate:** {{ journey.completion_rate }}
-{% endfor %}
-
-## Domain Glossary
-{% for term in glossary.terms | slice(0, 10) %}
-- **{{ term.term }}**: {{ term.definition }}
-{% endfor %}
-
-## KPIs
-{% for kpi in product.kpis %}
-- {{ kpi.name }}: {{ kpi.current }} (target: {{ kpi.target }})
-{% endfor %}
-```
-
-**2. Developer Guide (developer.md)**
-```markdown
-# {{ product.name }} - Developer Guide
-
-## Quick Start
-{{ onboarding.quick_start }}
-
-## Architecture Overview
-{{ architecture.style }} architecture using {{ tech_stack | join(", ") }}
-
-### Components
-{% for component in components %}
-- **{{ component.name }}** ({{ component.type }}): {{ component.description }}
-{% endfor %}
-
-## Domain Concepts
-{% for term in glossary.terms %}
-### {{ term.term }}
-{{ term.definition }}
-**Code reference:** `{{ term.code_references[0] }}`
-{% endfor %}
-
-## API Reference
-{% for api in apis %}
-### {{ api.name }} ({{ api.version }})
-Base: `{{ api.base_path }}`
-Auth: {{ api.authentication }}
-{% endfor %}
-
-## Development Setup
-{{ tooling.development_setup }}
-
-## Testing
-{{ tooling.testing_guide }}
-```
-
-**3. Security Overview (security.md)**
-```markdown
-# {{ product.name }} - Security Overview
-
-## Data Classification
-{% for category in data_categories %}
-### {{ category.name }}
-Classification: {{ category.classification }}
-PII: {{ category.contains_pii }}
-Retention: {{ category.retention }}
-{% endfor %}
-
-## Security Controls
-{% for control in controls %}
-### {{ control.name }}
-Status: {{ control.implementation.status }}
-Type: {{ control.type }}
-{% endfor %}
-
-## Trust Boundaries
-{% for boundary in boundaries %}
-- {{ boundary.from_zone }} → {{ boundary.to_zone }}: {{ boundary.controls | join(", ") }}
-{% endfor %}
-
-## Supply Chain Security
-- SBOM Format: {{ supply_chain.sbom.format }}
-- Vulnerability Threshold: {{ supply_chain.policies.vulnerability_threshold }}
-- Signing: {{ supply_chain.artifact_security.signing.method }}
-```
-
-**4. Operations Handbook (operations.md)**
-```markdown
-# {{ product.name }} - Operations Guide
-
-## Environments
-{% for env in environments %}
-### {{ env.name }}
-- URL: {{ env.url }}
-- Region: {{ env.region }}
-- Access: {{ env.access.method }}
-{% endfor %}
-
-## Monitoring
-Dashboard: {{ monitoring.dashboards[0].url }}
-
-### Key Metrics
-{% for metric in monitoring.metrics %}
-- {{ metric.name }}: Normal {{ metric.normal_range }}, Alert at {{ metric.alert_threshold }}
-{% endfor %}
-
-## On-Call
-Schedule: {{ on_call.rotation.schedule_url }}
-Escalation: {{ on_call.escalation_policy }}
-
-## Runbooks
-{% for runbook in runbooks %}
-### {{ runbook.name }}
-Trigger: {{ runbook.trigger }}
-[Full Runbook]({{ runbook.location }})
-{% endfor %}
-
-## Deployment
-Strategy: {{ deployments.strategy }}
-Rollback: {{ deployments.rollback.method }}
-```
-
-**5. Onboarding Guide (onboarding.md)**
-
-**6. Architecture Guide (architecture.md)**
-```markdown
-# {{ product.name }} - Architecture Guide
-
-## Quick Start
-{{ onboarding.quick_start }}
-
-## Architecture Overview
-{{ architecture.style }} architecture using {{ tech_stack | join(", ") }}
-
-### Components
-{% for component in components %}
-- **{{ component.name }}** ({{ component.type }}): {{ component.description }}
-{% endfor %}
-
-## Data Flows
-{% for flow in data_flows %}
-### {{ flow.name }}
-From: {{ flow.from }} → To: {{ flow.to }}
-Data: {{ flow.data | join(", ") }}
-{% endfor %}
-
-## APIs
-{% for api in apis %}
-### {{ api.name }} ({{ api.version }})
-Base: `{{ api.base_path }}`
-Auth: {{ api.authentication }}
-{% endfor %}
-
-## Integration Points
-{% for int in integrations %}
-- **{{ int.name }}**: {{ int.description }}
-{% endfor %}
-```
-```markdown
-# Welcome to {{ product.name }}!
-
-## What You're Working On
-{{ product.description }}
-
-## The Team
-{% for team in teams %}
-- **{{ team.name }}**: {{ team.focus }} (Lead: {{ team.lead }})
-{% endfor %}
-
-## Key Concepts
-Before diving in, familiarize yourself with these terms:
-{% for term in glossary.terms | slice(0, 15) %}
-- **{{ term.term }}**: {{ term.definition }}
-{% endfor %}
-
-## Architecture at a Glance
-{{ architecture.description }}
-
-## Your First Week
-1. Set up development environment
-2. Read the architecture overview
-3. Complete the domain glossary review
-4. Shadow on-call for one rotation
-5. Pick up your first ticket
-
-## Who to Ask
-{% for role in key_contacts %}
-- {{ role.area }}: {{ role.contact }}
-{% endfor %}
-
-## Important Links
-- Code: {{ repository.url }}
-- Docs: {{ documentation.url }}
-- Dashboards: {{ monitoring.dashboards[0].url }}
-- On-Call: {{ on_call.schedule_url }}
+Output location: docs/
 ```
 
 ---
@@ -588,6 +448,15 @@ Next Steps:
 
 ## Output Generation
 
+### YAML Templates
+
+**Fetch YAML templates before generating outputs** to ensure correct structure:
+
+| Output | Template URL |
+|--------|--------------|
+| `gaps.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/data/gaps.yaml.tera` |
+| `index.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/data/index.yaml.tera` |
+
 Generate the following files:
 
 ### gaps.yaml
@@ -603,12 +472,14 @@ Generate the following files:
 - Audience routing
 
 ### Documentation files (in docs/)
-- product.md
-- developer.md
-- security.md
-- operations.md
-- onboarding.md
-- architecture.md
+
+Documentation templates are defined in Step 6.4 above. Fetch each template before generating:
+- product.md ← product.md.tera
+- developer.md ← developer.md.tera
+- security.md ← security.md.tera
+- operations.md ← operations.md.tera
+- onboarding.md ← onboarding.md.tera
+- architecture.md ← architecture.md.tera
 
 ---
 

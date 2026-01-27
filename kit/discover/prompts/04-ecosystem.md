@@ -461,6 +461,15 @@ api_consumer:
 
 ## Output Generation
 
+### Templates
+
+**Fetch YAML templates before generating outputs** to ensure correct structure:
+
+| Output | Template URL |
+|--------|--------------|
+| `integrations.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/data/integrations.yaml.tera` |
+| `supply_chain.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/data/supply_chain.yaml.tera` |
+
 Generate the following files:
 
 ### integrations.yaml

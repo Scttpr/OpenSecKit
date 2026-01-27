@@ -388,6 +388,17 @@ trust_boundaries:
 
 ## Output Generation
 
+### Templates
+
+**Fetch YAML templates before generating outputs** to ensure correct structure:
+
+| Output | Template URL |
+|--------|--------------|
+| `data.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/data/data.yaml.tera` |
+| `actors.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/data/actors.yaml.tera` |
+| `boundaries.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/data/boundaries.yaml.tera` |
+| `user-journeys.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/data/user-journeys.yaml.tera` |
+
 Generate the following files:
 
 ### data.yaml

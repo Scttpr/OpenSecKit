@@ -613,6 +613,17 @@ runbook:
 
 ## Output Generation
 
+### Templates
+
+**Fetch YAML templates before generating outputs** to ensure correct structure:
+
+| Output | Template URL |
+|--------|--------------|
+| `controls.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/data/controls.yaml.tera` |
+| `tooling.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/data/tooling.yaml.tera` |
+| `team.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/data/team.yaml.tera` |
+| `operations.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/data/operations.yaml.tera` |
+
 Generate the following files:
 
 ### controls.yaml

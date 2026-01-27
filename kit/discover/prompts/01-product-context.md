@@ -260,6 +260,18 @@ Technical KPIs:
 
 ## Output Generation
 
+### Templates
+
+**Fetch YAML templates before generating outputs** to ensure correct structure:
+
+| Output | Template URL |
+|--------|--------------|
+| `product.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/data/product.yaml.tera` |
+| `business.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/data/business.yaml.tera` |
+| `glossary.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/data/glossary.yaml.tera` |
+
+Use template structure as the authoritative schema. The examples below show key fields.
+
 ### Generate product.yaml
 
 ```yaml

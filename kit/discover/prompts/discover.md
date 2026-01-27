@@ -402,6 +402,46 @@ Phases Completed:
 
 ---
 
+# Templates & Knowledge
+
+## Documentation Templates (Markdown)
+
+Phase 6 generates documentation using Tera templates. **Always fetch templates before generating docs.**
+
+| Output | Template URL |
+|--------|--------------|
+| `docs/product.md` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/outputs/product.md.tera` |
+| `docs/architecture.md` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/outputs/architecture.md.tera` |
+| `docs/developer.md` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/outputs/developer.md.tera` |
+| `docs/security.md` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/outputs/security.md.tera` |
+| `docs/operations.md` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/outputs/operations.md.tera` |
+| `docs/onboarding.md` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/outputs/onboarding.md.tera` |
+
+## Data Templates (YAML)
+
+YAML system model files are generated using data templates. **Always fetch templates before generating YAML.**
+
+| Output | Template URL |
+|--------|--------------|
+| `product.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/data/product.yaml.tera` |
+| `business.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/data/business.yaml.tera` |
+| `glossary.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/data/glossary.yaml.tera` |
+| `architecture.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/data/architecture.yaml.tera` |
+| `data.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/data/data.yaml.tera` |
+| `actors.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/data/actors.yaml.tera` |
+| `boundaries.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/data/boundaries.yaml.tera` |
+| `user-journeys.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/data/user-journeys.yaml.tera` |
+| `integrations.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/data/integrations.yaml.tera` |
+| `supply_chain.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/data/supply_chain.yaml.tera` |
+| `controls.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/data/controls.yaml.tera` |
+| `tooling.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/data/tooling.yaml.tera` |
+| `team.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/data/team.yaml.tera` |
+| `operations.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/data/operations.yaml.tera` |
+| `gaps.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/data/gaps.yaml.tera` |
+| `index.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/data/index.yaml.tera` |
+
+---
+
 # Rules
 
 1. **Orchestrate, don't duplicate**: Delegate to phase prompts, don't repeat their instructions
@@ -546,3 +586,4 @@ Phase 6 validates all cross-references before completing.
 - **Goal**: Validate, identify gaps, generate documentation
 - **Outputs**: gaps.yaml, index.yaml, docs/*.md
 - **Key Actions**: Cross-reference validation, gap analysis, doc generation
+- **Templates**: Fetch from `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/templates/outputs/*.md.tera`
