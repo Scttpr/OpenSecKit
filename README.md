@@ -26,11 +26,33 @@ Works with **Claude Code**, **GitHub Copilot**, **Cursor**, and **Gemini**.
 
 ## Installation
 
-```bash
-# Install CLI
-cargo install osk
+### Download Binary (Recommended)
 
-# Initialize in your project
+```bash
+# Linux
+curl -L https://github.com/Scttpr/OpenSecKit/releases/latest/download/osk-linux-amd64 -o osk
+chmod +x osk && sudo mv osk /usr/local/bin/
+
+# macOS
+curl -L https://github.com/Scttpr/OpenSecKit/releases/latest/download/osk-macos-amd64 -o osk
+chmod +x osk && sudo mv osk /usr/local/bin/
+
+# Windows (PowerShell)
+Invoke-WebRequest -Uri https://github.com/Scttpr/OpenSecKit/releases/latest/download/osk-windows-amd64.exe -OutFile osk.exe
+```
+
+### Build from Source
+
+```bash
+git clone https://github.com/Scttpr/OpenSecKit.git
+cd OpenSecKit/cli
+cargo build --release
+# Binary at target/release/osk
+```
+
+### Initialize Project
+
+```bash
 cd my-project
 osk init
 ```

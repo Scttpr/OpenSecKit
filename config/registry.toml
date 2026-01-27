@@ -32,10 +32,6 @@ prompts = "kit/secure/prompts"
 templates = "kit/secure/templates"
 knowledge = "kit/secure/knowledge"
 
-[paths.shared]
-schemas = "shared/schemas"
-agents = "shared/agents"
-
 # ════════════════════════════════════════════════════════════════════════════════
 # PARTS - The three main workflow areas
 # ════════════════════════════════════════════════════════════════════════════════
@@ -47,7 +43,7 @@ name = "Discover"
 description = "Reality Model - Document existing codebase"
 hub = true  # This is the central hub
 output = ".osk/system-model/"
-commands = ["discover", "discover-validate", "discover-docs"]
+commands = ["discover", "discover-validate"]
 
 [parts.comply]
 name = "Comply"
@@ -75,7 +71,7 @@ commands = ["secure-specify", "secure-clarify", "secure-plan", "secure-tasks", "
 name = "Discovery Analyst"
 description = "System documentation and reality model creation"
 part = "discover"
-commands = ["discover", "discover-validate", "discover-docs"]
+commands = ["discover", "discover-validate"]
 
 [roles.compliance-analyst]
 name = "Compliance Analyst"
@@ -136,19 +132,6 @@ argument = "[--resolve]"
 requires = [".osk/system-model/index.yaml"]
 generates = []
 model_sections = ["index", "gaps"]
-agents = ["claude-code", "copilot", "cursor", "gemini"]
-roles = ["discovery-analyst"]
-
-[commands.discover-docs]
-url = "https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/discover/prompts/docs.md"
-version = "4.0.0"
-part = "discover"
-phase = "discovery"
-description = "Generate documentation for security, developer, or management audiences"
-argument = "[--audience <security|developer|management|compliance>]"
-requires = [".osk/system-model/index.yaml"]
-generates = ["docs/"]
-model_sections = ["index", "business", "architecture", "data", "actors", "boundaries", "integrations", "controls", "tooling", "team", "gaps"]
 agents = ["claude-code", "copilot", "cursor", "gemini"]
 roles = ["discovery-analyst"]
 
@@ -369,7 +352,7 @@ phases = ["discovery", "compliance", "specify", "clarify", "plan", "tasks", "imp
 
 [workflow.discovery]
 part = "discover"
-commands = ["discover", "discover-validate", "discover-docs"]
+commands = ["discover", "discover-validate"]
 description = "Create and maintain the system reality model"
 
 [workflow.compliance]
