@@ -27,6 +27,7 @@
 | Data Flows | {{ stats.data_flows | default(value=0) }} |
 | Data Categories | {{ stats.data_categories }} |
 | Integrations | {{ stats.integrations }} |
+| ADRs | {{ architecture.adrs | default(value=[]) | length }} |
 | Tech Stack | {{ architecture.tech_stack.languages | default(value=[]) | join(sep=", ") }}{% if architecture.tech_stack.frameworks %}, {{ architecture.tech_stack.frameworks | join(sep=", ") }}{% endif %} |
 {% if operations.resilience %}| RTO / RPO | {{ operations.resilience.rto | default(value="Not defined") }} / {{ operations.resilience.rpo | default(value="Not defined") }} |{% endif %}
 {% if supply_chain.artifact_security.provenance %}| SLSA Level | {{ supply_chain.artifact_security.provenance.slsa_level | default(value="Not assessed") }} |{% endif %}
@@ -348,6 +349,32 @@ No integrations documented.
 {% if supply_chain.artifact_security.provenance.slsa_level %}| SLSA Level | {{ supply_chain.artifact_security.provenance.slsa_level }} |{% endif %}
 {% else %}
 No supply chain configuration documented.
+{% endif %}
+
+---
+
+## Architecture Decision Records (ADRs)
+
+{% if architecture.adrs %}
+{% for adr in architecture.adrs %}
+### {{ adr.id }}: {{ adr.title }}
+
+**Status**: {{ adr.status }}
+
+**Context**: {{ adr.context }}
+
+**Decision**: {{ adr.decision }}
+
+**Consequences**:
+{% for consequence in adr.consequences %}
+- {{ consequence }}
+{% endfor %}
+
+---
+
+{% endfor %}
+{% else %}
+No architecture decision records documented.
 {% endif %}
 
 ---
