@@ -354,27 +354,18 @@ No competitive context documented.
 | Organization | {{ team.team.organization | default(value="Not specified") }} |
 | Size | {{ team.team.size | default(value="Unknown") }} |
 | Location | {{ team.team.location | default(value="Not specified") }} |
-| Timezone | {{ team.team.timezone | default(value="Not specified") }} |
 
 {% if team.team.roles %}
-### Key Roles
-
-| Role | Responsibilities | Contact |
-|------|------------------|---------|
-{% for role in team.team.roles %}
-| {{ role.role }} | {{ role.responsibilities | default(value="-") }} | {{ role.contact | default(value="-") }} |
-{% endfor %}
-{% endif %}
-
-{% if team.team.security_roles %}
-### Security Roles
+### Key Contacts
 
 | Role | Contact |
 |------|---------|
-| Security Champion | {{ team.team.security_roles.security_champion | default(value="Not assigned") }} |
-| Incident Responder | {{ team.team.security_roles.incident_responder | default(value="Not assigned") }} |
-| Compliance Contact | {{ team.team.security_roles.compliance_contact | default(value="Not assigned") }} |
+{% for role in team.team.roles | slice(end=5) %}
+| {{ role.role }} | {{ role.contact | default(value="Not assigned") }} |
+{% endfor %}
 {% endif %}
+
+See [team.yaml](../system-model/team.yaml) for complete team structure, responsibilities, and training requirements.
 {% else %}
 No team information documented.
 {% endif %}
