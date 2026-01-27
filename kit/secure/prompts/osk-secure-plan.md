@@ -30,10 +30,20 @@ Argument required:
 
 # Templates & Knowledge
 
-**Fetch from OpenSecKit GitHub:**
-- Output template: `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/secure/templates/outputs/security-plan.md.tera`
-- ASVS mapping: `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/secure/knowledge/mappings/asvs-component-mapping.yaml`
-- System model for tech stack detection (local `.osk/system-model/`)
+**Step 1**: Get latest release tag:
+```bash
+gh api repos/Scttpr/OpenSecKit/releases/latest --jq '.tag_name'
+```
+
+**Step 2**: Fetch from OpenSecKit GitHub using the tag:
+
+| Resource | URL |
+|----------|-----|
+| Output template | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/secure/templates/outputs/security-plan.md.tera` |
+| ASVS mapping | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/secure/knowledge/mappings/asvs-component-mapping.yaml` |
+
+**Local resources:**
+- System model for tech stack detection: `.osk/system-model/`
 
 # Process
 

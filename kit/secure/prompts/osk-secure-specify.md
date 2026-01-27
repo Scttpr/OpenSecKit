@@ -36,17 +36,31 @@ Argument required:
 
 # Templates & Knowledge
 
-**Fetch from OpenSecKit GitHub:**
-- Principles: `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/secure/principles.yaml`
-- Threat libraries: `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/secure/knowledge/libraries/threats/`
-  - `api-threats.yaml`, `auth-threats.yaml`, `data-threats.yaml`, `web-threats.yaml`
-- ASVS mapping: `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/secure/knowledge/mappings/asvs-component-mapping.yaml`
-- Output template: `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/secure/templates/outputs/security-spec.md.tera`
-- Risk template: `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/secure/templates/data/risks.yaml.tera`
+**Step 1**: Get latest release tag:
+```bash
+gh api repos/Scttpr/OpenSecKit/releases/latest --jq '.tag_name'
+```
+
+**Step 2**: Fetch from OpenSecKit GitHub using the tag:
+
+| Resource | URL |
+|----------|-----|
+| Principles | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/secure/principles.yaml` |
+| Threat libraries | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/secure/knowledge/libraries/threats/` |
+| - api-threats.yaml | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/secure/knowledge/libraries/threats/api-threats.yaml` |
+| - auth-threats.yaml | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/secure/knowledge/libraries/threats/auth-threats.yaml` |
+| - data-threats.yaml | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/secure/knowledge/libraries/threats/data-threats.yaml` |
+| - web-threats.yaml | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/secure/knowledge/libraries/threats/web-threats.yaml` |
+| ASVS mapping | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/secure/knowledge/mappings/asvs-component-mapping.yaml` |
+| Output template | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/secure/templates/outputs/security-spec.md.tera` |
+| Risk template | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/secure/templates/data/risks.yaml.tera` |
 
 **Schemas:**
-- `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/secure/schemas/security-spec.yaml`
-- `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/secure/schemas/risks.yaml`
+
+| Schema | URL |
+|--------|-----|
+| security-spec.yaml | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/secure/schemas/security-spec.yaml` |
+| risks.yaml | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/secure/schemas/risks.yaml` |
 
 **Optional external enrichment:**
 - MITRE ATT&CK (https://attack.mitre.org/) → technique IDs

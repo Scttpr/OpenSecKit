@@ -144,7 +144,12 @@ ebios_context:
 
 # Knowledge Base
 
-Fetch from OpenSecKit GitHub (`https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/frameworks/rgs/knowledge/`):
+**Step 1**: Get latest release tag:
+```bash
+gh api repos/Scttpr/OpenSecKit/releases/latest --jq '.tag_name'
+```
+
+**Step 2**: Fetch from OpenSecKit GitHub using the tag (`https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/comply/frameworks/rgs/knowledge/`):
 
 | When Assessing | URL | For |
 |----------------|-----|-----|
@@ -768,17 +773,18 @@ Output files:
   - .osk/comply/rgs/system-perimeter.md        # Full system boundary
 ```
 
-Fetch templates from GitHub (base: `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/`):
-- `kit/comply/templates/data/assessment.yaml.tera`
-- `kit/comply/frameworks/rgs/templates/assessment-summary.md.tera`
-- `kit/comply/frameworks/rgs/templates/homologation-checklist.md.tera`
-- `kit/comply/frameworks/rgs/templates/system-perimeter.md.tera`
+Fetch templates from GitHub using the tag (get tag via `gh api repos/Scttpr/OpenSecKit/releases/latest --jq '.tag_name'`):
 
-Combine base URL with each path to fetch.
+| Template | URL |
+|----------|-----|
+| assessment.yaml.tera | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/comply/templates/data/assessment.yaml.tera` |
+| assessment-summary.md.tera | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/comply/frameworks/rgs/templates/assessment-summary.md.tera` |
+| homologation-checklist.md.tera | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/comply/frameworks/rgs/templates/homologation-checklist.md.tera` |
+| system-perimeter.md.tera | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/comply/frameworks/rgs/templates/system-perimeter.md.tera` |
 
 ## Step 9: Terminal Summary
 
-Fetch and use template from GitHub: `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/templates/reports/compliance-summary.tera`
+Fetch and use template from GitHub (using tag from Step 1): `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/comply/templates/reports/compliance-summary.tera`
 
 # Flags
 
@@ -999,7 +1005,7 @@ Blocker check:
 
 **Step 3: Generate Dossier d'Homologation**
 
-Fetch template from GitHub: `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/frameworks/rgs/templates/export-dossier.md.tera`
+Fetch template from GitHub (using tag from Step 1): `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/comply/frameworks/rgs/templates/export-dossier.md.tera`
 
 Output: `.osk/comply/rgs/exports/dossier-homologation-rgs-[date].md`
 

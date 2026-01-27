@@ -55,14 +55,19 @@ Recommended:
 
 # Knowledge Base
 
-Fetch from OpenSecKit GitHub (`https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/frameworks/rgpd/knowledge/`):
+**Step 1**: Get latest release tag:
+```bash
+gh api repos/Scttpr/OpenSecKit/releases/latest --jq '.tag_name'
+```
+
+**Step 2**: Fetch from OpenSecKit GitHub using the tag (`https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/comply/frameworks/rgpd/knowledge/`):
 
 | Topic | URL | Usage |
 |-------|-----|-------|
-| RGPD full text | `reference/rgpd-complet.md` | Art. 30 requirements |
-| AIPD mandatory list | `core/aipd-liste-obligatoire.md` | AIPD trigger detection |
-| Processing register | `core/registre-traitements.md` | Field definitions |
-| Legitimate interest | `core/interet-legitime.md` | Legal basis guidance |
+| RGPD full text | `{tag}/kit/comply/frameworks/rgpd/knowledge/reference/rgpd-complet.md` | Art. 30 requirements |
+| AIPD mandatory list | `{tag}/kit/comply/frameworks/rgpd/knowledge/core/aipd-liste-obligatoire.md` | AIPD trigger detection |
+| Processing register | `{tag}/kit/comply/frameworks/rgpd/knowledge/core/registre-traitements.md` | Field definitions |
+| Legitimate interest | `{tag}/kit/comply/frameworks/rgpd/knowledge/core/interet-legitime.md` | Legal basis guidance |
 
 ---
 

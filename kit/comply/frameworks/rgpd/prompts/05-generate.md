@@ -131,18 +131,23 @@ Ready to generate documents.
 
 # Knowledge Base for Generation
 
-Fetch from OpenSecKit GitHub (`https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/frameworks/rgpd/knowledge/`):
+**Step 1**: Get latest release tag:
+```bash
+gh api repos/Scttpr/OpenSecKit/releases/latest --jq '.tag_name'
+```
+
+**Step 2**: Fetch from OpenSecKit GitHub using the tag (`https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/comply/frameworks/rgpd/knowledge/`):
 
 | Document Type | URL |
 |---------------|-----|
-| Processing Register | `core/registre-traitements.md` |
-| Security Measures | `core/guide-securite.md` (25 fiches CNIL) |
-| DPIA | `core/aipd-modeles.md` |
-| LIA | `core/interet-legitime.md` |
-| Processor Clauses | `core/guide-sous-traitant.md` |
-| Breach Procedure | `core/violations-donnees.md` |
-| Data Subject Rights | `reference/edpb-droit-acces.md` |
-| SCCs | `reference/sccs-2021.md` |
+| Processing Register | `{tag}/kit/comply/frameworks/rgpd/knowledge/core/registre-traitements.md` |
+| Security Measures | `{tag}/kit/comply/frameworks/rgpd/knowledge/core/guide-securite.md` (25 fiches CNIL) |
+| DPIA | `{tag}/kit/comply/frameworks/rgpd/knowledge/core/aipd-modeles.md` |
+| LIA | `{tag}/kit/comply/frameworks/rgpd/knowledge/core/interet-legitime.md` |
+| Processor Clauses | `{tag}/kit/comply/frameworks/rgpd/knowledge/core/guide-sous-traitant.md` |
+| Breach Procedure | `{tag}/kit/comply/frameworks/rgpd/knowledge/core/violations-donnees.md` |
+| Data Subject Rights | `{tag}/kit/comply/frameworks/rgpd/knowledge/reference/edpb-droit-acces.md` |
+| SCCs | `{tag}/kit/comply/frameworks/rgpd/knowledge/reference/sccs-2021.md` |
 
 ---
 
