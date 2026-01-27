@@ -48,7 +48,10 @@ Run an assessment first:
 
 Available frameworks:
 ```
-Then list available frameworks by fetching from GitHub: `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/frameworks/{rgpd,rgs}/framework.yaml`
+
+Then list available frameworks by fetching from GitHub (first get latest tag via `gh api repos/Scttpr/OpenSecKit/releases/latest --jq '.tag_name'`):
+- `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/comply/frameworks/rgpd/framework.yaml`
+- `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/comply/frameworks/rgs/framework.yaml`
 
 # Process
 
@@ -233,10 +236,19 @@ Contents:
 
 # Templates
 
-**Load from:**
-- Assessment files from `.osk/comply/assessment-*.yaml` (local)
-- Framework definitions from GitHub: `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/frameworks/{rgpd,rgs}/framework.yaml`
-- Cross-framework mappings from framework files (GitHub)
+**Step 1**: Get latest release tag:
+```bash
+gh api repos/Scttpr/OpenSecKit/releases/latest --jq '.tag_name'
+```
+
+**Step 2**: Load from:
+
+| Resource | Location |
+|----------|----------|
+| Assessment files | `.osk/comply/assessment-*.yaml` (local) |
+| RGPD framework | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/comply/frameworks/rgpd/framework.yaml` |
+| RGS framework | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/comply/frameworks/rgs/framework.yaml` |
+| Cross-framework mappings | From framework files (GitHub) |
 
 # Output
 

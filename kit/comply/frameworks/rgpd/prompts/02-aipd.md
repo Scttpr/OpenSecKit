@@ -37,14 +37,19 @@ This is **Phase 2: AIPD/DPIA** of the RGPD compliance workflow.
 
 # Knowledge Base
 
-Fetch from OpenSecKit GitHub (`https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/frameworks/rgpd/knowledge/`):
+**Step 1**: Get latest release tag:
+```bash
+gh api repos/Scttpr/OpenSecKit/releases/latest --jq '.tag_name'
+```
+
+**Step 2**: Fetch from OpenSecKit GitHub using the tag (`https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/comply/frameworks/rgpd/knowledge/`):
 
 | Topic | URL | Usage |
 |-------|-----|-------|
-| PIA templates | `core/aipd-modeles.md` | Forms and checklists |
-| Mandatory list | `core/aipd-liste-obligatoire.md` | AIPD triggers |
-| Security measures | `core/guide-securite.md` | Control evaluation |
-| RGPD full text | `reference/rgpd-complet.md` | Article references |
+| PIA templates | `{tag}/kit/comply/frameworks/rgpd/knowledge/core/aipd-modeles.md` | Forms and checklists |
+| Mandatory list | `{tag}/kit/comply/frameworks/rgpd/knowledge/core/aipd-liste-obligatoire.md` | AIPD triggers |
+| Security measures | `{tag}/kit/comply/frameworks/rgpd/knowledge/core/guide-securite.md` | Control evaluation |
+| RGPD full text | `{tag}/kit/comply/frameworks/rgpd/knowledge/reference/rgpd-complet.md` | Article references |
 
 ---
 

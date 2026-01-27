@@ -19,9 +19,17 @@ This command lists all compliance frameworks available in OpenSecKit by fetching
 
 ## Phase 1: Fetch Frameworks
 
-Fetch framework definitions from GitHub:
-- `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/frameworks/rgpd/framework.yaml`
-- `https://raw.githubusercontent.com/Scttpr/OpenSecKit/main/kit/comply/frameworks/rgs/framework.yaml`
+**Step 1**: Get latest release tag:
+```bash
+gh api repos/Scttpr/OpenSecKit/releases/latest --jq '.tag_name'
+```
+
+**Step 2**: Fetch framework definitions from GitHub using the tag:
+
+| Framework | URL |
+|-----------|-----|
+| RGPD | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/comply/frameworks/rgpd/framework.yaml` |
+| RGS | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/comply/frameworks/rgs/framework.yaml` |
 
 Available frameworks: `rgpd`, `rgs`
 

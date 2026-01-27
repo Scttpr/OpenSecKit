@@ -613,6 +613,24 @@ runbook:
 
 ## Output Generation
 
+### Templates
+
+**Fetch YAML templates from latest release before generating outputs.**
+
+**Step 1**: Get latest release tag:
+```bash
+gh api repos/Scttpr/OpenSecKit/releases/latest --jq '.tag_name'
+```
+
+**Step 2**: Fetch templates using the tag:
+
+| Output | Template URL |
+|--------|--------------|
+| `controls.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/discover/templates/data/controls.yaml.tera` |
+| `tooling.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/discover/templates/data/tooling.yaml.tera` |
+| `team.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/discover/templates/data/team.yaml.tera` |
+| `operations.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/discover/templates/data/operations.yaml.tera` |
+
 Generate the following files:
 
 ### controls.yaml

@@ -260,6 +260,25 @@ Technical KPIs:
 
 ## Output Generation
 
+### Templates
+
+**Fetch YAML templates from latest release before generating outputs.**
+
+**Step 1**: Get latest release tag:
+```bash
+gh api repos/Scttpr/OpenSecKit/releases/latest --jq '.tag_name'
+```
+
+**Step 2**: Fetch templates using the tag:
+
+| Output | Template URL |
+|--------|--------------|
+| `product.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/discover/templates/data/product.yaml.tera` |
+| `business.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/discover/templates/data/business.yaml.tera` |
+| `glossary.yaml` | `https://raw.githubusercontent.com/Scttpr/OpenSecKit/{tag}/kit/discover/templates/data/glossary.yaml.tera` |
+
+Use template structure as the authoritative schema. The examples below show key fields.
+
 ### Generate product.yaml
 
 ```yaml
