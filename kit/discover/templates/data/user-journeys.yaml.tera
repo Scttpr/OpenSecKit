@@ -4,6 +4,14 @@
 # Purpose: Document user flows, personas, and touchpoints
 #
 # Audiences: PMs, UX Designers, Developers, QA
+#
+# ┌─────────────────────────────────────────────────────────────────────────────┐
+# │ OWNS: UX personas, user journeys, touchpoints                               │
+# │                                                                             │
+# │ REFERENCE (do not duplicate):                                               │
+# │   - System permissions → actors.yaml                                        │
+# │   - Business processes → business.yaml                                      │
+# └─────────────────────────────────────────────────────────────────────────────┘
 
 metadata:
   section: "user_journeys"
